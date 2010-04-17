@@ -1,4 +1,4 @@
-<?
+<?php
 require_once(dirname(__FILE__).'/client/facebook.php');
 
 class FacebookAuthenticationModule implements IAuthenticationModule
@@ -32,14 +32,14 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 	public function renderLoginForm($action)
 	{
 		?>
-		<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/en_US" type="text/javascript"></script><script type="text/javascript">FB.init("<?=$this->api_key?>", "<?=UserConfig::$USERSROOTURL; ?>/modules/facebook/xd_receiver.htm");</script>
+		<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/en_US" type="text/javascript"></script><script type="text/javascript">FB.init("<?php echo $this->api_key?>", "<?php echo UserConfig::$USERSROOTURL; ?>/modules/facebook/xd_receiver.htm");</script>
 
-		<form action="<?=$action?>" method="POST" name="facebookloginform">
+		<form action="<?php echo $action?>" method="POST" name="facebookloginform">
 		<input type="hidden" name="login" value="Login &gt;&gt;&gt;"/>
 		</form>
 
-		<a href="#" onclick="FB.Connect.requireSession(function() {document.facebookloginform.submit()}); return false;"><span style="background-image: url(<?=UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); background-position: 0px -22px; width: 198px; height: 22px; display: block; cursor: hand;" title="Login with Facebook Connect"></span></a>
-		<?
+		<a href="#" onclick="FB.Connect.requireSession(function() {document.facebookloginform.submit()}); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); background-position: 0px -22px; width: 198px; height: 22px; display: block; cursor: hand;" title="Login with Facebook Connect"></span></a>
+		<?php
 	}
 
 	public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null)
@@ -52,17 +52,17 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 		if (!$this->headersLoaded)
 		{
 			?>
-			<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/en_US" type="text/javascript"></script><script type="text/javascript">FB.init("<?=$this->api_key?>", "<?=UserConfig::$USERSROOTURL; ?>/modules/facebook/xd_receiver.htm");</script>
+			<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/en_US" type="text/javascript"></script><script type="text/javascript">FB.init("<?php echo $this->api_key?>", "<?php echo UserConfig::$USERSROOTURL; ?>/modules/facebook/xd_receiver.htm");</script>
 
-			<form action="<?=$action?>" method="POST" name="facebookregform">
+			<form action="<?php echo $action?>" method="POST" name="facebookregform">
 			<input type="hidden" name="register" value="Register &gt;&gt;&gt;"/>
 			</form>
-			<?
+			<?php
 			$this->headersLoaded = true;
 		}
 		?>
-		<a href="#" onclick="FB.Connect.requireSession(function() {document.facebookregform.submit()}); return false;"><span style="background-image: url(<?=UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); background-position: 0px 0px; width: 250px; height: 22px; display: block; cursor: hand;" title="Quick Sign-up using Facebook Connect"></span></a>
-		<?
+		<a href="#" onclick="FB.Connect.requireSession(function() {document.facebookregform.submit()}); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); background-position: 0px 0px; width: 250px; height: 22px; display: block; cursor: hand;" title="Quick Sign-up using Facebook Connect"></span></a>
+		<?php
 	}
 
 	/*
@@ -77,30 +77,30 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 	public function renderEditUserForm($action, $errors, $user, $data)
 	{
 		?>
-		<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/en_US" type="text/javascript"></script><script type="text/javascript">FB.init("<?=$this->api_key?>", "<?=UserConfig::$USERSROOTURL; ?>/modules/facebook/xd_receiver.htm");</script><?
+		<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/en_US" type="text/javascript"></script><script type="text/javascript">FB.init("<?php echo $this->api_key?>", "<?php echo UserConfig::$USERSROOTURL; ?>/modules/facebook/xd_receiver.htm");</script><?php
 		if (is_null($user->getFacebookID())) {
 			?>
-			<a href="#" onclick="FB.Connect.requireSession(function() {document.facebookusereditform.submit()}); return false;"><span style="background-image: url(<?=UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); background-position: 0px -44px; width: 230px; height: 22px; display: block; cursor: hand;" title="Connect to your Facebook account"></span></a>
-			<form action="<?=$action?>" method="POST" name="facebookusereditform">
+			<a href="#" onclick="FB.Connect.requireSession(function() {document.facebookusereditform.submit()}); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); background-position: 0px -44px; width: 230px; height: 22px; display: block; cursor: hand;" title="Connect to your Facebook account"></span></a>
+			<form action="<?php echo $action?>" method="POST" name="facebookusereditform">
 			<input type="hidden" name="save" value="Save &gt;&gt;&gt;"/>
 			</form>
-			<?
+			<?php
 		}
 		else
 		{
 		?>
 			<table><tr>
-			<td rowspan="2"><fb:profile-pic uid="<?=$user->getFacebookID(); ?>" linked="true" size="square" facebook-logo="true" linked="true"/></td>
-			<td><fb:name uid="<?=$user->getFacebookID(); ?>" useyou="false"/></td>
+			<td rowspan="2"><fb:profile-pic uid="<?php echo $user->getFacebookID(); ?>" linked="true" size="square" facebook-logo="true" linked="true"/></td>
+			<td><fb:name uid="<?php echo $user->getFacebookID(); ?>" useyou="false"/></td>
 			</tr><tr>
 			<td>
-			<form action="<?=$action?>" method="POST" name="facebookusereditform">
+			<form action="<?php echo $action?>" method="POST" name="facebookusereditform">
 			<input type="hidden" name="save" value="Save &gt;&gt;&gt;"/>
 			<input type="submit" name="remove" value="remove" style="font-size: xx-small"/>
 			</form>
 			</td>
 			</tr></table>
-		<?
+		<?php
 		}
 	}
 

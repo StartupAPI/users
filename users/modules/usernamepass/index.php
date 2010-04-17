@@ -1,4 +1,4 @@
-<?
+<?php
 class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 {
 	public function getID()
@@ -14,32 +14,32 @@ class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 	public function renderLoginForm($action)
 	{
 		?>
-		<form action="<?=$action?>" method="POST">
+		<form action="<?php echo $action?>" method="POST">
 		<table>
 		<tr><td>Username</td><td><input name="username" type="text" size="25" maxlength="25"/></td></tr>
 		<tr><td>Password</td><td><input name="pass" type="password" size="25" autocomplete="off"/></td></tr>
-		<? if (UserConfig::$allowRememberMe) {?><tr><td></td><td><input type="checkbox" name="remember" value="yes" id="remember"/><label for="remember">remember me</a></td></tr> <?}?>
-		<tr><td></td><td><input type="submit" name="login" value="Log in &gt;&gt;&gt;"/><? if (UserConfig::$enableRegistration) {?> <a href="<?=UserConfig::$USERSROOTURL?>/register.php">or register</a><? } ?></td></tr>
-		<tr><td></td><td><a style="font-size: smaller" href="<?=UserConfig::$USERSROOTURL?>/modules/usernamepass/forgotpassword.php">Forgot password?</a></td></tr>
+		<?php if (UserConfig::$allowRememberMe) {?><tr><td></td><td><input type="checkbox" name="remember" value="yes" id="remember"/><label for="remember">remember me</a></td></tr> <?php }?>
+		<tr><td></td><td><input type="submit" name="login" value="Log in &gt;&gt;&gt;"/><?php if (UserConfig::$enableRegistration) {?> <a href="<?php echo UserConfig::$USERSROOTURL?>/register.php">or register</a><?php } ?></td></tr>
+		<tr><td></td><td><a style="font-size: smaller" href="<?php echo UserConfig::$USERSROOTURL?>/modules/usernamepass/forgotpassword.php">Forgot password?</a></td></tr>
 		</table>
 		</form>
-		<?
+		<?php
 	}
 
 	public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null)
 	{
 		?>
-		<form action="<?=$action?>" method="POST">
+		<form action="<?php echo $action?>" method="POST">
 		<table>
-		<tr><td>Username</td><td><input name="username" type="text" size="25" maxlength="25" value="<?=array_key_exists('username', $data) ? htmlentities($data['username']) : ''?>"/><?=array_key_exists('username', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['username'])).'">*</span>' : ''?></td></tr>
-		<tr><td>Password</td><td><input name="pass" type="password" size="25" autocomplete="off"/><?=array_key_exists('pass', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['pass'])).'">*</span>' : ''?></td></tr>
-		<tr><td>Repeat password</td><td><input name="repeatpass" type="password" size="25" autocomplete="off"/><?=array_key_exists('repeatpass', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['repeatpass'])).'">*</span>' : ''?></td></tr>
-		<tr><td>Name</td><td><input name="name" type="test" size="25" value="<?=array_key_exists('name', $data) ? htmlentities($data['name']) : ''?>"/><?=array_key_exists('name', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['name'])).'">*</span>' : ''?></td></tr>
-		<tr><td>E-mail</td><td><input name="email" type="text" size="25" value="<?=array_key_exists('email', $data) ? htmlentities($data['email']) : ''?>"/><?=array_key_exists('email', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['email'])).'">*</span>' : ''?></td></tr>
-		<tr><td></td><td><input type="submit" name="register" value="Register &gt;&gt;&gt;"/> <a href="<?=UserConfig::$USERSROOTURL?>/login.php">or login here</a></td></tr>
+		<tr><td>Username</td><td><input name="username" type="text" size="25" maxlength="25" value="<?php echo array_key_exists('username', $data) ? htmlentities($data['username']) : ''?>"/><?php echo array_key_exists('username', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['username'])).'">*</span>' : ''?></td></tr>
+		<tr><td>Password</td><td><input name="pass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('pass', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['pass'])).'">*</span>' : ''?></td></tr>
+		<tr><td>Repeat password</td><td><input name="repeatpass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('repeatpass', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['repeatpass'])).'">*</span>' : ''?></td></tr>
+		<tr><td>Name</td><td><input name="name" type="test" size="25" value="<?php echo array_key_exists('name', $data) ? htmlentities($data['name']) : ''?>"/><?php echo array_key_exists('name', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['name'])).'">*</span>' : ''?></td></tr>
+		<tr><td>E-mail</td><td><input name="email" type="text" size="25" value="<?php echo array_key_exists('email', $data) ? htmlentities($data['email']) : ''?>"/><?php echo array_key_exists('email', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['email'])).'">*</span>' : ''?></td></tr>
+		<tr><td></td><td><input type="submit" name="register" value="Register &gt;&gt;&gt;"/> <a href="<?php echo UserConfig::$USERSROOTURL?>/login.php">or login here</a></td></tr>
 		</table>
 		</form>
-		<?
+		<?php
 	}
 
 	/*
@@ -54,33 +54,33 @@ class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 	public function renderEditUserForm($action, $errors, $user, $data)
 	{
 		?>
-		<form action="<?=$action?>" method="POST">
+		<form action="<?php echo $action?>" method="POST">
 		<table>
-		<?
+		<?php
 		$username = $user->getUsername();
 
 		if (is_null($username)) {
 		?>
-		<tr><td>Username</td><td><input name="username" type="text" size="25" maxlength="25" value="<?=array_key_exists('username', $data) ? htmlentities($data['username']) : ''?>"/><?=array_key_exists('username', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['username'])).'">*</span>' : ''?></td></tr>
-		<?}
+		<tr><td>Username</td><td><input name="username" type="text" size="25" maxlength="25" value="<?php echo array_key_exists('username', $data) ? htmlentities($data['username']) : ''?>"/><?php echo array_key_exists('username', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['username'])).'">*</span>' : ''?></td></tr>
+		<?php}
 		else
 		{?>
-		<tr><td>Username</td><td><b title="Sorry, you can't change your username">&nbsp;<?=htmlentities($username)?></b></td></tr>
-		<?}?>
+		<tr><td>Username</td><td><b title="Sorry, you can't change your username">&nbsp;<?php echo htmlentities($username)?></b></td></tr>
+		<?php }?>
 		<tr><td colspan="2" style="padding-top: 1em; font-weight: bold">Name and email</td></tr>
-		<tr><td>Name</td><td><input name="name" type="test" size="40" value="<?=htmlentities(array_key_exists('name', $data) ? $data['name'] : $user->getName())?>"/><?=array_key_exists('name', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['name'])).'">*</span>' : ''?></td></tr>
-		<tr><td>E-mail</td><td><input name="email" type="text" size="40" value="<?=htmlentities(array_key_exists('email', $data) ? $data['email'] : $user->getEmail())?>"/><?=array_key_exists('email', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['email'])).'">*</span>' : ''?></td></tr>
+		<tr><td>Name</td><td><input name="name" type="test" size="40" value="<?php echo htmlentities(array_key_exists('name', $data) ? $data['name'] : $user->getName())?>"/><?php echo array_key_exists('name', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['name'])).'">*</span>' : ''?></td></tr>
+		<tr><td>E-mail</td><td><input name="email" type="text" size="40" value="<?php echo htmlentities(array_key_exists('email', $data) ? $data['email'] : $user->getEmail())?>"/><?php echo array_key_exists('email', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['email'])).'">*</span>' : ''?></td></tr>
 
 		<tr><td colspan="2" style="padding-top: 1em; font-weight: bold">Change password</td></tr>
-		<? if (!is_null($user->getUsername())) {?>
-		<tr><td>Current password</td><td><input name="currentpass" type="password" size="25" autocomplete="off"/><?=array_key_exists('currentpass', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['currentpass'])).'">*</span>' : ''?></td></tr>
-		<? } ?>
-		<tr><td><? if (is_null($user->getUsername())) {?>Set a<? } else {?>New<?} ?> password</td><td><input name="pass" type="password" size="25" autocomplete="off"/><?=array_key_exists('pass', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['pass'])).'">*</span>' : ''?></td></tr>
-		<tr><td>Repeat new password</td><td><input name="repeatpass" type="password" size="25" autocomplete="off"/><?=array_key_exists('repeatpass', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['repeatpass'])).'">*</span>' : ''?></td></tr>
+		<?php if (!is_null($user->getUsername())) {?>
+		<tr><td>Current password</td><td><input name="currentpass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('currentpass', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['currentpass'])).'">*</span>' : ''?></td></tr>
+		<?php } ?>
+		<tr><td><?php if (is_null($user->getUsername())) {?>Set a<?php } else {?>New<?php } ?> password</td><td><input name="pass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('pass', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['pass'])).'">*</span>' : ''?></td></tr>
+		<tr><td>Repeat new password</td><td><input name="repeatpass" type="password" size="25" autocomplete="off"/><?php array_key_exists('repeatpass', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['repeatpass'])).'">*</span>' : ''?></td></tr>
 		<tr><td></td><td><input type="submit" name="save" value="Save &gt;&gt;&gt;"/></td></tr>
 		</table>
 		</form>
-		<?
+		<?php
 	}
 
 	public function processLogin($data)

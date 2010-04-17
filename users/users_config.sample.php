@@ -1,4 +1,4 @@
-<?
+<?php
 #require_once('users/modules/facebook/index.php');
 #UserConfig::$modules[] = new FacebookAuthenticationModule('...................', '......................');
 

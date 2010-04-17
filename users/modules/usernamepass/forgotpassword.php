@@ -1,4 +1,4 @@
-<?
+<?php
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 
 require_once(dirname(dirname(dirname(__FILE__))).'/User.php');
@@ -52,9 +52,9 @@ if (array_key_exists('status', $_GET) && $_GET['status'] == 'sent')
 ?>
 	<h1>Temporary password is sent</h1>
 	<p>We generated temporary password and sent it to email address on file with your account.</p>
-	<p>This password is only valid for one day, so please check your mail and come back to <a href="<?=UserConfig::$USERSROOTURL.'/login.php'?>" style="font-weight: bold; text-decoration: underline">log in</a>.</p>
+	<p>This password is only valid for one day, so please check your mail and come back to <a href="<?php echo UserConfig::$USERSROOTURL.'/login.php'?>" style="font-weight: bold; text-decoration: underline">log in</a>.</p>
 	<p>Once you're logged in, you will be asked to reset your password.</p>
-<?
+<?php
 }
 else
 {
@@ -67,6 +67,6 @@ else
 
 	<p>Email with temporary password will be sent to email address associated with your user account.</p>
 	</form>
-	</div><?
+	</div><?php
 }
 require_once(UserConfig::$footer);

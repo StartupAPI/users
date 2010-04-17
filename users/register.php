@@ -1,4 +1,4 @@
-<?
+<?php
 require_once(dirname(__FILE__).'/config.php');
 
 require_once(dirname(__FILE__).'/User.php');
@@ -86,7 +86,7 @@ if (UserConfig::$enableRegistration && array_key_exists('register', $_POST))
 require_once(UserConfig::$header);
 
 ?><h1>Sign up</h1>
-<div style="background: white; padding: 1em"><?
+<div style="background: white; padding: 1em"><?php
 
 if (UserConfig::$enableRegistration)
 {
@@ -103,9 +103,9 @@ if (UserConfig::$enableRegistration)
 			{
 				?><p>Invitation code you entered is not valid.</p>
 				<form action="" method="GET">
-				<input name="invite" size="10" value="<?=htmlentities($_GET['invite'])?>"/><input type="submit" value="&gt;&gt;"/>
+				<input name="invite" size="10" value="<?php echo htmlentities($_GET['invite'])?>"/><input type="submit" value="&gt;&gt;"/>
 				</form>
-				<?
+				<?php
 				$show_registration_form = false;
 			}
 			else
@@ -115,11 +115,11 @@ if (UserConfig::$enableRegistration)
 		}
 		else
 		{
-			?><p><?=UserConfig::$invitationRequiredMessage?></p>
+			?><p><?php echo UserConfig::$invitationRequiredMessage?></p>
 			<form action="" method="GET">
 			<input name="invite" size="10"/><input type="submit" value="&gt;&gt;"/>
 			</form>
-			<?
+			<?php
 			$show_registration_form = false;
 		}
 	}
@@ -132,34 +132,34 @@ if (UserConfig::$enableRegistration)
 
 			?>
 			<div style="margin-bottom: 2em">
-			<h2 name="<?=$id?>"><?=$module->getTitle()?></h2>
-		<?
+			<h2 name="<?php echo $id?>"><?php echo $module->getTitle()?></h2>
+		<?php
 			if (array_key_exists($id, $errors) && is_array($errors[$id]) && count($errors[$id]) > 0)
 			{
-				?><div style="border: 1px solid black; padding: 0.5em; background: #FFFBCF; margin-bottom: 1em; max-width: 25em"><ul><?
+				?><div style="border: 1px solid black; padding: 0.5em; background: #FFFBCF; margin-bottom: 1em; max-width: 25em"><ul><?php
 				foreach ($errors[$id] as $field => $errorset)
 				{
 					foreach ($errorset as $error)
 					{
-						?><li><?=$error?></li><?
+						?><li><?php echo $error?></li><?php
 					}
 				}
-				?></ul></div><?
+				?></ul></div><?php
 			}
 
 			$module->renderRegistrationForm(true, "?module=$id&invite=".(is_null($invitation_used) ? '' : $invitation_used->getCode()), array_key_exists($id, $errors) ? $errors[$id] : array(), $_POST);
 			?></div>
-<?
+<?php
 		}
 	}
 }
 else
 {
 ?>
-	<p><?=UserConfig::$registrationDisabledMessage?></p>
+	<p><?php echo UserConfig::$registrationDisabledMessage?></p>
 
-	<p>If you already have an account, you can <a href="<?=UserConfig::$USERSROOTURL?>/login.php">log in here</a>.</p>
-<?
+	<p>If you already have an account, you can <a href="<?php echo UserConfig::$USERSROOTURL?>/login.php">log in here</a>.</p>
+<?php
 }
-?></div><?
+?></div><?php
 require_once(UserConfig::$footer);

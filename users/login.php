@@ -1,4 +1,4 @@
-<?
+<?php
 require_once(dirname(__FILE__).'/config.php');
 
 require_once(dirname(__FILE__).'/User.php');
@@ -40,7 +40,7 @@ if (array_key_exists('login', $_POST))
 
 require_once(UserConfig::$header);
 
-?><h1>Log in</h1><div style="background: white; padding: 1em"><?
+?><h1>Log in</h1><div style="background: white; padding: 1em"><?php
 
 foreach (UserConfig::$modules as $module)
 {
@@ -48,17 +48,17 @@ foreach (UserConfig::$modules as $module)
 
 	?>
 	<div style="margin-bottom: 2em">
-	<h2 name="<?=$id?>"><?=$module->getTitle()?></h2>
-<?
+	<h2 name="<?php echo $id?>"><?php echo $module->getTitle()?></h2>
+<?php
 	if (array_key_exists('module', $_GET) && $id == $_GET['module'] && array_key_exists('error', $_GET))
 	{
-		?><div style="color: red; border: 1px solid black; padding: 10px; margin: 0.5em">Login failed</div><?
+		?><div style="color: red; border: 1px solid black; padding: 10px; margin: 0.5em">Login failed</div><?php
 	}
 
 	$module->renderLoginForm("?module=$id");
 	?></div>
-<?
+<?php
 }
 
-?></div><?
+?></div><?php
 require_once(UserConfig::$footer);

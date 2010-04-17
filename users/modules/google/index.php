@@ -1,4 +1,4 @@
-<?
+<?php
 class GoogleAuthenticationModule implements IAuthenticationModule
 {
 	private $siteid;
@@ -27,7 +27,7 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 		<script>
 		google.setOnLoadCallback(function() {
 			google.friendconnect.container.loadOpenSocialApi({
-				site: '<?=$this->siteid?>',
+				site: '<?php echo $this->siteid?>',
 				onload: function(securityToken) {
 					if (!window.timesloaded) {
 						window.timesloaded = 1;
@@ -44,12 +44,12 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 		</script>
 
 		<p>Sign in using your <b>OpenID</b> or an existing account with <b>Google</b>, <b>Twitter</b>, <b>Yahoo!</b> and more.</p>
-		<a href="#" onclick="google.friendconnect.requestSignIn(function() {document.googleloginform.submit()}); return false;"><span style="background-image: url(<?=UserConfig::$USERSROOTURL ?>/modules/google/google-sprite.png); background-position: 0px 0px; width: 152px; height: 21px; display: block; cursor: hand;" title="Log in using existing account via Gogle Friend Connect"></span></a>
+		<a href="#" onclick="google.friendconnect.requestSignIn(function() {document.googleloginform.submit()}); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/google/google-sprite.png); background-position: 0px 0px; width: 152px; height: 21px; display: block; cursor: hand;" title="Log in using existing account via Gogle Friend Connect"></span></a>
 		
-		<form action="<?=$action?>" method="POST" name="googleloginform">
+		<form action="<?php echo $action?>" method="POST" name="googleloginform">
 		<input type="hidden" name="login" value="Login &gt;&gt;&gt;"/>
 		</form>
-		<?
+		<?php
 	}
 
 	public function renderRegistrationForm($full = false, $action = null, $errors = null , $data = null)
@@ -67,7 +67,7 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 			<script>
 			google.setOnLoadCallback(function() {
 				google.friendconnect.container.loadOpenSocialApi({
-					site: '<?=$this->siteid?>',
+					site: '<?php echo $this->siteid?>',
 					onload: function(securityToken) {
 						if (!window.timesloaded) {
 							window.timesloaded = 1;
@@ -83,10 +83,10 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 			});
 			</script>
 
-			<form action="<?=$action?>" method="POST" name="googleregform">
+			<form action="<?php echo $action?>" method="POST" name="googleregform">
 			<input type="hidden" name="register" value="Register &gt;&gt;&gt;"/>
 			</form>
-			<?
+			<?php
 			$this->regHeadersLoaded = true;
 		}
 
@@ -94,11 +94,11 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 		{
 		?>
 			<p>Sign un using your <b>OpenID</b> or an existing account with <b>Google</b>, <b>Twitter</b>, <b>Yahoo!</b> and more.</p>
-		<?
+		<?php
 		}
 		?>
-		<a href="#" onclick="google.friendconnect.requestSignIn(); return false;"><span style="background-image: url(<?=UserConfig::$USERSROOTURL ?>/modules/google/google-sprite.png); background-position: 0px -42px; width: 200px; height: 21px; display: block; cursor: hand;" title="Quick Sign up using existing account via Google Friend Connect"></span></a>
-		<?
+		<a href="#" onclick="google.friendconnect.requestSignIn(); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/google/google-sprite.png); background-position: 0px -42px; width: 200px; height: 21px; display: block; cursor: hand;" title="Quick Sign up using existing account via Google Friend Connect"></span></a>
+		<?php
 	}
 
 	/*
@@ -115,15 +115,15 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 		$associations = $user->getGoogleFriendsConnectAssociations();
 
 		?>
-		<form action="<?=$action?>" method="POST">
+		<form action="<?php echo $action?>" method="POST">
 		<input type="hidden" name="save"value ="save"/>
-		<?
+		<?php
 		foreach ($associations as $association)
 		{
 			?><div style="float: left; margin-right: 1em">
-			<img src="<?=$association['userpic']?>"/><br/>
-			<input type="submit" name="remove[<?=$association['google_id']?>]" value="remove" style="font-size: xx-small"/>
-			</div><?
+			<img src="<?php echo $association['userpic']?>"/><br/>
+			<input type="submit" name="remove[<?php echo $association['google_id']?>]" value="remove" style="font-size: xx-small"/>
+			</div><?php
 		}
 
 		?>
@@ -136,7 +136,7 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 		<script>
 		google.setOnLoadCallback(function() {
 			google.friendconnect.container.loadOpenSocialApi({
-				site: '<?=$this->siteid?>',
+				site: '<?php echo $this->siteid?>',
 				onload: function(securityToken) {
 					if (!window.timesloaded) {
 						window.timesloaded = 1;
@@ -152,12 +152,12 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 		});
 		</script>
 		<p>Connect to your <b>OpenID</b> or existing account with <b>Google</b>, <b>Twitter</b>, <b>Yahoo!</b> and more.</p>
-		<a href="#" onclick="google.friendconnect.requestSignIn(function() {document.googleeditform.submit()}); return false;"><span style="background-image: url(<?=UserConfig::$USERSROOTURL ?>/modules/google/google-sprite.png); background-position: 0px -21px; width: 218px; height: 21px; display: block; cursor: hand;" title="Connect to another account via Google Friend Connect"></span></a>
+		<a href="#" onclick="google.friendconnect.requestSignIn(function() {document.googleeditform.submit()}); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/google/google-sprite.png); background-position: 0px -21px; width: 218px; height: 21px; display: block; cursor: hand;" title="Connect to another account via Google Friend Connect"></span></a>
 
-		<form action="<?=$action?>" method="POST" name="googleeditform">
+		<form action="<?php echo $action?>" method="POST" name="googleeditform">
 		<input type="hidden" name="save" value="Save &gt;&gt;&gt;"/>
 		</form>
-		<?
+		<?php
 	}
 
 	public function processLogin($data)

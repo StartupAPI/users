@@ -1,4 +1,4 @@
-<?
+<?php
 $_styles = array (
 	'http://yui.yahooapis.com/2.7.0/build/button/assets/skins/sam/button.css',
 	'http://yui.yahooapis.com/2.7.0/build/container/assets/skins/sam/container.css'
@@ -59,7 +59,7 @@ YAHOO.util.Event.onDOMReady(function() {
 
 <h1><a href="./">Users</a> | Invitations</h1><div style="background: white; padding: 1em">
 <h2>Unsent Invitations</h2>
-<?
+<?php
 $invitations = Invitation::getUnsent();
 
 if (count($invitations) == 0)
@@ -69,29 +69,29 @@ if (count($invitations) == 0)
 Generate <input name="add" size="4" value="5"> more <input type="submit" value="&gt;&gt;">
 </form>
 </div>
-<?
+<?php
 }
 else
 {
 ?>
 <form action="" method="POST">
 <table cellpadding="5" cellspacing="0" border="1" width="100%">
-<tr><th>Code</th><th>By</th><th>Sent To</th><? if (!is_null(UserConfig::$onRenderUserInvitationAction)) {?><th>Actions</th><?}?></tr>
-<?
+<tr><th>Code</th><th>By</th><th>Sent To</th><?php if (!is_null(UserConfig::$onRenderUserInvitationAction)) {?><th>Actions</th><?php }?></tr>
+<?php
 	foreach ($invitations as $invitation)
 	{
 		$code = $invitation->getCode();
-		?><tr><td><?=htmlentities($code)?></td><td><?=htmlentities(User::getUser($invitation->getIssuer())->getUserName())?></td><td><input name="code_<?=htmlentities($invitation->getCode())?>" value="" style="width: 100%"></td><?
+		?><tr><td><?php echo htmlentities($code)?></td><td><?php echo htmlentities(User::getUser($invitation->getIssuer())->getUserName())?></td><td><input name="code_<?php echo htmlentities($invitation->getCode())?>" value="" style="width: 100%"></td><?php
 
 		if (!is_null(UserConfig::$onRenderUserInvitationAction))
 		{
-			?><td><?
+			?><td><?php
 			error_log(UserConfig::$onRenderUserInvitationAction.'($code);');
 			eval(UserConfig::$onRenderUserInvitationAction.'($code);');
-			?></td><?
+			?></td><?php
 		}
 
-		?></tr><?
+		?></tr><?php
 	}
 ?>
 <tr><td colspan="2"></td>
@@ -99,7 +99,7 @@ else
 <td></td></tr>
 </table>
 </form>
-<?
+<?php
 }
 
 $invitations = Invitation::getSent();
@@ -109,29 +109,29 @@ if (count($invitations) > 0)
 ?>
 <h2>Sent Invitations</h2>
 <table cellpadding="5" cellspacing="0" border="1" width="100%">
-<tr><th>Code</th><th>By</th><th>Sent To</th><? if (!is_null(UserConfig::$onRenderUserInvitationFollowUpAction)) {?><th>Actions</th><?}?></tr>
-<?
+<tr><th>Code</th><th>By</th><th>Sent To</th><?php if (!is_null(UserConfig::$onRenderUserInvitationFollowUpAction)) {?><th>Actions</th><?php }?></tr>
+<?php
 	foreach ($invitations as $invitation)
 	{
 		$code = $invitation->getCode();
 		$comment = $invitation->getComment();
 
-		?><tr><td><?=htmlentities($code)?></td><td><?=htmlentities(User::getUser($invitation->getIssuer())->getUserName())?></td><td><?=htmlentities($comment)?></td><?
+		?><tr><td><?php echo htmlentities($code)?></td><td><?php echo htmlentities(User::getUser($invitation->getIssuer())->getUserName())?></td><td><?php echo htmlentities($comment)?></td><?php
 
 		if (!is_null(UserConfig::$onRenderUserInvitationFollowUpAction))
 		{
-			?><td><?
+			?><td><?php
 			eval(UserConfig::$onRenderUserInvitationFollowUpAction.'($code, $comment);');
-			?></td><?
+			?></td><?php
 		}
 
-		?></tr><?
+		?></tr><?php
 	}
 }
 ?>
 </table>
 
-<?
+<?php
 $invitations = Invitation::getAccepted();
 
 if (count($invitations) > 0)
@@ -140,14 +140,14 @@ if (count($invitations) > 0)
 <h2>Accepted Invitations</h2>
 <table cellpadding="5" cellspacing="0" border="1" width="100%">
 <tr><th>Code</th><th>By</th><th>Sent To</th><th>User</th></tr>
-<?
+<?php
 	foreach ($invitations as $invitation)
 	{
-		?><tr><td><?=htmlentities($invitation->getCode())?></td><td><?=htmlentities(User::getUser($invitation->getIssuer())->getUserName())?></td><td><?=htmlentities($invitation->getComment())?></td><td><?=htmlentities($invitation->getUser()->getUserName())?></td></tr><?
+		?><tr><td><?php echo htmlentities($invitation->getCode())?></td><td><?php echo htmlentities(User::getUser($invitation->getIssuer())->getUserName())?></td><td><?php echo htmlentities($invitation->getComment())?></td><td><?php echo htmlentities($invitation->getUser()->getUserName())?></td></tr><?php
 	}
 }
 ?>
 </table>
 
-</div><?
+</div><?php
 require_once(UserConfig::$footer);
