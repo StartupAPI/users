@@ -1,4 +1,27 @@
 --
+-- Table structure for table `u_users`
+--
+
+DROP TABLE IF EXISTS `u_users`;
+CREATE TABLE `u_users` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `regtime` timestamp NOT NULL default CURRENT_TIMESTAMP COMMENT 'Time of registration',
+  `name` text NOT NULL,
+  `username` varchar(25) default NULL,
+  `email` varchar(320) default NULL,
+  `pass` varchar(40) NOT NULL COMMENT 'Password digest',
+  `salt` varchar(13) NOT NULL COMMENT 'Salt',
+  `temppass` varchar(13) default NULL COMMENT 'Temporary password used for password recovery',
+  `temppasstime` timestamp NULL default NULL COMMENT 'Temporary password generation time',
+  `requirespassreset` tinyint(1) NOT NULL default '0' COMMENT 'Flag indicating that user must reset their password before using the site',
+  `fb_id` bigint(20) unsigned default NULL COMMENT 'Facebook user ID',
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `fb_id` (`fb_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
 -- Table structure for table `u_googlefriendconnect`
 --
 
@@ -52,25 +75,3 @@ CREATE TABLE `u_oid_nonces` (
   UNIQUE KEY `server_url` (`server_url`(255),`timestamp`,`salt`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `u_users`
---
-
-DROP TABLE IF EXISTS `u_users`;
-CREATE TABLE `u_users` (
-  `id` int(10) unsigned NOT NULL auto_increment,
-  `regtime` timestamp NOT NULL default CURRENT_TIMESTAMP COMMENT 'Time of registration',
-  `name` text NOT NULL,
-  `username` varchar(25) default NULL,
-  `email` varchar(320) default NULL,
-  `pass` varchar(40) NOT NULL COMMENT 'Password digest',
-  `salt` varchar(13) NOT NULL COMMENT 'Salt',
-  `temppass` varchar(13) default NULL COMMENT 'Temporary password used for password recovery',
-  `temppasstime` timestamp NULL default NULL COMMENT 'Temporary password generation time',
-  `requirespassreset` tinyint(1) NOT NULL default '0' COMMENT 'Flag indicating that user must reset their password before using the site',
-  `fb_id` bigint(20) unsigned default NULL COMMENT 'Facebook user ID',
-  PRIMARY KEY  (`id`),
-  UNIQUE KEY `username` (`username`),
-  UNIQUE KEY `email` (`email`),
-  UNIQUE KEY `fb_id` (`fb_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
