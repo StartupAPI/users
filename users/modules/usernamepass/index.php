@@ -62,7 +62,7 @@ class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 		if (is_null($username)) {
 		?>
 		<tr><td>Username</td><td><input name="username" type="text" size="25" maxlength="25" value="<?php echo array_key_exists('username', $data) ? htmlentities($data['username']) : ''?>"/><?php echo array_key_exists('username', $errors) ? ' <span style="color:red" title="'.htmlentities(implode("\n", $errors['username'])).'">*</span>' : ''?></td></tr>
-		<?php}
+		<?php }
 		else
 		{?>
 		<tr><td>Username</td><td><b title="Sorry, you can't change your username">&nbsp;<?php echo htmlentities($username)?></b></td></tr>
