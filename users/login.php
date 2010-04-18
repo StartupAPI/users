@@ -40,7 +40,7 @@ if (array_key_exists('login', $_POST))
 
 require_once(UserConfig::$header);
 
-?><h1>Log in</h1><div style="background: white; padding: 1em"><?php
+?><h1>Log in</h1><div style="background: white; padding: 0 1em"><?php
 
 foreach (UserConfig::$modules as $module)
 {

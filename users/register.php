@@ -86,7 +86,7 @@ if (UserConfig::$enableRegistration && array_key_exists('register', $_POST))
 require_once(UserConfig::$header);
 
 ?><h1>Sign up</h1>
-<div style="background: white; padding: 1em"><?php
+<div style="background: white; padding: 0 1em"><?php
 
 if (UserConfig::$enableRegistration)
 {
