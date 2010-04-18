@@ -61,7 +61,7 @@ foreach (UserConfig::$modules as $module)
 {
 	$id = $module->getID();
 
-	?><div style="background: white; padding: 1em"><h2 name="<?php echo $id?>"><?php echo $module->getTitle()?></h2>
+	?><div style="background: white; padding: 0 1em"><h2 name="<?php echo $id?>"><?php echo $module->getTitle()?></h2>
 <?php
 	if (array_key_exists($id, $errors) && is_array($errors[$id]) && count($errors[$id]) > 0)
 	{
