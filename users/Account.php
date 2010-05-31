@@ -1,5 +1,4 @@
-<?
-
+<?php
 class Account
 {
 	private $id;

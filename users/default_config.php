@@ -1,4 +1,4 @@
-<?
+<?php
 require_once(dirname(__FILE__).'/modules.php');
 
 class UserConfig
@@ -94,12 +94,12 @@ class UserConfig
 
 	public static function renderUserInvitationAction($code)
 	{
-		?><a href="mailto:?Subject=Invitation+to+HowDoable&Body=<?=UserConfig::$SITEROOTURL?>/users/register.php?invite=<?=urlencode($code)?>">Invite</a><?
+		?><a href="mailto:?Subject=Invitation+to+HowDoable&Body=<?php echo UserConfig::$SITEROOTURL?>/users/register.php?invite=<?php echo urlencode($code)?>">Invite</a><?php
 	}
 
 	public static function renderUserInvitationFollowUpAction($code)
 	{
-		?><a href="mailto:?Subject=Re:+Invitation+to+HowDoable&Body=<?=UserConfig::$SITEROOTURL?>/users/register.php?invite=<?=urlencode($code)?>">Follow Up</a><?
+		?><a href="mailto:?Subject=Re:+Invitation+to+HowDoable&Body=<?php echo UserConfig::$SITEROOTURL?>/users/register.php?invite=<?php echo urlencode($code)?>">Follow Up</a><?php
 	}
 
 	public static function renderTemporaryPasswordEmail($baseurl, $username, $temppass )
