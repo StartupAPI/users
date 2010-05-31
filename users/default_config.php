@@ -1,4 +1,4 @@
-<?php
+<?
 require_once(dirname(__FILE__).'/modules.php');
 
 class UserConfig
@@ -62,6 +62,9 @@ class UserConfig
 	// can be set to relatively short, e.g. 2 weeks if needed
 	public static $rememberMeTime = 315360000;
 
+	// use accounts or just users only
+	public static $useAccounts = false;
+
 	/*
 	 * hooks
 	 */
@@ -91,12 +94,12 @@ class UserConfig
 
 	public static function renderUserInvitationAction($code)
 	{
-		?><a href="mailto:?Subject=Invitation+to+HowDoable&Body=<?php echo UserConfig::$SITEROOTURL?>/users/register.php?invite=<?php echo urlencode($code)?>">Invite</a><?php
+		?><a href="mailto:?Subject=Invitation+to+HowDoable&Body=<?=UserConfig::$SITEROOTURL?>/users/register.php?invite=<?=urlencode($code)?>">Invite</a><?
 	}
 
 	public static function renderUserInvitationFollowUpAction($code)
 	{
-		?><a href="mailto:?Subject=Re:+Invitation+to+HowDoable&Body=<?php echo UserConfig::$SITEROOTURL?>/users/register.php?invite=<?php echo urlencode($code)?>">Follow Up</a><?php
+		?><a href="mailto:?Subject=Re:+Invitation+to+HowDoable&Body=<?=UserConfig::$SITEROOTURL?>/users/register.php?invite=<?=urlencode($code)?>">Follow Up</a><?
 	}
 
 	public static function renderTemporaryPasswordEmail($baseurl, $username, $temppass )

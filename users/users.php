@@ -1,4 +1,4 @@
-<?php
+<?
 /*
  * Users.php
  * 
@@ -7,4 +7,5 @@
 require_once(dirname(__FILE__).'/config.php');
 
 require_once(dirname(__FILE__).'/User.php');
+require_once(dirname(__FILE__).'/Account.php');
 

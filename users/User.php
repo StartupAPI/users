@@ -1,4 +1,4 @@
-<?php
+<?
 /*
  * User class
 */
@@ -50,6 +50,42 @@ class User
 		}
 	}
 
+	private function init()
+	{
+		$db = UserConfig::getDB();
+
+		if (UserConfig::$useAccounts) {
+			$userid = $this->getID();
+
+			if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'user_preferences (user_id) VALUES (?)'))
+			{
+				if (!$stmt->bind_param('i', $userid))
+				{
+					throw new Exception("Can't bind parameter");
+				}
+				if (!$stmt->execute())
+				{
+					throw new Exception("Can't update user preferences (set current account)");
+				}
+				$stmt->close();
+			}
+			else
+			{
+				throw new Exception("Can't update user preferences (set current account)");
+			}
+
+			$personal = Account::createAccount('FREE ('.$this->getName().')',
+							Account::PLAN_FREE, $this, Account::ROLE_ADMIN);
+
+			$personal->setAsCurrent($this);
+		}
+
+		if (!is_null(UserConfig::$onCreate))
+		{
+			eval(userConfig::$onCreate.'($this);');
+		}
+	}
+
 	/*
 	 * create new user based on Google Friend Connect info
 	 */
@@ -98,10 +134,7 @@ class User
 			throw new Exception("Can't prepare statement: ".$db->error);
 		}
 
-		if (!is_null(UserConfig::$onCreate))
-		{
-			eval(userConfig::$onCreate.'($user);');
-		}
+		$user->init();
 
 		return $user;
 	}
@@ -135,10 +168,7 @@ class User
 			throw new Exception("Can't prepare statement: ".$db->error);
 		}
 
-		if (!is_null(UserConfig::$onCreate))
-		{
-			eval(userConfig::$onCreate.'($user);');
-		}
+		$user->init();
 
 		return $user;
 	}
@@ -175,10 +205,7 @@ class User
 			throw new Exception("Can't prepare statement: ".$db->error);
 		}
 
-		if (!is_null(UserConfig::$onCreate))
-		{
-			eval(userConfig::$onCreate.'($user);');
-		}
+		$user->init();
 
 		return $user;
 	}
