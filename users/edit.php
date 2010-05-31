@@ -48,7 +48,7 @@ require_once(UserConfig::$header);
 
 ?><h1>Edit Your Information</h1>
 
-<?php if (!is_null(UserConfig::$maillist))
+<?php if (!is_null(UserConfig::$maillist) && file_exists(UserConfig::$maillist))
 {
 ?>
 <div style="float: right; width: 400px">
