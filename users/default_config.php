@@ -63,7 +63,7 @@ class UserConfig
 	public static $rememberMeTime = 315360000;
 
 	// use accounts or just users only
-	public static $useAccounts = false;
+	public static $useAccounts = true;
 
 	/*
 	 * hooks
