@@ -118,7 +118,7 @@ foreach ($users as $user)
 		if (!is_null($creds)) {
 		?>
 		<div><b><?php echo $module->getID() ?>: </b><?php echo $creds ?></div>
-		<?
+		<?php
 		}
 	}
 	?></td><td><?php echo $user->getName()?></td><td><?php echo $user->getEmail()?></td><td><form action="" method="POST"><input type="submit" value="impersonate"/><input type="hidden" name="impersonate" value="<?php echo $user->getID()?>"/></form></td></tr><?php
