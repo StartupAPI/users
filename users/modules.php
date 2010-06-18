@@ -9,6 +9,7 @@ interface IAuthenticationModule
 	public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null);
 	public function processLogin($data);
 	public function processRegistration($data);
+	public function getUserCredentials($user);
 }
 
 class InputValidationException extends Exception {

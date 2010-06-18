@@ -3,6 +3,7 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 {
 	private $siteid;
 	private $regHeadersLoaded = false;
+	private $adminHeaderShown = false;
 
 	public function __construct($siteid)
 	{
@@ -18,6 +19,84 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 	{
 		return "Other accounts using Google Friend Connect";
 	}
+
+	public function getUserCredentials($user)
+	{
+		$db = UserConfig::getDB();
+
+		$userid = $user->getID();
+
+		if ($stmt = $db->prepare('SELECT google_id FROM '.UserConfig::$mysql_prefix.'googlefriendconnect WHERE user_id = ?'))
+		{
+			if (!$stmt->bind_param('i', $userid))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($google_id))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			$google_ids = array();
+			while ($stmt->fetch() === TRUE) {
+				$google_ids[] = $google_id;
+			}
+			$stmt->close();
+
+			if (count($google_ids) > 0)
+			{
+				$creds = '';
+
+				if (!$this->adminHeaderShown) {
+					$creds .= '
+                <script src="http://www.google.com/jsapi"></script>
+                <script src="http://www.google.com/friendconnect/script/friendconnect.js?key=notsupplied&v=0.8"></script>
+                <script>
+                google.setOnLoadCallback(function() {
+                        google.friendconnect.container.loadOpenSocialApi({
+                                site: \''.$this->siteid.'\',
+                                onload: function(securityToken) {
+                                        if (!window.timesloaded) {
+                                                window.timesloaded = 1;
+                                        } else {
+                                                window.timesloaded++;
+                                        }
+
+                                        if (window.timesloaded > 1) {
+                                                document.googleloginform.submit();
+                                        }
+                                }
+                        });
+                });
+                </script>';
+					$this->adminHeaderShown = true;
+				}
+
+				$first = true;
+				foreach ($google_ids as $google_id) {
+					if ($first) {
+						$first = false;
+					} else {
+						$creds .= ', ';
+					}
+					$creds .= "<a href=\"#\" onclick=\"google.friendconnect.showMemberProfile('$google_id'); return false;\">$google_id</a>";
+				}
+
+				return $creds;
+			}
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return null;
+	}
+
 
 	public function renderLoginForm($action)
 	{

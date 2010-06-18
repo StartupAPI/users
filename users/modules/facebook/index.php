@@ -29,6 +29,43 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 		return "Facebook";
 	}
 
+	public function getUserCredentials($user)
+	{
+		$db = UserConfig::getDB();
+
+		$userid = $user->getID();
+
+		if ($stmt = $db->prepare('SELECT fb_id FROM '.UserConfig::$mysql_prefix.'users WHERE id = ?'))
+		{
+			if (!$stmt->bind_param('i', $userid))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($fb_id))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			$stmt->fetch();
+			$stmt->close();
+
+			if (!is_null($fb_id))
+			{
+				return "<a href=\"http://www.facebook.com/profile.php?id=$fb_id\">$fb_id</a>";
+			}
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return null;
+	}
+
 	public function renderLoginForm($action)
 	{
 		?>

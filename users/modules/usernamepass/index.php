@@ -11,6 +11,46 @@ class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 		return "Username / Password";
 	}
 
+	public function getUserCredentials($user)
+	{
+		$db = UserConfig::getDB();
+
+		$userid = $user->getID();
+
+		if ($stmt = $db->prepare('SELECT username FROM '.UserConfig::$mysql_prefix.'users WHERE id = ?'))
+		{
+			if (!$stmt->bind_param('i', $userid))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($username))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			$stmt->fetch();
+			$stmt->close();
+
+			// if user used password recovery and remembered his old password
+			// then clean temporary password and password reset flag
+			// (don't reset the flag if was was set for some other reasons)
+			if (!is_null($username))
+			{
+				return $username;
+			}
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return null;
+	}
+
 	public function renderLoginForm($action)
 	{
 		?>
