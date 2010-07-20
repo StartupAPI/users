@@ -61,7 +61,11 @@ google.setOnLoadCallback(function() {
 	data.addRows(daily);
 
 	var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
-	chart.draw(data, {displayAnnotations: true});
+	chart.draw(data, {
+		displayAnnotations: true,
+		scaleColumns: [0, 1],
+		scaleType: 'allmaximized'
+	});
 });
 </script>
 <div id='chart_div' style='width: 100%; height: 240px; margin-bottom: 1em'></div>
@@ -118,7 +122,7 @@ foreach ($users as $user)
 		if (!is_null($creds)) {
 		?>
 		<div><b><?php echo $module->getID() ?>: </b><?php echo $creds ?></div>
-		<?php
+		<?
 		}
 	}
 	?></td><td><?php echo $user->getName()?></td><td><?php echo $user->getEmail()?></td><td><form action="" method="POST"><input type="submit" value="impersonate"/><input type="hidden" name="impersonate" value="<?php echo $user->getID()?>"/></form></td></tr><?php
