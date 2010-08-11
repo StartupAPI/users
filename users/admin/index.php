@@ -100,7 +100,7 @@ else
 	?><span style="color: silver; float: left">&lt;&lt;&lt;prev</span><?php
 }
 ?>
-<span style="float: left; margin-left: 2em">Page <?php echo $pagenum+1?></span>
+<span style="float: left; margin-left: 2em">Page <?php echo $pagenumber+1?></span>
 
 </td></tr>
 <?php
@@ -147,7 +147,7 @@ else
 	?><span style="color: silver; float: left">&lt;&lt;&lt;prev</span><?php
 }
 ?>
-<span style="float: left; margin-left: 2em">Page <?php echo $pagenum+1?></span>
+<span style="float: left; margin-left: 2em">Page <?php echo $pagenumber+1?></span>
 
 </td></tr>
 </table>
