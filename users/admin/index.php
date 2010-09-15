@@ -24,7 +24,7 @@ require_once(UserConfig::$header);
 
 ?><h1>Users (<?php echo User::getTotalUsers()?>)<?php if (UserConfig::$enableInvitations) { ?> | <a href="invitations.php">Invitations</a><?php } ?></h1>
 <div style="background: white; padding: 1em">
-<h2>Registered Users</h2>
+<h2>Registered Users | <a href="./bymodule.php">By module</a></h2>
 <?php $dailyregs = User::getDailyRegistrations();
 
 $total = 0;

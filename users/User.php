@@ -277,6 +277,21 @@ class User
 		return $dailyregs;
 	}
 	/*
+	 * retrieves aggregated registrations numbers by module
+	 */
+	public static function getDailyRegistrationsByModule()
+	{
+		$dailyregs = array();
+
+		foreach (UserConfig::$modules as $module) {
+			foreach ($module->getDailyRegistrations() as $reg) {
+				$dailyregs[$reg['regdate']][$module->getID()] = $reg['regs'];
+			}
+		}
+
+		return $dailyregs;
+	}
+	/*
 	 * retrieves paged list of users
 	 */
 	public static function getUsers($pagenumber = 0, $perpage = 20)

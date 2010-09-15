@@ -66,6 +66,41 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 		return null;
 	}
 
+	/*
+	 * retrieves aggregated registrations numbers 
+	 */
+	public function getDailyRegistrations()
+	{
+		$db = UserConfig::getDB();
+
+		$dailyregs = array();
+
+		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, count(*) AS regs FROM '.UserConfig::$mysql_prefix.'users WHERE fb_id IS NOT NULL GROUP BY regdate'))
+		{
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($regdate, $regs))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			while($stmt->fetch() === TRUE)
+			{
+				$dailyregs[] = array('regdate' => $regdate, 'regs' => $regs);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return $dailyregs;
+	}
+
 	public function renderLoginForm($action)
 	{
 		?>
