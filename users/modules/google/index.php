@@ -106,7 +106,7 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 
 		$dailyregs = array();
 
-		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, count(*) AS regs FROM '.UserConfig::$mysql_prefix.'users u LEFT JOIN '.UserConfig::$mysql_prefix.'googlefriendconnect g ON u.id = g.user_id WHERE g.google_id IS NOT NULL GROUP BY regtime'))
+		if ($stmt = $db->prepare('SELECT regdate, count(*) AS reqs FROM (SELECT CAST(regtime AS DATE) AS regdate, id AS regs FROM '.UserConfig::$mysql_prefix.'users u LEFT JOIN '.UserConfig::$mysql_prefix.'googlefriendconnect g ON u.id = g.user_id WHERE g.google_id IS NOT NULL GROUP BY id) agg group by agg.regdate'))
 		{
 			if (!$stmt->execute())
 			{
