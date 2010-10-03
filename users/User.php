@@ -925,6 +925,7 @@ class User
 	public static function clearSession()
 	{
 		$storage = new MrClay_CookieStorage(array(
+			'path' => UserConfig::$SITEROOTURL,
 			'secret' => UserConfig::$SESSION_SECRET,
 			'mode' => MrClay_CookieStorage::MODE_ENCRYPT
 		));
