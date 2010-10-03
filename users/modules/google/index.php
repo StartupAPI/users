@@ -4,10 +4,15 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 	private $siteid;
 	private $regHeadersLoaded = false;
 	private $adminHeaderShown = false;
+	private $remember;
 
-	public function __construct($siteid)
+	public function __construct($siteid, $remember = true)
 	{
 		$this->siteid = $siteid;
+
+		// TODO Replace it with immediate GFC call:
+		// http://code.google.com/p/userbase/issues/detail?id=16
+		$this->remember = $remember;
 	}
 
 	public function getID()
@@ -273,8 +278,10 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 		<?php
 	}
 
-	public function processLogin($data)
+	public function processLogin($data, &$remember)
 	{
+		$remember = $this->remember; 
+
 		$fcauth = $_COOKIE['fcauth'.$this->siteid];
 
 		$ch = curl_init();
@@ -291,15 +298,17 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 			if (!is_null($user)) {
 				return $user;
 			} else {
-				return $this->processRegistration($post_data);
+				return $this->processRegistration($data, $remember);
 			}
 		} else {
 			return false;
 		}
 	}
 
-	public function processRegistration($data)
+	public function processRegistration($data, &$remember)
 	{
+		$remember = $this->remember; 
+
 		$fcauth = $_COOKIE['fcauth'.$this->siteid];
 
 		$ch = curl_init();

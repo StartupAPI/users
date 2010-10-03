@@ -5,12 +5,17 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 {
 	private $api_key;
 	private $secret;
+	private $remember;
 
 	private $headersLoaded = false;
 
-	public function __construct($api_key, $secret)
+	public function __construct($api_key, $secret, $remember = true)
 	{
 		$this->setKeys($api_key, $secret);
+
+		// TODO Replace it with immediate FB Connect call:
+		// http://code.google.com/p/userbase/issues/detail?id=16
+		$this->remember = $remember;
 	}
 
 	public function setKeys($api_key, $secret)
@@ -176,8 +181,10 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 		}
 	}
 
-	public function processLogin($post_data)
+	public function processLogin($post_data, &$remember)
 	{
+		$remember = $this->remember; 
+
 		$facebook = new Facebook($this->api_key, $this->secret);
 		$fbuser = $facebook->require_login();
 
@@ -186,12 +193,14 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 		if (!is_null($user)) {
 			return $user;
 		} else {
-			return $this->processRegistration($post_data);
+			return $this->processRegistration($post_data, $remember);
 		}
 	}
 
-	public function processRegistration($post_data)
+	public function processRegistration($post_data, &$remember)
 	{
+		$remember = $this->remember;
+
 		$facebook = new Facebook($this->api_key, $this->secret);
 		$fbuser = $facebook->require_login();
 

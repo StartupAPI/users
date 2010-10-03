@@ -158,8 +158,10 @@ class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 		<?php
 	}
 
-	public function processLogin($data)
+	public function processLogin($data, &$remember)
 	{
+		$remember = UserConfig::$allowRememberMe && array_key_exists('remember', $data);
+
 		$db = UserConfig::getDB();
 
 		$user = null;
@@ -249,8 +251,10 @@ class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 		return $user;
 	}
 
-	public function processRegistration($data)
+	public function processRegistration($data, &$remember)
 	{
+		$remember = UserConfig::$allowRememberMe && UserConfig::$rememberUserOnRegistration;
+
 		$errors = array();
 		if (array_key_exists('pass', $data) && array_key_exists('repeatpass', $data) && $data['pass'] !== $data['repeatpass'])
 		{

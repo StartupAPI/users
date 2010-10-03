@@ -7,8 +7,8 @@ interface IAuthenticationModule
 	public function getTitle();
 	public function renderLoginForm($action);
 	public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null);
-	public function processLogin($data);
-	public function processRegistration($data);
+	public function processLogin($data, &$remember);
+	public function processRegistration($data, &$remember);
 	public function getUserCredentials($user);
 	public function getDailyRegistrations();
 }

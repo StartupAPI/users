@@ -14,7 +14,8 @@ if (array_key_exists('login', $_POST))
 		}
 	}
 
-	$user = $module->processLogin($_POST);
+	$remember = false;
+	$user = $module->processLogin($_POST, $remember);
 
 	if (is_null($user))
 	{
@@ -22,7 +23,7 @@ if (array_key_exists('login', $_POST))
 		exit;
 	}
 
-	$user->setSession(array_key_exists('remember', $_POST) ? true : false);
+	$user->setSession($remember);
 
 	$return = User::getReturn();
 	User::clearReturn();

@@ -43,7 +43,8 @@ if (UserConfig::$enableRegistration && array_key_exists('register', $_POST))
 
 	try
 	{
-		$user = $module->processRegistration($_POST);
+		$remember = false;
+		$user = $module->processRegistration($_POST, $remember);
 
 		if (is_null($user))
 		{
@@ -57,7 +58,7 @@ if (UserConfig::$enableRegistration && array_key_exists('register', $_POST))
 			$invitation->save();
 		}
 
-		$user->setSession(UserConfig::$rememberUserOnRegistration);
+		$user->setSession($remember);
 
 		$return = User::getReturn();
 		User::clearReturn();

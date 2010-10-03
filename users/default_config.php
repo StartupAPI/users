@@ -29,10 +29,6 @@ class UserConfig
 	public static $mysql_password;
 	public static $mysql_prefix= 'u_';
 
-	// Facebook configuration
-	public static $FacebookAPIKey;
-	public static $FacebookSecret;
-
 	private static $db = null;
 
 	public static $header = 'header.php';
@@ -54,6 +50,7 @@ class UserConfig
 	// Password recovery email configuration
 	public static $passwordRecoveryEmailSubject = 'Your Password';
 
+	// TODO move all module-specific remember me configurations to module classes
 	// Allow remembering user for longer then a session
 	public static $allowRememberMe = true;
 	// Automatically remember user for longer then a session when they register
