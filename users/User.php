@@ -94,10 +94,11 @@ class User
 		$db = UserConfig::getDB();
 
 		$user = null;
+		$module = GoogleAuthenticationModule::getID();
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name) VALUES (?)'))
+		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name, regmodule) VALUES (?, ?)'))
 		{
-			if (!$stmt->bind_param('s', $name))
+			if (!$stmt->bind_param('ss', $name, $module))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}
@@ -146,10 +147,11 @@ class User
 		$db = UserConfig::getDB();
 
 		$user = null;
+		$module = FacebookAuthenticationModule::getID();
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name, fb_id) VALUES (?, ?)'))
+		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name, fb_id, regmodule) VALUES (?, ?, ?)'))
 		{
-			if (!$stmt->bind_param('si', $name, $fb_id))
+			if (!$stmt->bind_param('sis', $name, $fb_id, $module))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}
@@ -183,10 +185,11 @@ class User
 
 		$salt = uniqid();
 		$pass = sha1($salt.$password);
+		$module = UsernamePasswordAuthenticationModule::getID();
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name, username, email, pass, salt) VALUES (?, ?, ?, ?, ?)'))
+		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name, username, email, pass, salt, regmodule) VALUES (?, ?, ?, ?, ?, ?)'))
 		{
-			if (!$stmt->bind_param('sssss', $name, $username, $email, $pass, $salt))
+			if (!$stmt->bind_param('ssssss', $name, $username, $email, $pass, $salt, $module))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}
@@ -281,12 +284,31 @@ class User
 	 */
 	public static function getDailyRegistrationsByModule()
 	{
+		$db = UserConfig::getDB();
+
 		$dailyregs = array();
 
-		foreach (UserConfig::$modules as $module) {
-			foreach ($module->getDailyRegistrations() as $reg) {
-				$dailyregs[$reg['regdate']][$module->getID()] = $reg['regs'];
+		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, regmodule, count(*) AS reqs FROM '.UserConfig::$mysql_prefix.'users GROUP BY regdate, regmodule'))
+		{
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
+			if (!$stmt->bind_result($regdate, $regmodule, $regs))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			while($stmt->fetch() === TRUE)
+			{
+				$dailyregs[$regdate][$regmodule] = $regs;
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
 		}
 
 		return $dailyregs;
@@ -888,6 +910,7 @@ class User
 	public function setSession($remember)
 	{
 		$storage = new MrClay_CookieStorage(array(
+			'path' => UserConfig::$SITEROOTURL,
 			'secret' => UserConfig::$SESSION_SECRET,
 			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
 			'expire' => UserConfig::$allowRememberMe && $remember
