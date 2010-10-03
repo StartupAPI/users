@@ -93,7 +93,7 @@ class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 		<table>
 		<tr><td>Username</td><td><input name="username" type="text" size="25" maxlength="25"/></td></tr>
 		<tr><td>Password</td><td><input name="pass" type="password" size="25" autocomplete="off"/></td></tr>
-		<?php if (UserConfig::$allowRememberMe) {?><tr><td></td><td><input type="checkbox" name="remember" value="yes" id="remember"/><label for="remember">remember me</a></td></tr> <?php }?>
+		<?php if (UserConfig::$allowRememberMe) {?><tr><td></td><td><input type="checkbox" name="remember" value="yes" id="remember"<?php if (UserConfig::$rememberMeDefault) {?> checked<?php }?>/><label for="remember">remember me</a></td></tr> <?php }?>
 		<tr><td></td><td><input type="submit" name="login" value="Log in &gt;&gt;&gt;"/><?php if (UserConfig::$enableRegistration) {?> <a href="<?php echo UserConfig::$USERSROOTURL?>/register.php">or register</a><?php } ?></td></tr>
 		<tr><td></td><td><a style="font-size: smaller" href="<?php echo UserConfig::$USERSROOTURL?>/modules/usernamepass/forgotpassword.php">Forgot password?</a></td></tr>
 		</table>

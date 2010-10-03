@@ -61,6 +61,8 @@ class UserConfig
 	// Time for long sessions - defaults to 10 years
 	// can be set to relatively short, e.g. 2 weeks if needed
 	public static $rememberMeTime = 315360000;
+	// To check or not "remember me" box by default
+	public static $rememberMeDefault = false;
 
 	// use accounts or just users only
 	public static $useAccounts = true;
