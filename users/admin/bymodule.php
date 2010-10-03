@@ -24,7 +24,7 @@ require_once(UserConfig::$header);
 
 ?><h1>Users (<?php echo User::getTotalUsers()?>)<?php if (UserConfig::$enableInvitations) { ?> | <a href="invitations.php">Invitations</a><?php } ?></h1>
 <div style="background: white; padding: 1em">
-<h2><a href="./">Registered Users</a> | By module</h2>
+<h2><a href="./">Active Users</a> | <a href="registrations.php">Registered Users</a> | Registrations By Module</h2>
 
 <script type='text/javascript' src='http://www.google.com/jsapi'></script>
 <script type='text/javascript'>

@@ -243,6 +243,74 @@ class User
 	}
 
 	/*
+	 * retrieves daily active users
+	 */
+	public static function getDailyActiveUsers()
+	{
+		$db = UserConfig::getDB();
+
+		$daily_activity = array();
+
+		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, user_id FROM '.UserConfig::$mysql_prefix.'activity GROUP BY activity_date, user_id'))
+		{
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($date, $user_id))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			while($stmt->fetch() === TRUE)
+			{
+				$daily_activity[] = array('date' => $date, 'user' => $user_id);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return $daily_activity;
+	}
+	/*
+	 * retrieves aggregated activity points 
+	 */
+	public static function getDailyActivityPoints()
+	{
+		$db = UserConfig::getDB();
+
+		$daily_activity = array();
+
+		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total FROM '.UserConfig::$mysql_prefix.'activity GROUP BY activity_date, activity_id'))
+		{
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($date, $id, $total))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			while($stmt->fetch() === TRUE)
+			{
+				$daily_activity[] = array('date' => $date, 'activity' => $id, 'total' => $total);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return $daily_activity;
+	}
+	/*
 	 * retrieves aggregated registrations numbers 
 	 */
 	public static function getDailyRegistrations()
