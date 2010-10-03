@@ -8,6 +8,11 @@ User::clearSession();
 $return = User::getReturn();
 User::clearReturn();
 
+$user = User::get();
+if (!is_null($user)) {
+	$user->recordActivity(USERBASE_ACTIVITY_LOGOUT);
+}
+
 if (!is_null($return))
 {
 	header('Location: '.$return);

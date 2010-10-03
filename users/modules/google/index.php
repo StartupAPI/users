@@ -296,6 +296,7 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 		{
 			$user = User::getUserByGoogleFriendConnectID($data['entry']['id']);
 			if (!is_null($user)) {
+				$user->recordActivity(USERBASE_ACTIVITY_LOGIN_GFC);
 				return $user;
 			} else {
 				return $this->processRegistration($data, $remember);
@@ -341,6 +342,7 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 		$existing_user = User::getUserByGoogleFriendConnectID($googleid);
 		if (!is_null($existing_user))
 		{
+			$existing_user->recordActivity(USERBASE_ACTIVITY_LOGIN_GFC);
 			return $existing_user;
 		}
 
@@ -355,7 +357,9 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 		}
 
 		// ok, let's create a user
-		return User::createNewGoogleFriendConnectUser($displayName, $googleid, $thumbnailUrl);
+		$user = User::createNewGoogleFriendConnectUser($displayName, $googleid, $thumbnailUrl);
+		$user->recordActivity(USERBASE_ACTIVITY_REGISTER_GFC);
+		return $user;
 	}
 
 	/*

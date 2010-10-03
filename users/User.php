@@ -94,11 +94,10 @@ class User
 		$db = UserConfig::getDB();
 
 		$user = null;
-		$module = GoogleAuthenticationModule::getID();
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name, regmodule) VALUES (?, ?)'))
+		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name) VALUES (?)'))
 		{
-			if (!$stmt->bind_param('ss', $name, $module))
+			if (!$stmt->bind_param('s', $name))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}
@@ -147,11 +146,10 @@ class User
 		$db = UserConfig::getDB();
 
 		$user = null;
-		$module = FacebookAuthenticationModule::getID();
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name, fb_id, regmodule) VALUES (?, ?, ?)'))
+		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name, fb_id) VALUES (?, ?)'))
 		{
-			if (!$stmt->bind_param('sis', $name, $fb_id, $module))
+			if (!$stmt->bind_param('si', $name, $fb_id))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}
@@ -185,11 +183,10 @@ class User
 
 		$salt = uniqid();
 		$pass = sha1($salt.$password);
-		$module = UsernamePasswordAuthenticationModule::getID();
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name, username, email, pass, salt, regmodule) VALUES (?, ?, ?, ?, ?, ?)'))
+		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name, username, email, pass, salt) VALUES (?, ?, ?, ?, ?)'))
 		{
-			if (!$stmt->bind_param('ssssss', $name, $username, $email, $pass, $salt, $module))
+			if (!$stmt->bind_param('sssss', $name, $username, $email, $pass, $salt))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}
@@ -284,31 +281,12 @@ class User
 	 */
 	public static function getDailyRegistrationsByModule()
 	{
-		$db = UserConfig::getDB();
-
 		$dailyregs = array();
 
-		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, regmodule, count(*) AS reqs FROM '.UserConfig::$mysql_prefix.'users GROUP BY regdate, regmodule'))
-		{
-			if (!$stmt->execute())
-			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+		foreach (UserConfig::$modules as $module) {
+			foreach ($module->getDailyRegistrations() as $reg) {
+				$dailyregs[$reg['regdate']][$module->getID()] = $reg['regs'];
 			}
-			if (!$stmt->bind_result($regdate, $regmodule, $regs))
-			{
-				throw new Exception("Can't bind result: ".$stmt->error);
-			}
-
-			while($stmt->fetch() === TRUE)
-			{
-				$dailyregs[$regdate][$regmodule] = $regs;
-			}
-
-			$stmt->close();
-		}
-		else
-		{
-			throw new Exception("Can't prepare statement: ".$db->error);
 		}
 
 		return $dailyregs;
@@ -510,6 +488,7 @@ class User
 		{
 			throw new Exception("Can't prepare statement: ".$db->error);
 		}
+		$this->recordActivity(USERBASE_ACTIVITY_REMOVED_GFC);
 	}
 	public function addGoogleFriendConnectAssociation($google_id, $userpic)
 	{
@@ -532,6 +511,8 @@ class User
 		{
 			throw new Exception("Can't prepare statement: ".$db->error);
 		}
+
+		$this->recordActivity(USERBASE_ACTIVITY_ADDED_GFC);
 	}
 
 	public function getGoogleFriendsConnectAssociations()
@@ -646,6 +627,7 @@ class User
 
 		return $user;
 	}
+
 
 	/*
 	 * retrieves user information from database and constructs
@@ -910,7 +892,6 @@ class User
 	public function setSession($remember)
 	{
 		$storage = new MrClay_CookieStorage(array(
-			'path' => UserConfig::$SITEROOTURL,
 			'secret' => UserConfig::$SESSION_SECRET,
 			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
 			'expire' => UserConfig::$allowRememberMe && $remember
@@ -925,11 +906,37 @@ class User
 	public static function clearSession()
 	{
 		$storage = new MrClay_CookieStorage(array(
-			'path' => UserConfig::$SITEROOTURL,
 			'secret' => UserConfig::$SESSION_SECRET,
 			'mode' => MrClay_CookieStorage::MODE_ENCRYPT
 		));
 
 		$storage->delete(UserConfig::$session_userid_key);
+	}
+
+	/*
+	 * records user activity
+	 * @activity_id:	ID of activity performed by the user
+	 */
+	public function recordActivity($activity_id)
+	{
+		$db = UserConfig::getDB();
+
+		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'activity (user_id, activity_id) VALUES (?, ?)'))
+		{
+			if (!$stmt->bind_param('ii', $this->userid, $activity_id))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
 	}
 }

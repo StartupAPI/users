@@ -248,6 +248,7 @@ class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 			$user->resetTemporaryPassword();
 		}
 
+		$user->recordActivity(USERBASE_ACTIVITY_LOGIN_UPASS);
 		return $user;
 	}
 
@@ -335,7 +336,9 @@ class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 		}
 
 		// ok, let's create a user
-		return User::createNew($name, $username, $email, $data['pass']);
+		$user = User::createNew($name, $username, $email, $data['pass']);
+		$user->recordActivity(USERBASE_ACTIVITY_REGISTER_UPASS);
+		return $user;
 	}
 
 	/*
@@ -481,16 +484,22 @@ class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 		if ($changepass)
 		{
 			$user->setPass($data['pass']);
+			if ($has_username) {
+				$user->recordActivity(USERBASE_ACTIVITY_UPDATEPASS);
+			}
 		}
 
 		if (!$has_username)
 		{
 			$user->setUsername($username);
+			$user->recordActivity(USERBASE_ACTIVITY_ADDED_UPASS);
 		}
 
 		$user->setName($name);
 		$user->setEmail($email);
 		$user->save();
+
+		$user->recordActivity(USERBASE_ACTIVITY_UPDATEUSERINFO);
 
 		return true;
 	}
@@ -534,6 +543,8 @@ class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 		$user->save();
 
 		$user->resetTemporaryPassword();
+
+		$user->recordActivity(USERBASE_ACTIVITY_RESETPASS);
 
 		return true;
 	}

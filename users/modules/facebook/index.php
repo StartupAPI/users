@@ -191,6 +191,7 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 		$user = User::getUserByFacebookID($fbuser);
 
 		if (!is_null($user)) {
+			$user->recordActivity(USERBASE_ACTIVITY_LOGIN_FB);
 			return $user;
 		} else {
 			return $this->processRegistration($post_data, $remember);
@@ -214,6 +215,7 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 		$existing_user = User::getUserByFacebookID($fbuser);
 		if (!is_null($existing_user))
 		{
+			$existing_user->recordActivity(USERBASE_ACTIVITY_LOGIN_FB);
 			return $existing_user;
 		}
 
@@ -236,7 +238,9 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 		}
 
 		// ok, let's create a user
-		return User::createNewFacebookUser($name, $fbuser);
+		$user = User::createNewFacebookUser($name, $fbuser);
+		$user->recordActivity(USERBASE_ACTIVITY_REGISTER_FB);
+		return $user;
 	}
 
 	/*
@@ -251,6 +255,8 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 		if (array_key_exists('remove', $data)) {
 			$user->setFacebookID(null);
 			$user->save();
+
+			$user->recordActivity(USERBASE_ACTIVITY_REMOVED_FB);
 
 			return true;
 		}
@@ -278,6 +284,8 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 
 		$user->setFacebookID($fbuser);
 		$user->save();
+
+		$user->recordActivity(USERBASE_ACTIVITY_ADDED_FB);
 
 		return true;
 	}

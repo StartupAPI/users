@@ -35,6 +35,9 @@ class UserConfig
 	public static $footer = 'footer.php';
 	public static $maillist;
 
+	// a list of activities
+	public static $activities = array();
+
 	// functionality switches
 	public static $enableRegistration = true;
 	public static $registrationDisabledMessage = 'Registration is disabled.';
@@ -153,6 +156,54 @@ EOD;
 		UserConfig::$USERSROOTFULLURL = 'http://'.$host.substr(UserConfig::$ROOTPATH, strlen($_SERVER['DOCUMENT_ROOT']));
 
 		UserConfig::$supportEmailXMailer = 'UserBase (PHP/'.phpversion();
+
+		// Built in activities 
+		define('USERBASE_ACTIVITY_LOGIN_UPASS',		1000);
+		define('USERBASE_ACTIVITY_LOGIN_FB',		1001);
+		define('USERBASE_ACTIVITY_LOGIN_GFC',		1002);
+
+		define('USERBASE_ACTIVITY_ADDED_UPASS',		1003);
+		define('USERBASE_ACTIVITY_ADDED_FB',		1004);
+		define('USERBASE_ACTIVITY_ADDED_GFC',		1005);
+
+		define('USERBASE_ACTIVITY_REMOVED_FB',		1006);
+		define('USERBASE_ACTIVITY_REMOVED_GFC',		1007);
+
+		define('USERBASE_ACTIVITY_LOGOUT',		1008);
+
+		define('USERBASE_ACTIVITY_REGISTER_UPASS',	1009);
+		define('USERBASE_ACTIVITY_REGISTER_FB',		1010);
+		define('USERBASE_ACTIVITY_REGISTER_GFC',	1011);
+
+		define('USERBASE_ACTIVITY_UPDATEUSERINFO',	1012);
+
+		define('USERBASE_ACTIVITY_UPDATEPASS',		1013);
+		define('USERBASE_ACTIVITY_RESETPASS',		1014);
+
+		// array of activities in the system velue is an array of label and value of activity
+		UserConfig::$activities = array(
+			USERBASE_ACTIVITY_LOGIN_UPASS => array('Logged in using username and password',	1),
+			USERBASE_ACTIVITY_LOGIN_FB => array('Logged in using Facebook',			1),
+			USERBASE_ACTIVITY_LOGIN_GFC => array('Logged in using Google Friend Connect',	1),
+
+			USERBASE_ACTIVITY_ADDED_UPASS => array('Added username and password',		1),
+			USERBASE_ACTIVITY_ADDED_FB => array('Added Facebook credential',		1),
+			USERBASE_ACTIVITY_ADDED_GFC => array('A Google Friend Connect credential',	1),
+
+			USERBASE_ACTIVITY_REMOVED_FB => array('Removed Facebook Connect',		0),
+			USERBASE_ACTIVITY_REMOVED_GFC => array('Removed Google Friend Connect credential',0),
+
+			USERBASE_ACTIVITY_LOGOUT => array('Logged out',					0),
+
+			USERBASE_ACTIVITY_REGISTER_UPASS => array('Registered using a form',		3),
+			USERBASE_ACTIVITY_REGISTER_FB => array('Registered using Facebook',		4),
+			USERBASE_ACTIVITY_REGISTER_GFC => array('Registered using Google Friend Connect', 3),
+
+			USERBASE_ACTIVITY_UPDATEUSERINFO => array('Updated user info',			0),
+
+			USERBASE_ACTIVITY_UPDATEPASS => array('Updated their password',			0),
+			USERBASE_ACTIVITY_RESETPASS => array('Reset forgotten password',		0)
+		);
 	}
 }
 
