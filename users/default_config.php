@@ -31,8 +31,8 @@ class UserConfig
 
 	private static $db = null;
 
-	public static $header = 'header.php';
-	public static $footer = 'footer.php';
+	public static $header;
+	public static $footer;
 	public static $maillist;
 
 	// a list of activities
@@ -156,6 +156,9 @@ EOD;
 		UserConfig::$USERSROOTFULLURL = 'http://'.$host.substr(UserConfig::$ROOTPATH, strlen($_SERVER['DOCUMENT_ROOT']));
 
 		UserConfig::$supportEmailXMailer = 'UserBase (PHP/'.phpversion();
+
+		UserConfig::$header = dirname(__FILE__).'/header.php';
+		UserConfig::$footer = dirname(__FILE__).'/footer.php';
 
 		// Built in activities 
 		define('USERBASE_ACTIVITY_LOGIN_UPASS',		1000);
