@@ -3,6 +3,7 @@
  * User class
 */
 require_once(dirname(__FILE__).'/config.php');
+require_once(dirname(__FILE__).'/Account.php');
 require_once(dirname(__FILE__).'/CookieStorage.php');
 
 class User
