@@ -17,7 +17,7 @@ class Account
 	*/
 	public static function getByID($id)
 	{
-		global $db;
+		$db = UserConfig::getDB();
 		$account = null;
 
 		if ($stmt = $db->prepare('SELECT name, plan FROM '.UserConfig::$mysql_prefix.'accounts WHERE id = ?'))
@@ -52,7 +52,7 @@ class Account
 
 	public static function getUserAccounts($user)
 	{
-		global $db;
+		$db = UserConfig::getDB();
 		$accounts = array();
 		$userid = $user->getID();
 
@@ -119,7 +119,7 @@ class Account
 	}
 	public function getUsers()
 	{
-		global $db;
+		$db = UserConfig::getDB();
 		$userids = array();
 
 		if ($stmt = $db->prepare('SELECT user_id FROM '.UserConfig::$mysql_prefix.'account_users WHERE account_id = ?'))
@@ -211,7 +211,7 @@ class Account
 
 	public static function getCurrentAccount($user)
 	{
-		global $db;
+		$db = UserConfig::getDB();
 
 		$userid = $user->getID();
 
@@ -261,7 +261,7 @@ class Account
 
 	public function setAsCurrent($user)
 	{
-		global $db;
+		$db = UserConfig::getDB();
 
 		$accounts = self::getUserAccounts($user);
 
