@@ -12,6 +12,7 @@ UserConfig::$SESSION_SECRET= '..................................................
 
 UserConfig::setDB(new mysqli( 'localhost', 'user1', 'mypass', 'mydb'));
 
-UserConfig::$header = dirname(__FILE__).'/header.php';
-UserConfig::$footer = dirname(__FILE__).'/footer.php';
+# Set these to point at your header and footer or leave them commented out to use default ones
+#UserConfig::$header = dirname(__FILE__).'/header.php';
+#UserConfig::$footer = dirname(__FILE__).'/footer.php';
 
