@@ -198,9 +198,9 @@ EOD;
 
 			USERBASE_ACTIVITY_LOGOUT => array('Logged out',					0),
 
-			USERBASE_ACTIVITY_REGISTER_UPASS => array('Registered using a form',		0),
-			USERBASE_ACTIVITY_REGISTER_FB => array('Registered using Facebook',		0),
-			USERBASE_ACTIVITY_REGISTER_GFC => array('Registered using Google Friend Connect', 0),
+			USERBASE_ACTIVITY_REGISTER_UPASS => array('Registered using a form',		1),
+			USERBASE_ACTIVITY_REGISTER_FB => array('Registered using Facebook',		1),
+			USERBASE_ACTIVITY_REGISTER_GFC => array('Registered using Google Friend Connect', 1),
 
 			USERBASE_ACTIVITY_UPDATEUSERINFO => array('Updated user info',			0),
 
