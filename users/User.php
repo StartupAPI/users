@@ -400,6 +400,64 @@ class User
 
 		return $users;
 	}
+	/*
+	 * retrieves a list of latest activities 
+	 */
+	public static function getActivity($all, $pagenumber = 0, $perpage = 20)
+	{
+		$activities = array();
+
+		if ($all) {
+			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM '.UserConfig::$mysql_prefix.'activity ORDER BY time DESC LIMIT ?, ?';
+		} else {
+			$ids = array();
+
+			foreach (UserConfig::$activities as $id => $activity) {
+				if ($activity[1] > 0) {
+					$ids[] = $id;
+				}
+			}
+
+			if (count($ids) == 0) {
+				return $activities; // no activities are configured to be worthy
+			}
+
+			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM '.UserConfig::$mysql_prefix.'activity WHERE activity_id IN ('.implode(', ', $ids).') ORDER BY time DESC LIMIT ?, ?';
+		}
+
+		$db = UserConfig::getDB();
+
+		$first = $perpage * $pagenumber;
+
+		if ($stmt = $db->prepare($query))
+		{
+			if (!$stmt->bind_param('ii', $first, $perpage))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($time, $user_id, $activity_id))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			while($stmt->fetch() === TRUE)
+			{
+				$activities[] = array('time' => $time, 'user_id' => $user_id, 'activity_id' => $activity_id);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return $activities;
+	}
 
 	public static function getUsersByEmailOrUsername($nameoremail)
 	{
