@@ -38,6 +38,10 @@ class UserConfig
 	// a list of activities
 	public static $activities = array();
 
+	// returning user activity configs
+	public static $last_login_key = 'users-last-login';
+	public static $last_login_session_length = 30; // 30 minutes away considered returning user
+
 	// functionality switches
 	public static $enableRegistration = true;
 	public static $registrationDisabledMessage = 'Registration is disabled.';
@@ -183,6 +187,10 @@ EOD;
 		define('USERBASE_ACTIVITY_UPDATEPASS',		1013);
 		define('USERBASE_ACTIVITY_RESETPASS',		1014);
 
+		define('USERBASE_ACTIVITY_RETURN_DAILY',	1015);
+		define('USERBASE_ACTIVITY_RETURN_WEEKLY',	1016);
+		define('USERBASE_ACTIVITY_RETURN_MONTHLY',	1017);
+
 		// array of activities in the system velue is an array of label and value of activity
 		UserConfig::$activities = array(
 			USERBASE_ACTIVITY_LOGIN_UPASS => array('Logged in using username and password',	1),
@@ -205,7 +213,11 @@ EOD;
 			USERBASE_ACTIVITY_UPDATEUSERINFO => array('Updated user info',			0),
 
 			USERBASE_ACTIVITY_UPDATEPASS => array('Updated their password',			0),
-			USERBASE_ACTIVITY_RESETPASS => array('Reset forgotten password',		0)
+			USERBASE_ACTIVITY_RESETPASS => array('Reset forgotten password',		0),
+
+			USERBASE_ACTIVITY_RETURN_DAILY => array('Returned to the site within a day', 3),
+			USERBASE_ACTIVITY_RETURN_WEEKLY => array('Returned to the site within a week', 2),
+			USERBASE_ACTIVITY_RETURN_MONTHLY => array('Returned to the site within a month', 1)
 		);
 	}
 }

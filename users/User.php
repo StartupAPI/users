@@ -39,13 +39,32 @@ class User
 	{
 		$storage = new MrClay_CookieStorage(array(
 			'secret' => UserConfig::$SESSION_SECRET,
-			'mode' => MrClay_CookieStorage::MODE_ENCRYPT
+			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+			'path' => UserConfig::$SITEROOTURL
 		));
 
-		$user = $storage->fetch(UserConfig::$session_userid_key);
+		$userid = $storage->fetch(UserConfig::$session_userid_key);
 
-		if (is_string($user)) {
-			return self::getUser($user);
+		$last = $storage->fetch(UserConfig::$last_login_key);
+		if (!$storage->store(UserConfig::$last_login_key, time())) {
+			throw Exception($storage->errors);
+		}
+
+		if (is_string($userid)) {
+			$user = self::getUser($userid);
+
+			// only check if user has returned after some session time, e.g. 30 minutes
+			if ($last > 0 && $last < time() - UserConfig::$last_login_session_length * 60) {
+				if ($last > time() - 86400) {
+					$user->recordActivity(USERBASE_ACTIVITY_RETURN_DAILY);
+				} else if ($last > time() - 7 * 86400) {
+					$user->recordActivity(USERBASE_ACTIVITY_RETURN_WEEKLY);
+				} else if ($last > time() - 30 * 86400) {
+					$user->recordActivity(USERBASE_ACTIVITY_RETURN_MONTHLY);
+				} 
+			}
+
+			return $user;
 		} else {
 			return null;
 		}
@@ -799,6 +818,7 @@ class User
 	{
 		$storage = new MrClay_CookieStorage(array(
 			'secret' => UserConfig::$SESSION_SECRET,
+			'path' => UserConfig::$SITEROOTURL,
 			'expire' => 0
 		));
 
@@ -810,7 +830,8 @@ class User
 	public static function getReturn()
 	{
 		$storage = new MrClay_CookieStorage(array(
-			'secret' => UserConfig::$SESSION_SECRET
+			'secret' => UserConfig::$SESSION_SECRET,
+			'path' => UserConfig::$SITEROOTURL
 		));
 
 		$return = $storage->fetch(UserConfig::$session_return_key);
@@ -825,7 +846,8 @@ class User
 	public static function clearReturn()
 	{
 		$storage = new MrClay_CookieStorage(array(
-			'secret' => UserConfig::$SESSION_SECRET
+			'secret' => UserConfig::$SESSION_SECRET,
+			'path' => UserConfig::$SITEROOTURL
 		));
 
 		$storage->delete(UserConfig::$session_return_key);
@@ -1021,6 +1043,7 @@ class User
 		$storage = new MrClay_CookieStorage(array(
 			'secret' => UserConfig::$SESSION_SECRET,
 			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+			'path' => UserConfig::$SITEROOTURL,
 			'expire' => UserConfig::$allowRememberMe && $remember
 				? time() + UserConfig::$rememberMeTime : 0 
 		));
@@ -1034,7 +1057,8 @@ class User
 	{
 		$storage = new MrClay_CookieStorage(array(
 			'secret' => UserConfig::$SESSION_SECRET,
-			'mode' => MrClay_CookieStorage::MODE_ENCRYPT
+			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+			'path' => UserConfig::$SITEROOTURL
 		));
 
 		$storage->delete(UserConfig::$session_userid_key);

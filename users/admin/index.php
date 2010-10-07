@@ -31,9 +31,24 @@ $daily_activity = User::getDailyActivityPoints();
 
 $dates = array();
 foreach ($daily_active_users as $record) {
+	if (!array_key_exists($record['date'], $dates)) {
+		$dates[$record['date']] = array();
+	}
+
+	if (!array_key_exists('users', $dates[$record['date']])) {
+		$dates[$record['date']]['users'] = 0;
+	}
+
 	$dates[$record['date']]['users'] += 1;
 }
 foreach ($daily_activity as $record) {
+	if (!array_key_exists($record['date'], $dates)) {
+		$dates[$record['date']] = array();
+	}
+
+	if (!array_key_exists('points', $dates[$record['date']])) {
+		$dates[$record['date']]['points'] = 0;
+	}
 	$dates[$record['date']]['points'] += $record['total'] * UserConfig::$activities[$record['activity']][1];
 }
 
