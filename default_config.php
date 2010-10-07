@@ -199,7 +199,7 @@ EOD;
 
 			USERBASE_ACTIVITY_ADDED_UPASS => array('Added username and password',		1),
 			USERBASE_ACTIVITY_ADDED_FB => array('Added Facebook credential',		1),
-			USERBASE_ACTIVITY_ADDED_GFC => array('A Google Friend Connect credential',	1),
+			USERBASE_ACTIVITY_ADDED_GFC => array('Added Google Friend Connect credential',	1),
 
 			USERBASE_ACTIVITY_REMOVED_FB => array('Removed Facebook Connect',		0),
 			USERBASE_ACTIVITY_REMOVED_GFC => array('Removed Google Friend Connect credential',0),
