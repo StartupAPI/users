@@ -48,14 +48,28 @@ require_once(UserConfig::$header);
 
 ?><h1>Edit Your Information</h1>
 
+<div style="float: right; width: 400px">
+<div>
+<?php if (UserConfig::$useAccounts) { ?>
+<h2>Accounts:</h2>
+<?php
+	$accounts = $user->getAccounts();
+
+	foreach ($accounts as $user_account) {
+		?><div><?php echo $user_account->getName() ?> (<?php echo $user_account->getPlan()->getName() ?>)</div><?php
+	}
+}
+?>
+</div>
+
 <?php if (!is_null(UserConfig::$maillist) && file_exists(UserConfig::$maillist))
 {
 ?>
-<div style="float: right; width: 400px">
 <?php include(UserConfig::$maillist); ?>
-</div>
 <?php
 }
+?></div>
+<?php
 
 foreach (UserConfig::$modules as $module)
 {

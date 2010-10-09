@@ -95,7 +95,7 @@ class User
 			}
 
 			$personal = Account::createAccount('FREE ('.$this->getName().')',
-							Account::PLAN_FREE, $this, Account::ROLE_ADMIN);
+							Plan::getFreePlan(), $this, Account::ROLE_ADMIN);
 
 			$personal->setAsCurrent($this);
 		}
@@ -1089,5 +1089,13 @@ class User
 		{
 			throw new Exception("Can't prepare statement: ".$db->error);
 		}
+	}
+
+	/*
+	 * Returns a list of user's accounts
+	 */
+	public function getAccounts()
+	{
+		return Account::getUserAccounts($this);
 	}
 }

@@ -1,4 +1,5 @@
 <?php
+require_once(dirname(__FILE__).'/Plan.php');
 class Account
 {
 	private $id;
@@ -8,9 +9,6 @@ class Account
 
 	const ROLE_USER = 0;
 	const ROLE_ADMIN = 1;
-
-	const PLAN_FREE = 0;
-	const PLAN_INDIVIDUAL = 1;
 
 	/**
 	* Gets Account by ID
@@ -30,14 +28,14 @@ class Account
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($name, $plan))
+			if (!$stmt->bind_result($name, $plan_id))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
 
 			if ($stmt->fetch() === TRUE)
 			{
-				$account = new self($id, $name, $plan, Account::ROLE_USER);
+				$account = new self($id, $name, Plan::getByID($plan_id), Account::ROLE_USER);
 			}
 
 			$stmt->close();
@@ -66,14 +64,14 @@ class Account
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($id, $name, $plan, $role))
+			if (!$stmt->bind_result($id, $name, $plan_id, $role))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
 
 			while($stmt->fetch() === TRUE)
 			{
-				$accounts[] = new self($id, $name, $plan, $role);
+				$accounts[] = new self($id, $name, Plan::getByID($plan_id), $role);
 			}
 
 			$stmt->close();
@@ -107,7 +105,7 @@ class Account
 	}
 	public function getName()
 	{
-		if ($this->plan === Account::PLAN_FREE || $this->plan === Account::PLAN_INDIVIDUAL)
+		if ($this->plan->isIndividual())
 		{
 			$users = $this->getUsers();
 			return $users[0]->getName();
@@ -163,10 +161,11 @@ class Account
 	public static function createAccount($name, $plan, $user = null, $role = Account::ROLE_USER)
 	{
 		$db = UserConfig::getDB();
+		$plan_id = $plan->getID();
 
 		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'accounts (name, plan) VALUES (?, ?)'))
 		{
-			if (!$stmt->bind_param('si', $name, $plan))
+			if (!$stmt->bind_param('si', $name, $plan_id))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}
@@ -227,7 +226,7 @@ class Account
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($id, $name, $plan, $role))
+			if (!$stmt->bind_result($id, $name, $plan_id, $role))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
@@ -236,7 +235,7 @@ class Account
 			
 			if ($id)
 			{
-				return new self($id, $name, $plan, $role);
+				return new self($id, $name, Plan::getByID($plan_id), $role);
 			}
 			else
 			{

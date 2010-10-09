@@ -1,4 +1,5 @@
 <?php
+require_once(dirname(__FILE__).'/Plan.php');
 require_once(dirname(__FILE__).'/modules.php');
 
 class UserConfig
