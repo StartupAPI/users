@@ -80,12 +80,21 @@ if (array_key_exists('page', $_GET)) {
 	$pagenumber = $_GET['page'];
 }
 
-$users = User::getUsers($pagenumber, $perpage);
+$search = null;
+if (array_key_exists('q', $_GET)) {
+	$search = trim($_GET['q']);
+}
+
+if (is_null($search)) {
+	$users = User::getUsers($pagenumber, $perpage);
+} else {
+	$users = User::searchUsers($search, $pagenumber, $perpage);
+}
 ?>
-<tr><td colspan="6">
+<tr><td colspan="6" valign="middle">
 <?php
 if (count($users) == $perpage) {
-	?><a style="float: right" href="?page=<?php echo $pagenumber+1?>">next &gt;&gt;&gt;</a><?php
+	?><a style="float: right" href="?page=<?php echo $pagenumber+1; echo is_null($search) ? '' : '&q='.urlencode($search)?>">next &gt;&gt;&gt;</a><?php
 }
 else
 {
@@ -93,15 +102,17 @@ else
 }
 
 if ($pagenumber > 0) {
-	?><a style="float: left" href="?page=<?php echo $pagenumber-1?>">&lt;&lt;&lt;prev</a><?php
+	?><a style="float: left" href="?page=<?php echo $pagenumber-1; echo is_null($search) ? '' : '&q='.urlencode($search) ?>">&lt;&lt;&lt;prev</a><?php
 }
 else
 {
 	?><span style="color: silver; float: left">&lt;&lt;&lt;prev</span><?php
 }
 ?>
-<span style="float: left; margin-left: 2em">Page <?php echo $pagenumber+1?></span>
-
+<span style="float: left; margin: 0 2em 0 1em;">Page <?php echo $pagenumber+1?></span>
+<form action="" id="search" name="search">
+<input type="text" id="q" name="q"<?php echo is_null($search) ? '' : ' value="'.htmlspecialchars($search).'"'?>/><input type="submit" value="search"/><input type="button" value="clear" onclick="document.getElementById('q').value=''; document.search.submit()"/>
+</form>
 </td></tr>
 <?php
 $now = time();
@@ -132,7 +143,7 @@ foreach ($users as $user)
 <tr><td colspan="6">
 <?php
 if (count($users) == $perpage) {
-	?><a style="float: right" href="?page=<?php echo $pagenumber+1?>">next &gt;&gt;&gt;</a><?php
+	?><a style="float: right" href="?page=<?php echo $pagenumber+1; echo is_null($search) ? '' : '&q='.urlencode($search)?>">next &gt;&gt;&gt;</a><?php
 }
 else
 {
@@ -140,7 +151,7 @@ else
 }
 
 if ($pagenumber > 0) {
-	?><a style="float: left" href="?page=<?php echo $pagenumber-1?>">&lt;&lt;&lt;prev</a><?php
+	?><a style="float: left" href="?page=<?php echo $pagenumber-1; echo is_null($search) ? '' : '&q='.urlencode($search)?>">&lt;&lt;&lt;prev</a><?php
 }
 else
 {

@@ -425,6 +425,47 @@ class User
 		return $users;
 	}
 	/*
+	 * searches for users matching the query
+	 */
+	public static function searchUsers($search, $pagenumber = 0, $perpage = 20)
+	{
+		$db = UserConfig::getDB();
+
+		$users = array();
+
+		$first = $perpage * $pagenumber;
+
+		// TODO Replace with real, fast and powerful full-text search
+		if ($stmt = $db->prepare('SELECT id, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime) FROM '.UserConfig::$mysql_prefix.'users WHERE INSTR(name, ?) > 0 OR INSTR(username, ?) > 0 OR INSTR(email, ?) > 0 ORDER BY regtime DESC LIMIT ?, ?'))
+		{
+			if (!$stmt->bind_param('sssii', $search, $search, $search, $first, $perpage))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			while($stmt->fetch() === TRUE)
+			{
+				$users[] = new self($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return $users;
+	}
+	/*
 	 * retrieves a list of latest activities 
 	 */
 	public static function getActivity($all, $pagenumber = 0, $perpage = 20)
