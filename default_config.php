@@ -43,6 +43,9 @@ class UserConfig
 	public static $last_login_key = 'users-last-login';
 	public static $last_login_session_length = 30; // 30 minutes away considered returning user
 
+	// don't display activity for some admin users
+	public static $dont_display_activity_for = array();
+
 	// functionality switches
 	public static $enableRegistration = true;
 	public static $registrationDisabledMessage = 'Registration is disabled.';

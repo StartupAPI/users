@@ -305,7 +305,12 @@ class User
 
 		$daily_activity = array();
 
-		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total FROM '.UserConfig::$mysql_prefix.'activity GROUP BY activity_date, activity_id'))
+		$exclude = '';
+		if (count(UserConfig::$dont_display_activity_for) > 0) {
+			$exclude = ' WHERE user_id NOT IN('.join(', ', UserConfig::$dont_display_activity_for).') ';
+		}
+
+		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total FROM '.UserConfig::$mysql_prefix.'activity '.$exlude.'GROUP BY activity_date, activity_id'))
 		{
 			if (!$stmt->execute())
 			{
@@ -426,8 +431,13 @@ class User
 	{
 		$activities = array();
 
+		$exclude = '';
+		if (count(UserConfig::$dont_display_activity_for) > 0) {
+			$exclude = ' user_id NOT IN('.join(', ', UserConfig::$dont_display_activity_for).') ';
+		}
+
 		if ($all) {
-			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM '.UserConfig::$mysql_prefix.'activity ORDER BY time DESC LIMIT ?, ?';
+			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM '.UserConfig::$mysql_prefix.'activity '.($exclude != '' ? 'WHERE '.$exclude : '').' ORDER BY time DESC LIMIT ?, ?';
 		} else {
 			$ids = array();
 
@@ -441,7 +451,7 @@ class User
 				return $activities; // no activities are configured to be worthy
 			}
 
-			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM '.UserConfig::$mysql_prefix.'activity WHERE activity_id IN ('.implode(', ', $ids).') ORDER BY time DESC LIMIT ?, ?';
+			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM '.UserConfig::$mysql_prefix.'activity WHERE activity_id IN ('.implode(', ', $ids).') '.($exclude != '' ? 'AND '.$exclude : '').'ORDER BY time DESC LIMIT ?, ?';
 		}
 
 		$db = UserConfig::getDB();
