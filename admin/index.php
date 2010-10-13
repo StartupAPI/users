@@ -77,7 +77,7 @@ google.setOnLoadCallback(function() {
 				$first = false;
 			}
 
-	?>		[new Date('<?php echo $date?>'), <?php echo $record['users']?>, <?php echo $record['points']?>]<?php
+	?>		[new Date('<?php echo $date?>'), <?php echo $record['users']?>, <?php echo $record['points'] > 0 ? $record['points'] : 0?>]<?php
 		}
 	?>
 	];
