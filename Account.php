@@ -147,7 +147,9 @@ class Account
 			throw new Exception("Can't prepare statement: ".$db->error);
 		}
 
-		return User::getUsersByIDs($userids);
+		$users = User::getUsersByIDs($userids);
+
+		return $users;
 	}
 	public function getPlan()
 	{

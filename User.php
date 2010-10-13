@@ -310,7 +310,7 @@ class User
 			$exclude = ' WHERE user_id NOT IN('.join(', ', UserConfig::$dont_display_activity_for).') ';
 		}
 
-		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total FROM '.UserConfig::$mysql_prefix.'activity '.$exlude.'GROUP BY activity_date, activity_id'))
+		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total FROM '.UserConfig::$mysql_prefix.'activity '.$exclude.'GROUP BY activity_date, activity_id'))
 		{
 			if (!$stmt->execute())
 			{
@@ -632,14 +632,17 @@ class User
 
 		$users = array();
 
-		$idlist = join(', ', $userids);
-
-		if ($stmt = $db->prepare('SELECT id, name, username, email, requirespassreset, fb_id FROM '.UserConfig::$mysql_prefix.'users WHERE id IN (?)'))
-		{
-			if (!$stmt->bind_param('s', $idlist))
-			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+		$ids = array();
+		foreach ($userids as $userid) {
+			if (is_int($userid)){
+				$ids[] = $userid;
 			}
+		}
+
+		$idlist = join(', ', $ids);
+		
+		if ($stmt = $db->prepare('SELECT id, name, username, email, requirespassreset, fb_id FROM '.UserConfig::$mysql_prefix.'users WHERE id IN ('.$idlist.')'))
+		{
 			if (!$stmt->execute())
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
