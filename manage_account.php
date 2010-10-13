@@ -69,9 +69,9 @@ if (count($manageable_accounts) > 1) {
 	foreach ($manageable_accounts as $account)
 	{
 		if ($account->isTheSameAs($managed_account)) {
-			?><li><b><?php echo htmlentities($account->getName())?></b></li><?
+			?><li><b><?php echo htmlentities($account->getName())?></b></li><?php
 		} else {
-			?><li><a href="<?php echo UserConfig::$USERSROOTURL ?>/manage_account.php?account=<?php echo $account->getID()?>"><?php echo htmlentities($account->getName())?></a></li><?
+			?><li><a href="<?php echo UserConfig::$USERSROOTURL ?>/manage_account.php?account=<?php echo $account->getID()?>"><?php echo htmlentities($account->getName())?></a></li><?php
 		}
 	}
 
