@@ -248,7 +248,10 @@ class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 			$user->resetTemporaryPassword();
 		}
 
-		$user->recordActivity(USERBASE_ACTIVITY_LOGIN_UPASS);
+		if (!is_null($user))
+		{
+			$user->recordActivity(USERBASE_ACTIVITY_LOGIN_UPASS);
+		}
 		return $user;
 	}
 
