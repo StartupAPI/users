@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.1.49, for pc-linux-gnu (i686)
 --
--- Host: localhost    Database: userbase
+-- Host: localhost    Database: userbase 
 -- ------------------------------------------------------
 -- Server version	5.1.49
 
@@ -16,18 +16,16 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `u_accounts`
+-- Table structure for table `3f7f6ece338d68f7fbd069377de434e0_db_version`
 --
 
-DROP TABLE IF EXISTS `u_accounts`;
+DROP TABLE IF EXISTS `3f7f6ece338d68f7fbd069377de434e0_db_version`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `u_accounts` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` text,
-  `plan` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'Payment plan ID',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=latin1;
+CREATE TABLE `3f7f6ece338d68f7fbd069377de434e0_db_version` (
+  `version` int(10) unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`version`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -47,6 +45,21 @@ CREATE TABLE `u_account_users` (
   CONSTRAINT `u_account_users_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `u_accounts` (`id`),
   CONSTRAINT `u_account_users_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `u_users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `u_accounts`
+--
+
+DROP TABLE IF EXISTS `u_accounts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `u_accounts` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` text,
+  `plan` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'Payment plan ID',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -133,6 +146,24 @@ CREATE TABLE `u_oid_nonces` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `u_user_preferences`
+--
+
+DROP TABLE IF EXISTS `u_user_preferences`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `u_user_preferences` (
+  `user_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `current_account_id` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`user_id`),
+  KEY `preference_current_account` (`current_account_id`),
+  CONSTRAINT `preference_user` FOREIGN KEY (`user_id`) REFERENCES `u_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `u_user_preferences_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `u_users` (`id`),
+  CONSTRAINT `u_user_preferences_ibfk_2` FOREIGN KEY (`current_account_id`) REFERENCES `u_accounts` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `u_users`
 --
 
@@ -155,25 +186,7 @@ CREATE TABLE `u_users` (
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `fb_id` (`fb_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `u_user_preferences`
---
-
-DROP TABLE IF EXISTS `u_user_preferences`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `u_user_preferences` (
-  `user_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `current_account_id` int(10) unsigned DEFAULT NULL,
-  PRIMARY KEY (`user_id`),
-  KEY `preference_current_account` (`current_account_id`),
-  CONSTRAINT `preference_user` FOREIGN KEY (`user_id`) REFERENCES `u_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `u_user_preferences_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `u_users` (`id`),
-  CONSTRAINT `u_user_preferences_ibfk_2` FOREIGN KEY (`current_account_id`) REFERENCES `u_accounts` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -185,4 +198,4 @@ CREATE TABLE `u_user_preferences` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-10-03 14:51:27
+-- Dump completed on 2010-10-17  2:18:12

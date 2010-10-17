@@ -15,6 +15,13 @@ $versions = array();
 
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 2
+ * Adding a field to indicate last time current user was retrieved
+*/
+$versions[2]['up'][]	= 'ALTER TABLE '.UserConfig::$mysql_prefix.'users ADD last_accessed TIMESTAMP';
+$versions[2]['down'][]	= 'ALTER TABLE '.UserConfig::$mysql_prefix.'users DROP COLUMN last_accessed';
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 1
  * initial version must be loaded from tables.sql
 */
