@@ -299,18 +299,20 @@ class User
 	/*
 	 * retrieves aggregated activity points 
 	 */
-	public static function getDailyActivityPoints()
+	public static function getDailyActivityPoints($user)
 	{
 		$db = UserConfig::getDB();
 
 		$daily_activity = array();
 
-		$exclude = '';
-		if (count(UserConfig::$dont_display_activity_for) > 0) {
-			$exclude = ' WHERE user_id NOT IN('.join(', ', UserConfig::$dont_display_activity_for).') ';
+		$where = '';
+		if (!is_null($user)) {
+			$where = ' WHERE user_id = '.$user->getID().' ';
+		} else if (count(UserConfig::$dont_display_activity_for) > 0) {
+			$where = ' WHERE user_id NOT IN('.join(', ', UserConfig::$dont_display_activity_for).') ';
 		}
 
-		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total FROM '.UserConfig::$mysql_prefix.'activity '.$exclude.'GROUP BY activity_date, activity_id'))
+		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total FROM '.UserConfig::$mysql_prefix.'activity '.$where.'GROUP BY activity_date, activity_id'))
 		{
 			if (!$stmt->execute())
 			{
@@ -468,7 +470,7 @@ class User
 	/*
 	 * retrieves a list of latest activities 
 	 */
-	public static function getActivity($all, $pagenumber = 0, $perpage = 20)
+	public static function getUsersActivity($all, $pagenumber = 0, $perpage = 20)
 	{
 		$activities = array();
 
@@ -565,6 +567,65 @@ class User
 		}
 
 		return $users;
+	}
+
+	/*
+	 * retrieves a list of latest activities 
+	 */
+	public function getActivity($all, $pagenumber = 0, $perpage = 20)
+	{
+		$activities = array();
+
+		if ($all) {
+			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM '.UserConfig::$mysql_prefix.'activity WHERE user_id = ? ORDER BY time DESC LIMIT ?, ?';
+		} else {
+			$ids = array();
+
+			foreach (UserConfig::$activities as $id => $activity) {
+				if ($activity[1] > 0) {
+					$ids[] = $id;
+				}
+			}
+
+			if (count($ids) == 0) {
+				return $activities; // no activities are configured to be worthy
+			}
+
+			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM '.UserConfig::$mysql_prefix.'activity WHERE user_id = ? AND activity_id IN ('.implode(', ', $ids).')  ORDER BY time DESC LIMIT ?, ?';
+		}
+
+		$db = UserConfig::getDB();
+
+		$first = $perpage * $pagenumber;
+
+		if ($stmt = $db->prepare($query))
+		{
+			if (!$stmt->bind_param('iii', $this->userid, $first, $perpage))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($time, $user_id, $activity_id))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			while($stmt->fetch() === TRUE)
+			{
+				$activities[] = array('time' => $time, 'user_id' => $user_id, 'activity_id' => $activity_id);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return $activities;
 	}
 
 	/*

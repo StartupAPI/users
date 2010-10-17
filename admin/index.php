@@ -27,7 +27,12 @@ require_once(UserConfig::$header);
 <h2>Active Users | <a href="registrations.php">Registered Users</a> | <a href="bymodule.php">Registrations By Module</a></h2>
 <?php
 $daily_active_users = User::getDailyActiveUsers();
-$daily_activity = User::getDailyActivityPoints();
+
+$activityuser = null;
+if (array_key_exists('userid', $_REQUEST)) {
+	$activityuser = User::getUser($_REQUEST['userid']);
+}
+$daily_activity = User::getDailyActivityPoints($activityuser);
 
 $dates = array();
 foreach ($daily_active_users as $record) {
@@ -60,7 +65,13 @@ google.load('visualization', '1', {'packages':['annotatedtimeline']});
 google.setOnLoadCallback(function() {
 	var data = new google.visualization.DataTable();
 	data.addColumn('date', 'Date');
+	<?php 
+	if (is_null($activityuser)) {
+	?>
 	data.addColumn('number', 'Active Users');
+	<?php
+	}
+	?>
 	data.addColumn('number', 'Total Points');
 
 	var daily = [<?php
@@ -77,7 +88,14 @@ google.setOnLoadCallback(function() {
 				$first = false;
 			}
 
-	?>		[new Date('<?php echo $date?>'), <?php echo $record['users']?>, <?php echo $record['points'] > 0 ? $record['points'] : 0?>]<?php
+	?>		[new Date('<?php echo $date?>'),
+				<?php 
+				if (is_null($activityuser)) {
+					echo $record['users']?>,
+				<?php
+				}
+				?>
+				<?php echo (array_key_exists('points', $record) && $record['points'] > 0) ? $record['points'] : 0?>]<?php
 		}
 	?>
 	];
@@ -94,8 +112,23 @@ google.setOnLoadCallback(function() {
 </script>
 <div id='chart_div' style='width: 100%; height: 240px; margin-bottom: 1em'></div>
 
+<?php 
+if (!is_null($activityuser)) {
+?>
+<h2>Showing activity for <?php echo $activityuser->getName()?> (<a href=".">reset</a>)</h2>
+<?php
+}
+?>
+
 <table cellpadding="5" cellspacing="0" border="1" width="100%">
-<tr><th>Time</th><th>Activity</th><th>Points</th><th>User</th></tr>
+<tr><th>Time</th><th>Activity</th><th>Points</th>
+<?php
+if (is_null($activityuser)) {
+?>
+<th>User</th>
+<?php
+}?>
+</tr>
 <?php
 $perpage = 20;
 $pagenumber = 0;
@@ -104,7 +137,13 @@ if (array_key_exists('page', $_GET)) {
 	$pagenumber = $_GET['page'];
 }
 
-$activities = User::getActivity(array_key_exists('all', $_REQUEST), $pagenumber, $perpage);
+if (is_null($activityuser)) {
+	$activities = User::getUsersActivity(array_key_exists('all', $_REQUEST), $pagenumber, $perpage);
+}
+else
+{
+	$activities = $activityuser->getActivity(array_key_exists('all', $_REQUEST), $pagenumber, $perpage);
+}
 ?>
 <tr><td colspan="4">
 <?php
@@ -124,8 +163,7 @@ else
 	?><span style="color: silver; float: left">&lt;&lt;&lt;prev</span><?php
 }
 ?>
-<span style="float: left; margin-left: 2em">Page <?php echo $pagenumber+1?></span>
-
+<span style="float: left; margin: 0 2em">Page <?php echo $pagenumber+1?></span>
 </td></tr>
 <?php
 $now = time();
@@ -143,7 +181,12 @@ foreach ($activities as $activity)
 	<td><?php $act = UserConfig::$activities[$activity['activity_id']];
 	echo $act[0] ?></td>
 	<td><?php echo $act[1] ?></td>
-	<td><?php echo $user->getName();?></td>
+	<?php
+	if (is_null($activityuser)) {
+	?>
+		<td><a href="?userid=<?php echo $user->getID()?>"><?php echo $user->getName();?></a></td>
+	<?php
+	}?>
 </td></tr><?php
 }
 
