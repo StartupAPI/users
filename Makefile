@@ -11,7 +11,7 @@ all:	.svn .git updatedb
 
 # and vice versa
 .svn:
-	git pull
+	git pull origin master
 	git submodule init
 	git submodule update
 
