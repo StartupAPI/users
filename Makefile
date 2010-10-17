@@ -5,7 +5,7 @@ dbupgrade: .svn .git
 
 # if we don't have .git folder, let's assume we use SVN export
 .git:
-	svn export http://github.com/sergeychernyshev/DBUpgrade.git
+	svn export http://svn.github.com/sergeychernyshev/DBUpgrade.git dbupgrade
 
 # and vice versa
 .svn:
