@@ -42,7 +42,7 @@ $versions[1]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."users` (
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `fb_id` (`fb_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1";
-$versions[1]['down'][]  = "DROP TABLE IF EXISTS `".UserConfig::$mysql_prefix."users`";
+$versions[1]['down'][]  = "DROP TABLE `".UserConfig::$mysql_prefix."users`";
 
 $versions[1]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."accounts` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -50,7 +50,7 @@ $versions[1]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."accounts` (
   `plan` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'Payment plan ID',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1";
-$versions[1]['down'][]  = "DROP TABLE IF EXISTS `".UserConfig::$mysql_prefix."accounts`";
+$versions[1]['down'][]  = "DROP TABLE `".UserConfig::$mysql_prefix."accounts`";
 
 $versions[1]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."account_users` (
   `account_id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -65,7 +65,7 @@ $versions[1]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."account_users
   CONSTRAINT `".UserConfig::$mysql_prefix."account_users_ibfk_2` FOREIGN KEY (`user_id`)
 	REFERENCES `".UserConfig::$mysql_prefix."users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1";
-$versions[1]['down'][] = "DROP TABLE IF EXISTS `".UserConfig::$mysql_prefix."account_users`";
+$versions[1]['down'][] = "DROP TABLE `".UserConfig::$mysql_prefix."account_users`";
 
 $versions[1]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."activity` (
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Time of activity',
@@ -75,7 +75,7 @@ $versions[1]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."activity` (
   KEY `user_id` (`user_id`),
   KEY `activity_id` (`activity_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='Stores user activities'";
-$versions[1]['down'][] = "DROP TABLE IF EXISTS `".UserConfig::$mysql_prefix."activity`";
+$versions[1]['down'][] = "DROP TABLE `".UserConfig::$mysql_prefix."activity`";
 
 $versions[1]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."googlefriendconnect` (
   `user_id` int(10) unsigned NOT NULL COMMENT 'User ID',
@@ -85,7 +85,7 @@ $versions[1]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."googlefriendc
   CONSTRAINT `gfc_user` FOREIGN KEY (`user_id`)
 	REFERENCES `".UserConfig::$mysql_prefix."users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1";
-$versions[1]['down'][] = "DROP TABLE IF EXISTS `".UserConfig::$mysql_prefix."googlefriendconnect`";
+$versions[1]['down'][] = "DROP TABLE `".UserConfig::$mysql_prefix."googlefriendconnect`";
 
 $versions[1]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."invitation` (
   `code` char(10) NOT NULL COMMENT 'Code',
