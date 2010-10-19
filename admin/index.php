@@ -28,33 +28,41 @@ require_once(UserConfig::$header);
 <?php
 $daily_active_users = User::getDailyActiveUsers();
 
+$selectedactivityid = null;
+$selectedactivity = null;
 $activityuser = null;
-if (array_key_exists('userid', $_REQUEST)) {
-	$activityuser = User::getUser($_REQUEST['userid']);
-}
-$daily_activity = User::getDailyActivityPoints($activityuser);
-
 $dates = array();
-foreach ($daily_active_users as $record) {
-	if (!array_key_exists($record['date'], $dates)) {
-		$dates[$record['date']] = array();
-	}
+if (array_key_exists('activityid', $_REQUEST)) {
+	$selectedactivityid = $_REQUEST['activityid'];
+	$selectedactivity = UserConfig::$activities[$selectedactivityid];
 
-	if (!array_key_exists('users', $dates[$record['date']])) {
-		$dates[$record['date']]['users'] = 0;
+	$dates = User::getDailyPointsByActivity($selectedactivityid);
+} else {
+	if (array_key_exists('userid', $_REQUEST)) {
+		$activityuser = User::getUser($_REQUEST['userid']);
 	}
+	$daily_activity = User::getDailyActivityPoints($activityuser);
+	foreach ($daily_active_users as $record) {
+		if (!array_key_exists($record['date'], $dates)) {
+			$dates[$record['date']] = array();
+		}
 
-	$dates[$record['date']]['users'] += 1;
-}
-foreach ($daily_activity as $record) {
-	if (!array_key_exists($record['date'], $dates)) {
-		$dates[$record['date']] = array();
-	}
+		if (!array_key_exists('users', $dates[$record['date']])) {
+			$dates[$record['date']]['users'] = 0;
+		}
 
-	if (!array_key_exists('points', $dates[$record['date']])) {
-		$dates[$record['date']]['points'] = 0;
+		$dates[$record['date']]['users'] += 1;
 	}
-	$dates[$record['date']]['points'] += $record['total'] * UserConfig::$activities[$record['activity']][1];
+	foreach ($daily_activity as $record) {
+		if (!array_key_exists($record['date'], $dates)) {
+			$dates[$record['date']] = array();
+		}
+
+		if (!array_key_exists('points', $dates[$record['date']])) {
+			$dates[$record['date']]['points'] = 0;
+		}
+		$dates[$record['date']]['points'] += $record['total'] * UserConfig::$activities[$record['activity']][1];
+	}
 }
 
 $total = 0;
@@ -65,16 +73,25 @@ google.load('visualization', '1', {'packages':['annotatedtimeline']});
 google.setOnLoadCallback(function() {
 	var data = new google.visualization.DataTable();
 	data.addColumn('date', 'Date');
-	<?php 
-	if (is_null($activityuser)) {
+	<?php
+	if (is_null($selectedactivity)) {
+		if (is_null($activityuser)) {
+		?>
+		data.addColumn('number', 'Active Users');
+		<?php
+		}
+		?>
+		data.addColumn('number', 'Total Points');
+	<?php
+	} else {
 	?>
-	data.addColumn('number', 'Active Users');
+		data.addColumn('number', 'Number of activities');
 	<?php
 	}
 	?>
-	data.addColumn('number', 'Total Points');
 
-	var daily = [<?php
+	var daily = [
+<?php
 		$first = true;
 
 		foreach ($dates as $date => $record)
@@ -86,16 +103,23 @@ google.setOnLoadCallback(function() {
 			else
 			{
 				$first = false;
-			}
-
-	?>		[new Date('<?php echo $date?>'),
-				<?php 
+			}?>
+	[new Date('<?php echo $date?>'),<?php
+			if (is_null($selectedactivity)) {
 				if (is_null($activityuser)) {
-					echo $record['users']?>,
-				<?php
+					echo $record['users']?>,<?php
 				}
-				?>
-				<?php echo (array_key_exists('points', $record) && $record['points'] > 0) ? $record['points'] : 0?>]<?php
+				
+				if (array_key_exists('points', $record) && $record['points'] > 0) {
+					echo $record['points'];
+				} else {
+					echo 0;
+				}
+			} else {
+				echo $record ? $record : 0;
+			}
+			?>]
+			<?php
 		}
 	?>
 	];
@@ -113,6 +137,12 @@ google.setOnLoadCallback(function() {
 <div id='chart_div' style='width: 100%; height: 240px; margin-bottom: 1em'></div>
 
 <?php 
+if (!is_null($selectedactivity)) {
+?>
+<h2>Showing activity of type "<?php echo $selectedactivity[0] ?>" (<a href=".">reset</a>)</h2>
+<?php
+}
+
 if (!is_null($activityuser)) {
 ?>
 <h2>Showing activity for <?php echo $activityuser->getName()?> (<a href=".">reset</a>)</h2>
@@ -121,8 +151,14 @@ if (!is_null($activityuser)) {
 ?>
 
 <table cellpadding="5" cellspacing="0" border="1" width="100%">
-<tr><th>Time</th><th>Activity</th><th>Points</th>
+<tr><th>Time</th>
 <?php
+if (is_null($selectedactivity)) {
+?>
+<th>Activity</th><th>Points</th>
+<?php
+}
+
 if (is_null($activityuser)) {
 ?>
 <th>User</th>
@@ -137,7 +173,11 @@ if (array_key_exists('page', $_GET)) {
 	$pagenumber = $_GET['page'];
 }
 
-if (is_null($activityuser)) {
+// TODO get activities only for specific activity
+
+if (!is_null($selectedactivity)) {
+	$activities = User::getUsersByActivity($selectedactivityid, $pagenumber, $perpage);
+} else if (is_null($activityuser)) {
 	$activities = User::getUsersActivity(array_key_exists('all', $_REQUEST), $pagenumber, $perpage);
 }
 else
@@ -177,17 +217,22 @@ foreach ($activities as $activity)
 
 	$user = User::getUser($activity['user_id']);
 
-	?><tr valign="top"><td align="right"><?php echo date('M j, h:iA', $time)?> (<?php if ($ago <= 5) {?><span style="color: #00<?php echo sprintf('%02s', dechex((4 - $ago) * 150 / 4 + 50))?>00; font-weight: bold"><?php }?><?php echo $ago?> day<?php echo $ago > 1 ? 's' : '' ?> ago<?php if ($ago <= 5) {?></span><?php }?>)</td>
-	<td><?php $act = UserConfig::$activities[$activity['activity_id']];
-	echo $act[0] ?></td>
+	?><tr valign="top">
+	<td align="right"><?php echo date('M j, h:iA', $time)?> (<?php if ($ago <= 5) {?><span style="color: #00<?php echo sprintf('%02s', dechex((4 - $ago) * 150 / 4 + 50))?>00; font-weight: bold"><?php }?><?php echo $ago?> day<?php echo $ago > 1 ? 's' : '' ?> ago<?php if ($ago <= 5) {?></span><?php }?>)</td>
+	<?php
+	if (is_null($selectedactivity)) {
+	?>
+	<td><a href="?activityid=<?php echo $activity['activity_id']?>"><?php $act = UserConfig::$activities[$activity['activity_id']]; echo $act[0] ?></a></td>
 	<td><?php echo $act[1] ?></td>
 	<?php
+	}
+
 	if (is_null($activityuser)) {
 	?>
 		<td><a href="?userid=<?php echo $user->getID()?>"><?php echo $user->getName();?></a></td>
 	<?php
 	}?>
-</td></tr><?php
+</tr><?php
 }
 
 ?>

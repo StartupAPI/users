@@ -297,6 +297,44 @@ class User
 		return $daily_activity;
 	}
 	/*
+	 * retrieves daily active users by activity
+	 */
+	public static function getDailyPointsByActivity($activityid)
+	{
+		$db = UserConfig::getDB();
+
+		$daily_activity = array();
+
+		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, count(*) AS cnt FROM '.UserConfig::$mysql_prefix.'activity WHERE activity_id = ? GROUP BY activity_date'))
+		{
+			if (!$stmt->bind_param('i', $activityid))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($date, $cnt))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			while($stmt->fetch() === TRUE)
+			{
+				$daily_activity[$date] = $cnt;
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return $daily_activity;
+	}
+	/*
 	 * retrieves aggregated activity points 
 	 */
 	public static function getDailyActivityPoints($user)
@@ -519,6 +557,54 @@ class User
 			while($stmt->fetch() === TRUE)
 			{
 				$activities[] = array('time' => $time, 'user_id' => $user_id, 'activity_id' => $activity_id);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return $activities;
+	}
+
+	/*
+	 * retrieves a list of users by activity
+	 */
+	public static function getUsersByActivity($activityid, $pagenumber = 0, $perpage = 20)
+	{
+		$activities = array();
+
+		$exclude = '';
+		if (count(UserConfig::$dont_display_activity_for) > 0) {
+			$exclude = ' user_id NOT IN('.join(', ', UserConfig::$dont_display_activity_for).') ';
+		}
+
+		$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id FROM '.UserConfig::$mysql_prefix.'activity '.($exclude != '' ? 'WHERE activity_id = ? AND '.$exclude : '').' ORDER BY time DESC LIMIT ?, ?';
+
+		$db = UserConfig::getDB();
+
+		$first = $perpage * $pagenumber;
+
+		if ($stmt = $db->prepare($query))
+		{
+			if (!$stmt->bind_param('iii', $activityid, $first, $perpage))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($time, $user_id))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			while($stmt->fetch() === TRUE)
+			{
+				$activities[] = array('time' => $time, 'user_id' => $user_id);
 			}
 
 			$stmt->close();
