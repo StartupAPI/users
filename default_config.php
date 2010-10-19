@@ -141,10 +141,18 @@ EOD;
 		UserConfig::$modules = array();
 
 		UserConfig::$ROOTPATH = dirname(__FILE__);
-		UserConfig::$USERSROOTURL = substr(UserConfig::$ROOTPATH, strlen($_SERVER['DOCUMENT_ROOT']));
+
+		// Chopping of trailing slash which is not supposed to be there in Apache config
+		// See: http://httpd.apache.org/docs/2.0/mod/core.html#documentroot
+		$docroot = $_SERVER['DOCUMENT_ROOT'];
+		if (substr($docroot, -1) == '/') {
+			$docroot = substr($docroot, 0, -1);
+		}
+		$docrootlength = strlen($docroot);
+		UserConfig::$USERSROOTURL = substr(UserConfig::$ROOTPATH, $docrootlength);
 
 		// we assume that package is extracted into the root of the site
-		UserConfig::$SITEROOTURL = substr(dirname(UserConfig::$ROOTPATH), strlen($_SERVER['DOCUMENT_ROOT'])).'/';
+		UserConfig::$SITEROOTURL = substr(dirname(UserConfig::$ROOTPATH), $docrootlength).'/';
 		UserConfig::$DEFAULTLOGINRETURN = UserConfig::$SITEROOTURL;
 		UserConfig::$DEFAULTLOGOUTRETURN = UserConfig::$SITEROOTURL;
 		UserConfig::$DEFAULTREGISTERRETURN = UserConfig::$SITEROOTURL;
@@ -161,7 +169,7 @@ EOD;
 		}
 
 		UserConfig::$SITEROOTFULLURL = 'http://'.$host.UserConfig::$SITEROOTURL;
-		UserConfig::$USERSROOTFULLURL = 'http://'.$host.substr(UserConfig::$ROOTPATH, strlen($_SERVER['DOCUMENT_ROOT']));
+		UserConfig::$USERSROOTFULLURL = 'http://'.$host.substr(UserConfig::$ROOTPATH, $docrootlength);
 
 		UserConfig::$supportEmailXMailer = 'UserBase (PHP/'.phpversion();
 
