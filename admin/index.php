@@ -225,7 +225,7 @@ else
 <tr><td colspan="4">
 <?php
 if (count($activities) == $perpage) {
-	?><a style="float: right" href="?page=<?php echo $pagenumber+1?>">next &gt;&gt;&gt;</a><?php
+	?><a style="float: right" href="?<?php echo array_key_exists('activityid', $_REQUEST) ? 'activityid='.urlencode($_REQUEST['activityid']).'&' : '' ?>page=<?php echo $pagenumber+1?>">next &gt;&gt;&gt;</a><?php
 }
 else
 {
@@ -233,7 +233,7 @@ else
 }
 
 if ($pagenumber > 0) {
-	?><a style="float: left" href="?page=<?php echo $pagenumber-1?>">&lt;&lt;&lt;prev</a><?php
+	?><a style="float: left" href="?<?php echo array_key_exists('activityid', $_REQUEST) ? 'activityid='.urlencode($_REQUEST['activityid']).'&' : '' ?>page=<?php echo $pagenumber-1?>">&lt;&lt;&lt;prev</a><?php
 }
 else
 {
@@ -276,7 +276,7 @@ foreach ($activities as $activity)
 <tr><td colspan="6">
 <?php
 if (count($activities) == $perpage) {
-	?><a style="float: right" href="?page=<?php echo $pagenumber+1?>">next &gt;&gt;&gt;</a><?php
+	?><a style="float: right" href="?<?php echo array_key_exists('activityid', $_REQUEST) ? 'activityid='.urlencode($_REQUEST['activityid']).'&' : '' ?>page=<?php echo $pagenumber+1?>">next &gt;&gt;&gt;</a><?php
 }
 else
 {
@@ -284,7 +284,7 @@ else
 }
 
 if ($pagenumber > 0) {
-	?><a style="float: left" href="?page=<?php echo $pagenumber-1?>">&lt;&lt;&lt;prev</a><?php
+	?><a style="float: left" href="?<?php echo array_key_exists('activityid', $_REQUEST) ? 'activityid='.urlencode($_REQUEST['activityid']).'&' : '' ?>page=<?php echo $pagenumber-1?>">&lt;&lt;&lt;prev</a><?php
 }
 else
 {
