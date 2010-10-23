@@ -136,13 +136,37 @@ google.setOnLoadCallback(function() {
 </script>
 <div id='chart_div' style='width: 100%; height: 240px; margin-bottom: 1em'></div>
 
-<?php 
-if (!is_null($selectedactivity)) {
-?>
-<h2>Showing activity of type "<?php echo $selectedactivity[0] ?>" (<a href=".">reset</a>)</h2>
+
+<form action="" name="activities">
+<div>Filter activities:
+<select name="activityid" onchange="document.activities.submit();">
+<option value="">-- all --</option>
 <?php
+function mostpoints($a, $b) {
+	if (UserConfig::$activities[$a][1] > UserConfig::$activities[$b][1]) {
+		return -1;
+	} else if (UserConfig::$activities[$a][1] < UserConfig::$activities[$b][1]) {
+		return 1;
+	}
+
+	return strcmp(UserConfig::$activities[$a][0], UserConfig::$activities[$b][0]);
 }
 
+uksort(UserConfig::$activities, 'mostpoints');
+
+$stats = User::getActivityStatistics();
+
+foreach (UserConfig::$activities as $id => $activity) {
+	if (!array_key_exists($id, $stats)) {
+		continue;
+	}
+?>
+	<option value="<?php echo $id ?>"<?php echo $selectedactivityid == $id ? ' selected="yes"' : '' ?>><?php echo $activity[0] ?> (<?php echo $activity[1] ?> points)</option>
+<?php } ?>
+</select>
+</div>
+</form>
+<?php
 if (!is_null($activityuser)) {
 ?>
 <h2>Showing activity for <?php echo $activityuser->getName()?> (<a href=".">reset</a>)</h2>

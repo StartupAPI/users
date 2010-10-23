@@ -656,6 +656,45 @@ class User
 	}
 
 	/*
+	 * retrieve activity statistics 
+	 */
+	public static function getActivityStatistics()
+	{
+		$stats = array();
+
+		$where = ' WHERE user_id NOT IN('.join(', ', UserConfig::$dont_display_activity_for).') ';
+
+		$query = 'SELECT activity_id, count(*) as cnt FROM '.UserConfig::$mysql_prefix."activity $where GROUP BY activity_id";
+
+		$db = UserConfig::getDB();
+
+		if ($stmt = $db->prepare($query))
+		{
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($activity_id, $cnt))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			while($stmt->fetch() === TRUE)
+			{
+				$stats[$activity_id] = $cnt;
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return $stats;
+	}
+
+	/*
 	 * retrieves a list of latest activities 
 	 */
 	public function getActivity($all, $pagenumber = 0, $perpage = 20)
