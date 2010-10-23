@@ -32,7 +32,17 @@ $selectedactivityid = null;
 $selectedactivity = null;
 $activityuser = null;
 $dates = array();
-if (array_key_exists('activityid', $_REQUEST)) {
+
+$showactivities = null;
+if (array_key_exists('activityid', $_REQUEST) && $_REQUEST['activityid'] == 'all') {
+	$showactivities = 'all';
+}
+
+if (!array_key_exists('activityid', $_REQUEST) || $_REQUEST['activityid'] == 'withpoints') {
+	$showactivities = 'withpoints';
+}
+
+if (array_key_exists('activityid', $_REQUEST) && is_numeric($_REQUEST['activityid'])) {
 	$selectedactivityid = $_REQUEST['activityid'];
 	$selectedactivity = UserConfig::$activities[$selectedactivityid];
 
@@ -138,9 +148,11 @@ google.setOnLoadCallback(function() {
 
 
 <form action="" name="activities">
-<div>Filter activities:
+<div>
+Filter activities:
 <select name="activityid" onchange="document.activities.submit();">
-<option value="">-- all --</option>
+<option value="withpoints"<?php echo $showactivities == 'withpoints' ? ' selected="yes"' : '' ?>>-- all activities with points (default) --</option>
+<option value="all"<?php echo $showactivities == 'all' ? ' selected="yes"' : '' ?>>-- all activities --</option>
 <?php
 function mostpoints($a, $b) {
 	if (UserConfig::$activities[$a][1] > UserConfig::$activities[$b][1]) {
@@ -164,15 +176,16 @@ foreach (UserConfig::$activities as $id => $activity) {
 	<option value="<?php echo $id ?>"<?php echo $selectedactivityid == $id ? ' selected="yes"' : '' ?>><?php echo $activity[0] ?> (<?php echo $activity[1] ?> points)</option>
 <?php } ?>
 </select>
-</div>
-</form>
-<?php
-if (!is_null($activityuser)) {
-?>
-<h2>Showing activity for <?php echo $activityuser->getName()?> (<a href=".">reset</a>)</h2>
-<?php
+
+Users:
+<?php if (is_null($activityuser)) {
+	?>all<?php
+} else {
+	echo $activityuser->getName()?> (<a href=".">reset</a>)<?php
 }
 ?>
+</form>
+</div>
 
 <table cellpadding="5" cellspacing="0" border="1" width="100%">
 <tr><th>Time</th>
@@ -202,11 +215,11 @@ if (array_key_exists('page', $_GET)) {
 if (!is_null($selectedactivity)) {
 	$activities = User::getUsersByActivity($selectedactivityid, $pagenumber, $perpage);
 } else if (is_null($activityuser)) {
-	$activities = User::getUsersActivity(array_key_exists('all', $_REQUEST), $pagenumber, $perpage);
+	$activities = User::getUsersActivity($showactivities == 'all', $pagenumber, $perpage);
 }
 else
 {
-	$activities = $activityuser->getActivity(array_key_exists('all', $_REQUEST), $pagenumber, $perpage);
+	$activities = $activityuser->getActivity($showactivities == 'all', $pagenumber, $perpage);
 }
 ?>
 <tr><td colspan="4">
