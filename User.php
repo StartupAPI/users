@@ -127,8 +127,6 @@ class User
 			}
 			$id = $stmt->insert_id;
 
-			$user = new User($id, $name);
-
 			$stmt->close();
 		}
 		else
@@ -154,6 +152,7 @@ class User
 			throw new Exception("Can't prepare statement: ".$db->error);
 		}
 
+		$user = self::getUser($id);
 		$user->init();
 
 		return $user;
@@ -179,7 +178,6 @@ class User
 			}
 			$id = $stmt->insert_id;
 
-			$user = new User($id, $name, null, null, $fb_id);
 
 			$stmt->close();
 		}
@@ -188,6 +186,7 @@ class User
 			throw new Exception("Can't prepare statement: ".$db->error);
 		}
 
+		$user = self::getUser($id);
 		$user->init();
 
 		return $user;
@@ -216,8 +215,6 @@ class User
 			}
 			$id = $stmt->insert_id;
 
-			$user = new User($id, $name, $username, $email);
-
 			$stmt->close();
 		}
 		else
@@ -225,6 +222,7 @@ class User
 			throw new Exception("Can't prepare statement: ".$db->error);
 		}
 
+		$user = self::getUser($id);
 		$user->init();
 
 		return $user;
@@ -427,7 +425,7 @@ class User
 	/*
 	 * retrieves paged list of users
 	 */
-	public static function getUsers($pagenumber = 0, $perpage = 20)
+	public static function getUsers($pagenumber = 0, $perpage = 20, $sort = 'registration')
 	{
 		$db = UserConfig::getDB();
 
@@ -435,7 +433,12 @@ class User
 
 		$first = $perpage * $pagenumber;
 
-		if ($stmt = $db->prepare('SELECT id, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime) FROM '.UserConfig::$mysql_prefix.'users ORDER BY regtime DESC LIMIT ?, ?'))
+		$orderby = 'regtime';
+		if ($sort == 'activity') {
+			$orderby = 'points';
+		}
+
+		if ($stmt = $db->prepare('SELECT id, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users ORDER BY '.$orderby.' DESC LIMIT ?, ?'))
 		{
 			if (!$stmt->bind_param('ii', $first, $perpage))
 			{
@@ -445,14 +448,14 @@ class User
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime))
+			if (!$stmt->bind_result($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
 
 			while($stmt->fetch() === TRUE)
 			{
-				$users[] = new self($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime);
+				$users[] = new self($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
 			}
 
 			$stmt->close();
@@ -625,7 +628,7 @@ class User
 
 		$users = array();
 
-		if ($stmt = $db->prepare('SELECT id, name, username, email, requirespassreset, fb_id FROM '.UserConfig::$mysql_prefix.'users WHERE username = ? OR email = ?'))
+		if ($stmt = $db->prepare('SELECT id, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users WHERE username = ? OR email = ?'))
 		{
 			if (!$stmt->bind_param('ss', $nameoremail, $nameoremail))
 			{
@@ -635,14 +638,14 @@ class User
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($userid, $name, $username, $email, $requirespassreset, $fb_id))
+			if (!$stmt->bind_result($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
 
 			while ($stmt->fetch() === TRUE)
 			{
-				$users[] = new User($userid, $name, $username, $email, $requirespassreset, $fb_id);
+				$users[] = new User($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
 			}
 
 			$stmt->close();
@@ -827,20 +830,20 @@ class User
 
 		$idlist = join(', ', $ids);
 		
-		if ($stmt = $db->prepare('SELECT id, name, username, email, requirespassreset, fb_id FROM '.UserConfig::$mysql_prefix.'users WHERE id IN ('.$idlist.')'))
+		if ($stmt = $db->prepare('SELECT id, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users WHERE id IN ('.$idlist.')'))
 		{
 			if (!$stmt->execute())
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($userid, $name, $username, $email, $requirespassreset, $fb_id))
+			if (!$stmt->bind_result($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
 
 			while ($stmt->fetch() === TRUE)
 			{
-				$users[] = new User($userid, $name, $username, $email, $requirespassreset, $fb_id);
+				$users[] = new User($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
 			}
 
 			$stmt->close();
@@ -946,7 +949,7 @@ class User
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT id, name, username, email, requirespassreset, fb_id FROM '.UserConfig::$mysql_prefix.'users u INNER JOIN '.UserConfig::$mysql_prefix.'googlefriendconnect g ON u.id = g.user_id WHERE g.google_id = ?'))
+		if ($stmt = $db->prepare('SELECT id, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users u INNER JOIN '.UserConfig::$mysql_prefix.'googlefriendconnect g ON u.id = g.user_id WHERE g.google_id = ?'))
 		{
 			if (!$stmt->bind_param('s', $googleid))
 			{
@@ -956,14 +959,14 @@ class User
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($userid, $name, $username, $email, $requirespassreset, $fb_id))
+			if (!$stmt->bind_result($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
 
 			if ($stmt->fetch() === TRUE)
 			{
-				$user = new User($userid, $name, $username, $email, $requirespassreset, $fb_id);
+				$user = new User($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
 			}
 
 			$stmt->close();
@@ -984,7 +987,7 @@ class User
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT id, name, username, email, requirespassreset FROM '.UserConfig::$mysql_prefix.'users WHERE fb_id = ?'))
+		if ($stmt = $db->prepare('SELECT id, name, username, email, requirespassreset, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users WHERE fb_id = ?'))
 		{
 			if (!$stmt->bind_param('i', $fb_id))
 			{
@@ -994,14 +997,14 @@ class User
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($userid, $name, $username, $email, $requirespassreset))
+			if (!$stmt->bind_result($userid, $name, $username, $email, $requirespassreset, $regtime, $points))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
 
 			if ($stmt->fetch() === TRUE)
 			{
-				$user = new User($userid, $name, $username, $email, $requirespassreset, $fb_id);
+				$user = new User($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
 			}
 
 			$stmt->close();
@@ -1024,7 +1027,7 @@ class User
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT name, username, email, requirespassreset, fb_id FROM '.UserConfig::$mysql_prefix.'users WHERE id = ?'))
+		if ($stmt = $db->prepare('SELECT name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users WHERE id = ?'))
 		{
 			if (!$stmt->bind_param('i', $userid))
 			{
@@ -1034,14 +1037,14 @@ class User
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($name, $username, $email, $requirespassreset, $fb_id))
+			if (!$stmt->bind_result($name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
 
 			if ($stmt->fetch() === TRUE)
 			{
-				$user = new User($userid, $name, $username, $email, $requirespassreset, $fb_id);
+				$user = new User($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
 			}
 
 			$stmt->close();
@@ -1117,8 +1120,9 @@ class User
 	private $requirespassreset;
 	private $fbid;
 	private $regtime;
+	private $points;
 
-	function __construct($userid, $name, $username = null, $email = null, $requirespassreset = false, $fbid = null, $regtime = null)
+	function __construct($userid, $name, $username = null, $email = null, $requirespassreset = false, $fbid = null, $regtime = null, $points = 0)
 	{
 		$this->userid = $userid;
 		$this->name = $name;
@@ -1127,6 +1131,7 @@ class User
 		$this->requirespassreset = $requirespassreset ? true : false;
 		$this->fbid = $fbid;
 		$this->regtime = $regtime;
+		$this->points = $points;
 	}
 
 	public function requiresPasswordReset()
@@ -1183,6 +1188,10 @@ class User
 	public function getRegTime()
 	{
 		return $this->regtime;
+	}
+	public function getPoints()
+	{
+		return $this->points;
 	}
 	public function isTheSameAs($user)
 	{
@@ -1315,6 +1324,24 @@ class User
 		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'activity (user_id, activity_id) VALUES (?, ?)'))
 		{
 			if (!$stmt->bind_param('ii', $this->userid, $activity_id))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET points = points + ? WHERE id = ?'))
+		{
+			if (!$stmt->bind_param('ii', UserConfig::$activities[$activity_id][1], $this->userid))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}

@@ -164,7 +164,7 @@ EOD;
 		}
 		else
 		{
-			error_log("Warning: Can't determine site's host name, using www.example.com");
+			error_log("[UserBase config] Warning: Can't determine site's host name, using www.example.com");
 			$host = 'www.example.com';
 		}
 

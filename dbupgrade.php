@@ -12,7 +12,12 @@ require_once(dirname(__FILE__).'/dbupgrade/lib.php');
 $versions = array();
 // Add new migrations on top, right below this line.
 
-
+/* -------------------------------------------------------------------------------------------------------
+ * VERSION 3
+ * Adding user points counter
+*/
+$versions[3]['up'][]	= 'ALTER TABLE '.UserConfig::$mysql_prefix.'users ADD points INT(10) UNSIGNED NOT NULL DEFAULT 0';
+$versions[3]['down'][]	= 'ALTER TABLE '.UserConfig::$mysql_prefix.'users DROP COLUMN points';
 
 /* -------------------------------------------------------------------------------------------------------
  * VERSION 2

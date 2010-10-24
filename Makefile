@@ -17,3 +17,4 @@ all:	.svn .git updatedb
 
 updatedb:
 	php dbupgrade.php
+	php aggregatepoints.php
