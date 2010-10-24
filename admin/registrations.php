@@ -159,8 +159,6 @@ foreach ($users as $user)
 	$points = $user->getPoints();
 	if ($points > 0) {
 		?><a href="./?userid=<?php echo $userid ?>"><?php echo $points ?></a><?php
-	} else {
-		echo $points;
 	}
 	?>
 	</td>
