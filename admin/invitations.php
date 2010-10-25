@@ -83,7 +83,7 @@ else
 		$code = $invitation->getCode();
 		?><tr>
 		<td><?php echo htmlentities($code)?></td>
-		<td><?php echo htmlentities(User::getUser($invitation->getIssuer())->getUserName())?></td>
+		<td><?php // echo htmlentities(User::getUser($invitation->getIssuer())->getUserName())?></td>
 		<td><input name="code_<?php echo htmlentities($invitation->getCode())?>" value="" style="width: 100%"></td><?php
 
 		if (!is_null(UserConfig::$onRenderUserInvitationAction))
