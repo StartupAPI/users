@@ -116,7 +116,10 @@ if (count($invitations) > 0)
 		$code = $invitation->getCode();
 		$comment = $invitation->getComment();
 
-		?><tr><td><?php echo htmlentities($code)?></td><td><?php echo htmlentities(User::getUser($invitation->getIssuer())->getUserName())?></td><td><?php echo htmlentities($comment)?></td><?php
+		?><tr>
+		<td><?php echo htmlentities($code)?></td>
+		<td><?php // echo htmlentities(User::getUser($invitation->getIssuer())->getUserName())?></td>
+		<td><?php echo htmlentities($comment)?></td><?php
 
 		if (!is_null(UserConfig::$onRenderUserInvitationFollowUpAction))
 		{
@@ -143,7 +146,12 @@ if (count($invitations) > 0)
 <?php
 	foreach ($invitations as $invitation)
 	{
-		?><tr><td><?php echo htmlentities($invitation->getCode())?></td><td><?php echo htmlentities(User::getUser($invitation->getIssuer())->getUserName())?></td><td><?php echo htmlentities($invitation->getComment())?></td><td><?php echo htmlentities($invitation->getUser()->getUserName())?></td></tr><?php
+		?><tr>
+		<td><?php echo htmlentities($invitation->getCode())?></td>
+		<td><?php // echo htmlentities(User::getUser($invitation->getIssuer())->getUserName())?></td>
+		<td><?php echo htmlentities($invitation->getComment())?></td>
+		<td><?php echo htmlentities($invitation->getUser()->getUserName())?></td>
+		</tr><?php
 	}
 }
 ?>
