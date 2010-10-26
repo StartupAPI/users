@@ -104,12 +104,12 @@ class UserConfig
 
 	public static function renderUserInvitationAction($code)
 	{
-		?><a href="mailto:?Subject=Invitation&Body=<?php echo UserConfig::$SITEROOTFULLURL?>/users/register.php?invite=<?php echo urlencode($code)?>">Invite</a><?php
+		?><a href="mailto:?Subject=Invitation&Body=<?php echo UserConfig::$SITEROOTFULLURL?>users/register.php?invite=<?php echo urlencode($code)?>">Invite</a><?php
 	}
 
 	public static function renderUserInvitationFollowUpAction($code)
 	{
-		?><a href="mailto:?Subject=Re:+Invitation&Body=<?php echo UserConfig::$SITEROOTFULLURL?>/users/register.php?invite=<?php echo urlencode($code)?>">Follow Up</a><?php
+		?><a href="mailto:?Subject=Re:+Invitation&Body=<?php echo UserConfig::$SITEROOTFULLURL?>users/register.php?invite=<?php echo urlencode($code)?>">Follow Up</a><?php
 	}
 
 	public static function renderTemporaryPasswordEmail($baseurl, $username, $temppass )
