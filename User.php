@@ -665,7 +665,10 @@ class User
 	{
 		$stats = array();
 
-		$where = ' WHERE user_id NOT IN('.join(', ', UserConfig::$dont_display_activity_for).') ';
+		$where = '';
+		if (count(UserConfig::$dont_display_activity_for) > 0) {
+			$where = ' WHERE user_id NOT IN('.join(', ', UserConfig::$dont_display_activity_for).') ';
+		}
 
 		$query = 'SELECT activity_id, count(*) as cnt FROM '.UserConfig::$mysql_prefix."activity $where GROUP BY activity_id";
 
