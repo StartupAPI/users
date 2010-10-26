@@ -104,7 +104,7 @@ class UserConfig
 
 	public static function renderUserInvitationAction($code)
 	{
-		?><a href="mailto:?Subject=Invitation+to+HowDoable&Body=<?php echo UserConfig::$SITEROOTURL?>/users/register.php?invite=<?php echo urlencode($code)?>">Invite</a><?php
+		?><a href="mailto:?Subject=Invitation&Body=<?php echo UserConfig::$SITEROOTURL?>/users/register.php?invite=<?php echo urlencode($code)?>">Invite</a><?php
 	}
 
 	public static function renderUserInvitationFollowUpAction($code)
