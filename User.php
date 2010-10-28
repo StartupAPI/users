@@ -581,10 +581,10 @@ class User
 
 		$exclude = '';
 		if (count(UserConfig::$dont_display_activity_for) > 0) {
-			$exclude = ' user_id NOT IN('.join(', ', UserConfig::$dont_display_activity_for).') ';
+			$exclude = ' AND user_id NOT IN('.join(', ', UserConfig::$dont_display_activity_for).') ';
 		}
 
-		$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id FROM '.UserConfig::$mysql_prefix.'activity '.($exclude != '' ? 'WHERE activity_id = ? AND '.$exclude : '').' ORDER BY time DESC LIMIT ?, ?';
+		$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id FROM '.UserConfig::$mysql_prefix.'activity WHERE activity_id = ? '.$exclude.' ORDER BY time DESC LIMIT ?, ?';
 
 		$db = UserConfig::getDB();
 
