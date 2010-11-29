@@ -86,7 +86,7 @@ if (UserConfig::$enableRegistration && array_key_exists('register', $_POST))
 
 require_once(UserConfig::$header);
 
-?><h1>Sign up</h1>
+?><h2>Sign up</h2>
 <div style="background: white; padding: 0 1em"><?php
 
 if (UserConfig::$enableRegistration)
@@ -133,7 +133,7 @@ if (UserConfig::$enableRegistration)
 
 			?>
 			<div style="margin-bottom: 2em">
-			<h2 name="<?php echo $id?>"><?php echo $module->getTitle()?></h2>
+			<h3 name="<?php echo $id?>"><?php echo $module->getTitle()?></h3>
 		<?php
 			if (array_key_exists($id, $errors) && is_array($errors[$id]) && count($errors[$id]) > 0)
 			{
