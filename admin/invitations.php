@@ -57,7 +57,7 @@ YAHOO.util.Event.onDOMReady(function() {
 });
 </script>
 
-<h1><a href="./">Users</a> | Invitations</h1><div style="background: white; padding: 1em">
+<h2><a href="./">Users</a> | Invitations</h2><div style="background: white; padding: 1em">
 <h2>Unsent Invitations</h2>
 <?php
 $invitations = Invitation::getUnsent();

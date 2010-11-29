@@ -22,7 +22,7 @@ if (array_key_exists('impersonate', $_POST)) {
 
 require_once(UserConfig::$header);
 
-?><h1>Users (<?php echo User::getTotalUsers()?>)<?php if (UserConfig::$enableInvitations) { ?> | <a href="invitations.php">Invitations</a><?php } ?></h1>
+?><h2>Users (<?php echo User::getTotalUsers()?>)<?php if (UserConfig::$enableInvitations) { ?> | <a href="invitations.php">Invitations</a><?php } ?></h2>
 <div style="background: white; padding: 1em">
 <h2><a href="./">Active Users</a> | <a href="registrations.php">Registered Users</a> | Registrations By Module</h2>
 

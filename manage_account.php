@@ -36,7 +36,7 @@ if (is_null($managed_account)) {
 
 require_once(UserConfig::$header);
 ?>
-<h1>Account Info (<?php echo $managed_account->getName() ?>)</h1>
+<h2>Account Info (<?php echo $managed_account->getName() ?>)</h2>
 <div id="plan">
 <p>Subscription plan: <b><?php echo $managed_account->getPlan()->getName() ?></b>
 </div>

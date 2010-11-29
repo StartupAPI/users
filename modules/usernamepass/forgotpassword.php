@@ -50,7 +50,7 @@ require_once(UserConfig::$header);
 if (array_key_exists('status', $_GET) && $_GET['status'] == 'sent')
 {
 ?>
-	<h1>Temporary password is sent</h1>
+	<h2>Temporary password is sent</h2>
 	<p>We generated temporary password and sent it to email address on file with your account.</p>
 	<p>This password is only valid for one day, so please check your mail and come back to <a href="<?php echo UserConfig::$USERSROOTURL.'/login.php'?>" style="font-weight: bold; text-decoration: underline">log in</a>.</p>
 	<p>Once you're logged in, you will be asked to reset your password.</p>
@@ -58,7 +58,7 @@ if (array_key_exists('status', $_GET) && $_GET['status'] == 'sent')
 }
 else
 {
-	?><h1>Forgot password?</h1>
+	?><h2>Forgot password?</h2>
 	<div style="background: white; padding: 0 1em 0 1em">
 	<form action="" method="POST">
 	<p>Please enter your email or username:</p>

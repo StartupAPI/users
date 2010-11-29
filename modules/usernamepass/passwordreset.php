@@ -37,7 +37,7 @@ if (array_key_exists('save', $_POST))
 
 require_once(UserConfig::$header);
 
-?><h1>Please update your password</h1>
+?><h2>Please update your password</h2>
 
 <form action="" method="POST">
 <table>

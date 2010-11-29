@@ -46,7 +46,7 @@ if (array_key_exists('save', $_POST))
 
 require_once(UserConfig::$header);
 
-?><h1>Edit Your Information</h1>
+?><h2>Edit Your Information</h2>
 
 <div style="float: right; width: 400px">
 <div>
