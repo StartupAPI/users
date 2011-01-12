@@ -162,7 +162,7 @@ foreach ($users as $user)
 	}
 	?>
 	</td>
-	<td><form name="imp" action="" method="POST"><input type="submit" value="impersonate"/><input type="hidden" name="impersonate" value="<?php echo $user->getID()?>"/></form></td>
+	<td><form name="imp" action="" method="POST"><input type="submit" value="impersonate" style="font: small"/><input type="hidden" name="impersonate" value="<?php echo $user->getID()?>"/></form></td>
 
 </tr><?php
 }
