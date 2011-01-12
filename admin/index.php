@@ -266,8 +266,12 @@ foreach ($activities as $activity)
 
 	if (is_null($activityuser)) {
 	?>
-		<td><a href="?userid=<?php echo $user->getID()?>"><?php echo $user->getName();?></a>
-		<form name="imp" action="" method="POST"><input type="submit" value="impersonate" style="font: small"/><input type="hidden" name="impersonate" value="<?php echo $user->getID()?>"/></form></td>
+		<td>
+		<form name="imp" action="" method="POST">
+		<a href="?userid=<?php echo $user->getID()?>"><?php echo $user->getName();?></a>
+		<input type="submit" value="impersonate"/><input type="hidden" name="impersonate" value="<?php echo $user->getID()?>"/>
+		</form>
+		</td>
 	<?php
 	}?>
 </tr><?php
