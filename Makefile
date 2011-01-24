@@ -1,19 +1,19 @@
-all:	.svn .git updatedb
+all:	updatecode updatedb
 
-# if we don't have .git folder, let's assume we use SVN export
-.git:
+updatecode:
+ifneq "$(wildcard .svn )" ""
 	rm -rf dbupgrade
 	svn update
 	mkdir dbupgrade/
 	svn export http://svn.github.com/sergeychernyshev/DBUpgrade.git _dbupgrade
 	mv _dbupgrade/* dbupgrade/
 	rm -rf _dbupgrade
-
-# and vice versa
-.svn:
+endif
+ifneq "$(wildcard .git )" ""
 	git pull origin master
 	git submodule init
 	git submodule update
+endif
 
 updatedb:
 	php dbupgrade.php
