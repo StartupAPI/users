@@ -1,6 +1,0 @@
-AuthUserFile /www/data/.htpasswd
-AuthName "Private beta"
-AuthType Basic
-<Limit GET POST>
-	require user sergey
-</Limit>
