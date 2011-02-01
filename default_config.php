@@ -20,6 +20,9 @@ class UserConfig
 	// session secret - must be unique for each installation
 	public static $SESSION_SECRET;
 
+	// Administrator users
+	public static $admins = array();
+
 	// key used in session storage to store user's ID
 	public static $session_userid_key = 'users-userid';
 	public static $session_return_key = 'users-return-to';

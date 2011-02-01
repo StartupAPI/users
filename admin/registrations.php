@@ -3,15 +3,17 @@ require_once(dirname(dirname(__FILE__)).'/config.php');
 
 require_once(dirname(dirname(__FILE__)).'/User.php');
 
-if (!session_start())
-{
-	throw new Exception("Can't start session");
+$user = User::require_login();
+
+if (!in_array($user->getID(), UserConfig::$admins)) {
+	require_once(dirname(__FILE__).'/admin_access_only.php');
+	exit;
 }
 
 if (array_key_exists('impersonate', $_POST)) {
-	$user = User::getUser($_POST['impersonate']);
-	if ($user !== null) {
-		$user->setSession(false); // always impersonate only for the browser session
+	$impersonated_user= User::getUser($_POST['impersonate']);
+	if ($impersonated_user !== null) {
+		$impersonated_user->setSession(false); // always impersonate only for the browser session
 		header('Location: '.UserConfig::$DEFAULTLOGINRETURN);
 	}
 	else

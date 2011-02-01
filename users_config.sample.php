@@ -10,6 +10,8 @@ UserConfig::$modules[] = new UsernamePasswordAuthenticationModule();
 
 UserConfig::$SESSION_SECRET= '..................................................';
 
+UserConfig::$admins = array(  ); // IDs of admins for this instance
+
 UserConfig::setDB(new mysqli( 'localhost', 'user1', 'mypass', 'mydb'));
 
 # Set these to point at your header and footer or leave them commented out to use default ones

@@ -1,20 +1,14 @@
 <?php
-$_styles = array (
-	'http://yui.yahooapis.com/2.7.0/build/button/assets/skins/sam/button.css',
-	'http://yui.yahooapis.com/2.7.0/build/container/assets/skins/sam/container.css'
-);
-$_scripts = array ( 
-	'http://yui.yahooapis.com/2.7.0/build/yahoo-dom-event/yahoo-dom-event.js',
-	'http://yui.yahooapis.com/2.7.0/build/animation/animation-min.js',
-	'http://yui.yahooapis.com/2.7.0/build/connection/connection-min.js',
-	'http://yui.yahooapis.com/2.7.0/build/element/element-min.js',
-	'http://yui.yahooapis.com/2.7.0/build/button/button-min.js',
-	'http://yui.yahooapis.com/2.7.0/build/dragdrop/dragdrop-min.js',
-	'http://yui.yahooapis.com/2.7.0/build/container/container-min.js'
-);
-
 require_once(dirname(dirname(__FILE__)).'/config.php');
 require_once(dirname(dirname(__FILE__)).'/User.php');
+
+$user = User::require_login();
+
+if (!in_array($user->getID(), UserConfig::$admins)) {
+	require_once(dirname(__FILE__).'/admin_access_only.php');
+	exit;
+}
+
 require_once(dirname(dirname(__FILE__)).'/Invitation.php');
 
 if (array_key_exists('save', $_POST))
@@ -45,6 +39,20 @@ if (array_key_exists('add', $_POST) && is_numeric($_POST['add']))
 	header("Location: #message=added");
 	exit;
 }
+
+$_styles = array (
+	'http://yui.yahooapis.com/2.7.0/build/button/assets/skins/sam/button.css',
+	'http://yui.yahooapis.com/2.7.0/build/container/assets/skins/sam/container.css'
+);
+$_scripts = array ( 
+	'http://yui.yahooapis.com/2.7.0/build/yahoo-dom-event/yahoo-dom-event.js',
+	'http://yui.yahooapis.com/2.7.0/build/animation/animation-min.js',
+	'http://yui.yahooapis.com/2.7.0/build/connection/connection-min.js',
+	'http://yui.yahooapis.com/2.7.0/build/element/element-min.js',
+	'http://yui.yahooapis.com/2.7.0/build/button/button-min.js',
+	'http://yui.yahooapis.com/2.7.0/build/dragdrop/dragdrop-min.js',
+	'http://yui.yahooapis.com/2.7.0/build/container/container-min.js'
+);
 
 require_once(UserConfig::$header);
 ?>
