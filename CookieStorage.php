@@ -125,7 +125,7 @@ class MrClay_CookieStorage {
             return false;
         }
         $res = setcookie($name, $raw, $this->_o['expire'], $this->_o['path'], 
-                         $this->_o['domain'], $this->_o['secure']);
+                         $this->_o['domain'], $this->_o['secure'], $this->_o['httponly']);
         if ($res) {
             return true;
         } else {
@@ -148,7 +148,7 @@ class MrClay_CookieStorage {
             return false;
         }
         $res = setcookie($name, $raw, $this->_o['expire'], $this->_o['path'], 
-                         $this->_o['domain'], $this->_o['secure']);
+                         $this->_o['domain'], $this->_o['secure'], $this->_o['httponly']);
         if ($res) {
             return true;
         } else {
@@ -235,7 +235,7 @@ class MrClay_CookieStorage {
 
     public function delete($name)
     {
-        setcookie($name, '', time() - 3600, $this->_o['path'], $this->_o['domain'], $this->_o['secure']);
+        setcookie($name, '', time() - 3600, $this->_o['path'], $this->_o['domain'], $this->_o['secure'], $this->_o['httponly']);
     }
     
     /**
