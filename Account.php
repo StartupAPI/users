@@ -309,4 +309,50 @@ class Account
 
 		return $this->getID() == $account->getID();
 	}
+
+	/*
+	 * Returns true if account has requested feature enabled
+	 */
+	public function hasFeature($feature) {
+		if (array_key_exists($feature, UserConfig::$features)
+			&& UserConfig::$features[$feature][1]
+		) {
+			// if feature is forced, return true
+			if (UserConfig::$features[$feature][2]) {
+				return true;
+			}
+
+			// now, let's see if account has it enabled
+			$db = UserConfig::getDB();
+
+			$accountid = $this->getID();
+
+			if ($stmt = $db->prepare('SELECT COUNT(*) FROM '.UserConfig::$mysql_prefix.'account_features WHERE account_id = ? AND feature_id = ?'))
+			{
+				if (!$stmt->bind_param('ii', $accountid, $feature))
+				{
+					 throw new Exception("Can't bind parameter".$stmt->error);
+				}
+				if (!$stmt->execute())
+				{
+					throw new Exception("Can't execute statement: ".$stmt->error);
+				}
+				if (!$stmt->bind_result($enabled))
+				{
+					throw new Exception("Can't bind result: ".$stmt->error);
+				}
+
+				$stmt->fetch();
+				$stmt->close();
+
+				return $enabled > 0 ? true : false;
+			}
+			else
+			{
+				throw new Exception("Can't prepare statement: ".$db->error);
+			}
+		}
+
+		return false;
+	}
 }

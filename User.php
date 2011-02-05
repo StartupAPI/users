@@ -1368,4 +1368,65 @@ class User
 	{
 		return Account::getUserAccounts($this);
 	}
+
+	/*
+	 * Returns user's current account
+	 */
+	public function getCurrentAccount()
+	{
+		return Account::getCurrentAccount($this);
+	}
+
+	/*
+	 * Returns true if user has requested feature enabled
+	 */
+	public function hasFeature($feature) {
+		if (array_key_exists($feature, UserConfig::$features)
+			&& UserConfig::$features[$feature][1]
+		) {
+			// if feature is forced, return true
+			if (UserConfig::$features[$feature][2]) {
+				return true;
+			}
+
+			// if user's account has feature, user has it too
+			if (UserConfig::$useAccounts
+				&& $this->getCurrentAccount()->hasFeature($feature)
+			) {
+				return true;
+			}
+
+			// now, let's see if user has it enabled
+			$db = UserConfig::getDB();
+
+			$userid = $this->getID();
+
+			if ($stmt = $db->prepare('SELECT COUNT(*) FROM '.UserConfig::$mysql_prefix.'user_features WHERE user_id = ? AND feature_id = ?'))
+			{
+				if (!$stmt->bind_param('ii', $userid, $feature))
+				{
+					 throw new Exception("Can't bind parameter".$stmt->error);
+				}
+				if (!$stmt->execute())
+				{
+					throw new Exception("Can't execute statement: ".$stmt->error);
+				}
+				if (!$stmt->bind_result($enabled))
+				{
+					throw new Exception("Can't bind result: ".$stmt->error);
+				}
+
+				$stmt->fetch();
+				$stmt->close();
+
+				return $enabled > 0 ? true : false;
+			}
+			else
+			{
+				throw new Exception("Can't prepare statement: ".$db->error);
+			}
+		}
+
+		return false;
+	}
 }

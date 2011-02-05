@@ -42,6 +42,15 @@ class UserConfig
 	// a list of activities
 	public static $activities = array();
 
+	/* A list of features in the system.
+	   Key must be integer.
+	   Values of the array are:
+		- name of the feature (string)
+		- if it is enabled or disabled globally (boolean)
+		- if it is enabled for everybody, overriding account settings (boolean)
+	*/
+	public static $features = array();
+
 	// returning user activity configs
 	public static $last_login_key = 'users-last-login';
 	public static $last_login_session_length = 30; // 30 minutes away considered returning user
@@ -206,7 +215,9 @@ EOD;
 		define('USERBASE_ACTIVITY_RETURN_WEEKLY',	1016);
 		define('USERBASE_ACTIVITY_RETURN_MONTHLY',	1017);
 
-		// array of activities in the system velue is an array of label and value of activity
+		// Array of activities in the system.
+		// Key must be integer (best if specified using a constant).
+		// The values are an array with label and "points" value of activity.
 		UserConfig::$activities = array(
 			USERBASE_ACTIVITY_LOGIN_UPASS => array('Logged in using username and password',	1),
 			USERBASE_ACTIVITY_LOGIN_FB => array('Logged in using Facebook',			1),
@@ -230,8 +241,8 @@ EOD;
 			USERBASE_ACTIVITY_UPDATEPASS => array('Updated their password',			0),
 			USERBASE_ACTIVITY_RESETPASS => array('Reset forgotten password',		0),
 
-			USERBASE_ACTIVITY_RETURN_DAILY => array('Returned to the site within a day', 3),
-			USERBASE_ACTIVITY_RETURN_WEEKLY => array('Returned to the site within a week', 2),
+			USERBASE_ACTIVITY_RETURN_DAILY => array('Returned to the site within a day',	3),
+			USERBASE_ACTIVITY_RETURN_WEEKLY => array('Returned to the site within a week',	2),
 			USERBASE_ACTIVITY_RETURN_MONTHLY => array('Returned to the site within a month', 1)
 		);
 	}

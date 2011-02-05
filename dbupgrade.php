@@ -13,6 +13,32 @@ $versions = array();
 // Add new migrations on top, right below this line.
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION _
+ * Adding feature tracking
+*/
+/*
+$versions[_]['up'][]	= "";
+$versions[_]['down'][]	= "";
+*/
+
+/* -------------------------------------------------------------------------------------------------------
+ * VERSION 4
+ * Adding feature tracking
+*/
+$versions[4]['up'][]	= "CREATE TABLE ".UserConfig::$mysql_prefix."account_features (
+`account_id` INT( 10 ) UNSIGNED NOT NULL COMMENT  'User ID',
+`feature_id` INT( 2 ) UNSIGNED NOT NULL COMMENT  'Feature ID',
+PRIMARY KEY (  `account_id` ,  `feature_id` )
+) ENGINE = INNODB COMMENT = 'Keeps feature list for all users'";
+$versions[4]['up'][]	= "CREATE TABLE ".UserConfig::$mysql_prefix."user_features (
+`user_id` INT( 10 ) UNSIGNED NOT NULL COMMENT  'User ID',
+`feature_id` INT( 2 ) UNSIGNED NOT NULL COMMENT  'Feature ID',
+PRIMARY KEY (  `user_id` ,  `feature_id` )
+) ENGINE = INNODB COMMENT = 'Keeps feature list for all users'";
+$versions[4]['down'][]	= 'DROP TABLE '.UserConfig::$mysql_prefix.'user_features';
+$versions[4]['down'][]	= 'DROP TABLE '.UserConfig::$mysql_prefix.'account_features';
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 3
  * Adding user points counter
 */
