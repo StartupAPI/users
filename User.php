@@ -40,14 +40,15 @@ class User
 		$storage = new MrClay_CookieStorage(array(
 			'secret' => UserConfig::$SESSION_SECRET,
 			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
-			'path' => UserConfig::$SITEROOTURL
+			'path' => UserConfig::$SITEROOTURL,
+			'httponly' => true
 		));
 
 		$userid = $storage->fetch(UserConfig::$session_userid_key);
 
 		$last = $storage->fetch(UserConfig::$last_login_key);
-		if (!$storage->store(UserConfig::$last_login_key, time())) {
-			throw Exception($storage->errors);
+		if (!$storage->store(UserConfig::$last_login_key, time())) { 
+			throw new Exception(implode('; ', $storage->errors));
 		}
 
 		if (is_string($userid)) {
@@ -1065,7 +1066,8 @@ class User
 		$storage = new MrClay_CookieStorage(array(
 			'secret' => UserConfig::$SESSION_SECRET,
 			'path' => UserConfig::$SITEROOTURL,
-			'expire' => 0
+			'expire' => 0,
+			'httponly' => true
 		));
 
 		if (!$storage->store(UserConfig::$session_return_key, $return)) {
@@ -1077,7 +1079,8 @@ class User
 	{
 		$storage = new MrClay_CookieStorage(array(
 			'secret' => UserConfig::$SESSION_SECRET,
-			'path' => UserConfig::$SITEROOTURL
+			'path' => UserConfig::$SITEROOTURL,
+			'httponly' => true
 		));
 
 		$return = $storage->fetch(UserConfig::$session_return_key);
@@ -1093,7 +1096,8 @@ class User
 	{
 		$storage = new MrClay_CookieStorage(array(
 			'secret' => UserConfig::$SESSION_SECRET,
-			'path' => UserConfig::$SITEROOTURL
+			'path' => UserConfig::$SITEROOTURL,
+			'httponly' => true
 		));
 
 		$storage->delete(UserConfig::$session_return_key);
@@ -1297,7 +1301,8 @@ class User
 			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
 			'path' => UserConfig::$SITEROOTURL,
 			'expire' => UserConfig::$allowRememberMe && $remember
-				? time() + UserConfig::$rememberMeTime : 0 
+				? time() + UserConfig::$rememberMeTime : 0,
+			'httponly' => true
 		));
 
 		if (!$storage->store(UserConfig::$session_userid_key, $this->userid)) {
