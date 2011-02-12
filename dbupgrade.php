@@ -14,12 +14,19 @@ $versions = array();
 
 /* -------------------------------------------------------------------------------------------------------
  * VERSION _
- * Adding feature tracking
+ * ... add version description here ...
 */
 /*
 $versions[_]['up'][]	= "";
 $versions[_]['down'][]	= "";
 */
+
+/* -------------------------------------------------------------------------------------------------------
+ * VERSION 5
+ * Reducing the size of the email address
+*/
+$versions[5]['up'][]	= "ALTER TABLE  `u_users` CHANGE  `email`  `email` VARCHAR( 255 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL";
+// not downgrading it as it seems to cause troubles with some versions of MySQL
 
 /* -------------------------------------------------------------------------------------------------------
  * VERSION 4
@@ -61,7 +68,7 @@ $versions[1]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."users` (
   `regtime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Time of registration',
   `name` text NOT NULL,
   `username` varchar(25) DEFAULT NULL,
-  `email` varchar(320) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
   `pass` varchar(40) NOT NULL COMMENT 'Password digest',
   `salt` varchar(13) NOT NULL COMMENT 'Salt',
   `temppass` varchar(13) DEFAULT NULL COMMENT 'Temporary password used for password recovery',
