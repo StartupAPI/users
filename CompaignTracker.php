@@ -50,5 +50,3 @@ class CompaignTracker
 		return($storage->fetch(UserConfig::$entry_referer_key));
 	}
 }
-
-CompaignTracker::preserveReferer();
