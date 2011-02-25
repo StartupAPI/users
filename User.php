@@ -71,6 +71,30 @@ class User
 		}
 	}
 
+	private function setReferer() {
+		$db = UserConfig::getDB();
+
+		$referer = CompaignTracker::getReferer();
+
+		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET referer = ? WHERE id = ?'))
+		{
+			if (!$stmt->bind_param('si', $referer, $this->userid))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+	}
+
 	private function init()
 	{
 		$db = UserConfig::getDB();
@@ -154,6 +178,7 @@ class User
 		}
 
 		$user = self::getUser($id);
+		$user->setReferer();
 		$user->init();
 
 		return $user;
@@ -188,6 +213,7 @@ class User
 		}
 
 		$user = self::getUser($id);
+		$user->setReferer();
 		$user->init();
 
 		return $user;
@@ -224,6 +250,7 @@ class User
 		}
 
 		$user = self::getUser($id);
+		$user->setReferer();
 		$user->init();
 
 		return $user;

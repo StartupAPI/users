@@ -22,10 +22,17 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 6
+ * Adding referal tracking
+*/
+$versions[6]['up'][]	= "ALTER TABLE ".UserConfig::$mysql_prefix."users ADD  `referer` BLOB NOT NULL COMMENT  'Page user came from when registered'";
+$versions[6]['down'][]	= "ALTER TABLE ".UserConfig::$mysql_prefix."users DROP  `referer`";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 5
  * Reducing the size of the email address
 */
-$versions[5]['up'][]	= "ALTER TABLE  `u_users` CHANGE  `email`  `email` VARCHAR( 255 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL";
+$versions[5]['up'][]	= "ALTER TABLE ".UserConfig::$mysql_prefix."users CHANGE  `email`  `email` VARCHAR( 255 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL";
 // not downgrading it as it seems to cause troubles with some versions of MySQL
 
 /* -------------------------------------------------------------------------------------------------------

@@ -55,6 +55,9 @@ class UserConfig
 	public static $last_login_key = 'users-last-login';
 	public static $last_login_session_length = 30; // 30 minutes away considered returning user
 
+	// tracking referrals
+	public static $entry_referer_key = 'users-ref';
+
 	// don't display activity for some admin users
 	public static $dont_display_activity_for = array();
 

@@ -9,3 +9,5 @@ require_once(dirname(__FILE__).'/config.php');
 require_once(dirname(__FILE__).'/User.php');
 require_once(dirname(__FILE__).'/Plan.php');
 require_once(dirname(__FILE__).'/Account.php');
+
+require_once(dirname(__FILE__).'/referer_capture.php');
