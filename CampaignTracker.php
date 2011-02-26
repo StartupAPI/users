@@ -23,6 +23,7 @@ class CampaignTracker
 				'secret' => UserConfig::$SESSION_SECRET,
 				'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
 				'path' => UserConfig::$SITEROOTURL,
+				'expire' => 0,
 				'httponly' => true
 			));
 
