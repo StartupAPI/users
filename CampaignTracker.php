@@ -5,7 +5,7 @@ require_once(dirname(__FILE__).'/CookieStorage.php');
  * This file should be included on all pages if referer tracking is required
  */
 
-class CompaignTracker
+class CampaignTracker
 {
 	private static $referer = null;
 

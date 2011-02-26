@@ -5,7 +5,7 @@
 require_once(dirname(__FILE__).'/config.php');
 require_once(dirname(__FILE__).'/Account.php');
 require_once(dirname(__FILE__).'/CookieStorage.php');
-require_once(dirname(__FILE__).'/CompaignTracker.php');
+require_once(dirname(__FILE__).'/CampaignTracker.php');
 
 class User
 {
@@ -75,7 +75,7 @@ class User
 	private function setReferer() {
 		$db = UserConfig::getDB();
 
-		$referer = CompaignTracker::getReferer();
+		$referer = CampaignTracker::getReferer();
 
 		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET referer = ? WHERE id = ?'))
 		{
