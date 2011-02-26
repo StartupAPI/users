@@ -22,6 +22,16 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 7
+ * Should be null for registrations that don't have referals
+*/
+$versions[7]['up'][]	= "ALTER TABLE ".UserConfig::$mysql_prefix."users CHANGE `referer` `referer` BLOB NULL COMMENT 'Page user came from when registered'";
+$versions[7]['up'][]    = "UPDATE ".UserConfig::$mysql_prefix."users SET referer = NULL WHERE referer = ''";
+
+$versions[7]['down'][]	= "UPDATE ".UserConfig::$mysql_prefix."users SET referer = '' WHERE referer IS NULL";
+$versions[7]['down'][]	= "ALTER TABLE ".UserConfig::$mysql_prefix."users CHANGE `referer` `referer` BLOB NOT NULL COMMENT  'Page user came from when registered'";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 6
  * Adding referal tracking
 */

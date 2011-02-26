@@ -73,9 +73,12 @@ class User
 	}
 
 	private function setReferer() {
-		$db = UserConfig::getDB();
-
 		$referer = CampaignTracker::getReferer();
+		if (is_null($referer)) {
+			return;
+		}
+
+		$db = UserConfig::getDB();
 
 		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET referer = ? WHERE id = ?'))
 		{
