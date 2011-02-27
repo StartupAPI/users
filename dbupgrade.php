@@ -22,6 +22,68 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 8
+ * More fields for campaign tracking
+*/
+$versions[8]['up'][]	= "CREATE TABLE ".UserConfig::$mysql_prefix."cmp_source (
+id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Campaign source ID',
+source VARCHAR(255) UNIQUE NOT NULL COMMENT 'Campaign Source (google, newsletter5, widget1, embedplayer2)',
+PRIMARY KEY (id)
+) ENGINE = INNODB COMMENT = 'Campaign source'";
+$versions[8]['up'][]	= "CREATE TABLE ".UserConfig::$mysql_prefix."cmp_medium (
+id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Campaign medium ID',
+medium VARCHAR(255) UNIQUE NOT NULL COMMENT 'Campaign Medium (cpc, banners, email, twitter & atc',
+PRIMARY KEY (id)
+) ENGINE = INNODB COMMENT = 'Campaign medium'";
+$versions[8]['up'][]	= "CREATE TABLE ".UserConfig::$mysql_prefix."cmp_keywords (
+id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Campaign keyword combination ID',
+keywords VARCHAR(255) UNIQUE NOT NULL COMMENT 'Comma separated list of campaign keywords',
+PRIMARY KEY (id)
+) ENGINE = INNODB COMMENT = 'Campaign keywords'";
+$versions[8]['up'][]	= "CREATE TABLE ".UserConfig::$mysql_prefix."cmp_content (
+id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Campaign content ID',
+content VARCHAR(255) UNIQUE NOT NULL COMMENT 'Campaign content (dor A/B testing of different ads)',
+PRIMARY KEY (id)
+) ENGINE = INNODB COMMENT = 'Campaign content'";
+$versions[8]['up'][]	= "CREATE TABLE ".UserConfig::$mysql_prefix."cmp (
+id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Campaign ID',
+name VARCHAR(255) UNIQUE NOT NULL COMMENT 'Campaign Name',
+PRIMARY KEY (id)
+) ENGINE = INNODB COMMENT = 'Campaigns'";
+$versions[8]['up'][]	= "ALTER TABLE ".UserConfig::$mysql_prefix."users
+	ADD reg_cmp_source_id INT(10) UNSIGNED NULL
+		COMMENT 'Campaign Source (google, newsletter5, widget1, embedplayer2)',
+		ADD CONSTRAINT `registration_campaign_source` FOREIGN KEY (`reg_cmp_source_id`)
+			REFERENCES `".UserConfig::$mysql_prefix."cmp_source` (`id`) ON UPDATE CASCADE,
+	ADD reg_cmp_medium_id INT(10) UNSIGNED NULL
+		COMMENT 'Campaign Medium (cpc, banners, email, twitter & atc)',
+		ADD CONSTRAINT `registration_campaign_medium` FOREIGN KEY (`reg_cmp_medium_id`)
+			REFERENCES `".UserConfig::$mysql_prefix."cmp_medium` (`id`) ON UPDATE CASCADE,
+	ADD reg_cmp_keywords_id INT(10) UNSIGNED NULL
+		COMMENT 'Campaign Term (paid campaign keywords)',
+		ADD CONSTRAINT `registration_campaign_keywords` FOREIGN KEY (`reg_cmp_keywords_id`)
+			REFERENCES `".UserConfig::$mysql_prefix."cmp_keywords` (`id`) ON UPDATE CASCADE,
+	ADD reg_cmp_content_id INT(10) UNSIGNED NULL
+		COMMENT 'Campaign Content (for differentiating ads)',
+		ADD CONSTRAINT `registration_campaign_content` FOREIGN KEY (`reg_cmp_content_id`)
+			REFERENCES `".UserConfig::$mysql_prefix."cmp_content` (`id`) ON UPDATE CASCADE,
+	ADD reg_cmp_name_id INT(10) UNSIGNED NULL
+		COMMENT 'Campaign Name',
+		ADD CONSTRAINT `registration_campaign_name` FOREIGN KEY (`reg_cmp_name_id`)
+			REFERENCES `".UserConfig::$mysql_prefix."cmp` (`id`) ON UPDATE CASCADE";
+
+$versions[8]['down'][]	= "ALTER TABLE ".UserConfig::$mysql_prefix."users
+	DROP reg_cmp_source_id, DROP FOREIGN KEY registration_campaign_source,
+	DROP reg_cmp_medium_id, DROP FOREIGN KEY registration_campaign_medium,
+	DROP reg_cmp_keywords_id, DROP FOREIGN KEY registration_campaign_keywords,
+	DROP reg_cmp_content_id, DROP FOREIGN KEY registration_campaign_content,
+	DROP reg_cmp_name_id, DROP FOREIGN KEY registration_campaign_name";
+$versions[8]['down'][]	= "DROP TABLE ".UserConfig::$mysql_prefix."cmp";
+$versions[8]['down'][]	= "DROP TABLE ".UserConfig::$mysql_prefix."cmp_content";
+$versions[8]['down'][]	= "DROP TABLE ".UserConfig::$mysql_prefix."cmp_keywords";
+$versions[8]['down'][]	= "DROP TABLE ".UserConfig::$mysql_prefix."cmp_medium";
+$versions[8]['down'][]	= "DROP TABLE ".UserConfig::$mysql_prefix."cmp_source";
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 7
  * Should be null for registrations that don't have referals
 */

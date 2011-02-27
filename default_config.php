@@ -58,6 +58,16 @@ class UserConfig
 	// tracking referrals
 	public static $entry_referer_key = 'users-ref';
 
+	// campaign tracking variables with Google Analytics defaults
+	public static $entry_cmp_key = 'users-cmp';
+	public static $campaign_variables = array(
+		'cmp_source' => array('utm_source'),
+		'cmp_medium' => array('utm_medium'),
+		'cmp_keywords' => array('utm_term'),
+		'cmp_content' => array('utm_content'),
+		'cmp_name' => array('utm_campaign')
+	);
+
 	// don't display activity for some admin users
 	public static $dont_display_activity_for = array();
 

@@ -99,6 +99,71 @@ class User
 		}
 	}
 
+	private function setRegCampaign() {
+		$campaign = CampaignTracker::getCampaign();
+		if (is_null($campaign)) {
+			return;
+		}
+
+		$db = UserConfig::getDB();
+
+		$cmp_source_id = null;
+		if (array_key_exists('cmp_source', $campaign)) {
+			$cmp_source_id = CampaignTracker::getCampaignSourceID($campaign['cmp_source']);
+		}
+
+		$cmp_medium_id = null;
+		if (array_key_exists('cmp_medium', $campaign)) {
+			$cmp_medium_id = CampaignTracker::getCampaignMediumID($campaign['cmp_medium']);
+		}
+
+		$cmp_keywords_id = null;
+		if (array_key_exists('cmp_keywords', $campaign)) {
+			$cmp_keywords_id = CampaignTracker::getCampaignKeywordsID($campaign['cmp_keywords']);
+		}
+
+		$cmp_content_id = null;
+		if (array_key_exists('cmp_content', $campaign)) {
+			$cmp_content_id = CampaignTracker::getCampaignContentID($campaign['cmp_content']);;
+		}
+
+		$cmp_name_id = null;
+		if (array_key_exists('cmp_name', $campaign)) {
+			$cmp_name_id = CampaignTracker::getCampaignNameID($campaign['cmp_name']);
+		}
+
+		// update user record with compaign IDs
+		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET
+			reg_cmp_source_id = ?,
+			reg_cmp_medium_id = ?,
+			reg_cmp_keywords_id = ?,
+			reg_cmp_content_id = ?,
+			reg_cmp_name_id = ?
+			WHERE id = ?'))
+		{
+			if (!$stmt->bind_param('sssssi',
+				$cmp_source_id,
+				$cmp_medium_id,
+				$cmp_keywords_id,
+				$cmp_content_id,
+				$cmp_name_id,
+				$this->userid))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+	}
+
 	private function init()
 	{
 		$db = UserConfig::getDB();
@@ -183,6 +248,7 @@ class User
 
 		$user = self::getUser($id);
 		$user->setReferer();
+		$user->setRegCampaign();
 		$user->init();
 
 		return $user;
@@ -218,6 +284,7 @@ class User
 
 		$user = self::getUser($id);
 		$user->setReferer();
+		$user->setRegCampaign();
 		$user->init();
 
 		return $user;
@@ -255,6 +322,7 @@ class User
 
 		$user = self::getUser($id);
 		$user->setReferer();
+		$user->setRegCampaign();
 		$user->init();
 
 		return $user;

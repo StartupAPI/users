@@ -11,4 +11,6 @@ require_once(dirname(__FILE__).'/Plan.php');
 require_once(dirname(__FILE__).'/Account.php');
 
 require_once(dirname(__FILE__).'/CampaignTracker.php');
+
 CampaignTracker::preserveReferer();
+CampaignTracker::recordCampaignVariables();
