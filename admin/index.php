@@ -66,7 +66,7 @@ foreach (UserConfig::$modules as $module) {
 <tr id="metric_notes">
 	<td>* Users active within last 30 days<br/>(only measuring activity after one day since registration)</td>
 	<td>** Vanity metric - only shows the amount of marketing effort,<br/>use "Active users" instead</td>
-	<td>*** Useful for optimizing registration forms</td>
+	<td>*** Recent registrations breakdown by module<br/>Useful for optimizing registration forms</td>
 </tr>
 </table>
 
