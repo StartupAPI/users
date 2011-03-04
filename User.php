@@ -101,7 +101,7 @@ class User
 
 	private function setRegCampaign() {
 		$campaign = CampaignTracker::getCampaign();
-		if (is_null($campaign)) {
+		if (is_null($campaign) || !$campaign) {
 			return;
 		}
 
