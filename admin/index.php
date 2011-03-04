@@ -28,7 +28,7 @@ foreach (UserConfig::$modules as $module) {
 	}
 
 	if (array_key_exists($module->getID(), $regs)) {
-		$data .= (!$firstmodule ? '|' : '').$regs[$module->getID()];
+		$data .= (!$firstmodule ? ',' : '').$regs[$module->getID()];
 		$legend .= (!$firstmodule ? '|' : '').$module->getTitle();
 		$legend_colors .= (!$firstmodule ? '|' : '').$module->getLegendColor();
 		$labels .= (!$firstmodule ? '|' : '').sprintf('%.1f', $regs[$module->getID()] * 100 / $totalregs).'%';
