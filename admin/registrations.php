@@ -1,14 +1,6 @@
 <?php
-require_once(dirname(dirname(__FILE__)).'/config.php');
-
-require_once(dirname(dirname(__FILE__)).'/User.php');
-
-$user = User::require_login();
-
-if (!in_array($user->getID(), UserConfig::$admins)) {
-	require_once(dirname(__FILE__).'/admin_access_only.php');
-	exit;
-}
+$ADMIN_SECTION = 'registrations';
+require_once(dirname(__FILE__).'/header.php');
 
 if (array_key_exists('impersonate', $_POST)) {
 	$impersonated_user= User::getUser($_POST['impersonate']);
@@ -22,12 +14,7 @@ if (array_key_exists('impersonate', $_POST)) {
 	}
 }
 
-require_once(UserConfig::$header);
-
-?><h2>Users (<?php echo User::getTotalUsers()?>)<?php if (UserConfig::$enableInvitations) { ?> | <a href="invitations.php">Invitations</a><?php } ?></h2>
-<div style="background: white; padding: 1em">
-<h2><a href="./">Active Users</a> | Registered Users | <a href="bymodule.php">Registrations By Module</a></h2>
-<?php $dailyregs = User::getDailyRegistrations();
+$dailyregs = User::getDailyRegistrations();
 
 $total = 0;
 ?>
@@ -193,5 +180,5 @@ else
 </td></tr>
 </table>
 
-</div><?php
-require_once(UserConfig::$footer);
+<?php
+require_once(dirname(__FILE__).'/footer.php');

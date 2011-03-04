@@ -361,6 +361,45 @@ class User
 	}
 
 	/*
+	 * Returns a number of active users (with activity after one day from registration)
+	 */
+	public static function getActiveUsers()
+	{
+		$db = UserConfig::getDB();
+
+		$total = 0;
+
+		if ($stmt = $db->prepare('SELECT count(*) AS total FROM (
+						SELECT user_id, count(*)
+						FROM '.UserConfig::$mysql_prefix.'activity a
+						INNER JOIN '.UserConfig::$mysql_prefix.'users u
+							ON a.user_id = u.id
+						WHERE a.time > DATE_ADD(u.regtime, INTERVAL 1 DAY)
+							AND a.time > DATE_SUB(NOW(), INTERVAL 30 DAY)
+						GROUP BY user_id
+					) AS active'))
+		{
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($total))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			$stmt->fetch();
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return $total;
+	}
+
+	/*
 	 * retrieves daily active users
 	 */
 	public static function getDailyActiveUsers()
@@ -507,6 +546,7 @@ class User
 
 		return $dailyregs;
 	}
+
 	/*
 	 * retrieves aggregated registrations numbers by module
 	 */
@@ -522,6 +562,21 @@ class User
 
 		return $dailyregs;
 	}
+
+	/*
+	 * retrieves aggregated recent registrations numbers by module
+	 */
+	public static function getRecentRegistrationsByModule()
+	{
+		$regs = array();
+
+		foreach (UserConfig::$modules as $module) {
+			$regs[$module->getID()] = $module->getRecentRegistrations();
+		}
+
+		return $regs;
+	}
+
 	/*
 	 * retrieves paged list of users
 	 */

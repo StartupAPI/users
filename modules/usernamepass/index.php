@@ -6,6 +6,11 @@ class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 		return "userpass";
 	}
 
+	public function getLegendColor()
+	{
+		return "D7DDD5";
+	}
+
 	public function getTitle()
 	{
 		return "Username / Password";
@@ -51,6 +56,36 @@ class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 		return null;
 	}
 
+	/*
+	 * retrieves recent aggregated registrations numbers 
+	 */
+	public function getRecentRegistrations()
+	{
+		$db = UserConfig::getDB();
+
+		$regs = 0;
+
+		if ($stmt = $db->prepare('SELECT count(*) AS regs FROM '.UserConfig::$mysql_prefix.'users WHERE username IS NOT NULL AND regtime > DATE_SUB(NOW(), INTERVAL 30 DAY)'))
+		{
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($regs))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			$stmt->fetch();
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return $regs;
+	}
 	/*
 	 * retrieves aggregated registrations numbers 
 	 */

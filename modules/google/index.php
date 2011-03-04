@@ -20,6 +20,12 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 		return "google";
 	}
 
+	public function getLegendColor()
+	{
+		return "FF9900";
+	}
+
+
 	public function getTitle()
 	{
 		return "Other accounts using Google Friend Connect";
@@ -100,6 +106,37 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 		}
 
 		return null;
+	}
+
+	/*
+	 * retrieves recent aggregated registrations numbers 
+	 */
+	public function getRecentRegistrations()
+	{
+		$db = UserConfig::getDB();
+
+		$regs = 0;
+
+		if ($stmt = $db->prepare('SELECT count(*) AS reqs FROM (SELECT u.id FROM '.UserConfig::$mysql_prefix.'users u LEFT JOIN '.UserConfig::$mysql_prefix.'googlefriendconnect g ON u.id = g.user_id WHERE regtime > DATE_SUB(NOW(), INTERVAL 30 DAY) AND g.google_id IS NOT NULL GROUP BY id) AS agg'))
+		{
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($regs))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			$stmt->fetch();
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return $regs;
 	}
 
 	/*
