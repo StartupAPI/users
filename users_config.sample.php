@@ -5,21 +5,21 @@
  * And then uncomment two lines below and copy API Key and App Secret
  */
 #require_once(dirname(__FILE__).'/users/modules/facebook/index.php');
-#UserConfig::$modules[] = new FacebookAuthenticationModule('.api.key.goes.here.', '.api.secret.goes.here.');
+#UserConfig::$modules[] = new FacebookAuthenticationModule('...api.key.goes.here...', '...api.secret.goes.here...');
 
 /*
  * Google Friend Connect configuration
  * Register your app here: http://www.google.com/friendconnect/admin/site/setup
  * And then uncomment two lines below and copy the site ID from the URL
  */
-#require_once('users/modules/google/index.php');
+#require_once(dirname(__FILE__).'/users/modules/google/index.php');
 #UserConfig::$modules[] = new GoogleAuthenticationModule('...site.id.goes.here...');
 
 /*
  * Username and password registration configuration
  * just have these lines or comment them out if you don't want regular form registration
  */
-require_once('users/modules/usernamepass/index.php');
+require_once(dirname(__FILE__).'/users/modules/usernamepass/index.php');
 UserConfig::$modules[] = new UsernamePasswordAuthenticationModule();
 
 /*
