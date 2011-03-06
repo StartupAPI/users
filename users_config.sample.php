@@ -2,6 +2,7 @@
 /*
  * Facebook Connect configuration
  * Register your app here: http://www.facebook.com/developers/createapp.php
+ * Click "Edit settings" -> "Web Site" and enter your site's URL
  * And then uncomment two lines below and copy API Key and App Secret
  */
 #require_once(dirname(__FILE__).'/users/modules/facebook/index.php');
