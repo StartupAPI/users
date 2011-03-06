@@ -1,5 +1,6 @@
 <?php
 require_once(dirname(__FILE__).'/config.php');
+require_once(dirname(__FILE__).'/tools.php');
 
 require_once(dirname(__FILE__).'/User.php');
 require_once(dirname(__FILE__).'/Invitation.php');
@@ -104,7 +105,7 @@ if (UserConfig::$enableRegistration)
 			{
 				?><p>Invitation code you entered is not valid.</p>
 				<form action="" method="GET">
-				<input name="invite" size="10" value="<?php echo htmlentities($_GET['invite'])?>"/><input type="submit" value="&gt;&gt;"/>
+				<input name="invite" size="10" value="<?php echo UserTools::escape($_GET['invite'])?>"/><input type="submit" value="&gt;&gt;"/>
 				</form>
 				<?php
 				$show_registration_form = false;

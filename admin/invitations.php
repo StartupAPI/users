@@ -1,5 +1,6 @@
 <?php
 require_once(dirname(dirname(__FILE__)).'/config.php');
+require_once(dirname(dirname(__FILE__)).'/tools.php');
 require_once(dirname(dirname(__FILE__)).'/User.php');
 
 $user = User::require_login();
@@ -90,9 +91,9 @@ else
 	{
 		$code = $invitation->getCode();
 		?><tr>
-		<td><?php echo htmlentities($code)?></td>
-		<td><?php // echo htmlentities(User::getUser($invitation->getIssuer())->getUserName())?></td>
-		<td><input name="code_<?php echo htmlentities($invitation->getCode())?>" value="" style="width: 100%"></td><?php
+		<td><?php echo UserTools::escape($code)?></td>
+		<td><?php // echo UserTools::escape(User::getUser($invitation->getIssuer())->getUserName())?></td>
+		<td><input name="code_<?php echo UserTools::escape($invitation->getCode())?>" value="" style="width: 100%"></td><?php
 
 		if (!is_null(UserConfig::$onRenderUserInvitationAction))
 		{
@@ -128,9 +129,9 @@ if (count($invitations) > 0)
 		$comment = $invitation->getComment();
 
 		?><tr>
-		<td><?php echo htmlentities($code)?></td>
-		<td><?php // echo htmlentities(User::getUser($invitation->getIssuer())->getUserName())?></td>
-		<td><?php echo htmlentities($comment)?></td><?php
+		<td><?php echo UserTools::escape($code)?></td>
+		<td><?php // echo UserTools::escape(User::getUser($invitation->getIssuer())->getUserName())?></td>
+		<td><?php echo UserTools::escape($comment)?></td><?php
 
 		if (!is_null(UserConfig::$onRenderUserInvitationFollowUpAction))
 		{
@@ -158,10 +159,10 @@ if (count($invitations) > 0)
 	foreach ($invitations as $invitation)
 	{
 		?><tr>
-		<td><?php echo htmlentities($invitation->getCode())?></td>
-		<td><?php // echo htmlentities(User::getUser($invitation->getIssuer())->getUserName())?></td>
-		<td><?php echo htmlentities($invitation->getComment())?></td>
-		<td><?php echo htmlentities($invitation->getUser()->getUserName())?></td>
+		<td><?php echo UserTools::escape($invitation->getCode())?></td>
+		<td><?php // echo UserTools::escape(User::getUser($invitation->getIssuer())->getUserName())?></td>
+		<td><?php echo UserTools::escape($invitation->getComment())?></td>
+		<td><?php echo UserTools::escape($invitation->getUser()->getUserName())?></td>
 		</tr><?php
 	}
 }
