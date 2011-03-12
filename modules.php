@@ -11,6 +11,7 @@ interface IAuthenticationModule
 	public function processRegistration($data, &$remember);
 	public function getUserCredentials($user);
 	public function getDailyRegistrations();
+	public function getRecentRegistrations();
 }
 
 class InputValidationException extends Exception {

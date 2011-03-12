@@ -22,6 +22,88 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 9
+ * Added OAuth connectivity data from oauth-php and linking table
+*/
+$versions[9]['up'][]	= "CREATE TABLE ".UserConfig::$mysql_prefix."user_oauth_identity (
+`user_id` BIGINT( 10 ) UNSIGNED NOT NULL COMMENT  'UserBase user id',
+`ocr_id` INT( 11 ) NOT NULL COMMENT  'oauth-php server id',
+`oct_id` INT( 11 ) NOT NULL COMMENT  'oauth-php user''s consumer token id',
+`identity` TEXT NOT NULL COMMENT  'Identity string that indicates that user has the same identity on the oauth server end even if oauth consumer token has changed (recreated / expired / revoked)',
+PRIMARY KEY (  `user_id` )
+) ENGINE = INNODB COMMENT =  'Table that links UserBase users and oauth-php users and their consumer tokens';
+";
+$versions[9]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."oauth_log (
+    olg_id                  int(11) not null auto_increment,
+    olg_osr_consumer_key    varchar(64) binary,
+    olg_ost_token           varchar(64) binary,
+    olg_ocr_consumer_key    varchar(64) binary,
+    olg_oct_token           varchar(64) binary,
+    olg_usa_id_ref          int(11),
+    olg_received            text not null,
+    olg_sent                text not null,
+    olg_base_string         text not null,
+    olg_notes               text not null,
+    olg_timestamp           timestamp not null default current_timestamp,
+    olg_remote_ip           bigint not null,
+
+    primary key (olg_id),
+    key (olg_osr_consumer_key, olg_id),
+    key (olg_ost_token, olg_id),
+    key (olg_ocr_consumer_key, olg_id),
+    key (olg_oct_token, olg_id),
+    key (olg_usa_id_ref, olg_id)
+) engine=InnoDB default charset=utf8";
+
+$versions[9]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."oauth_consumer_registry (
+    ocr_id                  int(11) not null auto_increment,
+    ocr_usa_id_ref          int(11),
+    ocr_consumer_key        varchar(128) binary not null,
+    ocr_consumer_secret     varchar(128) binary not null,
+    ocr_signature_methods   varchar(255) not null default 'HMAC-SHA1,PLAINTEXT',
+    ocr_server_uri          varchar(255) not null,
+    ocr_server_uri_host     varchar(128) not null,
+    ocr_server_uri_path     varchar(128) binary not null,
+
+    ocr_request_token_uri   varchar(255) not null,
+    ocr_authorize_uri       varchar(255) not null,
+    ocr_access_token_uri    varchar(255) not null,
+    ocr_timestamp           timestamp not null default current_timestamp,
+
+    primary key (ocr_id),
+    unique key (ocr_consumer_key, ocr_usa_id_ref, ocr_server_uri),
+    key (ocr_server_uri),
+    key (ocr_server_uri_host, ocr_server_uri_path),
+    key (ocr_usa_id_ref)
+) engine=InnoDB default charset=utf8";
+
+$versions[9]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."oauth_consumer_token (
+    oct_id                  int(11) not null auto_increment,
+    oct_ocr_id_ref          int(11) not null,
+    oct_usa_id_ref          int(11) not null,
+    oct_name                varchar(64) binary not null default '',
+    oct_token               varchar(255) binary not null,
+    oct_token_secret        varchar(255) binary not null,
+    oct_token_type          enum('request','authorized','access'),
+    oct_token_ttl           datetime not null default '9999-12-31',
+    oct_timestamp           timestamp not null default current_timestamp,
+
+    primary key (oct_id),
+    unique key (oct_ocr_id_ref, oct_token),
+    unique key (oct_usa_id_ref, oct_ocr_id_ref, oct_token_type, oct_name),
+	key (oct_token_ttl),
+
+    foreign key (oct_ocr_id_ref) references ".UserConfig::$mysql_prefix."oauth_consumer_registry (ocr_id)
+        on update cascade
+        on delete cascade
+) engine=InnoDB default charset=utf8";
+
+$versions[9]['down'][]	= "DROP TABLE ".UserConfig::$mysql_prefix."oauth_consumer_token";
+$versions[9]['down'][]	= "DROP TABLE ".UserConfig::$mysql_prefix."oauth_consumer_registry";
+$versions[9]['down'][]	= "DROP TABLE ".UserConfig::$mysql_prefix."oauth_log";
+$versions[9]['down'][]	= "DROP TABLE ".UserConfig::$mysql_prefix."user_oauth_identity";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 8
  * More fields for campaign tracking
 */

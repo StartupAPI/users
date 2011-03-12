@@ -1,3 +1,6 @@
 [submodule "dbupgrade"]
 	path = dbupgrade
 	url = http://github.com/sergeychernyshev/DBUpgrade.git
+[submodule "oauth-php"]
+	path = oauth-php
+	url = git://github.com/sergeychernyshev/oauth-php.git
