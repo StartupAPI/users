@@ -87,6 +87,7 @@ class MrClay_CookieStorage {
             ,'encryptFunc' => array('MrClay_CookieStorage', 'encrypt')
             ,'decryptFunc' => array('MrClay_CookieStorage', 'decrypt')
             ,'mode' => self::MODE_VISIBLE
+	    ,'httponly' => false
         );
     }
 
