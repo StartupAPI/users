@@ -17,9 +17,19 @@ $versions = array();
  * ... add version description here ...
 */
 /*
-$versions[_]['up'][]	= "";
+$versions[_]['up'][] = "";
 $versions[_]['down'][]	= "";
 */
+
+/* -------------------------------------------------------------------------------------------------------
+ * VERSION 10
+ * Storing user data as well
+*/
+$versions[10]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."user_oauth_identity` ADD `userinfo` TEXT NULL COMMENT  'Serialized user information to be used for rendering'";
+$versions[10]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."user_oauth_identity` ADD `module` VARCHAR( 64 ) NOT NULL COMMENT 'Module id' AFTER `oauth_user_id`";
+
+$versions[10]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."user_oauth_identity` DROP `module`";
+$versions[10]['down'][]	= "ALTER TABLE `".UserConfig::$mysql_prefix."user_oauth_identity` DROP `userinfo`";
 
 /* -------------------------------------------------------------------------------------------------------
  * VERSION 9

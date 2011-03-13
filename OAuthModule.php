@@ -28,7 +28,6 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		$oAuthConsumerKey, $oAuthConsumerSecret,
 		$oAuthRequestTokenURL, $oAuthAccessTokenURL, $oAuthAuthorizeURL,
 		$oAuthSignatureMethods,
-		$callBackURL,
 		$remember = true)
 	{
 		$this->serviceName = $serviceName;
@@ -39,8 +38,6 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		$this->oAuthAccessTokenURL = $oAuthAccessTokenURL;
 		$this->oAuthAuthorizeURL = $oAuthAuthorizeURL;
 		$this->oAuthSignatureMethods = $oAuthSignatureMethods;
-
-		$this->callBackURL = $callBackURL;
 
 		$this->oAuthStore = OAuthStore::instance('MySQLi', array(
 			'conn' => UserConfig::getDB(),
@@ -98,8 +95,14 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'user_oauth_identity (oauth_user_id) VALUES (NULL)'))
+		$module = $this->getID();
+
+		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'user_oauth_identity (module) VALUES (?)'))
 		{
+			if (!$stmt->bind_param('s', $module))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
 			if (!$stmt->execute())
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
@@ -117,6 +120,62 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 	}
 
 	/**
+	 *
+	 */
+	public function addUserOAuthIdentity($user, $identity, $oauth_user_id) {
+		$db = UserConfig::getDB();
+
+		$user_id = $user->getID();
+		$old_oauth_user_id = null;
+
+		$server_unique_id = $identity['id'];
+		$serialized_userinfo = serialize($identity);
+
+		$module = $this->getID();
+
+		// updating new recently created entry
+		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'user_oauth_identity SET user_id = ?, identity = ?, userinfo = ? WHERE oauth_user_id = ? AND module = ?'))
+		{
+			if (!$stmt->bind_param('issis', $user_id, $server_unique_id, $serialized_userinfo, $oauth_user_id, $module))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+	}
+
+	public function deleteOAuthUser($oauth_user_id) {
+		$db = UserConfig::getDB();
+
+		if ($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.'user_oauth_identity WHERE oauth_user_id = ?'))
+		{
+			if (!$stmt->bind_param('i', $oauth_user_id))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+	}
+
+	/**
 	 * Get UserBase user by server identity and reset user_id -> oauth_user_id if necessary
 	 */
 	public function getUserByOAuthIdentity($identity, $oauth_user_id) {
@@ -127,9 +186,11 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 
 		$server_unique_id = $identity['id'];
 
-		if ($stmt = $db->prepare('SELECT oauth_user_id, user_id FROM '.UserConfig::$mysql_prefix.'user_oauth_identity WHERE identity = ?'))
+		$module = $this->getID();
+
+		if ($stmt = $db->prepare('SELECT oauth_user_id, user_id FROM '.UserConfig::$mysql_prefix.'user_oauth_identity WHERE module = ? AND identity = ?'))
 		{
-			if (!$stmt->bind_param('s', $server_unique_id))
+			if (!$stmt->bind_param('ss', $module, $server_unique_id))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}
@@ -158,28 +219,14 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		if ($old_oauth_user_id != $oauth_user_id) {
 			// let's re-map from old oauth_user_id to new one
 			// deleting old one first
-			if ($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.'user_oauth_identity WHERE oauth_user_id = ?'))
-			{
-				if (!$stmt->bind_param('i', $old_oauth_user_id))
-				{
-					 throw new Exception("Can't bind parameter".$stmt->error);
-				}
-				if (!$stmt->execute())
-				{
-					throw new Exception("Can't execute statement: ".$stmt->error);
-				}
+			$this->deleteOAuthUser($old_oauth_user_id);
 
-				$stmt->close();
-			}
-			else
-			{
-				throw new Exception("Can't prepare statement: ".$db->error);
-			}
+			$serialized_userinfo = serialize($identity);
 
 			// updating new recently created entry
-			if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'user_oauth_identity SET user_id = ?, identity = ? WHERE oauth_user_id = ?'))
+			if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'user_oauth_identity SET user_id = ?, identity = ?, userinfo = ? WHERE oauth_user_id = ?'))
 			{
-				if (!$stmt->bind_param('isi', $user_id, $server_unique_id, $oauth_user_id))
+				if (!$stmt->bind_param('issi', $user_id, $server_unique_id, $serialized_userinfo, $oauth_user_id))
 				{
 					 throw new Exception("Can't bind parameter".$stmt->error);
 				}
@@ -259,7 +306,58 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 	 */
 	public function renderEditUserForm($action, $errors, $user, $data)
 	{
-		?>EDIT FORM GOES HERE<?php
+		$db = UserConfig::getDB();
+
+		$user_id = $user->getID();
+		$module = $this->getID();
+
+		$oauth_user_id = null;
+		$serialized_userinfo = null;
+
+		if ($stmt = $db->prepare('SELECT oauth_user_id, userinfo FROM '.UserConfig::$mysql_prefix.'user_oauth_identity WHERE user_id = ? AND module = ?'))
+		{
+			if (!$stmt->bind_param('is', $user_id, $module))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($oauth_user_id, $serialized_userinfo))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			$stmt->fetch();
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		?>
+		<form action="<?php echo $action?>" method="POST">
+		<?php
+		if (is_null($oauth_user_id)) {
+			?><input type="submit" name="add" value="Connect existing <?php echo $this->getTitle() ?> account &gt;&gt;&gt;"/><?php
+		} else {
+			?>
+			<div><?php $this->renderUserInfo($serialized_userinfo) ?></div>
+			<input type="hidden" name="oauth_user_id" value="<?php echo htmlentities($oauth_user_id) ?>"/>
+			<input type="submit" name="remove" value="remove" style="font-size: xx-small"/>
+			<?php
+		}
+		?>
+		<input type="hidden" name="save" value="Save &gt;&gt;&gt;"/>
+		</form>
+		<?php
+	}
+
+	protected function renderUserInfo($serialized_userinfo) {
+		$user_info = unserialize($serialized_userinfo);
+		echo $user_info['id'];
 	}
 
 	public function processLogin($data, &$remember)
@@ -296,10 +394,11 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 				)
 			);
 
-			//  redirect to the google authorization page, they will redirect back
+			//  redirect to the authorization page, they will redirect back
 			header("Location: " . $this->oAuthAuthorizeURL . "?oauth_token=" . $tokenResultParams['token']);
 			exit;
 		} catch(OAuthException2 $e) {
+			error_log(var_export($e, true));
 			return null;
 		}
 	}
@@ -319,8 +418,74 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 	 */
 	public function processEditUser($user, $data)
 	{
-		// TODO Implement user editing
-		return true;
+		if (array_key_exists('remove', $data) && array_key_exists('oauth_user_id', $data)) {
+			$db = UserConfig::getDB();
+
+			$oauth_user_id = $data['oauth_user_id'];
+			$user_id = $user->getID();
+
+			if ($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.'user_oauth_identity WHERE oauth_user_id = ? AND user_id = ?'))
+			{
+				if (!$stmt->bind_param('ii', $oauth_user_id, $user_id))
+				{
+					 throw new Exception("Can't bind parameter".$stmt->error);
+				}
+				if (!$stmt->execute())
+				{
+					throw new Exception("Can't execute statement: ".$stmt->error);
+				}
+
+				$stmt->close();
+			}
+			else
+			{
+				throw new Exception("Can't prepare statement: ".$db->error);
+			}
+
+			return true;
+		}
+
+		if (array_key_exists('add', $data)) {
+			// generate new user id since we're logging in and have no idea who the user is
+			$oauth_user_id = $this->getNewOAuthUserID();
+
+			$storage = new MrClay_CookieStorage(array(
+				'secret' => UserConfig::$SESSION_SECRET,
+				'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+				'path' => UserConfig::$SITEROOTURL,
+				'httponly' => true
+			));
+
+			if (!$storage->store(UserConfig::$oauth_user_id_key, $oauth_user_id)) {
+				throw new Exception(implode('; ', $storage->errors));
+			}
+
+			try
+			{
+				$callback = UserConfig::$USERSROOTFULLURL.'/oauth_callback.php?module='.$this->getID();
+
+				// TODO add a way to skip this step if server was initialized
+				$this->initOAuthServer();
+
+				// STEP 1: get a request token
+				$tokenResultParams = OAuthRequester::requestRequestToken(
+					$this->oAuthConsumerKey,
+					$oauth_user_id,
+					array(
+						'scope' => $this->oAuthAPIRootURL,
+						'xoauth_displayname' => UserConfig::$appName,
+						'oauth_callback' => $callback
+					)
+				);
+
+				//  redirect to the authorization page, they will redirect back
+				header("Location: " . $this->oAuthAuthorizeURL . "?oauth_token=" . $tokenResultParams['token']);
+				exit;
+			} catch(OAuthException2 $e) {
+				error_log(var_export($e, true));
+				return null;
+			}
+		}
 	}
 
 	/*

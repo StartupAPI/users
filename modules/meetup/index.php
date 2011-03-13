@@ -14,7 +14,6 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 			'https://api.meetup.com/oauth/access/',
 			'http://www.meetup.com/authorize/',
 			array('HMAC-SHA1', 'PLAINTEXT'),
-			UserConfig::$USERSROOTFULLURL.'/modules/meetup/oauth_callback.php',
 			$remember
 		);
 	}
@@ -60,6 +59,11 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 		}
 
 		return null;
+	}
+
+	protected function renderUserInfo($serialized_userinfo) {
+		$user_info = unserialize($serialized_userinfo);
+		?><a href="<?php echo UserTools::escape($user_info['link']); ?>" target="_blank"><?php echo UserTools::escape($user_info['name']); ?></a><?php
 	}
 
 	/*
