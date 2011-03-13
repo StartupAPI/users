@@ -100,6 +100,12 @@ class UserConfig
 	// use accounts or just users only
 	public static $useAccounts = true;
 
+	// application name
+	public static $appName = 'UserBase';
+
+	// key for storing OAuth User ID during the OAuth workflow
+	public static $oauth_user_id_key = 'users-oauth-user-id';
+
 	/*
 	 * hooks
 	 */

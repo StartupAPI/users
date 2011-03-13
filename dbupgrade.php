@@ -25,77 +25,92 @@ $versions[_]['down'][]	= "";
  * VERSION 9
  * Added OAuth connectivity data from oauth-php and linking table
 */
-$versions[9]['up'][]	= "CREATE TABLE ".UserConfig::$mysql_prefix."user_oauth_identity (
-`user_id` BIGINT( 10 ) UNSIGNED NOT NULL COMMENT  'UserBase user id',
-`ocr_id` INT( 11 ) NOT NULL COMMENT  'oauth-php server id',
-`oct_id` INT( 11 ) NOT NULL COMMENT  'oauth-php user''s consumer token id',
-`identity` TEXT NOT NULL COMMENT  'Identity string that indicates that user has the same identity on the oauth server end even if oauth consumer token has changed (recreated / expired / revoked)',
-PRIMARY KEY (  `user_id` )
+$versions[9]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."user_oauth_identity` (
+	oauth_user_id INT(11) NOT NULL AUTO_INCREMENT COMMENT 'oauth-php user id',
+	user_id INT(10) UNSIGNED DEFAULT NULL COMMENT  'UserBase user id',
+	identity TEXT DEFAULT NULL COMMENT 'Identity string that indicates that user has the same identity on the oauth server end even if oauth consumer token has changed (recreated / expired / revoked)',
+	PRIMARY KEY (oauth_user_id),
+	CONSTRAINT oauth_identity_user_id FOREIGN KEY (user_id)
+		REFERENCES `".UserConfig::$mysql_prefix."users` (id)
+		ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = INNODB COMMENT =  'Table that links UserBase users and oauth-php users and their consumer tokens';
 ";
 $versions[9]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."oauth_log (
-    olg_id                  int(11) not null auto_increment,
-    olg_osr_consumer_key    varchar(64) binary,
-    olg_ost_token           varchar(64) binary,
-    olg_ocr_consumer_key    varchar(64) binary,
-    olg_oct_token           varchar(64) binary,
-    olg_usa_id_ref          int(11),
-    olg_received            text not null,
-    olg_sent                text not null,
-    olg_base_string         text not null,
-    olg_notes               text not null,
-    olg_timestamp           timestamp not null default current_timestamp,
-    olg_remote_ip           bigint not null,
+	olg_id                  INT(11) NOT NULL AUTO_INCREMENT,
+	olg_osr_consumer_key    VARCHAR(64) BINARY,
+	olg_ost_token           VARCHAR(64) BINARY,
+	olg_ocr_consumer_key    VARCHAR(64) BINARY,
+	olg_oct_token           VARCHAR(64) BINARY,
+	olg_usa_id_ref          INT(11),
+	olg_received            TEXT NOT NULL,
+	olg_sent                TEXT NOT NULL,
+	olg_base_string         TEXT NOT NULL,
+	olg_notes               TEXT NOT NULL,
+	olg_timestamp           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	olg_remote_ip           BIGINT NOT NULL,
 
-    primary key (olg_id),
-    key (olg_osr_consumer_key, olg_id),
-    key (olg_ost_token, olg_id),
-    key (olg_ocr_consumer_key, olg_id),
-    key (olg_oct_token, olg_id),
-    key (olg_usa_id_ref, olg_id)
-) engine=InnoDB default charset=utf8";
+	PRIMARY KEY (olg_id),
+	KEY (olg_osr_consumer_key, olg_id),
+	KEY (olg_ost_token, olg_id),
+	KEY (olg_ocr_consumer_key, olg_id),
+	KEY (olg_oct_token, olg_id),
+	KEY (olg_usa_id_ref, olg_id),
+
+	CONSTRAINT olg_oauth_user_id FOREIGN KEY (olg_usa_id_ref)
+		REFERENCES ".UserConfig::$mysql_prefix."user_oauth_identity (oauth_user_id)
+		ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
 $versions[9]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."oauth_consumer_registry (
-    ocr_id                  int(11) not null auto_increment,
-    ocr_usa_id_ref          int(11),
-    ocr_consumer_key        varchar(128) binary not null,
-    ocr_consumer_secret     varchar(128) binary not null,
-    ocr_signature_methods   varchar(255) not null default 'HMAC-SHA1,PLAINTEXT',
-    ocr_server_uri          varchar(255) not null,
-    ocr_server_uri_host     varchar(128) not null,
-    ocr_server_uri_path     varchar(128) binary not null,
+	ocr_id                  INT(11) NOT NULL AUTO_INCREMENT,
+	ocr_usa_id_ref          INT(11),
+	ocr_consumer_key        VARCHAR(128) BINARY NOT NULL,
+	ocr_consumer_secret     VARCHAR(128) BINARY NOT NULL,
+	ocr_signature_methods   VARCHAR(255) NOT NULL DEFAULT 'HMAC-SHA1,PLAINTEXT',
+	ocr_server_uri          VARCHAR(255) NOT NULL,
+	ocr_server_uri_host     VARCHAR(128) NOT NULL,
+	ocr_server_uri_path     VARCHAR(128) BINARY NOT NULL,
 
-    ocr_request_token_uri   varchar(255) not null,
-    ocr_authorize_uri       varchar(255) not null,
-    ocr_access_token_uri    varchar(255) not null,
-    ocr_timestamp           timestamp not null default current_timestamp,
+	ocr_request_token_uri   VARCHAR(255) NOT NULL,
+	ocr_authorize_uri       VARCHAR(255) NOT NULL,
+	ocr_access_token_uri    VARCHAR(255) NOT NULL,
+	ocr_timestamp           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    primary key (ocr_id),
-    unique key (ocr_consumer_key, ocr_usa_id_ref, ocr_server_uri),
-    key (ocr_server_uri),
-    key (ocr_server_uri_host, ocr_server_uri_path),
-    key (ocr_usa_id_ref)
+	PRIMARY KEY (ocr_id),
+	UNIQUE KEY (ocr_consumer_key, ocr_usa_id_ref, ocr_server_uri),
+	KEY (ocr_server_uri),
+	KEY (ocr_server_uri_host, ocr_server_uri_path),
+	KEY (ocr_usa_id_ref),
+
+	CONSTRAINT ocr_oauth_user_id FOREIGN KEY (ocr_usa_id_ref)
+		REFERENCES ".UserConfig::$mysql_prefix."user_oauth_identity (oauth_user_id)
+		ON UPDATE CASCADE ON DELETE CASCADE
 ) engine=InnoDB default charset=utf8";
 
 $versions[9]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."oauth_consumer_token (
-    oct_id                  int(11) not null auto_increment,
-    oct_ocr_id_ref          int(11) not null,
-    oct_usa_id_ref          int(11) not null,
-    oct_name                varchar(64) binary not null default '',
-    oct_token               varchar(255) binary not null,
-    oct_token_secret        varchar(255) binary not null,
-    oct_token_type          enum('request','authorized','access'),
-    oct_token_ttl           datetime not null default '9999-12-31',
-    oct_timestamp           timestamp not null default current_timestamp,
+	oct_id                  INT(11) NOT NULL AUTO_INCREMENT,
+	oct_ocr_id_ref          INT(11) NOT NULL,
+	oct_usa_id_ref          INT(11) NOT NULL,
+	oct_name                VARCHAR(64) BINARY NOT NULL DEFAULT '',
+	oct_token               VARCHAR(255) BINARY NOT NULL,
+	oct_token_secret        VARCHAR(255) BINARY NOT NULL,
+	oct_token_type          ENUM('request','authorized','access'),
+	oct_token_ttl           DATETIME NOT NULL DEFAULT '9999-12-31',
+	oct_timestamp           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    primary key (oct_id),
-    unique key (oct_ocr_id_ref, oct_token),
-    unique key (oct_usa_id_ref, oct_ocr_id_ref, oct_token_type, oct_name),
-	key (oct_token_ttl),
+	PRIMARY KEY (oct_id),
+	UNIQUE KEY (oct_ocr_id_ref, oct_token),
+	UNIQUE KEY (oct_usa_id_ref, oct_ocr_id_ref, oct_token_type, oct_name),
+	KEY (oct_token_ttl),
 
-    foreign key (oct_ocr_id_ref) references ".UserConfig::$mysql_prefix."oauth_consumer_registry (ocr_id)
-        on update cascade
-        on delete cascade
+	CONSTRAINT oct_token_server_id
+		FOREIGN KEY (oct_ocr_id_ref)
+		REFERENCES ".UserConfig::$mysql_prefix."oauth_consumer_registry (ocr_id)
+		ON UPDATE CASCADE ON DELETE CASCADE,
+
+	CONSTRAINT oct_oauth_user_id FOREIGN KEY (oct_usa_id_ref)
+		REFERENCES ".UserConfig::$mysql_prefix."user_oauth_identity (oauth_user_id)
+		ON UPDATE CASCADE ON DELETE CASCADE
 ) engine=InnoDB default charset=utf8";
 
 $versions[9]['down'][]	= "DROP TABLE ".UserConfig::$mysql_prefix."oauth_consumer_token";

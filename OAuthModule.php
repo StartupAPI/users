@@ -10,10 +10,13 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 	protected $oAuthAPIRootURL;
 	protected $oAuthConsumerKey;
 	protected $oAuthConsumerSecret;
+	protected $oAuthAuthorizeURL;
 	protected $oAuthRequestTokenURL;
 	protected $oAuthAccessTokenURL;
-	protected $oAuthAuthorizeURL;
-	protected $oSignatureMethods = array();
+	protected $oAuthSignatureMethods = array();
+
+	// OAuth store instance - using MySQLi store as the rest of the app uses MySQLi
+	protected $oAuthStore;
 
 	// support for immediate mode (when server redirects back if user is already connected)
 	protected $supportsImmediate = false;
@@ -24,7 +27,8 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		$oAuthAPIRootURL,
 		$oAuthConsumerKey, $oAuthConsumerSecret,
 		$oAuthRequestTokenURL, $oAuthAccessTokenURL, $oAuthAuthorizeURL,
-		$oSignatureMethods,
+		$oAuthSignatureMethods,
+		$callBackURL,
 		$remember = true)
 	{
 		$this->serviceName = $serviceName;
@@ -34,7 +38,14 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		$this->oAuthRequestTokenURL = $oAuthRequestTokenURL;
 		$this->oAuthAccessTokenURL = $oAuthAccessTokenURL;
 		$this->oAuthAuthorizeURL = $oAuthAuthorizeURL;
-		$this->oSignatureMethods = $oSignatureMethods;
+		$this->oAuthSignatureMethods = $oAuthSignatureMethods;
+
+		$this->callBackURL = $callBackURL;
+
+		$this->oAuthStore = OAuthStore::instance('MySQLi', array(
+			'conn' => UserConfig::getDB(),
+			'table_prefix' => UserConfig::$mysql_prefix
+		));
 
 		$this->remember = $remember;
 	}
@@ -51,13 +62,266 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 	 * mean that the system user identity has changed.
 	 *
 	 * @param array $oauth_user_id OAuth user id to get identity for
-	 * @return string $identity Identity string or integer id unique for the service
+	 * @return array $identity Identity array that includes user info including 'id' column which
+	 *                         uniquely identifies the user on server
 	 */
-	abstract protected function getIdentity($oauth_user_id);
+	abstract public function getIdentity($oauth_user_id);
+
+	/**
+	 * Initializes the server entry in the database if it wasn't initialized beforehand
+	 */
+	protected function initOAuthServer() {
+		// check if server is already registered in our database, otherwise, create the entry
+		try {
+			$this->oAuthStore->getServerForUri($this->oAuthAPIRootURL, null);
+		} catch (OAuthException2 $e) {
+			$this->oAuthStore->updateServer(array(
+				'server_uri' => $this->oAuthAPIRootURL,
+				'consumer_key' => $this->oAuthConsumerKey,
+				'consumer_secret' => $this->oAuthConsumerSecret,
+				'authorize_uri' => $this->oAuthAuthorizeURL,
+				'request_token_uri' => $this->oAuthRequestTokenURL,
+				'access_token_uri' => $this->oAuthAccessTokenURL,
+				'signature_methods' => $this->oAuthSignatureMethods,
+				'user_id' => null
+			), null, true);
+		}
+	}
+
+	/**
+	 * When we don't know current user, we need to create a new OAuth User ID to use for new connection.
+	 * If we know the user when OAuth comes through, we'll replace current OAuth User ID with the new one.
+	 */
+	protected function getNewOAuthUserID() {
+		// TODO add a way to skip this step if server was initialized
+		$this->initOAuthServer();
+
+		$db = UserConfig::getDB();
+
+		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'user_oauth_identity (oauth_user_id) VALUES (NULL)'))
+		{
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			$oauth_user_id = $stmt->insert_id;
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return $oauth_user_id;
+	}
+
+	/**
+	 * Get UserBase user by server identity and reset user_id -> oauth_user_id if necessary
+	 */
+	public function getUserByOAuthIdentity($identity, $oauth_user_id) {
+		$db = UserConfig::getDB();
+
+		$user_id = null;
+		$old_oauth_user_id = null;
+
+		$server_unique_id = $identity['id'];
+
+		if ($stmt = $db->prepare('SELECT oauth_user_id, user_id FROM '.UserConfig::$mysql_prefix.'user_oauth_identity WHERE identity = ?'))
+		{
+			if (!$stmt->bind_param('s', $server_unique_id))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($old_oauth_user_id, $user_id))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			$stmt->fetch();
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		// nobody registered with this identity yet
+		if (is_null($user_id)) {
+			return null;
+		}
+
+		if ($old_oauth_user_id != $oauth_user_id) {
+			// let's re-map from old oauth_user_id to new one
+			// deleting old one first
+			if ($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.'user_oauth_identity WHERE oauth_user_id = ?'))
+			{
+				if (!$stmt->bind_param('i', $old_oauth_user_id))
+				{
+					 throw new Exception("Can't bind parameter".$stmt->error);
+				}
+				if (!$stmt->execute())
+				{
+					throw new Exception("Can't execute statement: ".$stmt->error);
+				}
+
+				$stmt->close();
+			}
+			else
+			{
+				throw new Exception("Can't prepare statement: ".$db->error);
+			}
+
+			// updating new recently created entry
+			if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'user_oauth_identity SET user_id = ?, identity = ? WHERE oauth_user_id = ?'))
+			{
+				if (!$stmt->bind_param('isi', $user_id, $server_unique_id, $oauth_user_id))
+				{
+					 throw new Exception("Can't bind parameter".$stmt->error);
+				}
+				if (!$stmt->execute())
+				{
+					throw new Exception("Can't execute statement: ".$stmt->error);
+				}
+
+				$stmt->close();
+			}
+			else
+			{
+				throw new Exception("Can't prepare statement: ".$db->error);
+			}
+		}
+
+		return User::getUser($user_id);
+	}
+
+	public function getAccessToken($oauth_user_id) {
+		//  STEP 2:  Get an access token
+		$oauthToken = $_GET["oauth_token"];
+
+		// echo "oauth_verifier = '" . $oauthVerifier . "'<br/>";
+		$tokenResultParams = $_GET;
+
+		OAuthRequester::requestAccessToken(
+			$this->oAuthConsumerKey,
+			$oauthToken,
+			$oauth_user_id,
+			'POST',
+			$_GET
+		);
+	}
 
 ###########################################################################################
 # Methods related to UserBase mechanics
 ###########################################################################################
+	public function renderLoginForm($action)
+	{
+		?>
+		<p>Sign in using your existing account with <b><?php echo UserTools::escape($this->serviceName)?></b>.</p>
+		<form action="<?php echo $action?>" method="POST">
+		<input type="submit" name="login" value="Log in using <?php echo UserTools::escape($this->serviceName)?> &gt;&gt;&gt;"/>
+		</form>
+		<?php
+	}
+
+	public function renderRegistrationForm($full = false, $action = null, $errors = null , $data = null)
+	{
+		if (is_null($action))
+		{
+			$action = UserConfig::$USERSROOTURL.'/register.php?module='.$this->getID();
+		}
+
+		if ($full)
+		{
+		?>
+			<p>Sign in using your existing account with <b><?php echo UserTools::escape($this->serviceName)?></b>.</p>
+		<?php
+		}
+		?>
+		<form action="<?php echo $action?>" method="POST">
+		<input type="submit" name="register" value="Register using <?php echo UserTools::escape($this->serviceName)?>&gt;&gt;&gt;"/>
+		</form>
+		<?php
+	}
+
+	/*
+	 * Renders user editing form
+	 *
+	 * Parameters:
+	 * $action - form action to post back to
+	 * $errors - error messages to display
+	 * $user - user object for current user that is being edited
+	 * $data - data submitted to the form
+	 */
+	public function renderEditUserForm($action, $errors, $user, $data)
+	{
+		?>EDIT FORM GOES HERE<?php
+	}
+
+	public function processLogin($data, &$remember)
+	{
+		// generate new user id since we're logging in and have no idea who the user is
+		$oauth_user_id = $this->getNewOAuthUserID();
+
+		$storage = new MrClay_CookieStorage(array(
+			'secret' => UserConfig::$SESSION_SECRET,
+			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+			'path' => UserConfig::$SITEROOTURL,
+			'httponly' => true
+		));
+
+		if (!$storage->store(UserConfig::$oauth_user_id_key, $oauth_user_id)) {
+			throw new Exception(implode('; ', $storage->errors));
+		}
+
+		try
+		{
+			$callback = UserConfig::$USERSROOTFULLURL.'/oauth_callback.php?module='.$this->getID();
+
+			// TODO add a way to skip this step if server was initialized
+			$this->initOAuthServer();
+
+			// STEP 1: get a request token
+			$tokenResultParams = OAuthRequester::requestRequestToken(
+				$this->oAuthConsumerKey,
+				$oauth_user_id,
+				array(
+					'scope' => $this->oAuthAPIRootURL,
+					'xoauth_displayname' => UserConfig::$appName,
+					'oauth_callback' => $callback
+				)
+			);
+
+			//  redirect to the google authorization page, they will redirect back
+			header("Location: " . $this->oAuthAuthorizeURL . "?oauth_token=" . $tokenResultParams['token']);
+			exit;
+		} catch(OAuthException2 $e) {
+			return null;
+		}
+	}
+
+	public function processRegistration($data, &$remember)
+	{
+		// TODO Implement registration
+		return false;
+	}
+
+	/*
+	 * Updates user information
+	 *
+	 * returns true if successful and false if unsuccessful
+	 *
+	 * throws InputValidationException if there are problems with input data
+	 */
+	public function processEditUser($user, $data)
+	{
+		// TODO Implement user editing
+		return true;
+	}
 
 	/*
 	 * retrieves recent aggregated registrations numbers
@@ -127,71 +391,5 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 #		}
 #
 #		return $dailyregs;
-	}
-
-	public function renderLoginForm($action)
-	{
-		?>
-		<p>Sign in using your existing account with <b><?php echo UserTools::escape($this->serviceName)?></b>.</p>
-		<form action="<?php echo $action?>" method="POST">
-		<input type="submit" name="login" value="Log in using <?php echo UserTools::escape($this->serviceName)?> &gt;&gt;&gt;"/>
-		</form>
-		<?php
-	}
-
-	public function renderRegistrationForm($full = false, $action = null, $errors = null , $data = null)
-	{
-		if (is_null($action))
-		{
-			$action = UserConfig::$USERSROOTURL.'/register.php?module='.$this->getID();
-		}
-
-		if ($full)
-		{
-		?>
-			<p>Sign in using your existing account with <b><?php echo UserTools::escape($this->serviceName)?></b>.</p>
-		<?php
-		}
-		?>
-		<form action="<?php echo $action?>" method="POST">
-		<input type="submit" name="register" value="Register using <?php echo UserTools::escape($this->serviceName)?>&gt;&gt;&gt;"/>
-		</form>
-		<?php
-	}
-
-	/*
-	 * Renders user editing form
-	 *
-	 * Parameters:
-	 * $action - form action to post back to
-	 * $errors - error messages to display
-	 * $user - user object for current user that is being edited
-	 * $data - data submitted to the form
-	 */
-	public function renderEditUserForm($action, $errors, $user, $data)
-	{
-		?>EDIT FORM GOES HERE<?php
-	}
-
-	public function processLogin($data, &$remember)
-	{
-		return false;
-	}
-
-	public function processRegistration($data, &$remember)
-	{
-		return false;
-	}
-
-	/*
-	 * Updates user information
-	 *
-	 * returns true if successful and false if unsuccessful
-	 *
-	 * throws InputValidationException if there are problems with input data
-	 */
-	public function processEditUser($user, $data)
-	{
-		return true;
 	}
 }
