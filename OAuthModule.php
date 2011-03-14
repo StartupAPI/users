@@ -298,7 +298,12 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 
 	public function getUserCredentials($user)
 	{
-		$userinfo = unserialize($this->getUserInfo($user));
+		$serialized_userinfo = $this->getUserInfo($user);
+		if (is_null($serialized_userinfo)) {
+			return null;
+		}
+
+		$userinfo = unserialize($serialized_userinfo);
 
 		return $userinfo['name'];
 	}

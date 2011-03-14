@@ -35,7 +35,13 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 
 	public function getUserCredentials($user)
 	{
-		$userinfo = unserialize($this->getUserInfo($user));
+		$serialized_userinfo = $this->getUserInfo($user);
+		if (is_null($serialized_userinfo)) {
+			return null;
+		}
+
+		$userinfo = unserialize($serialized_userinfo);
+
 
 		return '<a href="'.UserTools::escape($userinfo['link']).'" target="_blank">'.$userinfo['name'].'</a>';
 	}

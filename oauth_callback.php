@@ -76,9 +76,13 @@ try
 
 			$module->addUserOAuthIdentity($new_user, $identity, $oauth_user_id);
 
+			// TODO record registration activity
+
 			$new_user->setSession(true);
 		} else {
 			$user->setSession(true);
+
+			// TODO record login activity
 		}
 	} else {
 		// otherwise, we're adding their credential to an existing user
@@ -87,6 +91,8 @@ try
 		}
 
 		$module->addUserOAuthIdentity($current_user, $identity, $oauth_user_id);
+
+		// TODO record connect account activity
 	}
 } catch (Exception $e) {
 	error_log($e->getMessage());
