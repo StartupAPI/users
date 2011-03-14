@@ -63,7 +63,8 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 
 	protected function renderUserInfo($serialized_userinfo) {
 		$user_info = unserialize($serialized_userinfo);
-		?><a href="<?php echo UserTools::escape($user_info['link']); ?>" target="_blank"><?php echo UserTools::escape($user_info['name']); ?></a><?php
+		?><a href="<?php echo UserTools::escape($user_info['link']); ?>" target="_blank"><?php echo UserTools::escape($user_info['name']); ?></a><br/>
+		<img src="<?php echo UserTools::escape($user_info['photo_url']); ?>" style="max-width: 60px; max-height: 60px"/><?php
 	}
 
 	/*
