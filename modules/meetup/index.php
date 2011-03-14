@@ -53,7 +53,9 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 			$userdata = json_decode($result['body'], true);
 
 			// array includes 'id' parameter which uniquely identifies a user
-			if (array_key_exists('id', $userdata['results'][0])) {
+			if (array_key_exists('id', $userdata['results'][0])
+				&& array_key_exists('name', $userdata['results'][0])
+			) {
 				return $userdata['results'][0];
 			}
 		}

@@ -289,6 +289,42 @@ class User
 
 		return $user;
 	}
+
+	/*
+	 * create new user without credentials
+	 */
+	public static function createNewWithoutCredentials($name)
+	{
+		$db = UserConfig::getDB();
+
+		$user = null;
+
+		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name) VALUES (?)'))
+		{
+			if (!$stmt->bind_param('s', $name))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			$id = $stmt->insert_id;
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		$user = self::getUser($id);
+		$user->setReferer();
+		$user->setRegCampaign();
+		$user->init();
+
+		return $user;
+	}
 	/*
 	 * create new user
 	 */

@@ -60,7 +60,8 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 	 *
 	 * @param array $oauth_user_id OAuth user id to get identity for
 	 * @return array $identity Identity array that includes user info including 'id' column which
-	 *                         uniquely identifies the user on server
+	 *                         uniquely identifies the user on server and 'name' value that can be
+	 *                         used as user's name upon registration
 	 */
 	abstract public function getIdentity($oauth_user_id);
 
@@ -405,8 +406,45 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 
 	public function processRegistration($data, &$remember)
 	{
-		// TODO Implement registration
-		return false;
+		// generate new user id since we're logging in and have no idea who the user is
+		$oauth_user_id = $this->getNewOAuthUserID();
+
+		$storage = new MrClay_CookieStorage(array(
+			'secret' => UserConfig::$SESSION_SECRET,
+			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+			'path' => UserConfig::$SITEROOTURL,
+			'httponly' => true
+		));
+
+		if (!$storage->store(UserConfig::$oauth_user_id_key, $oauth_user_id)) {
+			throw new Exception(implode('; ', $storage->errors));
+		}
+
+		try
+		{
+			$callback = UserConfig::$USERSROOTFULLURL.'/oauth_callback.php?module='.$this->getID();
+
+			// TODO add a way to skip this step if server was initialized
+			$this->initOAuthServer();
+
+			// STEP 1: get a request token
+			$tokenResultParams = OAuthRequester::requestRequestToken(
+				$this->oAuthConsumerKey,
+				$oauth_user_id,
+				array(
+					'scope' => $this->oAuthAPIRootURL,
+					'xoauth_displayname' => UserConfig::$appName,
+					'oauth_callback' => $callback
+				)
+			);
+
+			//  redirect to the authorization page, they will redirect back
+			header("Location: " . $this->oAuthAuthorizeURL . "?oauth_token=" . $tokenResultParams['token']);
+			exit;
+		} catch(OAuthException2 $e) {
+			error_log(var_export($e, true));
+			return null;
+		}
 	}
 
 	/*

@@ -71,7 +71,12 @@ try
 	if (is_null($current_user)) {
 		// if user is not logged in yet, it means we're logging them in
 		if (is_null($user)) {
-			throw new Exception('user not found');
+			// This user doesn't exist yet, registering them
+			$new_user = User::createNewWithoutCredentials($identity['name']);
+
+			$module->addUserOAuthIdentity($new_user, $identity, $oauth_user_id);
+
+			$new_user->setSession(true);
 		} else {
 			$user->setSession(true);
 		}
