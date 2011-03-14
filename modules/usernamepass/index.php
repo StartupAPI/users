@@ -8,7 +8,7 @@ class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 
 	public function getLegendColor()
 	{
-		return "D7DDD5";
+		return "a3a3a3";
 	}
 
 	public function getTitle()

@@ -43,7 +43,10 @@ google.setOnLoadCallback(function() {
 
 		[new Date('<?php echo $regdate?>'), <?php
 			$firstmodule = true;
+			$colors = array();
 			foreach (UserConfig::$modules as $module) {
+				$colors[] = '#'.$module->getLegendColor();
+
 				if (!$firstmodule) {
 					?>, <?php
 				}
@@ -68,7 +71,8 @@ google.setOnLoadCallback(function() {
 
 	var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
 	chart.draw(data, {
-		displayAnnotations: true
+		displayAnnotations: true,
+		colors: <?php echo json_encode($colors) ?>
 	});
 });
 </script>

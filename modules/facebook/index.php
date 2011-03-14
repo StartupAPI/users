@@ -31,7 +31,7 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 
 	public function getLegendColor()
 	{
-		return "7070DC";
+		return "3b5999";
 	}
 
 	public function getTitle()
