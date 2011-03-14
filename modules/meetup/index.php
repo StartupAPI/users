@@ -35,13 +35,9 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 
 	public function getUserCredentials($user)
 	{
-		$db = UserConfig::getDB();
+		$userinfo = unserialize($this->getUserInfo($user));
 
-		$userid = $user->getID();
-
-		# TODO get user's meetup credentials
-
-		return null;
+		return '<a href="'.UserTools::escape($userinfo['link']).'" target="_blank">'.$userinfo['name'].'</a>';
 	}
 
 	public function getIdentity($oauth_user_id) {

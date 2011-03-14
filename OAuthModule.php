@@ -296,6 +296,51 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		<?php
 	}
 
+	public function getUserCredentials($user)
+	{
+		$userinfo = unserialize($this->getUserInfo($user));
+
+		return $userinfo['name'];
+	}
+
+	/*
+	 * Returns user's OAuth server info if available
+	 */
+	public function getUserInfo($user) {
+		$db = UserConfig::getDB();
+
+		$user_id = $user->getID();
+		$module = $this->getID();
+
+		$oauth_user_id = null;
+		$serialized_userinfo = null;
+
+		if ($stmt = $db->prepare('SELECT oauth_user_id, userinfo FROM '.UserConfig::$mysql_prefix.'user_oauth_identity WHERE user_id = ? AND module = ?'))
+		{
+			if (!$stmt->bind_param('is', $user_id, $module))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($oauth_user_id, $serialized_userinfo))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			$stmt->fetch();
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return $serialized_userinfo;
+	}
+
 	/*
 	 * Renders user editing form
 	 *
