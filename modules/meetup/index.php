@@ -80,7 +80,24 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 
 		$regs = 0;
 
-		# TODO Implement getting a number of recent users registered using Meetup
+		if ($stmt = $db->prepare('SELECT count(*) AS reqs FROM (SELECT u.id FROM '.UserConfig::$mysql_prefix.'users u LEFT JOIN '.UserConfig::$mysql_prefix.'user_oauth_identity oa ON u.id = oa.user_id WHERE regtime > DATE_SUB(NOW(), INTERVAL 30 DAY) AND oa.oauth_user_id IS NOT NULL GROUP BY id) AS agg'))
+		{
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($regs))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			$stmt->fetch();
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
 
 		return $regs;
 	}
@@ -94,7 +111,28 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 
 		$dailyregs = array();
 
-		# TODO Implement getting a number of users registered using Meetup by day
+		if ($stmt = $db->prepare('SELECT regdate, count(*) AS reqs FROM (SELECT CAST(regtime AS DATE) AS regdate, id AS regs FROM '.UserConfig::$mysql_prefix.'users u LEFT JOIN '.UserConfig::$mysql_prefix.'user_oauth_identity oa ON u.id = oa.user_id WHERE oa.oauth_user_id IS NOT NULL GROUP BY id) agg group by agg.regdate'))
+		{
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($regdate, $regs))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			while($stmt->fetch() === TRUE)
+			{
+				$dailyregs[] = array('regdate' => $regdate, 'regs' => $regs);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
 
 		return $dailyregs;
 	}
