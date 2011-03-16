@@ -603,4 +603,9 @@ abstract class OAuthUserCredentials extends UserCredentials {
 	public function getHTML() {
 		return $this->userinfo['name'];
 	}
+
+	public function makeOAuthRequest($request, $method = null, $params = null, $body = null, $files = null) {
+		$request = new OAuthRequester($request, $method, $params, $body, $files);
+		return $request->doRequest($this->oauth_user_id);
+	}
 }

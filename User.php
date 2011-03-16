@@ -621,15 +621,15 @@ class User
 	/*
 	 * retrieves user credentials for all modules
 	 */
-	public function getUserCredentials($requested_module = null)
+	public function getUserCredentials($requested_module_id = null)
 	{
 		$credentials = array();
 
 		foreach (UserConfig::$modules as $module) {
-			if (is_null($requested_module)) {
+			if (is_null($requested_module_id)) {
 				$credentials[$module][] = $module->getUserCredentials($this);
 			} else {
-				if ($requested_module == $module) {
+				if ($requested_module_id == $module->getID()) {
 					return $module->getUserCredentials($this);
 				}
 			}
