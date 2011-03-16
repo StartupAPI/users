@@ -137,7 +137,7 @@ foreach ($users as $user)
 
 		if (!is_null($creds)) {
 		?>
-		<div><b><?php echo $module->getID() ?>: </b><?php echo $creds ?></div>
+		<div><b><?php echo $module->getID() ?>: </b><?php echo $creds->getHTML() ?></div>
 		<?php
 		}
 	}

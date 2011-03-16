@@ -6,6 +6,8 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 {
 	protected $serviceName;
 
+	protected $userCredentialsClass;
+
 	// oauth parameters
 	protected $oAuthAPIRootURL;
 	protected $oAuthConsumerKey;
@@ -348,20 +350,6 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 
 	public function getUserCredentials($user)
 	{
-		$serialized_userinfo = $this->getUserInfo($user);
-		if (is_null($serialized_userinfo)) {
-			return null;
-		}
-
-		$userinfo = unserialize($serialized_userinfo);
-
-		return $userinfo['name'];
-	}
-
-	/*
-	 * Returns user's OAuth server info if available
-	 */
-	public function getUserInfo($user) {
 		$db = UserConfig::getDB();
 
 		$user_id = $user->getID();
@@ -393,7 +381,11 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 			throw new Exception("Can't prepare statement: ".$db->error);
 		}
 
-		return $serialized_userinfo;
+		if (is_null($serialized_userinfo)) {
+			return null;
+		}
+
+		return new $this->userCredentialsClass($oauth_user_id, unserialize($serialized_userinfo));
 	}
 
 	/*
@@ -578,4 +570,37 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		return $dailyregs;
 	}
 
+}
+
+abstract class OAuthUserCredentials extends UserCredentials {
+	// OAuth user id
+	protected $oauth_user_id;
+
+	// User info object specific to a subclass
+	protected $userinfo;
+
+	public function __construct($oauth_user_id, $userinfo) {
+		$this->oauth_user_id = $oauth_user_id;
+		$this->userinfo = $userinfo;
+	}
+
+	public function getOAuthUserID() {
+		return $this->oauth_user_id;
+	}
+
+	/**
+	 * @return array Array of user-specific information
+	 */
+	public function getUserInfo() {
+		return $this->userinfo;
+	}
+
+	/**
+	 * This method will most likely be implemented by a subclass using $this->userinfo object
+	 *
+	 * @return string
+	 */
+	public function getHTML() {
+		return $this->userinfo['name'];
+	}
 }

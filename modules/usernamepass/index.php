@@ -45,7 +45,7 @@ class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 			// (don't reset the flag if was was set for some other reasons)
 			if (!is_null($username))
 			{
-				return $username;
+				return new UsernamePassUserCredentials($username);
 			}
 		}
 		else
@@ -585,5 +585,21 @@ class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 		$user->recordActivity(USERBASE_ACTIVITY_RESETPASS);
 
 		return true;
+	}
+}
+
+class UsernamePassUserCredentials extends UserCredentials {
+	private $username;
+
+	public function __construct($username) {
+		$this->username = $username;
+	}
+
+	public function getUsername() {
+		return $this->username;
+	}
+
+	public function getHTML() {
+		return $this->username;
 	}
 }

@@ -3,6 +3,8 @@ require_once(dirname(dirname(dirname(__FILE__))).'/OAuthModule.php');
 
 class GoogleOAuthAuthenticationModule extends OAuthAuthenticationModule
 {
+	protected $userCredentialsClass = 'GoogleOAuthUserCredentials';
+
 	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret, $remember = true)
 	{
 		parent::__construct(
@@ -55,4 +57,7 @@ class GoogleOAuthAuthenticationModule extends OAuthAuthenticationModule
 
 		return null;
 	}
+}
+
+class GoogleOAuthUserCredentials extends OAuthUserCredentials {
 }

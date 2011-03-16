@@ -619,6 +619,26 @@ class User
 	}
 
 	/*
+	 * retrieves user credentials for all modules
+	 */
+	public function getUserCredentials($requested_module = null)
+	{
+		$credentials = array();
+
+		foreach (UserConfig::$modules as $module) {
+			if (is_null($requested_module)) {
+				$credentials[$module][] = $module->getUserCredentials($this);
+			} else {
+				if ($requested_module == $module) {
+					return $module->getUserCredentials($this);
+				}
+			}
+		}
+
+		return $credentials;
+	}
+
+	/*
 	 * retrieves paged list of users
 	 */
 	public static function getUsers($pagenumber = 0, $perpage = 20, $sort = 'registration')
@@ -1140,7 +1160,7 @@ class User
 	}
 
 	/*
-	 * retrieves user information by Google Facebook Connect ID
+	 * retrieves user information by Google Friend Connect ID
 	 */
 	public static function getUserByGoogleFriendConnectID($googleid)
 	{

@@ -65,7 +65,7 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 
 			if (!is_null($fb_id))
 			{
-				return "<a href=\"http://www.facebook.com/profile.php?id=$fb_id\">$fb_id</a>";
+				return new FacebookUserCredentials($fb_id);
 			}
 		}
 		else
@@ -324,5 +324,22 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 		$user->recordActivity(USERBASE_ACTIVITY_ADDED_FB);
 
 		return true;
+	}
+}
+
+class FacebookUserCredentials extends UserCredentials {
+	// Facebook user id
+	private $fb_id;
+
+	public function __construct($fb_id) {
+		$this->fb_id = $fb_id;
+	}
+
+	public function getFacebookID() {
+		return $this->fb_id;
+	}
+
+	public function getHTML() {
+		return "<a href=\"http://www.facebook.com/profile.php?id=$this->fb_id\">$this->fb_id</a>";
 	}
 }

@@ -9,7 +9,15 @@ interface IAuthenticationModule
 	public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null);
 	public function processLogin($data, &$remember);
 	public function processRegistration($data, &$remember);
+
+	/**
+	 * This method should return user credentials object
+	 *
+	 * @param User $user User to get credentials for
+	 * @return UserCredentials User credentials object specific to the module
+	 */
 	public function getUserCredentials($user);
+
 	public function getDailyRegistrations();
 	public function getRecentRegistrations();
 }
@@ -42,4 +50,18 @@ class ExistingUserException extends Exception {
 	{
 		return $this->errors;
 	}
+}
+
+/*
+ * Class representing user credentials for particular module
+ * Must be subclassed and implemented by module
+ */
+abstract class UserCredentials {
+	/**
+	 * This method should return HTML representation of user credentials to be included in admin interface
+	 * Usually linking to user's public profile at the source service
+	 *
+	 * @return string HTML representation of user credentials
+	 */
+	public abstract function getHTML();
 }

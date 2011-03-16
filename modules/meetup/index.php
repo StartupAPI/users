@@ -3,6 +3,8 @@ require_once(dirname(dirname(dirname(__FILE__))).'/OAuthModule.php');
 
 class MeetupAuthenticationModule extends OAuthAuthenticationModule
 {
+	protected $userCredentialsClass = 'MeetupUserCredentials';
+
 	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret, $remember = true)
 	{
 		parent::__construct(
@@ -34,19 +36,6 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 		return "Meetup";
 	}
 
-	public function getUserCredentials($user)
-	{
-		$serialized_userinfo = $this->getUserInfo($user);
-		if (is_null($serialized_userinfo)) {
-			return null;
-		}
-
-		$userinfo = unserialize($serialized_userinfo);
-
-
-		return '<a href="'.UserTools::escape($userinfo['link']).'" target="_blank">'.$userinfo['name'].'</a>';
-	}
-
 	public function getIdentity($oauth_user_id) {
 		// get meetup user id
 		$request = new OAuthRequester('https://api.meetup.com/members.json/?relation=self', 'GET');
@@ -70,5 +59,11 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 		$user_info = unserialize($serialized_userinfo);
 		?><a href="<?php echo UserTools::escape($user_info['link']); ?>" target="_blank"><?php echo UserTools::escape($user_info['name']); ?></a><br/>
 		<img src="<?php echo UserTools::escape($user_info['photo_url']); ?>" style="max-width: 60px; max-height: 60px"/><?php
+	}
+}
+
+class MeetupUserCredentials extends OAuthUserCredentials {
+	public function getHTML() {
+		return '<a href="'.UserTools::escape($this->userinfo['link']).'" target="_blank">'.$this->userinfo['name'].'</a>';
 	}
 }

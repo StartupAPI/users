@@ -60,44 +60,7 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 
 			if (count($google_ids) > 0)
 			{
-				$creds = '';
-
-				if (!$this->adminHeaderShown) {
-					$creds .= '
-                <script src="http://www.google.com/jsapi"></script>
-                <script src="http://www.google.com/friendconnect/script/friendconnect.js?key=notsupplied&v=0.8"></script>
-                <script>
-                google.setOnLoadCallback(function() {
-                        google.friendconnect.container.loadOpenSocialApi({
-                                site: \''.$this->siteid.'\',
-                                onload: function(securityToken) {
-                                        if (!window.timesloaded) {
-                                                window.timesloaded = 1;
-                                        } else {
-                                                window.timesloaded++;
-                                        }
-
-                                        if (window.timesloaded > 1) {
-                                                document.googleloginform.submit();
-                                        }
-                                }
-                        });
-                });
-                </script>';
-					$this->adminHeaderShown = true;
-				}
-
-				$first = true;
-				foreach ($google_ids as $google_id) {
-					if ($first) {
-						$first = false;
-					} else {
-						$creds .= ', ';
-					}
-					$creds .= "<a href=\"#\" onclick=\"google.friendconnect.showMemberProfile('$google_id'); return false;\">$google_id</a>";
-				}
-
-				return $creds;
+				return new GoogleFriendConnectUserCredentials($this, $google_ids);	
 			}
 		}
 		else
@@ -450,5 +413,67 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 		}
 
 		return true;
+	}
+
+	public function getAdminHeaderHTML() {
+		$html = '';
+
+		if (!$this->adminHeaderShown) {
+			$html .= '
+<script src="http://www.google.com/jsapi"></script>
+<script src="http://www.google.com/friendconnect/script/friendconnect.js?key=notsupplied&v=0.8"></script>
+<script>
+google.setOnLoadCallback(function() {
+	google.friendconnect.container.loadOpenSocialApi({
+		site: \''.$this->siteid.'\',
+		onload: function(securityToken) {
+			if (!window.timesloaded) {
+				window.timesloaded = 1;
+			} else {
+				window.timesloaded++;
+			}
+
+			if (window.timesloaded > 1) {
+				document.googleloginform.submit();
+			}
+		}
+	});
+});
+</script>';
+			$this->adminHeaderShown = true;
+		}
+
+		return $html;
+	}
+}
+
+class GoogleFriendConnectUserCredentials extends UserCredentials {
+	// A list of Google Friend Connect IDs
+	private $google_ids;
+	private $module;
+
+	public function __construct($module, $google_ids) {
+		$this->module = $module;
+		$this->google_ids = $google_ids;
+	}
+
+	public function getUserIDs() {
+		return $this->google_ids;
+	}
+
+	public function getHTML() {
+		$html = $this->module->getAdminHeaderHTML();
+
+		$first = true;
+		foreach ($this->google_ids as $google_id) {
+			if ($first) {
+				$first = false;
+			} else {
+				$html .= ', ';
+			}
+			$html .= "<a href=\"#\" onclick=\"google.friendconnect.showMemberProfile('$google_id'); return false;\">$google_id</a>";
+		}
+
+		return $html;
 	}
 }
