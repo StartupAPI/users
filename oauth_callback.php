@@ -72,7 +72,10 @@ try
 		// if user is not logged in yet, it means we're logging them in
 		if (is_null($user)) {
 			// This user doesn't exist yet, registering them
-			$new_user = User::createNewWithoutCredentials($identity['name']);
+			$new_user = User::createNewWithoutCredentials(
+				$identity['name'],
+				array_key_exists('email', $identity) ? $identity['email'] : null
+			);
 
 			$module->addUserOAuthIdentity($new_user, $identity, $oauth_user_id);
 

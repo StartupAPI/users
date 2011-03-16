@@ -14,6 +14,7 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 			'https://api.meetup.com/oauth/access/',
 			'http://www.meetup.com/authorize/',
 			array('HMAC-SHA1', 'PLAINTEXT'),
+			'http://api.meetup.com',
 			$remember
 		);
 	}

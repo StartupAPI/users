@@ -293,15 +293,20 @@ class User
 	/*
 	 * create new user without credentials
 	 */
-	public static function createNewWithoutCredentials($name)
+	public static function createNewWithoutCredentials($name, $email = null)
 	{
 		$db = UserConfig::getDB();
 
 		$user = null;
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name) VALUES (?)'))
+		$email = filter_var($email, FILTER_VALIDATE_EMAIL);
+		if ($email === FALSE) {
+			$email = null;
+		}
+
+		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name, email) VALUES (?, ?)'))
 		{
-			if (!$stmt->bind_param('s', $name))
+			if (!$stmt->bind_param('ss', $name, $email))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}

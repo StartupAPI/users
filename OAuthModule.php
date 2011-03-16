@@ -14,6 +14,7 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 	protected $oAuthRequestTokenURL;
 	protected $oAuthAccessTokenURL;
 	protected $oAuthSignatureMethods = array();
+	protected $oAuthScope;
 
 	// OAuth store instance - using MySQLi store as the rest of the app uses MySQLi
 	protected $oAuthStore;
@@ -28,6 +29,7 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		$oAuthConsumerKey, $oAuthConsumerSecret,
 		$oAuthRequestTokenURL, $oAuthAccessTokenURL, $oAuthAuthorizeURL,
 		$oAuthSignatureMethods,
+		$oAuthScope,
 		$remember = true)
 	{
 		$this->serviceName = $serviceName;
@@ -38,6 +40,7 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		$this->oAuthAccessTokenURL = $oAuthAccessTokenURL;
 		$this->oAuthAuthorizeURL = $oAuthAuthorizeURL;
 		$this->oAuthSignatureMethods = $oAuthSignatureMethods;
+		$this->oAuthScope = $oAuthScope;
 
 		$this->oAuthStore = OAuthStore::instance('MySQLi', array(
 			'conn' => UserConfig::getDB(),
@@ -408,7 +411,7 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 
 	protected function renderUserInfo($serialized_userinfo) {
 		$user_info = unserialize($serialized_userinfo);
-		echo $user_info['id'];
+		echo $user_info['name'];
 	}
 
 	public function processLogin($data, &$remember)
@@ -439,7 +442,7 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 				$this->oAuthConsumerKey,
 				$oauth_user_id,
 				array(
-					'scope' => $this->oAuthAPIRootURL,
+					'scope' => $this->oAuthScope,
 					'xoauth_displayname' => UserConfig::$appName,
 					'oauth_callback' => $callback
 				)
@@ -482,7 +485,7 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 				$this->oAuthConsumerKey,
 				$oauth_user_id,
 				array(
-					'scope' => $this->oAuthAPIRootURL,
+					'scope' => $this->oAuthScope,
 					'xoauth_displayname' => UserConfig::$appName,
 					'oauth_callback' => $callback
 				)
@@ -560,7 +563,7 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 					$this->oAuthConsumerKey,
 					$oauth_user_id,
 					array(
-						'scope' => $this->oAuthAPIRootURL,
+						'scope' => $this->oAuthScope,
 						'xoauth_displayname' => UserConfig::$appName,
 						'oauth_callback' => $callback
 					)
