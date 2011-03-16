@@ -89,6 +89,53 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		}
 	}
 
+	protected function startOAuthFlow() {
+		// generate new user id since we're logging in and have no idea who the user is
+		$oauth_user_id = $this->getNewOAuthUserID();
+
+		$storage = new MrClay_CookieStorage(array(
+			'secret' => UserConfig::$SESSION_SECRET,
+			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+			'path' => UserConfig::$SITEROOTURL,
+			'httponly' => true
+		));
+
+		if (!$storage->store(UserConfig::$oauth_user_id_key, $oauth_user_id)) {
+			throw new Exception(implode('; ', $storage->errors));
+		}
+
+		try
+		{
+			$callback = UserConfig::$USERSROOTFULLURL.'/oauth_callback.php?module='.$this->getID();
+
+			// TODO add a way to skip this step if server was initialized
+			$this->initOAuthServer();
+
+			$params = array(
+				'scope' => $this->oAuthScope,
+				'oauth_callback' => $callback
+			);
+
+			if (!is_null(UserConfig::$OAuthAppName)) {
+				$params['xoauth_displayname'] = UserConfig::$OAuthAppName;
+			}
+
+			// STEP 1: get a request token
+			$tokenResultParams = OAuthRequester::requestRequestToken(
+				$this->oAuthConsumerKey,
+				$oauth_user_id,
+				$params
+			);
+
+			//  redirect to the authorization page, they will redirect back
+			header("Location: " . $this->oAuthAuthorizeURL . "?oauth_token=" . $tokenResultParams['token']);
+			exit;
+		} catch(OAuthException2 $e) {
+			error_log(var_export($e, true));
+			return null;
+		}
+	}
+
 	/**
 	 * When we don't know current user, we need to create a new OAuth User ID to use for new connection.
 	 * If we know the user when OAuth comes through, we'll replace current OAuth User ID with the new one.
@@ -416,88 +463,12 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 
 	public function processLogin($data, &$remember)
 	{
-		// generate new user id since we're logging in and have no idea who the user is
-		$oauth_user_id = $this->getNewOAuthUserID();
-
-		$storage = new MrClay_CookieStorage(array(
-			'secret' => UserConfig::$SESSION_SECRET,
-			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
-			'path' => UserConfig::$SITEROOTURL,
-			'httponly' => true
-		));
-
-		if (!$storage->store(UserConfig::$oauth_user_id_key, $oauth_user_id)) {
-			throw new Exception(implode('; ', $storage->errors));
-		}
-
-		try
-		{
-			$callback = UserConfig::$USERSROOTFULLURL.'/oauth_callback.php?module='.$this->getID();
-
-			// TODO add a way to skip this step if server was initialized
-			$this->initOAuthServer();
-
-			// STEP 1: get a request token
-			$tokenResultParams = OAuthRequester::requestRequestToken(
-				$this->oAuthConsumerKey,
-				$oauth_user_id,
-				array(
-					'scope' => $this->oAuthScope,
-					'xoauth_displayname' => UserConfig::$appName,
-					'oauth_callback' => $callback
-				)
-			);
-
-			//  redirect to the authorization page, they will redirect back
-			header("Location: " . $this->oAuthAuthorizeURL . "?oauth_token=" . $tokenResultParams['token']);
-			exit;
-		} catch(OAuthException2 $e) {
-			error_log(var_export($e, true));
-			return null;
-		}
+		$this->startOAuthFlow();
 	}
 
 	public function processRegistration($data, &$remember)
 	{
-		// generate new user id since we're logging in and have no idea who the user is
-		$oauth_user_id = $this->getNewOAuthUserID();
-
-		$storage = new MrClay_CookieStorage(array(
-			'secret' => UserConfig::$SESSION_SECRET,
-			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
-			'path' => UserConfig::$SITEROOTURL,
-			'httponly' => true
-		));
-
-		if (!$storage->store(UserConfig::$oauth_user_id_key, $oauth_user_id)) {
-			throw new Exception(implode('; ', $storage->errors));
-		}
-
-		try
-		{
-			$callback = UserConfig::$USERSROOTFULLURL.'/oauth_callback.php?module='.$this->getID();
-
-			// TODO add a way to skip this step if server was initialized
-			$this->initOAuthServer();
-
-			// STEP 1: get a request token
-			$tokenResultParams = OAuthRequester::requestRequestToken(
-				$this->oAuthConsumerKey,
-				$oauth_user_id,
-				array(
-					'scope' => $this->oAuthScope,
-					'xoauth_displayname' => UserConfig::$appName,
-					'oauth_callback' => $callback
-				)
-			);
-
-			//  redirect to the authorization page, they will redirect back
-			header("Location: " . $this->oAuthAuthorizeURL . "?oauth_token=" . $tokenResultParams['token']);
-			exit;
-		} catch(OAuthException2 $e) {
-			error_log(var_export($e, true));
-			return null;
-		}
+		$this->startOAuthFlow();
 	}
 
 	/*
@@ -537,45 +508,7 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		}
 
 		if (array_key_exists('add', $data)) {
-			// generate new user id since we're logging in and have no idea who the user is
-			$oauth_user_id = $this->getNewOAuthUserID();
-
-			$storage = new MrClay_CookieStorage(array(
-				'secret' => UserConfig::$SESSION_SECRET,
-				'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
-				'path' => UserConfig::$SITEROOTURL,
-				'httponly' => true
-			));
-
-			if (!$storage->store(UserConfig::$oauth_user_id_key, $oauth_user_id)) {
-				throw new Exception(implode('; ', $storage->errors));
-			}
-
-			try
-			{
-				$callback = UserConfig::$USERSROOTFULLURL.'/oauth_callback.php?module='.$this->getID();
-
-				// TODO add a way to skip this step if server was initialized
-				$this->initOAuthServer();
-
-				// STEP 1: get a request token
-				$tokenResultParams = OAuthRequester::requestRequestToken(
-					$this->oAuthConsumerKey,
-					$oauth_user_id,
-					array(
-						'scope' => $this->oAuthScope,
-						'xoauth_displayname' => UserConfig::$appName,
-						'oauth_callback' => $callback
-					)
-				);
-
-				//  redirect to the authorization page, they will redirect back
-				header("Location: " . $this->oAuthAuthorizeURL . "?oauth_token=" . $tokenResultParams['token']);
-				exit;
-			} catch(OAuthException2 $e) {
-				error_log(var_export($e, true));
-				return null;
-			}
+			$this->startOAuthFlow();
 		}
 	}
 

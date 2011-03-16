@@ -24,11 +24,6 @@ UserConfig::$modules[] = new UsernamePasswordAuthenticationModule();
 #UserConfig::$modules[] = new GoogleAuthenticationModule('...site.id.goes.here...');
 
 /*
- * Application name used for OAuth-based. Uses "UserBase" if not specified.
- */
-#UserConfig::$appName = 'My application name';
-
-/*
  * Google OAuth Authentication configuration
  * Register your app here: https://www.google.com/accounts/ManageDomains
  * Add URL for your site, verify it using one of the methods provided
