@@ -581,32 +581,30 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 	 */
 	public function getRecentRegistrations()
 	{
-# TODO Implement getting recent registrations
+		$db = UserConfig::getDB();
 
-#		$db = UserConfig::getDB();
-#
-#		$regs = 0;
-#
-#		if ($stmt = $db->prepare('SELECT count(*) AS reqs FROM (SELECT u.id FROM '.UserConfig::$mysql_prefix.'users u LEFT JOIN '.UserConfig::$mysql_prefix.'googlefriendconnect g ON u.id = g.user_id WHERE regtime > DATE_SUB(NOW(), INTERVAL 30 DAY) AND g.google_id IS NOT NULL GROUP BY id) AS agg'))
-#		{
-#			if (!$stmt->execute())
-#			{
-#				throw new Exception("Can't execute statement: ".$stmt->error);
-#			}
-#			if (!$stmt->bind_result($regs))
-#			{
-#				throw new Exception("Can't bind result: ".$stmt->error);
-#			}
-#
-#			$stmt->fetch();
-#			$stmt->close();
-#		}
-#		else
-#		{
-#			throw new Exception("Can't prepare statement: ".$db->error);
-#		}
-#
-#		return $regs;
+		$regs = 0;
+
+		if ($stmt = $db->prepare('SELECT count(*) AS reqs FROM (SELECT u.id FROM '.UserConfig::$mysql_prefix.'users u LEFT JOIN '.UserConfig::$mysql_prefix.'user_oauth_identity oa ON u.id = oa.user_id WHERE regtime > DATE_SUB(NOW(), INTERVAL 30 DAY) AND oa.oauth_user_id IS NOT NULL GROUP BY id) AS agg'))
+		{
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($regs))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			$stmt->fetch();
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return $regs;
 	}
 
 	/*
@@ -614,35 +612,34 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 	 */
 	public function getDailyRegistrations()
 	{
-# TODO Implement getting registrations
+		$db = UserConfig::getDB();
 
-#		$db = UserConfig::getDB();
-#
-#		$dailyregs = array();
-#
-#		if ($stmt = $db->prepare('SELECT regdate, count(*) AS reqs FROM (SELECT CAST(regtime AS DATE) AS regdate, id AS regs FROM '.UserConfig::$mysql_prefix.'users u LEFT JOIN '.UserConfig::$mysql_prefix.'googlefriendconnect g ON u.id = g.user_id WHERE g.google_id IS NOT NULL GROUP BY id) agg group by agg.regdate'))
-#		{
-#			if (!$stmt->execute())
-#			{
-#				throw new Exception("Can't execute statement: ".$stmt->error);
-#			}
-#			if (!$stmt->bind_result($regdate, $regs))
-#			{
-#				throw new Exception("Can't bind result: ".$stmt->error);
-#			}
-#
-#			while($stmt->fetch() === TRUE)
-#			{
-#				$dailyregs[] = array('regdate' => $regdate, 'regs' => $regs);
-#			}
-#
-#			$stmt->close();
-#		}
-#		else
-#		{
-#			throw new Exception("Can't prepare statement: ".$db->error);
-#		}
-#
-#		return $dailyregs;
+		$dailyregs = array();
+
+		if ($stmt = $db->prepare('SELECT regdate, count(*) AS reqs FROM (SELECT CAST(regtime AS DATE) AS regdate, id AS regs FROM '.UserConfig::$mysql_prefix.'users u LEFT JOIN '.UserConfig::$mysql_prefix.'user_oauth_identity oa ON u.id = oa.user_id WHERE oa.oauth_user_id IS NOT NULL GROUP BY id) agg group by agg.regdate'))
+		{
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($regdate, $regs))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			while($stmt->fetch() === TRUE)
+			{
+				$dailyregs[] = array('regdate' => $regdate, 'regs' => $regs);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return $dailyregs;
 	}
+
 }
