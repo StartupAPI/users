@@ -585,7 +585,7 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 
 		$regs = 0;
 
-		if ($stmt = $db->prepare('SELECT count(*) AS reqs FROM (SELECT u.id FROM '.UserConfig::$mysql_prefix.'users u LEFT JOIN '.UserConfig::$mysql_prefix.'user_oauth_identity oa ON u.id = oa.user_id WHERE regtime > DATE_SUB(NOW(), INTERVAL 30 DAY) AND oa.oauth_user_id IS NOT NULL GROUP BY id) AS agg'))
+		if ($stmt = $db->prepare('SELECT count(*) AS reqs FROM (SELECT u.id FROM '.UserConfig::$mysql_prefix.'users u LEFT JOIN '.UserConfig::$mysql_prefix.'user_oauth_identity oa ON u.id = oa.user_id WHERE regtime > DATE_SUB(NOW(), INTERVAL 30 DAY) AND oa.oauth_user_id IS NOT NULL AND oa.module = "'.$this->getID().'" GROUP BY id) AS agg'))
 		{
 			if (!$stmt->execute())
 			{
@@ -616,7 +616,7 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 
 		$dailyregs = array();
 
-		if ($stmt = $db->prepare('SELECT regdate, count(*) AS reqs FROM (SELECT CAST(regtime AS DATE) AS regdate, id AS regs FROM '.UserConfig::$mysql_prefix.'users u LEFT JOIN '.UserConfig::$mysql_prefix.'user_oauth_identity oa ON u.id = oa.user_id WHERE oa.oauth_user_id IS NOT NULL GROUP BY id) agg group by agg.regdate'))
+		if ($stmt = $db->prepare('SELECT regdate, count(*) AS reqs FROM (SELECT CAST(regtime AS DATE) AS regdate, id AS regs FROM '.UserConfig::$mysql_prefix.'users u LEFT JOIN '.UserConfig::$mysql_prefix.'user_oauth_identity oa ON u.id = oa.user_id WHERE oa.oauth_user_id IS NOT NULL AND oa.module = "'.$this->getID().'" GROUP BY id) agg group by agg.regdate'))
 		{
 			if (!$stmt->execute())
 			{
