@@ -65,9 +65,10 @@ if (array_key_exists('activityid', $_REQUEST) && is_numeric($_REQUEST['activityi
 
 $total = 0;
 ?>
+<script type='text/javascript' src='swfobject/swfobject/swfobject.js'></script>
 <script type='text/javascript' src='http://www.google.com/jsapi'></script>
 <script type='text/javascript'>
-google.load('visualization', '1', {'packages':['annotatedtimeline']});
+google.load('visualization', '1', {'packages':['annotatedtimeline', 'corechart']});
 google.setOnLoadCallback(function() {
 	var data = new google.visualization.DataTable();
 	data.addColumn('date', 'Date');
@@ -123,17 +124,20 @@ google.setOnLoadCallback(function() {
 	];
 
 	data.addRows(daily);
-
-	var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
-	chart.draw(data, {
-		displayAnnotations: true,
-		scaleColumns: [0, 1],
-		scaleType: 'allmaximized'
-	});
+	if (swfobject.hasFlashPlayerVersion("5")) {
+		var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
+		chart.draw(data, {
+			displayAnnotations: true,
+			scaleColumns: [0, 1],
+			scaleType: 'allmaximized'
+		});
+	} else {
+		var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
+		chart.draw(data);
+	}
 });
 </script>
 <div id='chart_div' style='width: 100%; height: 240px; margin-bottom: 1em'></div>
-
 
 <form action="" name="activities">
 <div>
