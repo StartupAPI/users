@@ -45,7 +45,7 @@ try
 	}
 	catch (OAuthException2 $e)
 	{
-		throw new Exception('problem getting access token');
+		throw new Exception('problem getting access token: '.$e->getMessage());
 	}
 
 	try
@@ -54,7 +54,7 @@ try
 	}
 	catch (OAuthException2 $e)
 	{
-		throw new Exception('problem getting user identity');
+		throw new Exception('problem getting user identity: '.$e->getMessage());
 	}
 
 	if (is_null($identity)) {
