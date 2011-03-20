@@ -22,6 +22,16 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 11
+ * Tracking registration module (issue 18)
+*/
+$versions[11]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."users` ADD `regmodule` VARCHAR( 64 ) NOT NULL COMMENT 'Registration module ID' AFTER `regtime`";
+$versions[11]['up'][] = "UPDATE `".UserConfig::$mysql_prefix."users` SET regmodule = 'google'";
+$versions[11]['up'][] = "UPDATE `".UserConfig::$mysql_prefix."users` SET regmodule = 'userpass' WHERE pass IS NOT NULL AND pass <> ''";
+$versions[11]['up'][] = "UPDATE `".UserConfig::$mysql_prefix."users` SET regmodule = 'facebook' WHERE fb_id IS NOT NULL";
+$versions[11]['down'][]	= "ALTER TABLE `".UserConfig::$mysql_prefix."users` DROP `regmodule`";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 10
  * Storing user data as well
 */

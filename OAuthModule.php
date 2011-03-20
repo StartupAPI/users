@@ -504,22 +504,25 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		}
 	}
 
-	/*
-	 * retrieves recent aggregated registrations numbers
-	 */
-	public function getRecentRegistrations()
+	public function getTotalConnectedUsers()
 	{
 		$db = UserConfig::getDB();
 
-		$regs = 0;
+		$module_id = $this->getID();
 
-		if ($stmt = $db->prepare('SELECT count(*) AS reqs FROM (SELECT u.id FROM '.UserConfig::$mysql_prefix.'users u LEFT JOIN '.UserConfig::$mysql_prefix.'user_oauth_identity oa ON u.id = oa.user_id WHERE regtime > DATE_SUB(NOW(), INTERVAL 30 DAY) AND oa.oauth_user_id IS NOT NULL AND oa.module = "'.$this->getID().'" GROUP BY id) AS agg'))
+		$conns = 0;
+
+		if ($stmt = $db->prepare('SELECT count(*) AS conns FROM '.UserConfig::$mysql_prefix.'users u LEFT JOIN '.UserConfig::$mysql_prefix.'user_oauth_identity oa ON u.id = oa.user_id WHERE oa.oauth_user_id IS NOT NULL AND oa.module = ?'))
 		{
+			if (!$stmt->bind_param('s', $module_id))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
 			if (!$stmt->execute())
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($regs))
+			if (!$stmt->bind_result($conns))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
@@ -532,44 +535,8 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 			throw new Exception("Can't prepare statement: ".$db->error);
 		}
 
-		return $regs;
+		return $conns;
 	}
-
-	/*
-	 * retrieves aggregated registrations numbers
-	 */
-	public function getDailyRegistrations()
-	{
-		$db = UserConfig::getDB();
-
-		$dailyregs = array();
-
-		if ($stmt = $db->prepare('SELECT regdate, count(*) AS reqs FROM (SELECT CAST(regtime AS DATE) AS regdate, id AS regs FROM '.UserConfig::$mysql_prefix.'users u LEFT JOIN '.UserConfig::$mysql_prefix.'user_oauth_identity oa ON u.id = oa.user_id WHERE oa.oauth_user_id IS NOT NULL AND oa.module = "'.$this->getID().'" GROUP BY id) agg group by agg.regdate'))
-		{
-			if (!$stmt->execute())
-			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
-			}
-			if (!$stmt->bind_result($regdate, $regs))
-			{
-				throw new Exception("Can't bind result: ".$stmt->error);
-			}
-
-			while($stmt->fetch() === TRUE)
-			{
-				$dailyregs[] = array('regdate' => $regdate, 'regs' => $regs);
-			}
-
-			$stmt->close();
-		}
-		else
-		{
-			throw new Exception("Can't prepare statement: ".$db->error);
-		}
-
-		return $dailyregs;
-	}
-
 }
 
 abstract class OAuthUserCredentials extends UserCredentials {

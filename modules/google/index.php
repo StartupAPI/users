@@ -71,16 +71,13 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 		return null;
 	}
 
-	/*
-	 * retrieves recent aggregated registrations numbers 
-	 */
-	public function getRecentRegistrations()
+	public function getTotalConnectedUsers()
 	{
 		$db = UserConfig::getDB();
 
-		$regs = 0;
+		$conns = 0;
 
-		if ($stmt = $db->prepare('SELECT count(*) AS reqs FROM (SELECT u.id FROM '.UserConfig::$mysql_prefix.'users u LEFT JOIN '.UserConfig::$mysql_prefix.'googlefriendconnect g ON u.id = g.user_id WHERE regtime > DATE_SUB(NOW(), INTERVAL 30 DAY) AND g.google_id IS NOT NULL GROUP BY id) AS agg'))
+		if ($stmt = $db->prepare('SELECT COUNT(DISTINCT user_id) AS connst FROM '.UserConfig::$mysql_prefix.'googlefriendconnect'))
 		{
 			if (!$stmt->execute())
 			{
@@ -99,7 +96,7 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 			throw new Exception("Can't prepare statement: ".$db->error);
 		}
 
-		return $regs;
+		return $conns;
 	}
 
 	/*

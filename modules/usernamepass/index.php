@@ -56,22 +56,19 @@ class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 		return null;
 	}
 
-	/*
-	 * retrieves recent aggregated registrations numbers 
-	 */
-	public function getRecentRegistrations()
+	public function getTotalConnectedUsers()
 	{
 		$db = UserConfig::getDB();
 
-		$regs = 0;
+		$conns = 0;
 
-		if ($stmt = $db->prepare('SELECT count(*) AS regs FROM '.UserConfig::$mysql_prefix.'users WHERE username IS NOT NULL AND regtime > DATE_SUB(NOW(), INTERVAL 30 DAY)'))
+		if ($stmt = $db->prepare('SELECT count(*) AS conns FROM '.UserConfig::$mysql_prefix.'users WHERE username IS NOT NULL'))
 		{
 			if (!$stmt->execute())
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($regs))
+			if (!$stmt->bind_result($conns))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
@@ -84,7 +81,7 @@ class UsernamePasswordAuthenticationModule implements IAuthenticationModule
 			throw new Exception("Can't prepare statement: ".$db->error);
 		}
 
-		return $regs;
+		return $conns;
 	}
 	/*
 	 * retrieves aggregated registrations numbers 

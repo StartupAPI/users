@@ -209,7 +209,7 @@ class User
 
 		$user = null;
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name) VALUES (?)'))
+		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix."users (name, regmodule) VALUES (?, 'google' )"))
 		{
 			if (!$stmt->bind_param('s', $name))
 			{
@@ -262,7 +262,7 @@ class User
 
 		$user = null;
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name, fb_id) VALUES (?, ?)'))
+		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix."users (name, regmodule, fb_id) VALUES (?, 'facebook', ?)"))
 		{
 			if (!$stmt->bind_param('si', $name, $fb_id))
 			{
@@ -330,6 +330,7 @@ class User
 
 		return $user;
 	}
+
 	/*
 	 * create new user
 	 */
@@ -342,7 +343,7 @@ class User
 		$salt = uniqid();
 		$pass = sha1($salt.$password);
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name, username, email, pass, salt) VALUES (?, ?, ?, ?, ?)'))
+		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix."users (regmodule, name, username, email, pass, salt) VALUES ('userpass', ?, ?, ?, ?, ?)"))
 		{
 			if (!$stmt->bind_param('sssss', $name, $username, $email, $pass, $salt))
 			{
@@ -593,12 +594,30 @@ class User
 	 */
 	public static function getDailyRegistrationsByModule()
 	{
+		$db = UserConfig::getDB();
+
 		$dailyregs = array();
 
-		foreach (UserConfig::$modules as $module) {
-			foreach ($module->getDailyRegistrations() as $reg) {
-				$dailyregs[$reg['regdate']][$module->getID()] = $reg['regs'];
+		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, regmodule, count(*) AS reg FROM '.UserConfig::$mysql_prefix.'users GROUP BY regdate, regmodule'))
+		{
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
+			if (!$stmt->bind_result($date, $module, $regs))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			while($stmt->fetch()) {
+				$dailyregs[$date][$module] = $regs;
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
 		}
 
 		return $dailyregs;
@@ -609,10 +628,30 @@ class User
 	 */
 	public static function getRecentRegistrationsByModule()
 	{
+		$db = UserConfig::getDB();
+
 		$regs = array();
 
-		foreach (UserConfig::$modules as $module) {
-			$regs[$module->getID()] = $module->getRecentRegistrations();
+		if ($stmt = $db->prepare('SELECT regmodule, count(*) AS reg FROM '.UserConfig::$mysql_prefix.'users u WHERE regtime > DATE_SUB(NOW(), INTERVAL 30 DAY) GROUP BY regmodule'))
+		{
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($module, $reg))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			while($stmt->fetch()) {
+				$regs[$module] = $reg;
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
 		}
 
 		return $regs;
@@ -1015,6 +1054,34 @@ class User
 		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET temppass = null, temppasstime = null WHERE id = ?'))
 		{
 			if (!$stmt->bind_param('s', $this->userid))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+	}
+
+	/*
+	 * Records user registration module (should be used only once
+	 */
+	public function setRegistrationModule($module)
+	{
+		$db = UserConfig::getDB();
+
+		$module_id = $module->getID();
+
+		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET regmodule = ? WHERE id = ?'))
+		{
+			if (!$stmt->bind_param('si', $module_id, $this->userid))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}

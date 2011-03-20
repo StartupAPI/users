@@ -79,6 +79,8 @@ try
 
 			$module->addUserOAuthIdentity($new_user, $identity, $oauth_user_id);
 
+			$new_user->setRegistrationModule($module);
+
 			// TODO record registration activity
 
 			$new_user->setSession(true);

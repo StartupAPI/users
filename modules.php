@@ -18,8 +18,12 @@ interface IAuthenticationModule
 	 */
 	public function getUserCredentials($user);
 
-	public function getDailyRegistrations();
-	public function getRecentRegistrations();
+	/**
+	 * This module returns total number of connections with provider
+	 * @return int Number of users who have connections through this provider
+	 *	       Some modules might allow for multiple connections, but the user is only counted once
+	 */
+	public function getTotalConnectedUsers();
 }
 
 class InputValidationException extends Exception {
