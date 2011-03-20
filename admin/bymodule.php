@@ -22,7 +22,7 @@ google.setOnLoadCallback(function() {
 	var data = new google.visualization.DataTable();
 	data.addColumn('date', 'Date');
 	<?php foreach (UserConfig::$modules as $module) { ?>
-		data.addColumn('number', '<?php echo $module->getID()?>');
+		data.addColumn('number', <?php echo json_encode($module->getTitle())?>);
 	<?php } ?>
 
 	var daily = [
@@ -79,8 +79,11 @@ google.setOnLoadCallback(function() {
 		});
 	}
 	else {
-		var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
-		chart.draw(data);
+		var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+		chart.draw(data, {
+			legend: 'top',
+			colors: <?php echo json_encode($colors) ?>
+		});
 	}
 });
 </script>

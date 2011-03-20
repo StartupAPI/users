@@ -74,14 +74,14 @@ google.setOnLoadCallback(function() {
 	data.addColumn('date', 'Date');
 	<?php
 	if (is_null($selectedactivity)) {
-		if (is_null($activityuser)) {
-		?>
-		data.addColumn('number', 'Active Users');
-		<?php
-		}
 		?>
 		data.addColumn('number', 'Total Points');
-	<?php
+		<?php
+		if (is_null($activityuser)) {
+		?>
+			data.addColumn('number', 'Active Users');
+		<?php
+		}
 	} else {
 	?>
 		data.addColumn('number', 'Number of activities');
@@ -105,14 +105,16 @@ google.setOnLoadCallback(function() {
 			}?>
 	[new Date('<?php echo $date?>'),<?php
 			if (is_null($selectedactivity)) {
-				if (is_null($activityuser)) {
-					echo $record['users']?>,<?php
-				}
-				
 				if (array_key_exists('points', $record) && $record['points'] > 0) {
 					echo $record['points'];
 				} else {
 					echo 0;
+				}
+
+				echo ',';
+
+				if (is_null($activityuser)) {
+					echo $record['users'];
 				}
 			} else {
 				echo $record ? $record : 0;
@@ -132,8 +134,10 @@ google.setOnLoadCallback(function() {
 			scaleType: 'allmaximized'
 		});
 	} else {
-		var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
-		chart.draw(data);
+		var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+		chart.draw(data, {
+			legend: 'top'
+		});
 	}
 });
 </script>

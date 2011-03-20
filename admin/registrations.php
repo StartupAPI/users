@@ -25,8 +25,8 @@ google.load('visualization', '1', {'packages':['annotatedtimeline', 'corechart']
 google.setOnLoadCallback(function() {
 	var data = new google.visualization.DataTable();
 	data.addColumn('date', 'Date');
-	data.addColumn('number', 'Registrations');
-	data.addColumn('number', 'Total');
+	data.addColumn('number', 'Total Users');
+	data.addColumn('number', 'Daily Registrations');
 
 	var daily = [<?php
 		$first = true;
@@ -43,7 +43,7 @@ google.setOnLoadCallback(function() {
 			}
 			$total += $day['regs'];
 
-	?>		[new Date('<?php echo $day['regdate']?>'), <?php echo $day['regs']?>, <?php echo $total?>]<?php
+	?>		[new Date('<?php echo $day['regdate']?>'), <?php echo $total?>, <?php echo $day['regs']?>]<?php
 		}
 	?>
 	];
@@ -58,8 +58,10 @@ google.setOnLoadCallback(function() {
 			scaleType: 'allmaximized'
 		});
 	} else {
-		var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
-		chart.draw(data);
+		var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+		chart.draw(data, {
+			legend: 'top'
+		});
 	}
 });
 </script>
