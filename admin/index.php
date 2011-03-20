@@ -29,9 +29,9 @@ foreach (UserConfig::$modules as $module) {
 
 	if (array_key_exists($module->getID(), $regs)) {
 		$data .= (!$firstmodule ? ',' : '').sprintf('%.1f', $regs[$module->getID()] * 100 / $totalregs);
-		$legend .= (!$firstmodule ? '|' : '').$module->getTitle();
+		$legend .= (!$firstmodule ? '|' : '').$module->getTitle().' ('.sprintf('%.1f', $regs[$module->getID()] * 100 / $totalregs).'%)';
 		$legend_colors .= (!$firstmodule ? '|' : '').$module->getLegendColor();
-		$labels .= (!$firstmodule ? '|' : '').sprintf('%.1f', $regs[$module->getID()] * 100 / $totalregs).'%';
+		$labels .= (!$firstmodule ? '|' : '').$module->getTitle();
 	} else {
 		echo 0;
 	}
