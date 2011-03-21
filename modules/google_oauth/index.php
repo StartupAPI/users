@@ -17,6 +17,9 @@ class GoogleOAuthAuthenticationModule extends OAuthAuthenticationModule
 			'https://www.google.com/accounts/OAuthAuthorizeToken',
 			array('HMAC-SHA1'),
 			'https://www.google.com/m8/feeds/',
+			UserConfig::$USERSROOTURL.'/modules/google_oauth/login-button.png',
+			UserConfig::$USERSROOTURL.'/modules/google_oauth/login-button.png',
+			UserConfig::$USERSROOTURL.'/modules/google_oauth/login-button.png',
 			$remember
 		);
 	}
