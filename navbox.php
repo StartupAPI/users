@@ -33,7 +33,7 @@ function _USERBASE_render_navbox()
 		<?php
 		}
 		?>
-		<span id="profile"><a href="/p/<?php echo UserTools::escape($current_account->getID()) ?>/" title="<?php echo UserTools::escape($current_account->getName()) ?>'s public profile">Public profile</a></span> |
+		<!-- <span id="profile"><a href="/p/<?php echo UserTools::escape($current_account->getID()) ?>/" title="<?php echo UserTools::escape($current_account->getName()) ?>'s public profile">Public profile</a></span> | -->
 		<span id="username"><a href="<?php echo UserConfig::$USERSROOTURL ?>/edit.php" title="<?php echo UserTools::escape($current_user->getName())?>'s user information"><?php echo UserTools::escape($current_user->getName()) ?></a></span> |
 		<span id="logout"><a href="<?php echo UserConfig::$USERSROOTURL ?>/logout.php">logout</a></span>
 	<?php
