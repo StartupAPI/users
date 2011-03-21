@@ -22,6 +22,64 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 12
+ * Dropping unique key by dropping a table - can't drop it otherwise
+ * Will loose all data, unfortunately - hope nobody uses it yet
+*/
+$versions[12]['up'][] = "DROP TABLE ".UserConfig::$mysql_prefix."oauth_consumer_token";
+$versions[12]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."oauth_consumer_token (
+	oct_id                  INT(11) NOT NULL AUTO_INCREMENT,
+	oct_ocr_id_ref          INT(11) NOT NULL,
+	oct_usa_id_ref          INT(11) NOT NULL,
+	oct_name                VARCHAR(64) BINARY NOT NULL DEFAULT '',
+	oct_token               VARCHAR(255) BINARY NOT NULL,
+	oct_token_secret        VARCHAR(255) BINARY NOT NULL,
+	oct_token_type          ENUM('request','authorized','access'),
+	oct_token_ttl           DATETIME NOT NULL DEFAULT '9999-12-31',
+	oct_timestamp           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+	PRIMARY KEY (oct_id),
+	UNIQUE KEY (oct_usa_id_ref, oct_ocr_id_ref, oct_token_type, oct_name),
+	KEY (oct_token_ttl),
+
+	CONSTRAINT oct_token_server_id
+		FOREIGN KEY (oct_ocr_id_ref)
+		REFERENCES ".UserConfig::$mysql_prefix."oauth_consumer_registry (ocr_id)
+		ON UPDATE CASCADE ON DELETE CASCADE,
+
+	CONSTRAINT oct_oauth_user_id FOREIGN KEY (oct_usa_id_ref)
+		REFERENCES ".UserConfig::$mysql_prefix."user_oauth_identity (oauth_user_id)
+		ON UPDATE CASCADE ON DELETE CASCADE
+) engine=InnoDB default charset=utf8";
+
+$versions[12]['down'][] = "DROP TABLE ".UserConfig::$mysql_prefix."oauth_consumer_token";
+$versions[12]['down'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."oauth_consumer_token (
+	oct_id                  INT(11) NOT NULL AUTO_INCREMENT,
+	oct_ocr_id_ref          INT(11) NOT NULL,
+	oct_usa_id_ref          INT(11) NOT NULL,
+	oct_name                VARCHAR(64) BINARY NOT NULL DEFAULT '',
+	oct_token               VARCHAR(255) BINARY NOT NULL,
+	oct_token_secret        VARCHAR(255) BINARY NOT NULL,
+	oct_token_type          ENUM('request','authorized','access'),
+	oct_token_ttl           DATETIME NOT NULL DEFAULT '9999-12-31',
+	oct_timestamp           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+	PRIMARY KEY (oct_id),
+	UNIQUE KEY (oct_ocr_id_ref, oct_token),
+	UNIQUE KEY (oct_usa_id_ref, oct_ocr_id_ref, oct_token_type, oct_name),
+	KEY (oct_token_ttl),
+
+	CONSTRAINT oct_token_server_id
+		FOREIGN KEY (oct_ocr_id_ref)
+		REFERENCES ".UserConfig::$mysql_prefix."oauth_consumer_registry (ocr_id)
+		ON UPDATE CASCADE ON DELETE CASCADE,
+
+	CONSTRAINT oct_oauth_user_id FOREIGN KEY (oct_usa_id_ref)
+		REFERENCES ".UserConfig::$mysql_prefix."user_oauth_identity (oauth_user_id)
+		ON UPDATE CASCADE ON DELETE CASCADE
+) engine=InnoDB default charset=utf8";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 11
  * Tracking registration module (issue 18)
 */
