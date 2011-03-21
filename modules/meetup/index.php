@@ -14,7 +14,7 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 			$oAuthConsumerSecret,
 			'https://api.meetup.com/oauth/request/',
 			'https://api.meetup.com/oauth/access/',
-			'http://www.meetup.com/authorize/',
+			'http://www.meetup.com/authenticate/',
 			array('HMAC-SHA1', 'PLAINTEXT'),
 			'http://api.meetup.com',
 			$remember
