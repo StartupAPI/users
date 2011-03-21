@@ -17,6 +17,9 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 			'http://www.meetup.com/authenticate/',
 			array('HMAC-SHA1', 'PLAINTEXT'),
 			'http://api.meetup.com',
+			UserConfig::$USERSROOTURL.'/modules/meetup/login-button.png',
+			UserConfig::$USERSROOTURL.'/modules/meetup/login-button.png',
+			UserConfig::$USERSROOTURL.'/modules/meetup/login-button.png',
 			$remember
 		);
 	}

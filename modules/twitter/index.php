@@ -16,6 +16,10 @@ class TwitterAuthenticationModule extends OAuthAuthenticationModule
 			'https://api.twitter.com/oauth/access_token',
 			'https://api.twitter.com/oauth/authenticate',
 			array('HMAC-SHA1'),
+			'http://api.twitter.com',
+			UserConfig::$USERSROOTURL.'/modules/twitter/login-button.png',
+			UserConfig::$USERSROOTURL.'/modules/twitter/login-button.png',
+			UserConfig::$USERSROOTURL.'/modules/twitter/login-button.png',
 			$remember
 		);
 	}

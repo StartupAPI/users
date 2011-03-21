@@ -21,8 +21,10 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 	// OAuth store instance - using MySQLi store as the rest of the app uses MySQLi
 	protected $oAuthStore;
 
-	// support for immediate mode (when server redirects back if user is already connected)
-	protected $supportsImmediate = false;
+	// Look and feel
+	protected $signUpButtonURL;
+	protected $logInButtonURL;
+	protected $connectButtonURL;
 
 	protected $remember;
 
@@ -32,6 +34,9 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		$oAuthRequestTokenURL, $oAuthAccessTokenURL, $oAuthAuthorizeURL,
 		$oAuthSignatureMethods,
 		$oAuthScope,
+		$signUpButtonURL = null,
+		$logInButtonURL = null,
+		$connectButtonURL = null,
 		$remember = true)
 	{
 		$this->serviceName = $serviceName;
@@ -43,6 +48,10 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		$this->oAuthAuthorizeURL = $oAuthAuthorizeURL;
 		$this->oAuthSignatureMethods = $oAuthSignatureMethods;
 		$this->oAuthScope = $oAuthScope;
+
+		$this->signUpButtonURL = $signUpButtonURL;
+		$this->logInButtonURL = $logInButtonURL;
+		$this->connectButtonURL = $connectButtonURL;
 
 		$this->oAuthStore = OAuthStore::instance('MySQLi', array(
 			'conn' => UserConfig::getDB(),
@@ -323,7 +332,11 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		?>
 		<p>Sign in using your existing account with <b><?php echo UserTools::escape($this->serviceName)?></b>.</p>
 		<form action="<?php echo $action?>" method="POST">
+		<?php if (is_null($this->logInButtonURL)) { ?>
 		<input type="submit" name="login" value="Log in using <?php echo UserTools::escape($this->serviceName)?> &gt;&gt;&gt;"/>
+		<?php } else { ?>
+		<input type="image" name="login" src="<?php echo UserTools::escape($this->logInButtonURL) ?>" value="login"/>
+		<?php } ?>
 		</form>
 		<?php
 	}
@@ -343,7 +356,11 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		}
 		?>
 		<form action="<?php echo $action?>" method="POST">
+		<?php if (is_null($this->signUpButtonURL)) { ?>
 		<input type="submit" name="register" value="Register using <?php echo UserTools::escape($this->serviceName)?>&gt;&gt;&gt;"/>
+		<?php } else { ?>
+		<input type="image" name="register" src="<?php echo UserTools::escape($this->signUpButtonURL) ?>" value="register"/>
+		<?php } ?>
 		</form>
 		<?php
 	}
@@ -434,7 +451,11 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		<form action="<?php echo $action?>" method="POST">
 		<?php
 		if (is_null($oauth_user_id)) {
-			?><input type="submit" name="add" value="Connect existing <?php echo $this->getTitle() ?> account &gt;&gt;&gt;"/><?php
+			if (is_null($this->connectButtonURL)) {
+				?><input type="submit" name="add" value="Connect existing <?php echo $this->getTitle() ?> account &gt;&gt;&gt;"/><?php
+			} else {
+				?><input type="image" name="add" src="<?php echo UserTools::escape($this->connectButtonURL) ?>" value="add"/><?php
+			}
 		} else {
 			?>
 			<div><?php $this->renderUserInfo($serialized_userinfo) ?></div>
