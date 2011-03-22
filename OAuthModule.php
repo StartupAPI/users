@@ -26,7 +26,11 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 	protected $logInButtonURL;
 	protected $connectButtonURL;
 
-	protected $remember;
+	// Subclasses must assign unique integer IDs
+	protected $USERBASE_ACTIVITY_OAUTH_MODULE_LOGIN;
+	protected $USERBASE_ACTIVITY_OAUTH_MODULE_ADDED;
+	protected $USERBASE_ACTIVITY_OAUTH_MODULE_REMOVED;
+	protected $USERBASE_ACTIVITY_OAUTH_MODULE_REGISTER;
 
 	public function __construct($serviceName,
 		$oAuthAPIRootURL,
@@ -37,7 +41,7 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		$signUpButtonURL = null,
 		$logInButtonURL = null,
 		$connectButtonURL = null,
-		$remember = true)
+		$activities = null)
 	{
 		$this->serviceName = $serviceName;
 		$this->oAuthAPIRootURL = $oAuthAPIRootURL;
@@ -53,12 +57,22 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		$this->logInButtonURL = $logInButtonURL;
 		$this->connectButtonURL = $connectButtonURL;
 
+		if (!is_null($activities)) {
+			$this->USERBASE_ACTIVITY_OAUTH_MODULE_LOGIN = $activities[0][0];
+			$this->USERBASE_ACTIVITY_OAUTH_MODULE_ADDED = $activities[1][0];
+			$this->USERBASE_ACTIVITY_OAUTH_MODULE_REMOVED = $activities[2][0];
+			$this->USERBASE_ACTIVITY_OAUTH_MODULE_REGISTER = $activities[3][0];
+
+			UserConfig::$activities[$activities[0][0]] = array($activities[0][1], $activities[0][2]);
+			UserConfig::$activities[$activities[1][0]] = array($activities[1][1], $activities[1][2]);
+			UserConfig::$activities[$activities[2][0]] = array($activities[2][1], $activities[2][2]);
+			UserConfig::$activities[$activities[3][0]] = array($activities[3][1], $activities[3][2]);
+		}
+
 		$this->oAuthStore = OAuthStore::instance('MySQLi', array(
 			'conn' => UserConfig::getDB(),
 			'table_prefix' => UserConfig::$mysql_prefix
 		));
-
-		$this->remember = $remember;
 	}
 
 ###########################################################################################
@@ -517,11 +531,31 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 				throw new Exception("Can't prepare statement: ".$db->error);
 			}
 
+			if (!is_null($this->USERBASE_ACTIVITY_OAUTH_MODULE_REMOVED)) {
+				$user->recordActivity($this->USERBASE_ACTIVITY_OAUTH_MODULE_REMOVED);
+			}
+
 			return true;
 		}
 
 		if (array_key_exists('add', $data)) {
 			$this->startOAuthFlow();
+		}
+	}
+
+	public function recordLoginActivity($user) {
+		if (!is_null($this->USERBASE_ACTIVITY_OAUTH_MODULE_LOGIN)) {
+			$user->recordActivity($this->USERBASE_ACTIVITY_OAUTH_MODULE_LOGIN);
+		}
+	}
+	public function recordRegistrationActivity($user) {
+		if (!is_null($this->USERBASE_ACTIVITY_OAUTH_MODULE_REGISTER)) {
+			$user->recordActivity($this->USERBASE_ACTIVITY_OAUTH_MODULE_REGISTER);
+		}
+	}
+	public function recordAddActivity($user) {
+		if (!is_null($this->USERBASE_ACTIVITY_OAUTH_MODULE_ADDED)) {
+			$user->recordActivity($this->USERBASE_ACTIVITY_OAUTH_MODULE_ADDED);
 		}
 	}
 

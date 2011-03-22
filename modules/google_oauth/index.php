@@ -5,7 +5,7 @@ class GoogleOAuthAuthenticationModule extends OAuthAuthenticationModule
 {
 	protected $userCredentialsClass = 'GoogleOAuthUserCredentials';
 
-	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret, $remember = true)
+	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret)
 	{
 		parent::__construct(
 			'Google',
@@ -20,7 +20,12 @@ class GoogleOAuthAuthenticationModule extends OAuthAuthenticationModule
 			UserConfig::$USERSROOTURL.'/modules/google_oauth/login-button.png',
 			UserConfig::$USERSROOTURL.'/modules/google_oauth/login-button.png',
 			UserConfig::$USERSROOTURL.'/modules/google_oauth/login-button.png',
-			$remember
+			array(
+				array(3001, "Logged in using Google account", 1),
+				array(3002, "Added Google account", 1),
+				array(3003, "Removed Google account", 0),
+				array(3004, "Registered using Google account", 1),
+			)
 		);
 	}
 

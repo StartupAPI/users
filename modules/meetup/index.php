@@ -5,7 +5,7 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 {
 	protected $userCredentialsClass = 'MeetupUserCredentials';
 
-	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret, $remember = true)
+	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret)
 	{
 		parent::__construct(
 			'Meetup',
@@ -20,7 +20,12 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 			UserConfig::$USERSROOTURL.'/modules/meetup/login-button.png',
 			UserConfig::$USERSROOTURL.'/modules/meetup/login-button.png',
 			UserConfig::$USERSROOTURL.'/modules/meetup/login-button.png',
-			$remember
+			array(
+				array(2001, "Logged in using Meetup account", 1),
+				array(2002, "Added Meetup account", 1),
+				array(2003, "Removed Meetup account", 0),
+				array(2004, "Registered using Meetup account", 1),
+			)
 		);
 	}
 

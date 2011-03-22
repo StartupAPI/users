@@ -5,7 +5,7 @@ class TwitterAuthenticationModule extends OAuthAuthenticationModule
 {
 	protected $userCredentialsClass = 'TwitterUserCredentials';
 
-	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret, $remember = true)
+	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret)
 	{
 		parent::__construct(
 			'Twitter',
@@ -20,7 +20,12 @@ class TwitterAuthenticationModule extends OAuthAuthenticationModule
 			UserConfig::$USERSROOTURL.'/modules/twitter/login-button.png',
 			UserConfig::$USERSROOTURL.'/modules/twitter/login-button.png',
 			UserConfig::$USERSROOTURL.'/modules/twitter/login-button.png',
-			$remember
+			array(
+				array(4001, "Logged in using Twitter account", 1),
+				array(4002, "Added Twitter account", 1),
+				array(4003, "Removed Twitter account", 0),
+				array(4004, "Registered using Twitter account", 1),
+			)
 		);
 	}
 

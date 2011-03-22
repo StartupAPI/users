@@ -81,13 +81,11 @@ try
 
 			$new_user->setRegistrationModule($module);
 
-			// TODO record registration activity
-
 			$new_user->setSession(true);
+			$module->recordRegistrationActivity($new_user);
 		} else {
 			$user->setSession(true);
-
-			// TODO record login activity
+			$module->recordLoginActivity($user);
 		}
 	} else {
 		// otherwise, we're adding their credential to an existing user
@@ -97,7 +95,7 @@ try
 
 		$module->addUserOAuthIdentity($current_user, $identity, $oauth_user_id);
 
-		// TODO record connect account activity
+		$module->recordAddActivity($current_user);
 	}
 } catch (Exception $e) {
 	error_log($e->getMessage());
@@ -119,13 +117,11 @@ try
 	exit;
 }
 
-$return = null;
+$return = User::getReturn();
+User::clearReturn();
 
-if (!is_null($current_user)) {
+if (is_null($return) && !is_null($current_user)) {
 	$return = UserConfig::$USERSROOTURL.'/edit.php';
-} else {
-	$return = User::getReturn();
-	User::clearReturn();
 }
 
 if (!is_null($return))
