@@ -264,7 +264,7 @@ foreach ($activities as $activity)
 	?>
 		<td>
 		<form name="imp" action="" method="POST">
-		<a href="?userid=<?php echo $user->getID()?>"><?php echo $user->getName();?></a>
+		<a href="activity.php?userid=<?php echo $user->getID()?>"><?php echo $user->getName();?></a>
 		<input type="submit" value="impersonate"/><input type="hidden" name="impersonate" value="<?php echo $user->getID()?>"/>
 		</form>
 		</td>
