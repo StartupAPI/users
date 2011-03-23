@@ -1,26 +1,26 @@
 <?php
-require_once(dirname(__FILE__).'/client/facebook.php');
+require_once(dirname(__FILE__).'/facebook.php');
 
 class FacebookAuthenticationModule implements IAuthenticationModule
 {
-	private $api_key;
+	private $appID;
 	private $secret;
 	private $remember;
 
 	private $headersLoaded = false;
 
-	public function __construct($api_key, $secret, $remember = true)
+	public function __construct($appID, $secret, $remember = true)
 	{
-		$this->setKeys($api_key, $secret);
+		$this->setKeys($appID, $secret);
 
 		// TODO Replace it with immediate FB Connect call:
 		// http://code.google.com/p/userbase/issues/detail?id=16
 		$this->remember = $remember;
 	}
 
-	public function setKeys($api_key, $secret)
+	public function setKeys($appID, $secret)
 	{
-		$this->api_key = $api_key;
+		$this->appID= $appID;
 		$this->secret = $secret;
 	}
 
@@ -141,14 +141,30 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 
 	public function renderLoginForm($action)
 	{
-		?>
-		<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/en_US" type="text/javascript"></script><script type="text/javascript">FB.init("<?php echo $this->api_key?>", "<?php echo UserConfig::$USERSROOTURL; ?>/modules/facebook/xd_receiver.htm");</script>
+		?><div id="fb-root"></div>
+		<script>
+		window.fbAsyncInit = function() {
+			FB.init({
+				appId  : '<?php echo $this->appID?>',
+				status : true, // check login status
+				cookie : true, // enable cookies to allow the server to access the session
+				xfbml  : true  // parse XFBML
+			});
+		};
+
+		(function() {
+			var e = document.createElement('script');
+			e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+			e.async = true;
+			document.getElementById('fb-root').appendChild(e);
+		}());
+		</script>
 
 		<form action="<?php echo $action?>" method="POST" name="facebookloginform">
 		<input type="hidden" name="login" value="Login &gt;&gt;&gt;"/>
 		</form>
 
-		<a href="#" onclick="FB.Connect.requireSession(function() {document.facebookloginform.submit()}); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); background-position: 0px -22px; width: 198px; height: 22px; display: block; cursor: hand;" title="Login with Facebook Connect"></span></a>
+		<a href="#" onclick="FB.login(function(response) {if (response.session && response.perms == 'email,read_stream,publish_stream,offline_access') {document.facebookloginform.submit()}}, {perms:'email,read_stream,publish_stream,offline_access'}); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); background-position: 0px -22px; width: 198px; height: 22px; display: block; cursor: hand;" title="Login with Facebook Connect"></span></a>
 		<?php
 	}
 
@@ -218,7 +234,12 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 	{
 		$remember = $this->remember; 
 
-		$facebook = new Facebook($this->api_key, $this->secret);
+		$facebook = new Facebook(array(
+			'appId'  => $this->appID,
+			'secret' => $this->secret,
+			'cookie' => true, // enable optional cookie support
+		));
+
 		$fbuser = $facebook->require_login();
 
 		$user = User::getUserByFacebookID($fbuser);
