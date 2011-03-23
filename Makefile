@@ -2,22 +2,19 @@ all:	updatecode updatedb
 
 updatecode:
 ifneq "$(wildcard .svn )" ""
-	rm -rf dbupgrade
+	rm -rf dbupgrade oauth-php admin/swfobject
 	svn update
+
 	mkdir dbupgrade/
 	svn export http://svn.github.com/sergeychernyshev/DBUpgrade.git _dbupgrade
 	mv _dbupgrade/* dbupgrade/
 	rm -rf _dbupgrade
 
-	rm -rf oauth-php 
-	svn update
 	mkdir oauth-php
 	svn export http://svn.github.com/sergeychernyshev/oauth-php.git _oauth-php
 	mv _oauth-php/* oauth-php
 	rm -rf _oauth-php
 
-	rm -rf admin/swfobject
-	svn update
 	mkdir admin/swfobject
 	svn export http://svn.github.com/swfobject/swfobject.git _swfobject
 	mv _swfobject/* admin/swfobject
