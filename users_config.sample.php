@@ -27,10 +27,33 @@ UserConfig::$modules[] = new UsernamePasswordAuthenticationModule();
  * Google OAuth Authentication configuration
  * Register your app here: https://www.google.com/accounts/ManageDomains
  * Add URL for your site, verify it using one of the methods provided
- * And then uncomment two lines below and copy API Key and App Secret
+ * And then uncomment lines below and copy API Key and App Secret
+ * Optional 3rd parameter is an array of API scopes you need authorization for.
+ * 	See up to date list of scopes here: http://code.google.com/apis/gdata/faq.html#AuthScopes
+ *	(Google Contacts API scope is required and is included by default)
  */
 #require_once(dirname(__FILE__).'/users/modules/google_oauth/index.php');
-#UserConfig::$modules[] = new GoogleOAuthAuthenticationModule('...OAuth.key.goes.here...', '...OAuth.secret.goes.here...');
+#UserConfig::$modules[] = new GoogleOAuthAuthenticationModule(
+#	'...OAuth.key.goes.here...',
+#	'...OAuth.secret.goes.here...',
+#	array(
+#		'https://www.google.com/analytics/feeds/',		// Google Analytics Data API
+#		'http://www.google.com/base/feeds/',			// Google Base Data API
+#		'https://sites.google.com/feeds/',			// Google Sites Data API
+#		'http://www.blogger.com/feeds/',			// Blogger Data API
+#		'http://www.google.com/books/feeds/',			// Book Search Data API
+#		'https://www.google.com/calendar/feeds/',		// Calendar Data API
+#		'https://docs.google.com/feeds/',			// Documents List Data API
+#		'http://finance.google.com/finance/feeds/',		// Finance Data API
+#		'https://mail.google.com/mail/feed/atom/',		// Gmail Atom feed
+#		'http://maps.google.com/maps/feeds/',			// Maps Data API
+#		'http://picasaweb.google.com/data/',			// Picasa Web Albums Data API
+#		'http://www.google.com/sidewiki/feeds/',		// Sidewiki Data API
+#		'https://spreadsheets.google.com/feeds/',		// Spreadsheets Data API
+#		'http://www.google.com/webmasters/tools/feeds/',	// Webmaster Tools API
+#		'http://gdata.youtube.com'				// YouTube Data API
+#	)
+#);
 
 /*
  * Meetup Authentication configuration

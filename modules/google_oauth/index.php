@@ -5,8 +5,24 @@ class GoogleOAuthAuthenticationModule extends OAuthAuthenticationModule
 {
 	protected $userCredentialsClass = 'GoogleOAuthUserCredentials';
 
-	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret)
+	/**
+	 * Constructor for Google OAuth module
+	 * @param string $oAuthConsumerKey OAuth Consumer Key
+	 * @param string $oAuthConsumerSecret OAuth Consumer Secret
+	 * @param array $GoogleAPIScopes (optional) Array of Google API Scopes
+	 *		See full list here: http://code.google.com/apis/gdata/faq.html#AuthScopes
+	 */
+	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret,
+		$GoogleAPIScopes = null)
 	{
+		// default scope needed for identity verification
+		// TODO rewrite using hybrid OpenID + OAuth implementation
+		$scopes = array('https://www.google.com/m8/feeds/');
+
+		if (is_array($GoogleAPIScopes)) {
+			$scopes = array_merge($scopes, $GoogleAPIScopes);
+		}
+
 		parent::__construct(
 			'Google',
 			'https://www.google.com/',
@@ -16,7 +32,7 @@ class GoogleOAuthAuthenticationModule extends OAuthAuthenticationModule
 			'https://www.google.com/accounts/OAuthGetAccessToken',
 			'https://www.google.com/accounts/OAuthAuthorizeToken',
 			array('HMAC-SHA1'),
-			'https://www.google.com/m8/feeds/',
+			implode(' ', $scopes),
 			UserConfig::$USERSROOTURL.'/modules/google_oauth/login-button.png',
 			UserConfig::$USERSROOTURL.'/modules/google_oauth/login-button.png',
 			UserConfig::$USERSROOTURL.'/modules/google_oauth/login-button.png',
