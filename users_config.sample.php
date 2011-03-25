@@ -29,7 +29,7 @@ UserConfig::$modules[] = new UsernamePasswordAuthenticationModule();
  * Add URL for your site, verify it using one of the methods provided
  * And then uncomment lines below and copy API Key and App Secret
  * Optional 3rd parameter is an array of API scopes you need authorization for.
- * 	See up to date list of scopes here: http://code.google.com/apis/gdata/faq.html#AuthScopes
+ * 	See up-to-date list of scopes here: http://code.google.com/apis/gdata/faq.html#AuthScopes
  *	(Google Contacts API scope is required and is included by default)
  */
 #require_once(dirname(__FILE__).'/users/modules/google_oauth/index.php');
