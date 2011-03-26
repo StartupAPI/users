@@ -145,6 +145,16 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 
 	public function renderLoginForm($action)
 	{
+		if (is_null($action))
+		{
+			$action = UserConfig::$USERSROOTURL.'/login.php?module='.$this->getID();
+		}
+
+		$this->renderForm($action, true);
+	}
+
+	private function renderForm($action, $login)
+	{
 		$facebook = new Facebook(array(
 			'appId'  => $this->appID,
 			'secret' => $this->secret,
@@ -154,15 +164,17 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 		$session = $facebook->getSession();
 
 		?><div id="fb-root"></div>
-		<form action="<?php echo $action?>" method="POST" name="facebookloginform">
-		<input type="hidden" name="login" value="Login &gt;&gt;&gt;"/>
-		</form>
 
-		<a class="userbase-fb-login" href="#" onclick="UserBaseFBLogin()"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); background-position: 0px -22px; width: 198px; height: 22px; display: block; cursor: hand;" title="Login with Facebook Connect"></span></a>
+		<form action="<?php echo $action?>" method="POST" name="facebookconnectform">
+		<input type="hidden" name="<?php echo $login ? 'login' : 'register' ?>" value="Connect &gt;&gt;&gt;"/>
+		</form>
+		<a class="userbase-fb-connect" href="#" onclick="UserBaseFBConnect(); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); <?php echo $login ? 'background-position: 0px -22px; width: 198px;' : 'background-position: 0px 0px; width: 250px;' ?> height: 22px; display: block; cursor: hand;" title="<?php echo $login ? 'Login with' : 'Quick Sign-up using' ?> Facebook Connect"></span></a>
 
 		<script src="<?php echo UserConfig::$USERSROOTURL; ?>/modules/facebook/json2-min.js"></script>
 		<script>
-		var UserBaseFBLogin = function() { console.log('FB is not loaded yet') };
+		var UserBaseFBConnect = function() {
+			// FB is not loaded yet
+		};
 
 		window.fbAsyncInit = function() {
 			// permissions required by this instance of UserBase
@@ -176,14 +188,13 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 				cookie : true // enable cookies to allow the server to access the session
 			});
 
-			UserBaseFBLogin = function() {
-				console.log('loggin in');
+			UserBaseFBConnect = function() {
 				// here perms is just a comma-separated string
 				FB.login(function(response) {
 					if (response.session &&
 						(required_perms == '' || response.perms == required_perms)
 					) {
-						document.facebookloginform.submit();
+						document.facebookconnectform.submit();
 						return;
 					}
 				}, {perms: required_perms_string});
@@ -226,8 +237,8 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 						}
 
 						// override login function with simple form submit
-						UserBaseFBLogin = function() {
-							document.facebookloginform.submit();
+						UserBaseFBConnect = function() {
+							document.facebookconnectform.submit();
 						}
 						return;
 					} else {
@@ -255,20 +266,7 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 			$action = UserConfig::$USERSROOTURL.'/register.php?module='.$this->getID();
 		}
 
-		if (!$this->headersLoaded)
-		{
-			?>
-			<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/en_US" type="text/javascript"></script><script type="text/javascript">FB.init("<?php echo $this->api_key?>", "<?php echo UserConfig::$USERSROOTURL; ?>/modules/facebook/xd_receiver.htm");</script>
-
-			<form action="<?php echo $action?>" method="POST" name="facebookregform">
-			<input type="hidden" name="register" value="Register &gt;&gt;&gt;"/>
-			</form>
-			<?php
-			$this->headersLoaded = true;
-		}
-		?>
-		<a href="#" onclick="FB.Connect.requireSession(function() {document.facebookregform.submit()}); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); background-position: 0px 0px; width: 250px; height: 22px; display: block; cursor: hand;" title="Quick Sign-up using Facebook Connect"></span></a>
-		<?php
+		$this->renderForm($action, false);
 	}
 
 	/*
