@@ -256,15 +256,20 @@ class User
 	/*
 	 * create new user based on facebook info
 	 */
-	public static function createNewFacebookUser($name, $fb_id)
+	public static function createNewFacebookUser($name, $fb_id, $me = null)
 	{
 		$db = UserConfig::getDB();
 
+		$email = null;
+		if (array_key_exists('email', $me)) {
+			$email = $me['email'];
+		}
+
 		$user = null;
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix."users (name, regmodule, fb_id) VALUES (?, 'facebook', ?)"))
+		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix."users (name, regmodule, email, fb_id) VALUES (?, 'facebook', ?, ?)"))
 		{
-			if (!$stmt->bind_param('si', $name, $fb_id))
+			if (!$stmt->bind_param('ssi', $name, $email, $fb_id))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}
