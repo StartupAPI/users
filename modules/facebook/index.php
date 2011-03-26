@@ -5,23 +5,27 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 {
 	private $appID;
 	private $secret;
+	private $permissions;
 	private $remember;
 
 	private $headersLoaded = false;
 
-	public function __construct($appID, $secret, $remember = true)
+	/**
+	 * Cretes Facebook authentication module
+	 * @param string $appID Facebook application ID
+	 * @param string $secret Facebook application secret (not key)
+	 * @param array $permissions Array of additional permissions (e.g. email)
+	 * 	full list can be found here: http://developers.facebook.com/docs/authentication/permissions/
+	 */
+	public function __construct($appID, $secret, $permissions = array(), $remember = true)
 	{
-		$this->setKeys($appID, $secret);
+		$this->appID= $appID;
+		$this->secret = $secret;
+		$this->permissions = $permissions;
 
 		// TODO Replace it with immediate FB Connect call:
 		// http://code.google.com/p/userbase/issues/detail?id=16
 		$this->remember = $remember;
-	}
-
-	public function setKeys($appID, $secret)
-	{
-		$this->appID= $appID;
-		$this->secret = $secret;
 	}
 
 	public function getID()
@@ -141,15 +145,96 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 
 	public function renderLoginForm($action)
 	{
+		$facebook = new Facebook(array(
+			'appId'  => $this->appID,
+			'secret' => $this->secret,
+			'cookie' => true, // enable optional cookie support
+		));
+
+		$session = $facebook->getSession();
+
 		?><div id="fb-root"></div>
+		<form action="<?php echo $action?>" method="POST" name="facebookloginform">
+		<input type="hidden" name="login" value="Login &gt;&gt;&gt;"/>
+		</form>
+
+		<a class="userbase-fb-login" href="#" onclick="UserBaseFBLogin()"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); background-position: 0px -22px; width: 198px; height: 22px; display: block; cursor: hand;" title="Login with Facebook Connect"></span></a>
+
+		<script src="<?php echo UserConfig::$USERSROOTURL; ?>/modules/facebook/json2-min.js"></script>
 		<script>
+		var UserBaseFBLogin = function() { console.log('FB is not loaded yet') };
+
 		window.fbAsyncInit = function() {
+			// permissions required by this instance of UserBase
+			var required_perms = <?php echo json_encode($this->permissions); ?>;
+			var required_perms_string = <?php echo json_encode(implode(',', $this->permissions)); ?>;
+
 			FB.init({
 				appId  : '<?php echo $this->appID?>',
+				session : <?php echo json_encode($session); ?>, // don't refetch the session when PHP already has it
 				status : true, // check login status
-				cookie : true, // enable cookies to allow the server to access the session
-				xfbml  : true  // parse XFBML
+				cookie : true // enable cookies to allow the server to access the session
 			});
+
+			UserBaseFBLogin = function() {
+				console.log('loggin in');
+				// here perms is just a comma-separated string
+				FB.login(function(response) {
+					if (response.session &&
+						(required_perms == '' || response.perms == required_perms)
+					) {
+						document.facebookloginform.submit();
+						return;
+					}
+				}, {perms: required_perms_string});
+			};
+
+			(function() {
+				FB.getLoginStatus(function(response) {
+					// getLoginStatus returns an array with 'extended' key or null
+					if (response.session) {
+						if (required_perms.length > 0) {
+							// bug in API - it returns a serialized array
+							if (typeof(response.perms) == 'string') {
+								response.perms = JSON.parse(response.perms);
+							}
+
+							if (typeof(response.perms) == 'object'
+								&& typeof(response.perms.extended) == 'object'
+								&& (response.perms.extended instanceof Array)
+							) {
+								var i = required_perms.length;
+								while (i--) {
+									var ex = response.perms.extended;
+
+									var j = ex.length;
+									var found = false;
+									while (j--) {
+										if (required_perms[i] == ex[j]) {
+											found = true;
+											break;
+										}
+									}
+
+									if (!found) {
+										return;
+									}
+								}
+							} else {
+								return; // no permissions passed
+							}
+						}
+
+						// override login function with simple form submit
+						UserBaseFBLogin = function() {
+							document.facebookloginform.submit();
+						}
+						return;
+					} else {
+						return;
+					}
+				}, {perms: required_perms_string});
+			})(); // returning a function to run on login button click
 		};
 
 		(function() {
@@ -158,13 +243,8 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 			e.async = true;
 			document.getElementById('fb-root').appendChild(e);
 		}());
+
 		</script>
-
-		<form action="<?php echo $action?>" method="POST" name="facebookloginform">
-		<input type="hidden" name="login" value="Login &gt;&gt;&gt;"/>
-		</form>
-
-		<a href="#" onclick="FB.login(function(response) {if (response.session && response.perms == 'email,read_stream,publish_stream,offline_access') {document.facebookloginform.submit()}}, {perms:'email,read_stream,publish_stream,offline_access'}); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); background-position: 0px -22px; width: 198px; height: 22px; display: block; cursor: hand;" title="Login with Facebook Connect"></span></a>
 		<?php
 	}
 
@@ -240,7 +320,18 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 			'cookie' => true, // enable optional cookie support
 		));
 
-		$fbuser = $facebook->require_login();
+		$session = $facebook->getSession();
+
+		if (!$session) {
+			return null;
+		}
+
+		try {
+			$fbuser = $facebook->getUser();
+		} catch (FacebookApiException $e) {
+			error_log("Can't get Facebook user");
+			return null;
+		}
 
 		$user = User::getUserByFacebookID($fbuser);
 
@@ -256,8 +347,23 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 	{
 		$remember = $this->remember;
 
-		$facebook = new Facebook($this->api_key, $this->secret);
-		$fbuser = $facebook->require_login();
+		$facebook = new Facebook(array(
+			'appId'  => $this->appID,
+			'secret' => $this->secret,
+			'cookie' => true, // enable optional cookie support
+		));
+
+		$session = $facebook->getSession();
+		if (!$session) {
+			return null;
+		}
+
+		try {
+			$fbuser = $facebook->getUser();
+		} catch (FacebookApiException $e) {
+			error_log("Can't get Facebook user");
+			return null;
+		}
 
 		$errors = array();
 		if (is_int($fbuser)) {
@@ -273,13 +379,16 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 			return $existing_user;
 		}
 
-		$data = $facebook->api_client->users_getInfo($fbuser, 'last_name, first_name');
+		try {
+			$me = $facebook->api('/me');
+		} catch (FacebookApiException $e) {
+			error_log("Can't get /me API data");
+			return null;
+		}
 
-		if (count($data) > 0
-			&& array_key_exists('first_name', $data[0])
-			&& array_key_exists('last_name', $data[0]))
+		if (array_key_exists('first_name', $me)	&& array_key_exists('last_name', $me))
 		{
-			$name = $data[0]['first_name'].' '.$data[0]['last_name'];
+			$name = $me['first_name'].' '.$me['last_name'];
 		}
 		else
 		{
@@ -292,7 +401,7 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 		}
 
 		// ok, let's create a user
-		$user = User::createNewFacebookUser($name, $fbuser);
+		$user = User::createNewFacebookUser($name, $fbuser, $me);
 		$user->recordActivity(USERBASE_ACTIVITY_REGISTER_FB);
 		return $user;
 	}

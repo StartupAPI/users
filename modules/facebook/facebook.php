@@ -722,6 +722,7 @@ class Facebook
         $session_without_sig,
         $this->getApiSecret()
       );
+
       if ($session['sig'] != $expected_sig) {
         self::errorLog('Got invalid session signature in cookie.');
         $session = null;
