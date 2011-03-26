@@ -150,11 +150,25 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 			$action = UserConfig::$USERSROOTURL.'/login.php?module='.$this->getID();
 		}
 
-		$this->renderForm($action, true);
+		$this->renderForm($action, 'login');
 	}
 
-	private function renderForm($action, $login)
+	private function renderForm($action, $form)
 	{
+		if ($form == 'login') {
+			$formsubmit = 'login';
+			$buttonspritestyle = 'background-position: 0px -22px; width: 198px; height: 22px;';
+			$buttontitle = 'Login with Facebook';
+		} else if ($form == 'register') {
+			$formsubmit = 'register';
+			$buttonspritestyle = 'background-position: 0px 0px; width: 250px; height: 22px;';
+			$buttontitle = 'Quick Sign-up using Facebook';
+		} else if ($form == 'connect') {
+			$formsubmit = 'save';
+			$buttonspritestyle = 'background-position: 0px -44px; width: 230px; height: 22px;';
+			$buttontitle = 'Connect to your Facebook Account';
+		}
+
 		$facebook = new Facebook(array(
 			'appId'  => $this->appID,
 			'secret' => $this->secret,
@@ -166,9 +180,9 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 		?><div id="fb-root"></div>
 
 		<form action="<?php echo $action?>" method="POST" name="facebookconnectform">
-		<input type="hidden" name="<?php echo $login ? 'login' : 'register' ?>" value="Connect &gt;&gt;&gt;"/>
+		<input type="hidden" name="<?php echo $formsubmit ?>" value="Connect &gt;&gt;&gt;"/>
 		</form>
-		<a class="userbase-fb-connect" href="#" onclick="UserBaseFBConnect(); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); <?php echo $login ? 'background-position: 0px -22px; width: 198px;' : 'background-position: 0px 0px; width: 250px;' ?> height: 22px; display: block; cursor: hand;" title="<?php echo $login ? 'Login with' : 'Quick Sign-up using' ?> Facebook Connect"></span></a>
+		<a class="userbase-fb-connect" href="#" onclick="UserBaseFBConnect(); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); <?php echo $buttonspritestyle ?> display: block; cursor: hand;" title="<?php echo $buttontitle ?>"></span></a>
 
 		<script src="<?php echo UserConfig::$USERSROOTURL; ?>/modules/facebook/json2-min.js"></script>
 		<script>
@@ -266,7 +280,7 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 			$action = UserConfig::$USERSROOTURL.'/register.php?module='.$this->getID();
 		}
 
-		$this->renderForm($action, false);
+		$this->renderForm($action, 'register');
 	}
 
 	/*
@@ -280,22 +294,29 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 	 */
 	public function renderEditUserForm($action, $errors, $user, $data)
 	{
-		?>
-		<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/en_US" type="text/javascript"></script><script type="text/javascript">FB.init("<?php echo $this->api_key?>", "<?php echo UserConfig::$USERSROOTURL; ?>/modules/facebook/xd_receiver.htm");</script><?php
-		if (is_null($user->getFacebookID())) {
-			?>
-			<a href="#" onclick="FB.Connect.requireSession(function() {document.facebookusereditform.submit()}); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); background-position: 0px -44px; width: 230px; height: 22px; display: block; cursor: hand;" title="Connect to your Facebook account"></span></a>
-			<form action="<?php echo $action?>" method="POST" name="facebookusereditform">
-			<input type="hidden" name="save" value="Save &gt;&gt;&gt;"/>
-			</form>
-			<?php
+		$fb_id = $user->getFacebookID();
+
+		if (is_null($fb_id)) {
+			$this->renderForm($action, 'connect');
 		}
 		else
 		{
-		?>
+			$facebook = new Facebook(array(
+				'appId'  => $this->appID,
+				'secret' => $this->secret,
+				'cookie' => true, // enable optional cookie support
+			));
+
+			try {
+				$me = $facebook->api('/'.$fb_id);
+			} catch (FacebookApiException $e) {
+				error_log("Can't get /me API data");
+				return null;
+			}
+			?>
 			<table><tr>
-			<td rowspan="2"><fb:profile-pic uid="<?php echo $user->getFacebookID(); ?>" linked="true" size="square" facebook-logo="true" linked="true"/></td>
-			<td><fb:name uid="<?php echo $user->getFacebookID(); ?>" useyou="false"/></td>
+			<td rowspan="2"><a href="<?php echo $me['link'] ?>" target="_blank"><img src="http://graph.facebook.com/<?php echo $fb_id ?>/picture" style="border: 0; max-width: 100px; max-height: 100px" title="<?php echo UserTools::escape($me['name']) ?>"></a></td>
+			<td><a href="<?php echo UserTools::escape($me['link']) ?>" target="_blank"><?php echo $me['name'] ?></a></td>
 			</tr><tr>
 			<td>
 			<form action="<?php echo $action?>" method="POST" name="facebookusereditform">
@@ -384,13 +405,13 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 			return null;
 		}
 
-		if (array_key_exists('first_name', $me)	&& array_key_exists('last_name', $me))
+		if (array_key_exists('name', $me))
 		{
-			$name = $me['first_name'].' '.$me['last_name'];
+			$name = $me['name'];
 		}
 		else
 		{
-			$errors['username'][] = "User doesn't have first and last name";
+			$errors['username'][] = "User doesn't have a name";
 		}
 
 		if (count($errors) > 0)
@@ -422,10 +443,23 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 			return true;
 		}
 
-		$errors = array();
+		$facebook = new Facebook(array(
+			'appId'  => $this->appID,
+			'secret' => $this->secret,
+			'cookie' => true, // enable optional cookie support
+		));
 
-		$facebook = new Facebook($this->api_key, $this->secret);
-		$fbuser = $facebook->require_login();
+		$session = $facebook->getSession();
+		if (!$session) {
+			return null;
+		}
+
+		try {
+			$fbuser = $facebook->getUser();
+		} catch (FacebookApiException $e) {
+			error_log("Can't get Facebook user");
+			return null;
+		}
 
 		$errors = array();
 		if (is_int($fbuser)) {
@@ -444,6 +478,22 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 		}
 
 		$user->setFacebookID($fbuser);
+
+		// if user doesn't have email address and we required it for Facebook connection, let's save it
+		if (!$user->getEmail()) {
+			try {
+				$me = $facebook->api('/me');
+			} catch (FacebookApiException $e) {
+				error_log("Can't get /me API data");
+				return null;
+			}
+
+			if (array_key_exists('email', $me))
+			{
+				$user->setEmail($me['email']);
+			}
+		}
+
 		$user->save();
 
 		$user->recordActivity(USERBASE_ACTIVITY_ADDED_FB);
