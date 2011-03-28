@@ -39,25 +39,19 @@ class MailChimpModule extends EmailModule
 	 * or email is recorded for the user for the first time
 	 */
 	public function registerSubscriber($user) {
-		$data = array(
-			'output' => 'json',
-			'apikey' => $this->apiKey,
+		error_log("Registering new MailChimp subscriber: ".$user->getName().' <'.$user->getEmail().'>');
 
-			'method' => 'listSubscribe',
+		$url = $this->endpoint.'?output=json&method=listSubscribe&apikey='.urlencode($this->apiKey)
+			. '&id='.urlencode($this->listID)
+			. '&email_address='.urlencode($user->getEmail())
+			. '&merge_vars='.urlencode(json_encode(array('NAME' => $user->getName())));
 
-			'id' => $this->listID,
-			'email_address' => $user->getEmail(),
-			'merge' => array(
-				'NAME' => $user->getName()
-			)
-		);
+		error_log('URL: '.var_export($url, true));
 
 		$ch = curl_init(); 
-		curl_setopt($ch, CURLOPT_URL, $this->endpoint);
+		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE); 
 		curl_setopt($ch, CURLOPT_HEADER, TRUE);
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
 		$result = curl_exec($ch); 
 
@@ -67,7 +61,7 @@ class MailChimpModule extends EmailModule
 		curl_close($ch);
 
 		if ($result !== 'true') {
-			throw new EmailSubscriptionException("MailChimp subscription failed");
+			throw new EmailSubscriptionException("MailChimp subscription failed: ".var_export($result, true));
 		}
 	}
 
@@ -75,8 +69,9 @@ class MailChimpModule extends EmailModule
 	 * This function should be called when user information has changed
 	 * e.g. email address or additional information passed to provider like name or gender and etc.
 	 */
-	public function updateSubscriber($user) {
+	public function updateSubscriber($old_user, $new_user) {
 		// TODO Implement subscriber info update
+		error_log("MailChimp::updateSubscriber method is not implemented yet");
 	}
 
 	/**
@@ -84,6 +79,16 @@ class MailChimpModule extends EmailModule
 	 */
 	public function removeSubscriber($user) {
 		// TODO Implement subscriber removal
+		error_log("MailChimp::removeSubscriber method is not implemented yet");
+	}
+
+	/**
+	 * This method is called by userChanged (implemented in parent class)
+	 * @return boolean Returns true if user's information has changed and needs to be synced
+	 */
+	public function hasUserInfoChanged($old_user, $new_user) {
+		// we only track user name change so far
+		return ($old_user->getName() != $new_user->getName());
 	}
 }
 

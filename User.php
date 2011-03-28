@@ -198,6 +198,10 @@ class User
 		{
 			eval(userConfig::$onCreate.'($this);');
 		}
+
+		if (!is_null(UserCounfig::$email_module)) {
+			UserCounfig::$email_module->registerSubscriber($this);
+		}
 	}
 
 	/*
@@ -1569,6 +1573,16 @@ class User
 
 		$passresetnum = $this->requirespassreset ? 1 : 0;
 
+		if (!is_null(UserConfig::$email_module)) {
+			// !WARNING! it's not safe to do anything with this user except reading it's built-in
+			// properties
+			// TODO implement some protection from reading or writing to DB based on this user's info,
+			// just reading object properties.
+
+			// creating a copy of the user in case we need to update their email subscription
+			$old_user = User::getUser($this->getID());
+		}
+
 		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET username = ?, name = ?, email = ?, requirespassreset = ?, fb_id = ? WHERE id = ?'))
 		{
 			if (!$stmt->bind_param('sssiii', $this->username, $this->name, $this->email, $passresetnum, $this->fbid, $this->userid))
@@ -1585,6 +1599,11 @@ class User
 		else
 		{
 			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		if (!is_null(UserConfig::$email_module)) {
+			// it's up to email module to decide what to do
+			UserConfig::$email_module->userChanged($old_user, $this);
 		}
 
 		return;
