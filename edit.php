@@ -8,10 +8,10 @@ $user = User::require_login();
 
 $errors = array();
 
-$module = UserConfig::$modules[0];
+$module = UserConfig::$authentication_modules[0];
 if (array_key_exists('module', $_GET))
 {
-	foreach (UserConfig::$modules as $module)
+	foreach (UserConfig::$authentication_modules as $module)
 	{
 		if ($module->getID() == $_GET['module']) {
 			break;
@@ -77,7 +77,7 @@ require_once(UserConfig::$header);
 ?></div>
 <?php
 
-foreach (UserConfig::$modules as $module)
+foreach (UserConfig::$authentication_modules as $module)
 {
 	$id = $module->getID();
 

@@ -4,7 +4,7 @@
  * just have these lines or comment them out if you don't want regular form registration
  */
 require_once(dirname(__FILE__).'/users/modules/usernamepass/index.php');
-UserConfig::$modules[] = new UsernamePasswordAuthenticationModule();
+new UsernamePasswordAuthenticationModule();
 
 /*
  * Facebook Connect configuration
@@ -13,7 +13,7 @@ UserConfig::$modules[] = new UsernamePasswordAuthenticationModule();
  * And then uncomment two lines below and copy API Key and App Secret
  */
 #require_once(dirname(__FILE__).'/users/modules/facebook/index.php');
-#UserConfig::$modules[] = new FacebookAuthenticationModule('...api.key.goes.here...', '...api.secret.goes.here...');
+#new FacebookAuthenticationModule('...api.key.goes.here...', '...api.secret.goes.here...');
 
 /*
  * Google Friend Connect configuration
@@ -21,7 +21,7 @@ UserConfig::$modules[] = new UsernamePasswordAuthenticationModule();
  * And then uncomment two lines below and copy the site ID from the URL
  */
 #require_once(dirname(__FILE__).'/users/modules/google/index.php');
-#UserConfig::$modules[] = new GoogleAuthenticationModule('...site.id.goes.here...');
+#new GoogleAuthenticationModule('...site.id.goes.here...');
 
 /*
  * Google OAuth Authentication configuration
@@ -33,7 +33,7 @@ UserConfig::$modules[] = new UsernamePasswordAuthenticationModule();
  *	(Google Contacts API scope is required and is included by default)
  */
 #require_once(dirname(__FILE__).'/users/modules/google_oauth/index.php');
-#UserConfig::$modules[] = new GoogleOAuthAuthenticationModule(
+#new GoogleOAuthAuthenticationModule(
 #	'...OAuth.key.goes.here...',
 #	'...OAuth.secret.goes.here...',
 #	array(
@@ -62,7 +62,7 @@ UserConfig::$modules[] = new UsernamePasswordAuthenticationModule();
  * And then uncomment two lines below and copy API Key and App Secret
  */
 #require_once(dirname(__FILE__).'/users/modules/meetup/index.php');
-#UserConfig::$modules[] = new MeetupAuthenticationModule('...OAuth.key.goes.here...', '...OAuth.secret.goes.here...');
+#new MeetupAuthenticationModule('...OAuth.key.goes.here...', '...OAuth.secret.goes.here...');
 
 /*
  * You must fill it in with some random string

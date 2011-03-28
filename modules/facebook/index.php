@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__).'/facebook.php');
 
-class FacebookAuthenticationModule implements IAuthenticationModule
+class FacebookAuthenticationModule extends AuthenticationModule
 {
 	private $appID;
 	private $secret;
@@ -19,6 +19,8 @@ class FacebookAuthenticationModule implements IAuthenticationModule
 	 */
 	public function __construct($appID, $secret, $permissions = array(), $remember = true)
 	{
+		parent::__construct();
+
 		$this->appID= $appID;
 		$this->secret = $secret;
 		$this->permissions = $permissions;

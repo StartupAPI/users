@@ -13,17 +13,19 @@ $labels = '';
 $regs = User::getRecentRegistrationsByModule();
 
 $totalregs = 0;
-foreach (UserConfig::$modules as $module) {
-	$reg = $regs[$module->getID()];
+foreach (UserConfig::$authentication_modules as $module) {
+	$module_id = $module->getID();
 
-	$totalregs += $reg;
+	if (array_key_exists($module_id, $regs)) {
+		$totalregs += $regs[$module_id];
+	}
 }
 
 $firstmodule = true;
-foreach (UserConfig::$modules as $module) {
-	$reg = $regs[$module->getID()];
+foreach (UserConfig::$authentication_modules as $module) {
+	$module_id = $module->getID();
 
-	if ($reg == 0) {
+	if (!array_key_exists($module_id, $regs) || $regs[$module_id] == 0) {
 		continue;
 	}
 

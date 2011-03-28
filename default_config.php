@@ -4,8 +4,14 @@ require_once(dirname(__FILE__).'/modules.php');
 
 class UserConfig
 {
-	// modules list all modules available
-	public static $modules;
+	// list of all available modules
+	public static $all_modules = array();
+
+	// multiple email modules can be assigned for the same instance
+	public static $authentication_modules = array();
+
+	// Only one email module can exist
+	public static $email_module;
 
 	public static $ROOTPATH;
 	public static $USERSROOTURL;
@@ -169,8 +175,6 @@ EOD;
 
 	public static function init()
 	{
-		UserConfig::$modules = array();
-
 		UserConfig::$ROOTPATH = dirname(__FILE__);
 
 		// Chopping of trailing slash which is not supposed to be there in Apache config
@@ -265,6 +269,10 @@ EOD;
 			USERBASE_ACTIVITY_RETURN_MONTHLY => array('Returned to the site within a month', 1)
 		);
 	}
+
+	// Couldn't reuse it, but keeping it here because it might be still populated in user configs
+	// Use UserConfig::$all_modules array instead of needed
+	/* !!! DEPRECATED !!! */ public static $modules = array();
 }
 
 UserConfig::init();

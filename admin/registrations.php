@@ -139,7 +139,7 @@ foreach ($users as $user)
 	<td><?php $userid = $user->getID(); echo $userid; ?></td>
 	<td align="right"><?php echo date('M j, h:iA', $regtime)?> (<?php if ($ago <= 5) {?><span style="color: #00<?php echo sprintf('%02s', dechex((4 - $ago) * 150 / 4 + 50))?>00; font-weight: bold"><?php }?><?php echo $ago?> day<?php echo $ago > 1 ? 's' : '' ?> ago<?php if ($ago <= 5) {?></span><?php }?>)</td>
 	<td><?php
-	foreach (UserConfig::$modules as $module)
+	foreach (UserConfig::$authentication_modules as $module)
 	{
 		$creds = $module->getUserCredentials($user);
 

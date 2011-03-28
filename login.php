@@ -7,7 +7,7 @@ if (array_key_exists('login', $_POST))
 {
 	$module = null;
 
-	foreach (UserConfig::$modules as $module)
+	foreach (UserConfig::$authentication_modules as $module)
 	{
 		if ($module->getID() == $_GET['module']) {
 			break;
@@ -43,7 +43,7 @@ require_once(UserConfig::$header);
 
 ?><h2>Log in</h2><div style="background: white; padding: 0 1em"><?php
 
-foreach (UserConfig::$modules as $module)
+foreach (UserConfig::$authentication_modules as $module)
 {
 	$id = $module->getID();
 

@@ -1,5 +1,5 @@
 <?php
-class GoogleAuthenticationModule implements IAuthenticationModule
+class GoogleAuthenticationModule extends AuthenticationModule
 {
 	private $siteid;
 	private $regHeadersLoaded = false;
@@ -8,6 +8,8 @@ class GoogleAuthenticationModule implements IAuthenticationModule
 
 	public function __construct($siteid, $remember = true)
 	{
+		parent::__construct();
+
 		$this->siteid = $siteid;
 
 		// TODO Replace it with immediate GFC call:

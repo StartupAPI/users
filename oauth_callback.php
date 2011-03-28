@@ -16,14 +16,7 @@ try
 		throw new Exception('oauth_token & oauth_varifier required');
 	}
 
-	$module = null;
-
-	foreach (UserConfig::$modules as $module)
-	{
-		if ($module->getID() == $_GET['module']) {
-			break;
-		}
-	}
+	$module = AuthenticationModule::get($_GET['module']);
 
 	$storage = new MrClay_CookieStorage(array(
 		'secret' => UserConfig::$SESSION_SECRET,

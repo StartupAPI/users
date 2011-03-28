@@ -672,13 +672,13 @@ class User
 	}
 
 	/*
-	 * retrieves user credentials for all modules
+	 * retrieves user credentials for all authentication modules
 	 */
 	public function getUserCredentials($requested_module_id = null)
 	{
 		$credentials = array();
 
-		foreach (UserConfig::$modules as $module) {
+		foreach (UserConfig::$authentication_modules as $module) {
 			if (is_null($requested_module_id)) {
 				$credentials[$module][] = $module->getUserCredentials($this);
 			} else {

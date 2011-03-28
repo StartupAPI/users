@@ -21,7 +21,7 @@ google.load('visualization', '1', {'packages':['annotatedtimeline', 'corechart']
 google.setOnLoadCallback(function() {
 	var data = new google.visualization.DataTable();
 	data.addColumn('date', 'Date');
-	<?php foreach (UserConfig::$modules as $module) { ?>
+	<?php foreach (UserConfig::$authentication_modules as $module) { ?>
 		data.addColumn('number', <?php echo json_encode($module->getTitle())?>);
 	<?php } ?>
 
@@ -45,7 +45,7 @@ google.setOnLoadCallback(function() {
 		[new Date('<?php echo $regdate?>'), <?php
 			$firstmodule = true;
 			$colors = array();
-			foreach (UserConfig::$modules as $module) {
+			foreach (UserConfig::$authentication_modules as $module) {
 				$colors[] = '#'.$module->getLegendColor();
 
 				if (!$firstmodule) {

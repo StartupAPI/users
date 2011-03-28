@@ -2,7 +2,7 @@
 include_once(dirname(__FILE__).'/oauth-php/library/OAuthStore.php');
 include_once(dirname(__FILE__).'/oauth-php/library/OAuthRequester.php');
 
-abstract class OAuthAuthenticationModule implements IAuthenticationModule
+abstract class OAuthAuthenticationModule extends AuthenticationModule
 {
 	protected $serviceName;
 
@@ -43,6 +43,8 @@ abstract class OAuthAuthenticationModule implements IAuthenticationModule
 		$connectButtonURL = null,
 		$activities = null)
 	{
+		parent::__construct();
+
 		$this->serviceName = $serviceName;
 		$this->oAuthAPIRootURL = $oAuthAPIRootURL;
 		$this->oAuthConsumerKey = $oAuthConsumerKey;

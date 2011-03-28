@@ -11,14 +11,7 @@ $user_exists = false;
 
 if (UserConfig::$enableRegistration && array_key_exists('register', $_POST))
 {
-	$module = null;
-
-	foreach (UserConfig::$modules as $module)
-	{
-		if ($module->getID() == $_GET['module']) {
-			break;
-		}
-	}
+	$module = AuthenticationModule::get($_GET['module']);
 
 	if (is_null($module))
 	{
@@ -128,7 +121,7 @@ if (UserConfig::$enableRegistration)
 	
 	if ($show_registration_form)
 	{
-		foreach (UserConfig::$modules as $module)
+		foreach (UserConfig::$authentication_modules as $module)
 		{
 			$id = $module->getID();
 

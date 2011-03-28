@@ -1,5 +1,5 @@
 <?php
-class UsernamePasswordAuthenticationModule implements IAuthenticationModule
+class UsernamePasswordAuthenticationModule extends AuthenticationModule
 {
 	public function getID()
 	{
