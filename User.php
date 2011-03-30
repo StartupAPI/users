@@ -1029,6 +1029,109 @@ class User
 	}
 
 	/*
+	 * @param int $activityid Activity ID
+	 * @param int $regnum Number of days in registration period
+	 * @param int $actnum Number of days in activity period
+	 */
+	public static function getActivityRateByRegistrationPeriod($activityid, $regnum, $actnum)
+	{
+		$db = UserConfig::getDB();
+
+		$firstregdate = null;
+		$query = 'SELECT min(regtime) FROM '.UserConfig::$mysql_prefix."users";
+
+		if ($stmt = $db->prepare($query))
+		{
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($firstregdate))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			$stmt->fetch();
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		if (is_null($firstregdate)) {
+			return null; // no users yet
+		}
+
+		// getting total users per period
+		$totals = array();
+
+		$query = 'SELECT CEILING(DATEDIFF(regtime, ?) / ?) AS regperiod, COUNT(*) AS totals FROM '.UserConfig::$mysql_prefix."users GROUP BY regperiod";
+		if ($stmt = $db->prepare($query))
+		{
+			if (!$stmt->bind_param('si', $firstregdate, $regnum))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($period, $total))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			while($stmt->fetch() === TRUE)
+			{
+				$totals[$period] = $total;
+			}
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		$cohorts = array();
+
+		$query = 'SELECT CEILING(DATEDIFF(u.regtime, ?) / ?) AS regperiod, CEILING(DATEDIFF(a.time, u.regtime) / ?) AS actperiod, COUNT(DISTINCT u.id) AS total FROM `'.UserConfig::$mysql_prefix.'activity` a INNER JOIN '.UserConfig::$mysql_prefix.'users u ON a.user_id = u.id WHERE `activity_id` = ? GROUP BY regperiod, actperiod ORDER BY regperiod ASC, actperiod ASC';
+
+		if ($stmt = $db->prepare($query))
+		{
+			if (!$stmt->bind_param('siii', $firstregdate, $regnum, $actnum, $activityid))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($regperiod, $actperiod, $activeusers))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			while($stmt->fetch() === TRUE)
+			{
+				if (array_key_exists($regperiod, $totals)) {
+					$cohorts[$regperiod][$actperiod] = $activeusers / $totals[$regperiod];
+				} else {
+					error_log('Got reg user for period we have no users in: '.$regperiod);
+				}
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return $cohorts;
+	}
+
+	/*
 	 * Generates password recovery code and saves it to the database for later matching
 	 */
 	public function generateTemporaryPassword()

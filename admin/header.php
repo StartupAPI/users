@@ -1,6 +1,5 @@
 <?php
 require_once(dirname(dirname(__FILE__)).'/config.php');
-
 require_once(dirname(dirname(__FILE__)).'/User.php');
 
 $user = User::require_login();
@@ -23,6 +22,11 @@ if (!isset($ADMIN_SECTION)) {
 	?><a href="./">Dashboard</a><?php
 } else {
 	?>Dashboard<?php
+} ?> |
+<?php if ($ADMIN_SECTION != 'cohorts') {
+	?><a href="cohorts.php">Cohort Analysis</a><?php
+} else {
+	?>Cohort Analysis<?php
 } ?> |
 <?php if ($ADMIN_SECTION != 'activity') {
 	?><a href="activity.php">Activity</a><?php
