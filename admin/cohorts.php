@@ -48,11 +48,11 @@ foreach (UserConfig::$activities as $id => $activity) {
 <?php 
 
 $boxes = array_key_exists('boxes', $_REQUEST);
-$normalize = array_key_exists('normalize', $_REQUEST);
+$zoom = array_key_exists('zoom', $_REQUEST);
 ?>
 
-<span style="padding-left: 1em"><input type="checkbox" name="boxes"<?php if ($boxes) {?> checked<?php } ?> onchange="document.activities.submit();"/><?php if (!$boxes && $normalize) {?><input type="hidden" name="normalize" value="on"/><?php } ?> Show Boxes</span>
-<span style="padding-left: 1em"><input type="checkbox" name="normalize"<?php if (!$boxes) {?> disabled<?php } ?><?php if ($boxes && $normalize) {?> checked<?php } ?> onchange="document.activities.submit();"/> Normalize</span>
+<span style="padding-left: 1em"><input type="checkbox" id="boxes" name="boxes"<?php if ($boxes) {?> checked<?php } ?> onchange="document.activities.submit();"/><?php if (!$boxes && $zoom) {?><input type="hidden" name="zoom" value="on"/><?php } ?> <label for="boxes">Show Boxes</label></span>
+<span style="padding-left: 1em" title="Zoom in to fit maximum velue into the box"><input type="checkbox"<?php if ($boxes) {?> id="zoom" name="zoom"<?php } else { ?> disabled<?php } ?><?php if ($boxes && $zoom) {?> checked<?php } ?> onchange="document.activities.submit();"/> <label for="zoom">Zoom in</label></span>
 
 </form>
 </div>
@@ -66,14 +66,14 @@ if (is_null($selectedactivityid)) {
 
 $selectedactivity = UserConfig::$activities[$selectedactivityid];
 
-$regperiodname = 'Month';
+$regperiodtype = 'Month';
 $regperiodlength = 30;
-$actperiodname = 'Month';
+$actperiodtype = 'Month';
 $actperiodlength = 30;
 
 $cohorts = User::getActivityRateByRegistrationPeriod($selectedactivityid, $regperiodlength, $actperiodlength);
 
-$minregperiod = 5;
+$minregperiod = 0;
 $maxregperiod = $minregperiod;
 
 $minactperiod = 0;
@@ -81,7 +81,7 @@ $maxactperiod = $minactperiod;
 
 $maxvalue = 0;
 foreach (array_keys($cohorts) as $regperiod) {
-	foreach (array_keys($cohorts[$regperiod]) as $actperiod) {
+	foreach (array_keys($cohorts[$regperiod]['rates']) as $actperiod) {
 		if ($regperiod < $minregperiod || $actperiod < $minactperiod) {
 			continue;
 		}
@@ -94,8 +94,8 @@ foreach (array_keys($cohorts) as $regperiod) {
 			$maxactperiod = $actperiod;
 		}
 
-		if ($cohorts[$regperiod][$actperiod] > $maxvalue) {
-			$maxvalue = $cohorts[$regperiod][$actperiod];
+		if ($cohorts[$regperiod]['rates'][$actperiod] > $maxvalue) {
+			$maxvalue = $cohorts[$regperiod]['rates'][$actperiod];
 		}
 	}
 }
@@ -105,27 +105,55 @@ $cohort_type = 'Reg. date';
 
 if (!is_null($cohorts)) {
 
-$squaresize = 100;
+$squaresize = 70;
 ?>
 <style>
 .outerbox {
-	width: <?php echo $squaresize ?>px;
-	height: <?php echo $squaresize ?>px;
-	border: 1px dashed #e51837;
+	width: <?php echo $squaresize + 4 ?>px;
+	height: <?php echo $squaresize + 4 ?>px;
+	border: 1px dashed black;
+	position: relative;
 	padding: 2px;
 }
+
+.emptybox {
+	width: <?php echo $squaresize + 4 ?>px;
+	height: <?php echo $squaresize + 4 ?>px;
+	border: 1px dashed silver;
+	padding: 2px;
+}
+
 
 .innerbox {
-	background-color: #e51837;
+	background-color: #759ff9;
+	border: 2px solid #4269d6;
 	color: black;
+	position: absolute;
+	bottom: 2px;
+	left: 2px;
 }
 
-.nobox {
-	width: <?php echo $squaresize ?>px;
-	height: <?php echo $squaresize ?>px;
-	border: 1px dashed #e51837;
-	padding: 2px;
-	font-size: <?php echo ceil($squaresize / 5) ?>px;
+.ratebox {
+	text-align: right;
+	font-size: <?php echo ceil($squaresize / 4) ?>px;
+	font-weight: bold;
+	position: absolute;
+	right: 2px;
+	top: 2px;
+}
+
+.up {
+	color: green;
+	font-size: <?php echo ceil($squaresize / 6) ?>px;
+}
+
+.down {
+	color: red;
+	font-size: <?php echo ceil($squaresize / 6) ?>px;
+}
+
+.numbers {
+	font-size: <?php echo ceil($squaresize / 7) ?>px;
 }
 </style>
 
@@ -134,41 +162,66 @@ $squaresize = 100;
 	<th><?php echo $cohort_type ?></th>
 <?php
 for ($period = $minactperiod; $period <= $maxactperiod; $period ++) {
-?>	<th><?php echo $actperiodname.' '.$period ?></th><?php
+?>	<th><?php echo $actperiodtype.' '.$period ?></th><?php
 }
 ?>
 </tr>
 
 <?php 
 
-for ($regperiod = $minregperiod; $regperiod <= $maxregperiod; $regperiod++) {
-	?><tr><th><?php echo $regperiodname.' '.$regperiod ?></th><?php
+for ($regperiod = $maxregperiod; $regperiod >= $minregperiod; $regperiod--) {
+	?><tr><th><?php
+		echo $regperiodtype.' '.$regperiod."\n<br/>"
+			. $cohorts[$regperiod]['periodstart'].' - '
+			. $cohorts[$regperiod]['periodend']
+	?></th><?php
 	for ($actperiod = $minactperiod; $actperiod <= $maxactperiod; $actperiod++) {
 
 		?><td><?php
-		if ($boxes) {
-			if (array_key_exists($regperiod, $cohorts) && array_key_exists($actperiod, $cohorts[$regperiod]))
-			{
-				$rate = ceil($cohorts[$regperiod][$actperiod] * 1000) / 10;
+		if (array_key_exists($regperiod, $cohorts)
+			&& array_key_exists($actperiod, $cohorts[$regperiod]['rates']))
+		{
+			$rate = $cohorts[$regperiod]['rates'][$actperiod];
 
-				if ($normalize) {
-					$percent = ceil($cohorts[$regperiod][$actperiod] / $maxvalue * 100);
-				} else {
-					$percent = ceil($cohorts[$regperiod][$actperiod] * 100);
+			$ratepercent = round($rate * 100, 1);
+			if ($zoom) {
+				$boxsize = ceil(sqrt($squaresize * $squaresize * $rate / $maxvalue));
+			} else {
+				$boxsize = ceil(sqrt($squaresize * $squaresize * $rate));
+			}
+
+			?><div class="outerbox"<?php echo $boxes ? 'title="'.$ratepercent.'% ('.$cohorts[$regperiod]['activeusers'][$actperiod].' out of '.$cohorts[$regperiod]['totalusers'].' uers registered during this period)"' : ''; ?>><?php
+			if ($boxes) {
+
+				?>
+				<div class="innerbox" style="width: <?php echo $boxsize ?>px; height: <?php echo $boxsize ?>px"></div>
+				<?php
+			}
+			?><div class="ratebox"><?php
+			echo $ratepercent?>%<?php
+			if ($regperiod > $minregperiod) {
+				$prevrate = 0;
+				if (array_key_exists($regperiod - 1, $cohorts) &&
+					array_key_exists($actperiod, $cohorts[$regperiod - 1]['rates']))
+				{
+					$prevrate = $cohorts[$regperiod - 1]['rates'][$actperiod];
 				}
 
-				?><div class="outerbox" title="<?php echo $rate ?>%"><div style="width: <?php echo $percent ?>%; height: <?php echo $percent ?>%" class="innerbox"></div></div><?php
-			} else {
-				?><div style="width: <?php echo $squaresize ?>px; height: <?php echo $squaresize ?>px"/><?php
-	#			echo '<span style="color: silver">0</span>';
+				$diff = $rate - $prevrate;
+
+				if ($diff > 0) {
+					?> <div class="up">+<?php echo round($diff * 100, 2) ?>&uarr;</div><?php
+				} else if ($diff < 0) {
+					?> <div class="down"><?php echo round($diff * 100, 2) ?>&darr;</div><?php
+				}
 			}
+			?><div class="numbers"><?php echo $cohorts[$regperiod]['activeusers'][$actperiod] ?> / <?php echo $cohorts[$regperiod]['totalusers'] ?></div>
+			</div>
+			</div>
+			<?php
 		} else {
-			if (array_key_exists($regperiod, $cohorts) && array_key_exists($actperiod, $cohorts[$regperiod]))
-			{
-				$rate = ceil($cohorts[$regperiod][$actperiod] * 1000) / 10;
-				?><div class="nobox"><?php echo $rate ?>%</div><?php
-			}
-			
+			?><div class="emptybox" /><?php
+#			echo '<span style="color: silver">0</span>';
 		}
 		?></td><?php
 	}

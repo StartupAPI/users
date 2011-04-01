@@ -1037,8 +1037,17 @@ class User
 	{
 		$db = UserConfig::getDB();
 
+		$siteadminsstring = null;
+		if (count(UserConfig::$admins) > 0) {
+			$siteadminsstring = implode(", ", UserConfig::$admins);
+		}
+
 		$firstregdate = null;
-		$query = 'SELECT min(regtime) FROM '.UserConfig::$mysql_prefix."users";
+		$query = 'SELECT UNIX_TIMESTAMP(MIN(regtime)) FROM '.UserConfig::$mysql_prefix."users";
+
+		if (!is_null($siteadminsstring)) {
+			$query .= "\nWHERE id NOT IN ($siteadminsstring)";
+		}
 
 		if ($stmt = $db->prepare($query))
 		{
@@ -1063,13 +1072,29 @@ class User
 			return null; // no users yet
 		}
 
+		$seconds_in_reg_period = $regnum * 24 * 60 * 60;
+
+		// make it first of the period
+		$firstregdate = floor($firstregdate / $seconds_in_reg_period) * $seconds_in_reg_period;
+
 		// getting total users per period
 		$totals = array();
 
-		$query = 'SELECT CEILING(DATEDIFF(regtime, ?) / ?) AS regperiod, COUNT(*) AS totals FROM '.UserConfig::$mysql_prefix."users GROUP BY regperiod";
+		$query = 'SELECT FLOOR(DATEDIFF(regtime, FROM_UNIXTIME(?)) / ?) AS regperiod,
+			DATE(MIN(regtime)) AS periodstart,
+			DATE(MAX(regtime)) AS periodend,
+			COUNT(*) AS totals
+			FROM '.UserConfig::$mysql_prefix.'users';
+
+		if (!is_null($siteadminsstring)) {
+			$query .= "\nWHERE id NOT IN ($siteadminsstring)";
+		}
+
+		$query .= ' GROUP BY regperiod';
+
 		if ($stmt = $db->prepare($query))
 		{
-			if (!$stmt->bind_param('si', $firstregdate, $regnum))
+			if (!$stmt->bind_param('ii', $firstregdate, $regnum))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}
@@ -1077,14 +1102,16 @@ class User
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($period, $total))
+			if (!$stmt->bind_result($period, $periodstart, $periodend, $total))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
 
 			while($stmt->fetch() === TRUE)
 			{
-				$totals[$period] = $total;
+				$totals[$period]['periodstart'] = $periodstart;
+				$totals[$period]['periodend'] = $periodend;
+				$totals[$period]['total'] = $total;
 			}
 			$stmt->close();
 		}
@@ -1095,11 +1122,25 @@ class User
 
 		$cohorts = array();
 
-		$query = 'SELECT CEILING(DATEDIFF(u.regtime, ?) / ?) AS regperiod, CEILING(DATEDIFF(a.time, u.regtime) / ?) AS actperiod, COUNT(DISTINCT u.id) AS total FROM `'.UserConfig::$mysql_prefix.'activity` a INNER JOIN '.UserConfig::$mysql_prefix.'users u ON a.user_id = u.id WHERE `activity_id` = ? GROUP BY regperiod, actperiod ORDER BY regperiod ASC, actperiod ASC';
+		$query = 'SELECT FLOOR(DATEDIFF(u.regtime, FROM_UNIXTIME(?)) / ?) AS regperiod,
+			FLOOR(DATEDIFF(a.time, u.regtime) / ?) AS actperiod,
+			COUNT(DISTINCT u.id) AS total
+			FROM `'.UserConfig::$mysql_prefix.'activity` a
+				INNER JOIN '.UserConfig::$mysql_prefix.'users u
+					ON a.user_id = u.id
+			WHERE `activity_id` = ?';
+
+		if (!is_null($siteadminsstring)) {
+			$query .= "\nAND u.id NOT IN ($siteadminsstring)";
+		}
+
+		$query .= '
+			GROUP BY regperiod, actperiod
+			ORDER BY regperiod ASC, actperiod ASC';
 
 		if ($stmt = $db->prepare($query))
 		{
-			if (!$stmt->bind_param('siii', $firstregdate, $regnum, $actnum, $activityid))
+			if (!$stmt->bind_param('iiii', $firstregdate, $regnum, $actnum, $activityid))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}
@@ -1115,7 +1156,12 @@ class User
 			while($stmt->fetch() === TRUE)
 			{
 				if (array_key_exists($regperiod, $totals)) {
-					$cohorts[$regperiod][$actperiod] = $activeusers / $totals[$regperiod];
+					$cohorts[$regperiod]['activeusers'][$actperiod] = $activeusers;
+					$cohorts[$regperiod]['rates'][$actperiod] = $activeusers / $totals[$regperiod]['total'];
+
+					$cohorts[$regperiod]['totalusers'] = $totals[$regperiod]['total'];
+					$cohorts[$regperiod]['periodstart'] = $totals[$regperiod]['periodstart'];
+					$cohorts[$regperiod]['periodend'] = $totals[$regperiod]['periodend'];
 				} else {
 					error_log('Got reg user for period we have no users in: '.$regperiod);
 				}
