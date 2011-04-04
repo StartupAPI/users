@@ -189,42 +189,11 @@ class GenerationCohorts extends CohortProvider {
 			$siteadminsstring = implode(", ", UserConfig::$admins);
 		}
 
-		// date of first user registration to start counting cohorts from
-		$firstregdate = null;
-		$query = 'SELECT UNIX_TIMESTAMP(MIN(regtime)) FROM '.UserConfig::$mysql_prefix."users";
-
-		if (!is_null($siteadminsstring)) {
-			$query .= "\nWHERE id NOT IN ($siteadminsstring)";
-		}
-
-		if ($stmt = $db->prepare($query))
-		{
-			if (!$stmt->execute())
-			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
-			}
-			if (!$stmt->bind_result($firstregdate))
-			{
-				throw new Exception("Can't bind result: ".$stmt->error);
-			}
-
-			$stmt->fetch();
-			$stmt->close();
-		}
-		else
-		{
-			throw new Exception("Can't prepare statement: ".$db->error);
-		}
-
-		if (is_null($firstregdate)) {
-			return null; // no users yet
-		}
-
 		// an array of cohorts to return
 		$cohorts = array();
 
 		/**
-		 * The query must return a unique cohort_id, start date, end date and total members
+		 * The query must return a unique cohort_id, title and total members
 		 */
 		switch ($this->period) {
 			case self::MONTH:
@@ -332,12 +301,62 @@ class RegMethodCohorts extends CohortProvider {
 	 * @return array $cohorts an array of Cohort objects
 	 */
 	public function getCohorts() {
+		$db = UserConfig::getDB();
+
+		$cohort_titles = array();
+
+		foreach (UserConfig::$authentication_modules as $module) {
+			$cohort_titles[$module->getID()] = $module->getTitle();
+		}
+
+		/**
+		 * The query must return a unique cohort_id, title and total members
+		 */
+		$query = "SELECT regmodule AS cohort_id, COUNT(*) AS totals
+			FROM ".UserConfig::$mysql_prefix.'users';
+
+		$siteadminsstring = null;
+		if (count(UserConfig::$admins) > 0) {
+			$siteadminsstring = implode(", ", UserConfig::$admins);
+		}
+
+		if (!is_null($siteadminsstring)) {
+			$query .= "\nWHERE id NOT IN ($siteadminsstring)";
+		}
+
 		$cohorts = array();
 
-		// TODO Implement a list of registration modules
+		$query .= ' GROUP BY cohort_id ORDER BY regtime DESC';
+
+		if ($stmt = $db->prepare($query))
+		{
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($cohort_id, $total))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			while($stmt->fetch() === TRUE)
+			{
+				$cohorts[] = new Cohort($cohort_id, $cohort_titles[$cohort_id], $total);
+			}
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
 
 		return $cohorts;
 	}
 
-
+	/**
+	 * @return string SQL statement for generating a resultset with id, regtime and cohort_id
+	 */
+	public function getCohortSQL() {
+		return 'SELECT id, regtime, regmodule AS cohort_id FROM '.UserConfig::$mysql_prefix.'users';
+	}
 }
