@@ -1,5 +1,6 @@
 <?php
 require_once(dirname(__FILE__).'/Plan.php');
+require_once(dirname(__FILE__).'/Cohort.php');
 require_once(dirname(__FILE__).'/modules.php');
 
 class UserConfig
@@ -47,6 +48,9 @@ class UserConfig
 
 	// a list of activities
 	public static $activities = array();
+
+	// a list of cohort providers for cohort analysis
+	public static $cohort_providers = array();
 
 	/* A list of features in the system.
 	   Key must be integer.
@@ -268,6 +272,10 @@ EOD;
 			USERBASE_ACTIVITY_RETURN_WEEKLY => array('Returned to the site within a week',	2),
 			USERBASE_ACTIVITY_RETURN_MONTHLY => array('Returned to the site within a month', 1)
 		);
+
+		UserConfig::$cohort_providers[] = new GenerationCohorts(GenerationCohorts::MONTH);
+		UserConfig::$cohort_providers[] = new GenerationCohorts(GenerationCohorts::WEEK);
+		UserConfig::$cohort_providers[] = new GenerationCohorts(GenerationCohorts::YEAR);
 	}
 
 	// Couldn't reuse it, but keeping it here because it might be still populated in user configs
