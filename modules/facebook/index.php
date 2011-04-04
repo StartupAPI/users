@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'/facebook.php');
+require_once(dirname(__FILE__).'/php-sdk/src/facebook.php');
 
 class FacebookAuthenticationModule extends AuthenticationModule
 {

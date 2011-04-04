@@ -2,7 +2,7 @@ all:	updatecode updatedb
 
 updatecode:
 ifneq "$(wildcard .svn )" ""
-	rm -rf dbupgrade oauth-php admin/swfobject
+	rm -rf dbupgrade oauth-php admin/swfobject modules/facebook/php-sdk
 	svn update
 
 	mkdir dbupgrade/
@@ -19,6 +19,11 @@ ifneq "$(wildcard .svn )" ""
 	svn export http://svn.github.com/swfobject/swfobject.git _swfobject
 	mv _swfobject/* admin/swfobject
 	rm -rf _swfobject
+
+	mkdir modules/facebook/php-sdk
+	svn export http://svn.github.com/facebook/php-sdk.git _php-sdk
+	mv _php-sdk/* modules/facebook/php-sdk
+	rm -rf _php-sdk 
 endif
 ifneq "$(wildcard .git )" ""
 	git pull origin master
