@@ -41,7 +41,25 @@ if (array_key_exists('login', $_POST))
 
 require_once(UserConfig::$header);
 
-?><h2>Log in</h2><div style="background: white; padding: 0 1em"><?php
+?><h2>Log in</h2>
+<style>
+.errorbox {
+	background: #f7dfb9;
+	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	padding: 0.4em 1em;
+	margin: 1em 0;
+	width: 445px;
+	border: 4px solid #f77;
+	border-radius: 7px;
+	-moz-border-radius: 7px;
+	-webkit-border-radius: 7px;
+	font-size: 1.2em;
+	color: #500;
+	font-weight: bold;
+}
+</style>
+
+<div style="background: white; padding: 0 1em"><?php
 
 foreach (UserConfig::$authentication_modules as $module)
 {
@@ -53,7 +71,7 @@ foreach (UserConfig::$authentication_modules as $module)
 <?php
 	if (array_key_exists('module', $_GET) && $id == $_GET['module'] && array_key_exists('error', $_GET))
 	{
-		?><div style="color: red; border: 1px solid black; padding: 10px; margin: 0.5em">Login failed</div><?php
+		?><div class="errorbox">Login failed</div><?php
 	}
 
 	$module->renderLoginForm("?module=$id");

@@ -81,6 +81,28 @@ if (UserConfig::$enableRegistration && array_key_exists('register', $_POST))
 require_once(UserConfig::$header);
 
 ?><h2>Sign up</h2>
+<style>
+.errorbox {
+	background: #f7dfb9;
+	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	padding: 0.4em 1em;
+	margin: 1em 0;
+	width: 445px;
+	border: 4px solid #f77;
+	border-radius: 7px;
+	-moz-border-radius: 7px;
+	-webkit-border-radius: 7px;
+	font-size: 1.2em;
+	color: #500;
+	font-weight: bold;
+}
+
+.errorbox ul {
+	margin: 0;
+	padding-left: 1em;
+}
+</style>
+
 <div style="background: white; padding: 0 1em"><?php
 
 if (UserConfig::$enableRegistration)
@@ -131,7 +153,7 @@ if (UserConfig::$enableRegistration)
 		<?php
 			if (array_key_exists($id, $errors) && is_array($errors[$id]) && count($errors[$id]) > 0)
 			{
-				?><div style="border: 1px solid black; padding: 0.5em; background: #FFFBCF; margin-bottom: 1em; max-width: 25em"><ul><?php
+				?><div class="errorbox"><ul><?php
 				foreach ($errors[$id] as $field => $errorset)
 				{
 					foreach ($errorset as $error)

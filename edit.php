@@ -85,7 +85,7 @@ foreach (UserConfig::$authentication_modules as $module)
 <?php
 	if (array_key_exists($id, $errors) && is_array($errors[$id]) && count($errors[$id]) > 0)
 	{
-		?><div style="border: 1px solid black; padding: 0.5em; background: #FFFBCF; margin-bottom: 1em; max-width: 25em"><ul><?php
+		?><div class="errorbox"><ul><?php
 		foreach ($errors[$id] as $field => $errorset)
 		{
 			foreach ($errorset as $error)
