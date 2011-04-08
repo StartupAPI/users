@@ -86,7 +86,7 @@ class UserConfig
 	public static $registrationDisabledMessage = 'Registration is disabled.';
 
 	public static $enableInvitations = false;
-	public static $invitationRequiredMessage = 'Invitation code is required to register.';
+	public static $invitationRequiredMessage = 'Please enter your invitation code';
 
 	// Support emails configuration
 	public static $supportEmailFrom = 'User Support <support@example.com>';

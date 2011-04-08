@@ -47,7 +47,41 @@ if (array_key_exists('save', $_POST))
 
 require_once(UserConfig::$header);
 
-?><h2>Edit Your Information</h2>
+?>
+<style>
+#userbase-edit-info {
+	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	background: white;
+	padding: 0 1em;
+	margin: 0;
+}
+
+#userbase-edit-info h2 {
+	font-weight: bold;
+	font-size: 2.5em;
+}
+
+#userbase-edit-info h3 {
+	font-weight: bold;
+	font-size: 1.5em;
+}
+
+.userbase-errorbox {
+	background: #f7dfb9;
+	padding: 0.4em 1em;
+	margin: 1em 0;
+	width: 515px;
+	border: 4px solid #f77;
+	border-radius: 7px;
+	-moz-border-radius: 7px;
+	-webkit-border-radius: 7px;
+	font-size: 1.2em;
+	color: #500;
+	font-weight: bold;
+}
+</style>
+<div id="userbase-edit-info">
+<h2>Edit Your Information</h2>
 
 <div style="float: right; width: 400px">
 <div>
@@ -75,17 +109,19 @@ require_once(UserConfig::$header);
 <?php
 }
 ?></div>
+<div id="userbase-authlist">
 <?php
 
 foreach (UserConfig::$authentication_modules as $module)
 {
 	$id = $module->getID();
 
-	?><div style="background: white; padding: 0 1em"><h2 name="<?php echo $id?>"><?php echo $module->getTitle()?></h2>
+	?><div style="background: white; padding: 0 1em">
+	<h3 name="<?php echo $id?>"><?php echo $module->getTitle()?></h3>
 <?php
 	if (array_key_exists($id, $errors) && is_array($errors[$id]) && count($errors[$id]) > 0)
 	{
-		?><div class="errorbox"><ul><?php
+		?><div class="userbase-errorbox"><ul><?php
 		foreach ($errors[$id] as $field => $errorset)
 		{
 			foreach ($errorset as $error)
@@ -102,4 +138,9 @@ foreach (UserConfig::$authentication_modules as $module)
 		$_POST);
 	?></div><?php
 }
+?>
+</div>
+
+</div>
+<?php
 require_once(UserConfig::$footer);

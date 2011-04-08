@@ -80,14 +80,14 @@ if (UserConfig::$enableRegistration && array_key_exists('register', $_POST))
 
 require_once(UserConfig::$header);
 
-?><h2>Sign up</h2>
+?>
 <style>
-.errorbox {
+.userbase-errorbox {
 	background: #f7dfb9;
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0.4em 1em;
 	margin: 1em 0;
-	width: 445px;
+	width: 465px;
 	border: 4px solid #f77;
 	border-radius: 7px;
 	-moz-border-radius: 7px;
@@ -97,13 +97,32 @@ require_once(UserConfig::$header);
 	font-weight: bold;
 }
 
-.errorbox ul {
+.userbase-errorbox ul {
 	margin: 0;
 	padding-left: 1em;
 }
+
+#userbase-authlist {
+	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	background: white;
+	padding: 0 1em;
+	margin: 0 auto;
+	width: 480px;
+}
+
+#userbase-authlist h2 {
+	font-weight: bold;
+	font-size: 2.5em;
+}
+#userbase-authlist h3 {
+	font-weight: bold;
+	font-size: 1.5em;
+}
 </style>
 
-<div style="background: white; padding: 0 1em"><?php
+<div id="userbase-authlist">
+<h2>Sign up</h2>
+<?php
 
 if (UserConfig::$enableRegistration)
 {
@@ -112,32 +131,107 @@ if (UserConfig::$enableRegistration)
 
 	if (UserConfig::$enableInvitations)
 	{
+		$message = UserConfig::$invitationRequiredMessage;
+		$code = null;
+
+		$show_registration_form = false;
+
 		if (array_key_exists('invite', $_GET))
 		{
 			$invitation = Invitation::getByCode($_GET['invite']);
 
 			if (is_null($invitation) || $invitation->getStatus())
 			{
-				?><p>Invitation code you entered is not valid.</p>
-				<form action="" method="GET">
-				<input name="invite" size="10" value="<?php echo UserTools::escape($_GET['invite'])?>"/><input type="submit" value="&gt;&gt;"/>
-				</form>
-				<?php
-				$show_registration_form = false;
+				$message = 'Invitation code you entered is not valid';
 			}
 			else
 			{
 				$invitation_used = $invitation;
+
+				$show_registration_form = true;
 			}
 		}
-		else
-		{
-			?><p><?php echo UserConfig::$invitationRequiredMessage?></p>
-			<form action="" method="GET">
-			<input name="invite" size="10"/><input type="submit" value="&gt;&gt;"/>
+
+		if (!$show_registration_form) {
+			?>
+			<style>
+			#userbase-invitation-form {
+				font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+				padding: 0.4em 1em;
+				margin: 0;
+				width: 382px;
+				border: 4px solid #ccc;
+				border-radius: 7px;
+				-moz-border-radius: 7px;
+				-webkit-border-radius: 7px;
+			}
+
+			#userbase-invitation-form p {
+				font-size: 1.2em;
+				line-height: 1.5;
+
+				clear: both;
+				margin: 0 0 .75em;
+				padding: 0;
+			}
+
+			#userbase-invitation-form fieldset {
+				border: 0;
+				padding: 0;
+				margin: 0;
+			}
+
+			#userbase-invitation-form legend {
+				border: 0;
+				padding: 0;
+				margin: 0;
+				font-size: 1.8em;
+				line-height: 1.8;
+				padding-bottom: .6em;
+			}
+
+			#userbase-invitation-button {
+				padding: 0.3em 25px;
+				cursor: pointer;
+			}
+
+			#userbase-invitation-form input {
+				background: #f6f6f6;
+				border: 2px solid #888;
+				border-radius: 2px;
+				-moz-border-radius: 2px;
+				-webkit-border-radius: 2px;
+				padding: 4px;
+			}
+
+			#userbase-invitation-form input:focus {
+				background: #fff;
+			}
+
+			#userbase-invitation-form abbr {
+				cursor: help;
+				font-style: normal;
+				border: 0;
+				color: red;
+				font-size: 1.2em;
+				font-weight: bold;
+			}
+
+			#userbase-invite-code {
+				width: 290px;
+			}
+			</style>
+
+			<form id="userbase-invitation-form" action="" method="GET">
+			<fieldset>
+			<legend><?php echo $message?></legend>
+			<p>
+			<input id="userbase-invite-code" name="invite" size="30" value="<?php echo UserTools::escape($_GET['invite'])?>"/>
+			<button id="userbase-invitation-button" type="submit">&gt;&gt;</button>
+			</p>
+			</fieldset>
 			</form>
 			<?php
-			$show_registration_form = false;
 		}
 	}
 	
@@ -153,7 +247,7 @@ if (UserConfig::$enableRegistration)
 		<?php
 			if (array_key_exists($id, $errors) && is_array($errors[$id]) && count($errors[$id]) > 0)
 			{
-				?><div class="errorbox"><ul><?php
+				?><div class="userbase-errorbox"><ul><?php
 				foreach ($errors[$id] as $field => $errorset)
 				{
 					foreach ($errorset as $error)

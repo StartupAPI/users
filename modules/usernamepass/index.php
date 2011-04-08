@@ -191,7 +191,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		}
 
 		#userbase-usernamepass-login-form input {
-			background: #eee;
+			background: #f6f6f6;
 			border: 2px solid #888;
 			border-radius: 2px;
 			-moz-border-radius: 2px;
@@ -311,7 +311,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		}
 
 		#userbase-usernamepass-register-form input {
-			background: #eee;
+			background: #f6f6f6;
 			border: 2px solid #888;
 			border-radius: 2px;
 			-moz-border-radius: 2px;
@@ -336,11 +336,11 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		<fieldset>
 		<legend>Enter your information to create an account</legend>
 		<ul>
-		<li><label>Username</label><input name="username" type="text" size="25" maxlength="25" value="<?php echo array_key_exists('username', $data) ? UserTools::escape($data['username']) : ''?>"/><?php echo array_key_exists('username', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['username'])).'">*</abbr>' : ''?></li>
-		<li><label>Password</label><input name="pass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('pass', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['pass'])).'">*</abbr>' : ''?></li>
-		<li><label>Repeat password</label><input name="repeatpass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('repeatpass', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['repeatpass'])).'">*</abbr>' : ''?></li>
-		<li><label>Name</label><input name="name" type="test" size="25" value="<?php echo array_key_exists('name', $data) ? UserTools::escape($data['name']) : ''?>"/><?php echo array_key_exists('name', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['name'])).'">*</abbr>' : ''?></li>
-		<li><label>E-mail</label><input name="email" type="text" size="25" value="<?php echo array_key_exists('email', $data) ? UserTools::escape($data['email']) : ''?>"/><?php echo array_key_exists('email', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</abbr>' : ''?></li>
+		<li><label for="userbase-usernamepass-register-username">Username</label><input id="userbase-usernamepass-register-username" name="username" type="text" size="25" maxlength="25" value="<?php echo array_key_exists('username', $data) ? UserTools::escape($data['username']) : ''?>"/><?php echo array_key_exists('username', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['username'])).'">*</abbr>' : ''?></li>
+		<li><label for="userbase-usernamepass-register-pass">Password</label><input id="userbase-usernamepass-register-pass" name="pass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('pass', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['pass'])).'">*</abbr>' : ''?></li>
+		<li><label for="userbase-usernamepass-register-passrepeat">Repeat password</label><input id="userbase-usernamepass-register-passrepeat" name="repeatpass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('repeatpass', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['repeatpass'])).'">*</abbr>' : ''?></li>
+		<li><label for="userbase-usernamepass-register-name">Name</label><input id="userbase-usernamepass-register-name" name="name" type="test" size="25" value="<?php echo array_key_exists('name', $data) ? UserTools::escape($data['name']) : ''?>"/><?php echo array_key_exists('name', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['name'])).'">*</abbr>' : ''?></li>
+		<li><label for="userbase-usernamepass-register-email">E-mail</label><input id="userbase-usernamepass-register-email" name="email" type="text" size="25" value="<?php echo array_key_exists('email', $data) ? UserTools::escape($data['email']) : ''?>"/><?php echo array_key_exists('email', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</abbr>' : ''?></li>
 		<li><button id="userbase-usernamepass-register-button" type="submit" name="register">Register</button> <a href="<?php echo UserConfig::$USERSROOTURL?>/login.php">or login here</a></li>
 		</ul>
 		</table>
@@ -430,7 +430,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		}
 
 		#userbase-usernamepass-edit-form input {
-			background: #eee;
+			background: #f6f6f6;
 			border: 2px solid #888;
 			border-radius: 2px;
 			-moz-border-radius: 2px;
@@ -455,21 +455,6 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 			font-size: 1.5em;
 			font-weight: bold;
 			margin-top: 1em;
-		}
-
-		.errorbox {
-			background: #f7dfb9;
-			font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-			padding: 0.4em 1em;
-			margin: 1em 0;
-			width: 515px;
-			border: 4px solid #f77;
-			border-radius: 7px;
-			-moz-border-radius: 7px;
-			-webkit-border-radius: 7px;
-			font-size: 1.2em;
-			color: #500;
-			font-weight: bold;
 		}
 		</style>
 		<form id="userbase-usernamepass-edit-form" action="<?php echo $action?>" method="POST">
