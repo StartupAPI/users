@@ -1371,7 +1371,7 @@ class User
 		));
 
 		if (!$storage->store(UserConfig::$session_return_key, $return)) {
-			throw new Exception(implode(', ', $storage->errors));
+			throw new Exception(implode('; ', $storage->errors));
 		}
 	}
 
@@ -1621,7 +1621,7 @@ class User
 		));
 
 		if (!$storage->store(UserConfig::$session_userid_key, $this->userid)) {
-			throw new Exception($storage->errors);
+			throw new Exception(implode('; ', $storage->errors));
 		}
 	}
 
