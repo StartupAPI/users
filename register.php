@@ -132,7 +132,6 @@ if (UserConfig::$enableRegistration)
 	if (UserConfig::$enableInvitations)
 	{
 		$message = UserConfig::$invitationRequiredMessage;
-		$code = null;
 
 		$show_registration_form = false;
 
