@@ -1371,7 +1371,7 @@ class User
 		));
 
 		if (!$storage->store(UserConfig::$session_return_key, $return)) {
-			throw new Exception($storage->errors);
+			throw new Exception(implode(', ', $storage->errors));
 		}
 	}
 
