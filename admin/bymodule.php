@@ -1,18 +1,6 @@
 <?php
 $ADMIN_SECTION = 'bymodule';
 require_once(dirname(__FILE__).'/header.php');
-
-if (array_key_exists('impersonate', $_POST)) {
-	$impersonated_user= User::getUser($_POST['impersonate']);
-	if ($impersonated_user !== null) {
-		$impersonated_user->setSession(false); // always impersonate only for the browser session
-		header('Location: '.UserConfig::$DEFAULTLOGINRETURN);
-	}
-	else
-	{
-		header('Location: #msg=cantimpersonate');
-	}
-}
 ?>
 <script type='text/javascript' src='swfobject/swfobject/swfobject.js'></script>
 <script type='text/javascript' src='http://www.google.com/jsapi'></script>

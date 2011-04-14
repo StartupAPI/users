@@ -9,6 +9,18 @@ if (!in_array($user->getID(), UserConfig::$admins)) {
 	exit;
 }
 
+if (array_key_exists('impersonate', $_POST)) {
+	$impersonated_user= User::getUser($_POST['impersonate']);
+	if ($impersonated_user !== null) {
+		$impersonated_user->setSession(false); // always impersonate only for the browser session
+		header('Location: '.UserConfig::$DEFAULTLOGINRETURN);
+	}
+	else
+	{
+		header('Location: #msg=cantimpersonate');
+	}
+}
+
 require_once(UserConfig::$header);
 
 if (!isset($ADMIN_SECTION)) {
