@@ -41,7 +41,7 @@ if (array_key_exists('recover', $_POST))
 	}
 	else
 	{
-		throw Exception('Can\'t render temporary password email, check if UserConfig::$onRenderTemporaryPasswordEmail is set');
+		throw new Exception('Can\'t render temporary password email, check if UserConfig::$onRenderTemporaryPasswordEmail is set');
 	}
 }
 
