@@ -5,7 +5,7 @@ require_once(dirname(dirname(dirname(__FILE__))).'/User.php');
 
 if (array_key_exists('recover', $_POST))
 {
-	$users = User::getUsersByEmailOrUsername($_POST['emailorusername']);
+	$users = User::getUsersByEmailOrUsername(mb_convert_encoding($_POST['emailorusername'], 'UTF-8'));
 
 	$subject = UserConfig::$passwordRecoveryEmailSubject;
 

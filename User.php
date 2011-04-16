@@ -199,8 +199,8 @@ class User
 			eval(userConfig::$onCreate.'($this);');
 		}
 
-		if (!is_null(UserCounfig::$email_module)) {
-			UserCounfig::$email_module->registerSubscriber($this);
+		if (!is_null(UserConfig::$email_module)) {
+			UserConfig::$email_module->registerSubscriber($this);
 		}
 	}
 
@@ -209,6 +209,8 @@ class User
 	 */
 	public static function createNewGoogleFriendConnectUser($name, $googleid, $userpic)
 	{
+		$name = mb_convert_encoding($name, 'UTF-8');
+
 		$db = UserConfig::getDB();
 
 		$user = null;
@@ -262,6 +264,8 @@ class User
 	 */
 	public static function createNewFacebookUser($name, $fb_id, $me = null)
 	{
+		$name = mb_convert_encoding($name, 'UTF-8');
+
 		$db = UserConfig::getDB();
 
 		$email = null;
@@ -304,6 +308,8 @@ class User
 	 */
 	public static function createNewWithoutCredentials($name, $email = null)
 	{
+		$name = mb_convert_encoding($name, 'UTF-8');
+
 		$db = UserConfig::getDB();
 
 		$user = null;
@@ -345,6 +351,9 @@ class User
 	 */
 	public static function createNew($name, $username, $email, $password)
 	{
+		$name = mb_convert_encoding($name, 'UTF-8');
+		$username = mb_convert_encoding($username, 'UTF-8');
+
 		$db = UserConfig::getDB();
 
 		$user = null;
@@ -1583,9 +1592,13 @@ class User
 			$old_user = User::getUser($this->getID());
 		}
 
+		$username = mb_convert_encoding($this->username, 'UTF-8');
+		$name = mb_convert_encoding($this->name, 'UTF-8');
+		$email = mb_convert_encoding($this->email, 'UTF-8');
+
 		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET username = ?, name = ?, email = ?, requirespassreset = ?, fb_id = ? WHERE id = ?'))
 		{
-			if (!$stmt->bind_param('sssiii', $this->username, $this->name, $this->email, $passresetnum, $this->fbid, $this->userid))
+			if (!$stmt->bind_param('sssiii', $username, $name, $email, $passresetnum, $this->fbid, $this->userid))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}

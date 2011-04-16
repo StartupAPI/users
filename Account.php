@@ -162,6 +162,8 @@ class Account
 
 	public static function createAccount($name, $plan, $user = null, $role = Account::ROLE_USER)
 	{
+		$name = mb_convert_encoding($name, 'UTF-8');
+
 		$db = UserConfig::getDB();
 		$plan_id = $plan->getID();
 

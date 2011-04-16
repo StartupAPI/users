@@ -603,7 +603,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 
 		if (array_key_exists('username', $data))
 		{
-			$username = strtolower(trim($data['username']));
+			$username = strtolower(trim(mb_convert_encoding($data['username'], 'UTF-8')));
 
 			if (strlen($username) < 2)
 			{
@@ -628,7 +628,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 
 		if (array_key_exists('name', $data))
 		{
-			$name = trim($data['name']);
+			$name = trim(mb_convert_encoding($data['name'], 'UTF-8'));
 			if ($name == '')
 			{
 				$errors['name'][] = "Name can't be empty";
@@ -641,7 +641,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 
 		if (array_key_exists('email', $data))
 		{
-			$email = trim($data['email']);
+			$email = trim(mb_convert_encoding($data['email'], 'UTF-8'));
 			if (filter_var($email, FILTER_VALIDATE_EMAIL) === FALSE)
 			{
 				$errors['email'][] = 'Invalid email address';
@@ -744,7 +744,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		{
 			if (array_key_exists('username', $data))
 			{
-				$username = strtolower(trim($data['username']));
+				$username = strtolower(trim(mb_convert_encoding($data['username'], 'UTF-8')));
 
 				if (strlen($username) < 2)
 				{
@@ -769,7 +769,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 
 		if (array_key_exists('name', $data))
 		{
-			$name = trim($data['name']);
+			$name = trim(mb_convert_encoding($data['name'], 'UTF-8'));
 			if ($name == '')
 			{
 				$errors['name'][] = "Name can't be empty";
@@ -782,7 +782,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 
 		if (array_key_exists('email', $data))
 		{
-			$email = trim($data['email']);
+			$email = trim(mb_convert_encoding($data['email'], 'UTF-8'));
 			if (filter_var($email, FILTER_VALIDATE_EMAIL) === FALSE)
 			{
 				$errors['email'][] = 'Invalid email address';

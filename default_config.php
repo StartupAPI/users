@@ -133,6 +133,9 @@ class UserConfig
 		if (is_null(self::$db))
 		{
 			self::$db = new mysqli(self::$mysql_host, self::$mysql_user, self::$mysql_password, self::$mysql_db);
+			if (!self::$db->set_charset('utf8')) {
+				error_log("[UserBase] Warning: Can't set utf8 charset for DB connection");
+			}
 		}
 
 		return self::$db;

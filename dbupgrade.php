@@ -22,6 +22,113 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 13
+ * Converting to utf8
+*/
+$versions[13]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."users`
+CHANGE `regmodule` `regmodule` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'Registration module ID',
+CHANGE `name` `name` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+CHANGE `username` `username` VARCHAR(25) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+CHANGE `email` `email` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+CHANGE `pass` `pass` VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'Password digest',
+CHANGE `salt` `salt` VARCHAR(13) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'Salt',
+CHANGE `temppass` `temppass` VARCHAR(13) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'Temporary password used for password recovery',
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
+$versions[13]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."accounts`
+CHANGE  `name`  `name` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
+$versions[13]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."account_features`
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
+$versions[13]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."account_users`
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
+$versions[13]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."activity`
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
+$versions[13]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."cmp`
+CHANGE `name` `name` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'Campaign Name',
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
+$versions[13]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."cmp_content`
+CHANGE `content` `content` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'Campaign content (dor A/B testing of different ads)',
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
+$versions[13]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."cmp_keywords`
+CHANGE `keywords` `keywords` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'Comma separated list of campaign keywords',
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
+$versions[13]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."cmp_medium`
+CHANGE `medium` `medium` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'Campaign Medium (cpc, banners, email, twitter & atc',
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
+$versions[13]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."cmp_source`
+CHANGE `source` `source` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'Campaign Source (google, newsletter5, widget1, embedplayer2)',
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
+$versions[13]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."googlefriendconnect`
+CHANGE `google_id` `google_id` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'Google Friend Connect ID',
+CHANGE `userpic` `userpic` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'Google Friend Connect User picture',
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
+$versions[13]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."invitation`
+CHANGE `code` `code` CHAR(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'Code',
+CHANGE `sentto` `sentto` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'Note about who this invitation was sent to',
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
+$versions[13]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."user_features`
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
+$versions[13]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."user_oauth_identity`
+CHANGE `module` `module` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'Module id',
+CHANGE `identity` `identity` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'Identity string that indicates that user has the same identity on the oauth server end even if oauth consumer token has changed (recreated / expired / revoked)',
+CHANGE `userinfo` `userinfo` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'Serialized user information to be used for rendering',
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
+$versions[13]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."user_preferences`
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
+
+
+$versions[13]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."user_preferences`
+DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci";
+$versions[13]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."user_oauth_identity`
+CHANGE `module` `module` VARCHAR(64) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'Module id',
+CHANGE `identity` `identity` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Identity string that indicates that user has the same identity on the oauth server end even if oauth consumer token has changed (recreated / expired / revoked)',
+CHANGE `userinfo` `userinfo` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Serialized user information to be used for rendering',
+DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci";
+$versions[13]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."user_features`
+DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci";
+$versions[13]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."invitation`
+CHANGE `code` `code` CHAR(10) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'Code',
+CHANGE `sentto` `sentto` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Note about who this invitation was sent to',
+DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci";
+$versions[13]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."googlefriendconnect`
+CHANGE `google_id` `google_id` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'Google Friend Connect ID',
+CHANGE `userpic` `userpic` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'Google Friend Connect User picture',
+DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci";
+$versions[13]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."cmp_source`
+CHANGE `source` `source` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'Campaign Source (google, newsletter5, widget1, embedplayer2)',
+DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci";
+$versions[13]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."cmp_medium`
+CHANGE `medium` `medium` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'Campaign Medium (cpc, banners, email, twitter & atc',
+DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci";
+$versions[13]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."cmp_keywords`
+CHANGE `keywords` `keywords` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'Comma separated list of campaign keywords',
+DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci";
+$versions[13]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."cmp_content`
+CHANGE `content` `content` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'Campaign content (dor A/B testing of different ads)',
+DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci";
+$versions[13]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."cmp`
+CHANGE `name` `name` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'Campaign Name',
+DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci";
+$versions[13]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."activity`
+DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci";
+$versions[13]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."account_users`
+DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci";
+$versions[13]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."account_features`
+DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci";
+$versions[13]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."accounts`
+CHANGE `name` `name` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,
+DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci";
+$versions[13]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."users`
+CHANGE `regmodule` `regmodule` VARCHAR(64) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'Registration module ID',
+CHANGE `name` `name` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
+CHANGE `username` `username` VARCHAR(25) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,
+CHANGE `email` `email` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,
+CHANGE `pass` `pass` VARCHAR(40) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'Password digest',
+CHANGE `salt` `salt` VARCHAR(13) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'Salt',
+CHANGE `temppass` `temppass` VARCHAR(13) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Temporary password used for password recovery',
+DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 12
  * Dropping unique key by dropping a table - can't drop it otherwise
  * Will loose all data, unfortunately - hope nobody uses it yet

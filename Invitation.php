@@ -234,9 +234,11 @@ class Invitation
 	{
 		$db = UserConfig::getDB();
 
+		$comment = mb_convert_encoding($this->comment, 'UTF-8');
+
 		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'invitation SET sentto = ?, user = ? WHERE code = ?'))
 		{
-			if (!$stmt->bind_param('sis', $this->comment, $this->user, $this->code))
+			if (!$stmt->bind_param('sis', $this->comment, $comment, $this->code))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}

@@ -97,6 +97,8 @@ class CampaignTracker
 	}
 
 	public static function getCampaignSourceID($source) {
+		$source = mb_convert_encoding($source, 'UTF-8');
+
 		$db = UserConfig::getDB();
 
 		$cmp_source_id = null;
@@ -145,6 +147,8 @@ class CampaignTracker
 	}
 
 	public static function getCampaignMediumID($medium) {
+		$medium = mb_convert_encoding($medium, 'UTF-8');
+
 		$db = UserConfig::getDB();
 
 		$cmp_medium_id = null;
@@ -193,6 +197,8 @@ class CampaignTracker
 	}
 
 	public static function getCampaignKeywordsID($keywords) {
+		$keywords = mb_convert_encoding($keywords, 'UTF-8');
+
 		$db = UserConfig::getDB();
 
 		$cmp_keywords_id = null;
@@ -241,6 +247,8 @@ class CampaignTracker
 	}
 
 	public static function getCampaignContentID($content) {
+		$content = mb_convert_encoding($content, 'UTF-8');
+
 		$db = UserConfig::getDB();
 
 		$cmp_content_id = null;
@@ -289,6 +297,8 @@ class CampaignTracker
 	}
 
 	public static function getCampaignNameID($name) {
+		$name = mb_convert_encoding($name, 'UTF-8');
+
 		$db = UserConfig::getDB();
 
 		$cmp_name_id = null;
