@@ -31,7 +31,7 @@ Follow these steps:
 		UserConfig::$mysql_user = '...username...';
 		UserConfig::$mysql_password = '...password...';
 
-4. Run make to generate database tables and other files required by the different parts of UserBase
+4. Run make to generate database tables and other submodules and files required by the different parts of UserBase
 
 		make
 
@@ -51,6 +51,14 @@ Follow these steps:
 		$current_user = User::require_login();
 
 7. <s>Sit back and relax</s> Go implement the business logic now. You can call getID(), getName() and other methods on the user object to utilize it in your code.
+
+## Upgrading
+
+As usual, make a backup of the database to avoid loosing data in case of disasters.
+
+Then just run make - it should grab the latest code and run database update scripts to bring schema up to date with the code.
+
+	make
 
 ## Additional features
 
