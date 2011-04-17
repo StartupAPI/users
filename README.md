@@ -1,14 +1,14 @@
 # UserBase
 
-UserBase is a drop-in user management tool for Saas (Software As A Service), or simply put, online business sites.
+UserBase is a drop-in user management tool for on-line projects and SaaS (Software As A Service) web sites.
 
-It supports many registration and authentication methods, integrates with various useful modules like newsletters and provides comprehensive administrative dashboard that will help you to make business decisions.
+It supports many registration and authentication methods, integrates with various useful services like newsletters and provides comprehensive administrative dashboard that helps make business decisions based on data collected from the users.
 
-The goal of the project is to allow fast idea-to-business cycle so we all can concentrate on know-how and not the infrastracture.
+One of main goals for the project is to allow fast idea-to-product cycle so we all can concentrate on know-how and not the infrastracture.
 
 ## Installation
 
-The goal for the project is to simplify installation and upgrades as much as possible. Let us know where you experience problems and we'll try to reduce the friction.
+Another important goal for the project are simple installation and upgrades. Let us know where you experience problems and we'll try to reduce the friction.
 
 Follow these steps:
 
@@ -39,8 +39,7 @@ Follow these steps:
 		 * Get User object or null if user is not logged in
 		 */
 		$current_user = User::get();
-
-   or if you want to protect the page from anonymous users, use User::require_login() function
+	or if you want to protect the page from anonymous users, use User::require_login() function
 
 		/**
 		 * Get User object or redirect to login page if user is not logged in
