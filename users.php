@@ -15,5 +15,7 @@ require_once(dirname(__FILE__).'/Cohort.php');
 
 require_once(dirname(__FILE__).'/CampaignTracker.php');
 
+// do this on each page view (where user.php is included)
 CampaignTracker::preserveReferer();
 CampaignTracker::recordCampaignVariables();
+User::updateReturnActivity(); // only if user is logged in

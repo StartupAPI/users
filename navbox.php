@@ -2,17 +2,10 @@
 
 function _USERBASE_render_navbox()
 {
-	global $user;
+	$current_user = User::get();
 
-	if (isset($user)) {
-		$current_user = $user;
-	}
-
-	if (!isset($current_user)) {
-		$current_user = User::get();
-	}
-
-	if (!is_null($current_user)) {
+	$accounts = array();
+	if (UserConfig::$useAccounts && !is_null($current_user)) {
 		$accounts = Account::getUserAccounts($current_user);
 
 		$current_account = Account::getCurrentAccount($current_user);
@@ -32,11 +25,16 @@ function _USERBASE_render_navbox()
 		?></select>
 		<?php
 		}
+
+		if (UserConfig::$useAccounts) {
 		?>
-		<!-- <span id="profile"><a href="/p/<?php echo UserTools::escape($current_account->getID()) ?>/" title="<?php echo UserTools::escape($current_account->getName()) ?>'s public profile">Public profile</a></span> | -->
+			<!-- <span id="profile"><a href="/p/<?php echo UserTools::escape($current_account->getID()) ?>/" title="<?php echo UserTools::escape($current_account->getName()) ?>'s public profile">Public profile</a></span> | -->
+		<?php
+		}
+		?>
 		<span id="username"><a href="<?php echo UserConfig::$USERSROOTURL ?>/edit.php" title="<?php echo UserTools::escape($current_user->getName())?>'s user information"><?php echo UserTools::escape($current_user->getName()) ?></a></span> |
 		<span id="logout"><a href="<?php echo UserConfig::$USERSROOTURL ?>/logout.php">logout</a></span>
-	<?php
+		<?php
 	}
 	else
 	{

@@ -33,6 +33,34 @@ class User
 		}
 	}
 
+	public static function updateReturnActivity() {
+		$storage = new MrClay_CookieStorage(array(
+			'secret' => UserConfig::$SESSION_SECRET,
+			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+			'path' => UserConfig::$SITEROOTURL,
+			'httponly' => true
+		));
+
+		$last = $storage->fetch(UserConfig::$last_login_key);
+		if (!$storage->store(UserConfig::$last_login_key, time())) { 
+			throw new Exception(implode('; ', $storage->errors));
+		}
+
+		$user = self::get();
+
+		if (!is_null($user) && $last > 0
+			&& $last < time() - UserConfig::$last_login_session_length * 60)
+		{
+			if ($last > time() - 86400) {
+				$user->recordActivity(USERBASE_ACTIVITY_RETURN_DAILY);
+			} else if ($last > time() - 7 * 86400) {
+				$user->recordActivity(USERBASE_ACTIVITY_RETURN_WEEKLY);
+			} else if ($last > time() - 30 * 86400) {
+				$user->recordActivity(USERBASE_ACTIVITY_RETURN_MONTHLY);
+			}
+		}
+	}
+
 	/*
 	 * Checks if user is logged in and returns use object or null if user is not logged in
 	 */
@@ -47,26 +75,8 @@ class User
 
 		$userid = $storage->fetch(UserConfig::$session_userid_key);
 
-		$last = $storage->fetch(UserConfig::$last_login_key);
-		if (!$storage->store(UserConfig::$last_login_key, time())) { 
-			throw new Exception(implode('; ', $storage->errors));
-		}
-
-		if (is_string($userid)) {
-			$user = self::getUser($userid);
-
-			// only check if user has returned after some session time, e.g. 30 minutes
-			if ($last > 0 && $last < time() - UserConfig::$last_login_session_length * 60) {
-				if ($last > time() - 86400) {
-					$user->recordActivity(USERBASE_ACTIVITY_RETURN_DAILY);
-				} else if ($last > time() - 7 * 86400) {
-					$user->recordActivity(USERBASE_ACTIVITY_RETURN_WEEKLY);
-				} else if ($last > time() - 30 * 86400) {
-					$user->recordActivity(USERBASE_ACTIVITY_RETURN_MONTHLY);
-				} 
-			}
-
-			return $user;
+		if (is_numeric($userid)) {
+			return self::getUser($userid);
 		} else {
 			return null;
 		}
