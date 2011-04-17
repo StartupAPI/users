@@ -25,7 +25,11 @@ Follow these steps:
 3. Fill out users_config.php - as minimum, set DB credentials and seed the secret for cookie encryption
 
 		UserConfig::$SESSION_SECRET= '...some.random.characters.go.here...';
-		UserConfig::setDB(new mysqli( 'localhost', '...username...', '...password...', '...database...'));
+
+		UserConfig::$mysql_host = 'localhost';
+		UserConfig::$mysql_db = '...database...';
+		UserConfig::$mysql_user = '...username...';
+		UserConfig::$mysql_password = '...password...';
 
 4. Run make to generate database tables and other files required by the different parts of UserBase
 
