@@ -29,7 +29,7 @@ UserConfig::$admins = array(  ); // usually first user has ID of 1
  * Username and password registration configuration
  * just have these lines or comment them out if you don't want regular form registration
  */
-require_once(dirname(__FILE__).'/users/modules/usernamepass/index.php');
+UserConfig::loadModule('usernamepass');
 new UsernamePasswordAuthenticationModule();
 
 /**
@@ -38,7 +38,7 @@ new UsernamePasswordAuthenticationModule();
  * Click "Edit settings" -> "Web Site" and enter your site's URL
  * And then uncomment two lines below and copy API Key and App Secret
  */
-#require_once(dirname(__FILE__).'/users/modules/facebook/index.php');
+#UserConfig::loadModule('facebook');
 #new FacebookAuthenticationModule('...api.key.goes.here...', '...api.secret.goes.here...');
 
 /**
@@ -46,7 +46,7 @@ new UsernamePasswordAuthenticationModule();
  * Register your app here: https://dev.twitter.com/apps/new
  * And then uncomment two lines below and copy API Key and App Secret
  */
-#require_once(dirname(__FILE__).'/users/modules/twitter/index.php');
+#UserConfig::loadModule('twitter');
 #UserConfig::$modules[] = new TwitterAuthenticationModule('...api.key.goes.here...', '...api.secret.goes.here...');
 
 /**
@@ -54,7 +54,7 @@ new UsernamePasswordAuthenticationModule();
  * Register your app here: http://www.google.com/friendconnect/admin/site/setup
  * And then uncomment two lines below and copy the site ID from the URL
  */
-#require_once(dirname(__FILE__).'/users/modules/google/index.php');
+#UserConfig::loadModule('google');
 #new GoogleAuthenticationModule('...site.id.goes.here...');
 
 /**
@@ -66,7 +66,7 @@ new UsernamePasswordAuthenticationModule();
  * 	See up-to-date list of scopes here: http://code.google.com/apis/gdata/faq.html#AuthScopes
  *	(Google Contacts API scope is required and is included by default)
  */
-#require_once(dirname(__FILE__).'/users/modules/google_oauth/index.php');
+#UserConfig::loadModule('google_oauth');
 #new GoogleOAuthAuthenticationModule(
 #	'...OAuth.key.goes.here...',
 #	'...OAuth.secret.goes.here...',
@@ -95,6 +95,6 @@ new UsernamePasswordAuthenticationModule();
  * Click red "Register OAuth Consumer" button on the right and enter your site's name and URL
  * And then uncomment two lines below and copy API Key and App Secret
  */
-#require_once(dirname(__FILE__).'/users/modules/meetup/index.php');
+#UserConfig::loadModule('meetup');
 #new MeetupAuthenticationModule('...OAuth.key.goes.here...', '...OAuth.secret.goes.here...');
 

@@ -180,6 +180,10 @@ EOD;
 		return $message;
 	}
 
+	public static function loadModule($modulename) {
+		require_once(dirname(__FILE__).'/modules/'.$modulename.'/index.php');
+	}
+
 	public static function init()
 	{
 		UserConfig::$ROOTPATH = dirname(__FILE__);
