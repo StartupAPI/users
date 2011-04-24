@@ -2,9 +2,9 @@
 require_once(dirname(dirname(__FILE__)).'/config.php');
 require_once(dirname(dirname(__FILE__)).'/User.php');
 
-$user = User::require_login();
+$current_user = User::require_login();
 
-if (!in_array($user->getID(), UserConfig::$admins)) {
+if (!in_array($current_user->getID(), UserConfig::$admins)) {
 	require_once(dirname(__FILE__).'/admin_access_only.php');
 	exit;
 }
@@ -27,7 +27,10 @@ if (!isset($ADMIN_SECTION)) {
 	$ADMIN_SECTION = null;
 }
 
-?><h2>Users<?php if (UserConfig::$enableInvitations) { ?> | <a href="invitations.php">Invitations</a><?php } ?></h2>
+if (UserConfig::$enableInvitations) {
+	?><h2>Users | <a href="invitations.php">Invitations</a></h2><?php
+}
+?>
 <div style="background: white; padding: 0">
 <h3>
 <?php if ($ADMIN_SECTION != 'dashboard') {

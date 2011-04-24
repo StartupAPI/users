@@ -165,7 +165,7 @@ Users:
 <?php if (is_null($activityuser)) {
 	?>all<?php
 } else {
-	echo $activityuser->getName()?> (<a href=".">reset</a>)<?php
+	?><a href="user.php?id=<?php echo $activityuser->getID()?>"><?php echo UserTools::escape($activityuser->getName())?></a> (<a href=".">reset</a>)<?php
 }
 ?>
 </form>
@@ -251,10 +251,7 @@ foreach ($activities as $activity)
 	if (is_null($activityuser)) {
 	?>
 		<td>
-		<form name="imp" action="" method="POST">
-		<a href="activity.php?userid=<?php echo $user->getID()?>"><?php echo $user->getName();?></a>
-		<input type="submit" value="impersonate"/><input type="hidden" name="impersonate" value="<?php echo $user->getID()?>"/>
-		</form>
+		<a href="user.php?id=<?php echo $user->getID()?>"><?php echo UserTools::escape($user->getName());?></a> (<a href="activity.php?userid=<?php echo $user->getID()?>">user activity</a>)
 		</td>
 	<?php
 	}?>

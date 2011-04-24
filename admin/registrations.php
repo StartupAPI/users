@@ -56,7 +56,7 @@ google.setOnLoadCallback(function() {
 <div id='chart_div' style='width: 100%; height: 240px; margin-bottom: 1em'></div>
 
 <table cellpadding="5" cellspacing="0" border="1" width="100%">
-<tr><th>ID</th><th>Reg</th><th>Credentials</th><th>Name</th><th>Email</th><th>Points</th><th>Actions</th></tr>
+<tr><th>ID</th><th>Reg</th><th>Credentials</th><th>Name</th><th>Email</th><th>Points</th></tr>
 <?php
 $perpage = 20;
 $pagenumber = 0;
@@ -124,7 +124,7 @@ foreach ($users as $user)
 	$tz = date_default_timezone_get();
 
 	?><tr valign="top">
-	<td><?php $userid = $user->getID(); echo $userid; ?></td>
+	<td><a href="user.php?id=<?php $userid = $user->getID(); echo $userid; ?>"><?php echo $userid; ?></a></td>
 	<td align="right"><?php echo date('M j, h:iA', $regtime)?> (<?php if ($ago <= 5) {?><span style="color: #00<?php echo sprintf('%02s', dechex((4 - $ago) * 150 / 4 + 50))?>00; font-weight: bold"><?php }?><?php echo $ago?> day<?php echo $ago > 1 ? 's' : '' ?> ago<?php if ($ago <= 5) {?></span><?php }?>)</td>
 	<td><?php
 	foreach (UserConfig::$authentication_modules as $module)
@@ -138,8 +138,8 @@ foreach ($users as $user)
 		}
 	}
 	?></td>
-	<td><?php echo $user->getName()?></td>
-	<td><?php echo $user->getEmail()?></td>
+	<td><a href="user.php?id=<?php echo $userid ?>"><?php echo UserTools::escape($user->getName())?></a></td>
+	<td><?php echo UserTools::escape($user->getEmail())?></td>
 	<td><?php
 	$points = $user->getPoints();
 	if ($points > 0) {
@@ -147,8 +147,6 @@ foreach ($users as $user)
 	}
 	?>
 	</td>
-	<td><form name="imp" action="" method="POST"><input type="submit" value="impersonate" style="font: small"/><input type="hidden" name="impersonate" value="<?php echo $user->getID()?>"/></form></td>
-
 </tr><?php
 }
 

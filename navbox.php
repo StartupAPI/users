@@ -26,7 +26,7 @@ function _USERBASE_render_navbox()
 		<?php
 		}
 
-		if (UserConfig::$useAccounts) {
+		if (UserConfig::$useAccounts && !is_null($current_account)) {
 		?>
 			<!-- <span id="profile"><a href="/p/<?php echo UserTools::escape($current_account->getID()) ?>/" title="<?php echo UserTools::escape($current_account->getName()) ?>'s public profile">Public profile</a></span> | -->
 		<?php
