@@ -30,7 +30,7 @@ class Feature {
 		return $this->enabled;
 	}
 
-	public static function getAllFeatures() {
+	public static function getAll() {
 		return self::$features;
 	}
 
@@ -40,6 +40,13 @@ class Feature {
 		}
 
 		return null;
+	}
+
+	// used for backwards compatibility
+	public static function init() {
+		foreach (UserConfig::$features as $id => $details) {
+			new Feature($id, $details[0], $details[1], $details[2]);
+		}
 	}
 
 	public function isEnabledForAccount($account){
@@ -92,7 +99,7 @@ class Feature {
 		}
 
 		// if feature is forced, return true
-		if (!$this->enabled_for_all) {
+		if ($this->enabled_for_all) {
 			return true;
 		}
 
@@ -104,7 +111,7 @@ class Feature {
 		// now, let's see if user has it enabled
 		$db = UserConfig::getDB();
 
-		$userid = $this->getID();
+		$userid = $user->getID();
 
 		if ($stmt = $db->prepare('SELECT COUNT(*) FROM '.UserConfig::$mysql_prefix.'user_features WHERE user_id = ? AND feature_id = ?'))
 		{
@@ -134,10 +141,61 @@ class Feature {
 		return false;
 	}
 
-	// used for backwards compatibility
-	public static function  init() {
-		foreach (UserConfig::$features as $id => $details) {
-			new Feature($id, $details[0], $details[1], $details[2]);
+	public function disableForUser($user) {
+		// now, let's see if user has it enabled
+		$db = UserConfig::getDB();
+
+		$userid = $user->getID();
+
+		if ($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.'user_features WHERE user_id = ? AND feature_id = ?'))
+		{
+			if (!$stmt->bind_param('ii', $userid, $this->id))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+	}
+
+	public function enableForUser($user) {
+		if (!$this->enabled) {
+			return;
+		}
+
+		// if feature is forced, return true
+		if ($this->enabled_for_all) {
+			return;
+		}
+
+		// now, let's see if user has it enabled
+		$db = UserConfig::getDB();
+
+		$userid = $user->getID();
+
+		if ($stmt = $db->prepare('REPLACE INTO '.UserConfig::$mysql_prefix.'user_features (user_id, feature_id) VALUES (?, ?)'))
+		{
+			if (!$stmt->bind_param('ii', $userid, $this->id))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
 		}
 	}
 }

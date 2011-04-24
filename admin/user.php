@@ -13,6 +13,21 @@ if (is_null($user)) {
 	exit;
 }
 
+if (array_key_exists("savefeatures", $_POST)) {
+	$features_to_set = array();
+
+	if (array_key_exists("feature", $_POST) && is_array($_POST['feature'])) {
+		foreach (array_keys($_POST['feature']) as $featureid) {
+			$feature = Feature::getByID($featureid);
+			if (!is_null($feature) && $feature->isEnabled()) {
+				$features_to_set[] = $feature;
+			}
+		}
+	}
+
+	$user->setFeatures($features_to_set);
+}
+
 #$ADMIN_SECTION = 'registrations';
 require_once(dirname(__FILE__).'/header.php');
 ?>
@@ -63,6 +78,22 @@ foreach (UserConfig::$authentication_modules as $module)
 	?>
 	</ul>
 	<?php
-}?>
+}
+
+$features = Feature::getAll();
+
+if (count($features) > 0) {
+	?><h2>Features</h2>
+	<form action="" method="POST">
+	<?php foreach ($features as $id => $feature) {
+		?><div<?php if (!$feature->isEnabled()) {?> style="text-decoration: line-through"<?php } ?>>
+		<input id="feature_<?php echo UserTools::escape($feature->getID()) ?>" type="checkbox" name="feature[<?php echo UserTools::escape($feature->getID()) ?>]"<?php echo $feature->isEnabledForUser($user) ? ' checked="true"' : '' ?>>
+		<label for="feature_<?php echo UserTools::escape($feature->getID()) ?>"><?php echo UserTools::escape($feature->getName()) ?></label>
+		</div><?php
+	} ?>
+	<input type="submit" name="savefeatures" value="update features">
+	</form>
 <?php
+}
+
 require_once(dirname(__FILE__).'/footer.php');
