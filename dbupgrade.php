@@ -81,7 +81,7 @@ $versions[13]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."user_prefer
 DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci";
 $versions[13]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."user_oauth_identity`
 CHANGE `module` `module` VARCHAR(64) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'Module id',
-CHANGE `identity` `identity` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Identity string that indicates that user has the same identity on the oauth server end even if oauth consumer token has changed (recreated / expired / revoked)',
+CHANGE `identity` `identity` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'String uniquely identifying user on the oauth server',
 CHANGE `userinfo` `userinfo` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Serialized user information to be used for rendering',
 DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci";
 $versions[13]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."user_features`
@@ -213,7 +213,7 @@ $versions[10]['down'][]	= "ALTER TABLE `".UserConfig::$mysql_prefix."user_oauth_
 $versions[9]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."user_oauth_identity` (
 	oauth_user_id INT(11) NOT NULL AUTO_INCREMENT COMMENT 'oauth-php user id',
 	user_id INT(10) UNSIGNED DEFAULT NULL COMMENT  'UserBase user id',
-	identity TEXT DEFAULT NULL COMMENT 'Identity string that indicates that user has the same identity on the oauth server end even if oauth consumer token has changed (recreated / expired / revoked)',
+	identity TEXT DEFAULT NULL COMMENT 'String uniquely identifying user on the oauth server',
 	PRIMARY KEY (oauth_user_id),
 	CONSTRAINT oauth_identity_user_id FOREIGN KEY (user_id)
 		REFERENCES `".UserConfig::$mysql_prefix."users` (id)
