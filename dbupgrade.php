@@ -70,7 +70,7 @@ $versions[13]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."user_features
 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
 $versions[13]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."user_oauth_identity`
 CHANGE `module` `module` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'Module id',
-CHANGE `identity` `identity` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'Identity string that indicates that user has the same identity on the oauth server end even if oauth consumer token has changed (recreated / expired / revoked)',
+CHANGE `identity` `identity` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'String uniquely identifying user on the oauth server',
 CHANGE `userinfo` `userinfo` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'Serialized user information to be used for rendering',
 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
 $versions[13]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."user_preferences`
