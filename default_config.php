@@ -213,8 +213,9 @@ EOD;
 		}
 		else
 		{
-			error_log("[UserBase config] Warning: Can't determine site's host name, using www.example.com");
-			$host = 'www.example.com';
+			$host = gethostname();
+			error_log("[UserBase config] Warning: Can't determine site's host name, using $host");
+ 
 		}
 
 		UserConfig::$SITEROOTFULLURL = 'http://'.$host.UserConfig::$SITEROOTURL;
