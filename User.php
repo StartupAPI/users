@@ -12,9 +12,9 @@ class User
 	/*
 	 * Checks if user is logged in and returns use object or redirects to login page
 	 */
-	public static function require_login()
+	public static function require_login($impersonate = true)
 	{
-		$user = self::get();
+		$user = self::get($impersonate);
 
 		if (!is_null($user))
 		{
@@ -64,7 +64,7 @@ class User
 	/*
 	 * Checks if user is logged in and returns use object or null if user is not logged in
 	 */
-	public static function get()
+	public static function get($impersonate = true)
 	{
 		$storage = new MrClay_CookieStorage(array(
 			'secret' => UserConfig::$SESSION_SECRET,
@@ -76,7 +76,28 @@ class User
 		$userid = $storage->fetch(UserConfig::$session_userid_key);
 
 		if (is_numeric($userid)) {
-			return self::getUser($userid);
+			$user = self::getUser($userid);
+
+			if (is_null($user)) {
+				return null;
+			}
+			// don't event try impersonating if not admin
+			if (!$impersonate || !$user->isAdmin()) {
+				return $user;
+			}
+
+			// now, let's check impersonation
+			$impersonated_userid = $storage->fetch(UserConfig::$impersonation_userid_key);
+			$impersonated_user = self::getUser($impersonated_userid);
+
+			// do not impersonate unknown user or the same user
+			if (is_null($impersonated_user) || $user->isTheSameAs($impersonated_user)) {
+				return $user;
+			}
+
+			$impersonated_user->impersonator = $user;
+
+			return $impersonated_user;
 		} else {
 			return null;
 		}
@@ -1447,6 +1468,7 @@ class User
 	private $fbid;
 	private $regtime;
 	private $points;
+	private $impersonator;
 
 	function __construct($userid, $name, $username = null, $email = null, $requirespassreset = false, $fbid = null, $regtime = null, $points = 0)
 	{
@@ -1650,6 +1672,8 @@ class User
 
 	public static function clearSession()
 	{
+		self::stopImpersonation();
+
 		$storage = new MrClay_CookieStorage(array(
 			'secret' => UserConfig::$SESSION_SECRET,
 			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
@@ -1657,6 +1681,49 @@ class User
 		));
 
 		$storage->delete(UserConfig::$session_userid_key);
+	}
+
+	/**
+	 * This method turns on impersonation of particular user (instead of just becoming one)
+	 */
+	public function impersonate($user)
+	{
+		if (is_null($user) || $user->isTheSameAs($this)) {
+			return null;
+		}
+
+		$storage = new MrClay_CookieStorage(array(
+			'secret' => UserConfig::$SESSION_SECRET,
+			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+			'path' => UserConfig::$SITEROOTURL,
+			'httponly' => true
+		));
+
+		if (!$this->isAdmin()) {
+			throw new Exception('Not admin (userid: '.$this->userid.') is trying to impersonate another user (userid: '.$user->userid.')');
+		}
+
+		if (!$storage->store(UserConfig::$impersonation_userid_key, $user->userid)) {
+			throw new Exception(implode('; ', $storage->errors));
+		}
+
+		$user->impersonator = $this;
+
+		return $user;
+	}
+
+	/**
+	 * Stops impersonation
+	 */
+	public static function stopImpersonation()
+	{
+		$storage = new MrClay_CookieStorage(array(
+			'secret' => UserConfig::$SESSION_SECRET,
+			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+			'path' => UserConfig::$SITEROOTURL
+		));
+
+		$storage->delete(UserConfig::$impersonation_userid_key);
 	}
 
 	/*
@@ -1750,5 +1817,20 @@ class User
 	 */
 	public function isAdmin() {
 		return in_array($this->getID(), UserConfig::$admins);
+	}
+
+	/**
+	 * Returns true if user is being impersonated by another user
+	 */
+	public function isImpersonated() {
+		return !is_null($this->impersonator);
+	}
+
+	/**
+	 * Returns impersonator object (not actual, but a copy to avoid fiddling with real object)
+	 */
+	public function getImpersonator() {
+		// do not return
+		return clone($this->impersonator);
 	}
 }

@@ -35,6 +35,7 @@ class UserConfig
 	// key used in session storage to store user's ID
 	public static $session_userid_key = 'users-userid';
 	public static $session_return_key = 'users-return-to';
+	public static $impersonation_userid_key = 'users-userid-impr';
 
 	public static $mysql_host = 'localhost';
 	public static $mysql_port = 3306;

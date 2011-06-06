@@ -14,13 +14,17 @@ function _USERBASE_render_navbox()
 <div id="navbox">
 	<?php if (!is_null($current_user))
 	{
+		if ($current_user->isImpersonated()) {
+			?><b id="userbase-navbox-impersonating"><a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/stopimpersonation.php" title="Impersonated by <?php echo UserTools::escape($current_user->getImpersonator()->getName())?>">Stop Impersonation</a></b> | <?php 
+		}
+
 		if ($current_user->isAdmin()) {
-			?><b id="navbox-admin"><a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/">Admin</a></b> | <?php 
+			?><b id="userbase-navbox-admin"><a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/">Admin</a></b> | <?php 
 		}
 
 		if (count($accounts) > 1)
 		{
-			?><select id="account-picker" name="account" onchange="document.location.href='<?php echo UserConfig::$USERSROOTURL ?>/change_account.php?return=/dashboard/&account='+this.value"><?php
+			?><select id="userbase-navbox-account-picker" name="account" onchange="document.location.href='<?php echo UserConfig::$USERSROOTURL ?>/change_account.php?return='+encodeURIComponent(document.location)+'&account='+this.value"><?php
 
 			foreach ($accounts as $account)
 			{
@@ -36,15 +40,15 @@ function _USERBASE_render_navbox()
 		<?php
 		}
 		?>
-		<span id="username"><a href="<?php echo UserConfig::$USERSROOTURL ?>/edit.php" title="<?php echo UserTools::escape($current_user->getName())?>'s user information"><?php echo UserTools::escape($current_user->getName()) ?></a></span> |
-		<span id="logout"><a href="<?php echo UserConfig::$USERSROOTURL ?>/logout.php">logout</a></span>
+		<span id="userbase-navbox-username"><a href="<?php echo UserConfig::$USERSROOTURL ?>/edit.php" title="<?php echo UserTools::escape($current_user->getName())?>'s user information"><?php echo UserTools::escape($current_user->getName()) ?></a></span> |
+		<span id="userbase-navbox-logout"><a href="<?php echo UserConfig::$USERSROOTURL ?>/logout.php">logout</a></span>
 		<?php
 	}
 	else
 	{
 	?>
-		<span id="signup"><a href="<?php echo UserConfig::$USERSROOTURL ?>/register.php">Sign Up Now!</a></span> |
-		<span id="login"><a href="<?php echo UserConfig::$USERSROOTURL ?>/login.php">log in</a></span>
+		<span id="userbase-navbox-signup"><a href="<?php echo UserConfig::$USERSROOTURL ?>/register.php">Sign Up Now!</a></span> |
+		<span id="userbase-navbox-login"><a href="<?php echo UserConfig::$USERSROOTURL ?>/login.php">log in</a></span>
 	<?php
 	}
 	?>

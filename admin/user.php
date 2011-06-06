@@ -59,9 +59,16 @@ foreach (UserConfig::$authentication_modules as $module)
 	}
 }
 ?>
-<form name="imp" action="" method="POST"><input type="submit" value="impersonate" style="font: small"/><input type="hidden" name="impersonate" value="<?php echo $user->getID()?>"/></form>
 </ul>
-<?php if (UserConfig::$useAccounts) { ?>
+<?php
+
+if (!$user->isTheSameAs($current_user)) {
+?>
+<form name="imp" action="" method="POST"><input type="submit" value="impersonate" style="font: small"/><input type="hidden" name="impersonate" value="<?php echo $user->getID()?>"/></form>
+<?php
+}
+
+if (UserConfig::$useAccounts) { ?>
 	<h2>Accounts:</h2>
 	<ul>
 	<?php
@@ -86,9 +93,10 @@ if (count($features) > 0) {
 	?><h2>Features</h2>
 	<form action="" method="POST">
 	<?php foreach ($features as $id => $feature) {
-		?><div<?php if (!$feature->isEnabled()) {?> style="text-decoration: line-through"<?php } ?>>
-		<input id="feature_<?php echo UserTools::escape($feature->getID()) ?>" type="checkbox" name="feature[<?php echo UserTools::escape($feature->getID()) ?>]"<?php echo $feature->isEnabledForUser($user) ? ' checked="true"' : '' ?>>
-		<label for="feature_<?php echo UserTools::escape($feature->getID()) ?>"><?php echo UserTools::escape($feature->getName()) ?></label>
+		?><div<?php if (!$feature->isEnabled()) {?> style="color: grey; text-decoration: line-through"<?php } ?>>
+		<label>
+		<input id="feature_<?php echo UserTools::escape($feature->getID()) ?>" type="checkbox" name="feature[<?php echo UserTools::escape($feature->getID()) ?>]"<?php echo $feature->isEnabledForUser($user) ? ' checked="true"' : '' ?><?php echo !$feature->isEnabled() ? ' disabled="disabled"' : '' ?>>
+		<?php echo UserTools::escape($feature->getName()) ?></label>
 		</div><?php
 	} ?>
 	<input type="submit" name="savefeatures" value="update features">

@@ -2,7 +2,7 @@
 require_once(dirname(dirname(__FILE__)).'/config.php');
 require_once(dirname(dirname(__FILE__)).'/User.php');
 
-$current_user = User::require_login();
+$current_user = User::require_login(false);
 
 if (!$current_user->isAdmin()) {
 	require_once(dirname(__FILE__).'/admin_access_only.php');
@@ -10,14 +10,20 @@ if (!$current_user->isAdmin()) {
 }
 
 if (array_key_exists('impersonate', $_POST)) {
-	$impersonated_user= User::getUser($_POST['impersonate']);
+	if ($current_user->isTheSameAs(User::getUser($_POST['impersonate']))) {
+		header('Location: #msg=cantimpersonateself');
+		exit;
+	}
+
+	$impersonated_user= $current_user->impersonate(User::getUser($_POST['impersonate']));
 	if ($impersonated_user !== null) {
-		$impersonated_user->setSession(false); // always impersonate only for the browser session
 		header('Location: '.UserConfig::$DEFAULTLOGINRETURN);
+		exit;
 	}
 	else
 	{
 		header('Location: #msg=cantimpersonate');
+		exit;
 	}
 }
 
