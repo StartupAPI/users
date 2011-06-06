@@ -5,7 +5,7 @@ require_once(dirname(dirname(__FILE__)).'/User.php');
 
 $user = User::require_login();
 
-if (!in_array($user->getID(), UserConfig::$admins)) {
+if (!$user->isAdmin()) {
 	require_once(dirname(__FILE__).'/admin_access_only.php');
 	exit;
 }

@@ -194,7 +194,7 @@ EOD;
 		// Chopping of trailing slash which is not supposed to be there in Apache config
 		// See: http://httpd.apache.org/docs/2.0/mod/core.html#documentroot
 		$docroot = $_SERVER['DOCUMENT_ROOT'];
-		if (substr($docroot, -1) == '/') {
+		if (substr($docroot, -1) == DIRECTORY_SEPARATOR) {
 			$docroot = substr($docroot, 0, -1);
 		}
 		$docrootlength = strlen($docroot);

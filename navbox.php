@@ -14,6 +14,10 @@ function _USERBASE_render_navbox()
 <div id="navbox">
 	<?php if (!is_null($current_user))
 	{
+		if ($current_user->isAdmin()) {
+			?><b id="navbox-admin"><a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/">Admin</a></b> | <?php 
+		}
+
 		if (count($accounts) > 1)
 		{
 			?><select id="account-picker" name="account" onchange="document.location.href='<?php echo UserConfig::$USERSROOTURL ?>/change_account.php?return=/dashboard/&account='+this.value"><?php

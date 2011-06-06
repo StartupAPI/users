@@ -1744,4 +1744,11 @@ class User
 			}
 		}
 	}
+
+	/**
+	 * Returns true if user is the admin of the instance
+	 */
+	public function isAdmin() {
+		return in_array($this->getID(), UserConfig::$admins);
+	}
 }

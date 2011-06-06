@@ -4,7 +4,7 @@ require_once(dirname(dirname(__FILE__)).'/User.php');
 
 $current_user = User::require_login();
 
-if (!in_array($current_user->getID(), UserConfig::$admins)) {
+if (!$current_user->isAdmin()) {
 	require_once(dirname(__FILE__).'/admin_access_only.php');
 	exit;
 }
