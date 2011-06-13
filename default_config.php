@@ -215,7 +215,9 @@ EOD;
 		else
 		{
 			$host = gethostname();
-			error_log("[UserBase config] Warning: Can't determine site's host name, using $host");
+			if (php_sapi_name() !== 'cli') {
+				error_log("[UserBase config] Warning: Can't determine site's host name, using $host");
+			}
  
 		}
 
