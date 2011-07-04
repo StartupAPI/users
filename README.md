@@ -37,7 +37,11 @@ Follow these steps:
 
 5. Uncomment and configure API keys for more authentication modules for Facebook, Twitter, Google and etc.
 
-6. In your code, use either User::get() function to get a user object
+6. In your code, add include users.php file above any other output
+
+		require_once(dirname(__FILE__).'/users/users.php');
+
+then use either User::get() function to get a user object
 
 		/**
 		 * Get User object or null if user is not logged in
