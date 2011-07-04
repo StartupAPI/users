@@ -47,7 +47,7 @@ then use either User::get() function to get a user object
 		 * Get User object or null if user is not logged in
 		 */
 		$current_user = User::get();
-	or if you want to protect the page from anonymous users, use User::require_login() function
+or if you want to protect the page from anonymous users, use User::require_login() function
 
 		/**
 		 * Get User object or redirect to login page if user is not logged in
