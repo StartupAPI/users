@@ -1,6 +1,6 @@
-# StartupAPI Users
+# Startup API
 
-StartupAPI Users is a drop-in user management tool for on-line projects and SaaS (Software As A Service) web sites.
+Startup API is a drop-in user management tool for on-line projects and SaaS (Software As A Service) web sites.
 
 It supports many registration and authentication methods, integrates with various useful services like newsletters and provides comprehensive administrative dashboard that helps make business decisions based on data collected from the users.
 
@@ -31,7 +31,7 @@ Follow these steps:
 		UserConfig::$mysql_user = '...username...';
 		UserConfig::$mysql_password = '...password...';
 
-4. Run make to generate database tables and other submodules and files required by the different parts of StartupAPI users.
+4. Run make to generate database tables and other submodules and files required by the different parts of Startup API.
 
 		make
 
