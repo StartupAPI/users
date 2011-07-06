@@ -1,6 +1,6 @@
-# UserBase
+# StartupAPI Users
 
-UserBase is a drop-in user management tool for on-line projects and SaaS (Software As A Service) web sites.
+StartupAPI Users is a drop-in user management tool for on-line projects and SaaS (Software As A Service) web sites.
 
 It supports many registration and authentication methods, integrates with various useful services like newsletters and provides comprehensive administrative dashboard that helps make business decisions based on data collected from the users.
 
@@ -14,7 +14,7 @@ Follow these steps:
 
 1. Get the code from GitHub into the root of your site under users folder:
 
-		git clone git://github.com/sergeychernyshev/UserBase.git users
+		git clone git://github.com/StartupAPI/users.git users
 
 2. If you don't have it yet, create MySQL database and get user credentials for it
 
@@ -31,7 +31,7 @@ Follow these steps:
 		UserConfig::$mysql_user = '...username...';
 		UserConfig::$mysql_password = '...password...';
 
-4. Run make to generate database tables and other submodules and files required by the different parts of UserBase
+4. Run make to generate database tables and other submodules and files required by the different parts of StartupAPI users.
 
 		make
 
@@ -66,8 +66,8 @@ Then just run make - it should grab the latest code and run database update scri
 
 ## Additional features
 
-When you're comfortable with basic features and want to explore more, go check the documentation (TODO [write the documentation](https://github.com/sergeychernyshev/UserBase/issues/46)) for more advanced features like embedding registration / login forms on your pages, activity tracking, feature management and so on.
+When you're comfortable with basic features and want to explore more, go check the documentation (TODO [write the documentation](https://github.com/StartupAPI/users/issues/46)) for more advanced features like embedding registration / login forms on your pages, activity tracking, feature management and so on.
 
 ## Problems and Questions
 
-If you have any problems with installations check out the [list of issues/tasks](https://github.com/sergeychernyshev/UserBase/issues) or let us know about new one.
+If you have any problems with installations check out the [list of issues/tasks](https://github.com/StartupAPI/users/issues) or let us know about new one.
