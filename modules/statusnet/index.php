@@ -98,6 +98,18 @@ class StatusNetAuthenticationModule extends OAuthAuthenticationModule
 		$user_info = unserialize($serialized_userinfo);
 		?>@<a href="<?php echo $this->rootURL . UserTools::escape($user_info['screen_name']); ?>" target="_blank"><?php echo UserTools::escape($user_info['screen_name']); ?></a><br/><?php
 	}
+
+	/**
+	 * Call to Status.Net Twitter API using OAuth
+	 */
+	protected function api_call($path, $method = "GET", $params = null, $body = null, $files = null) {
+		return makeOAuthRequest(
+			$this->$APIRootURL.$path,
+			$method,
+			$params,
+			$body,
+			$files);
+	}
 }
 
 class StatusNetUserCredentials extends OAuthUserCredentials {
