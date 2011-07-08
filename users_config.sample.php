@@ -51,6 +51,19 @@ new UsernamePasswordAuthenticationModule();
 #UserConfig::$modules[] = new TwitterAuthenticationModule('...api.key.goes.here...', '...api.secret.goes.here...');
 
 /**
+ * Status.Net Authentication configuration
+ * Register your app with your Status.Net installation
+ * And then uncomment two lines below and copy API Key, App Secret
+ * as well as provider name and root URL for the site and API
+ */
+#UserConfig::loadModule('statusnet');
+#new StatusNetAuthenticationModule('...api.key.goes.here...', '...api.secret.goes.here...', '...provider.name...', '...base.app.url...', '...base.api.url...');
+
+# Identi.ca's simplified setup (get your keys here: http://identi.ca/settings/oauthapps)
+#UserConfig::loadModule('statusnet');
+#new StatusNetAuthenticationModule('...identi.ca.api.key.goes.here...', '...identi.ca.api.secret.goes.here...');
+
+/**
  * Google Friend Connect configuration
  * Register your app here: http://www.google.com/friendconnect/admin/site/setup
  * And then uncomment two lines below and copy the site ID from the URL
