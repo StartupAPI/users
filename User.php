@@ -460,17 +460,49 @@ class User
 
 		$total = 0;
 
-		if ($stmt = $db->prepare('SELECT count(*) AS total FROM (
-						SELECT user_id, count(*)
-						FROM '.UserConfig::$mysql_prefix.'activity a
-						INNER JOIN '.UserConfig::$mysql_prefix.'users u
-							ON a.user_id = u.id
-						WHERE a.time > DATE_ADD(u.regtime, INTERVAL 1 DAY)
-							AND a.time > DATE_SUB('.
-							(is_null($date) ? 'NOW()' : '?').
-							', INTERVAL 30 DAY)
-						GROUP BY user_id
-					) AS active'))
+		if (UserConfig::$adminActiveOnlyWithPoints) {
+			$activities_with_points = array();
+
+			foreach (UserConfig::$activities as $id => $activity) {
+				if ($activity[1] > 0) {
+					$activities_with_points[] = $id;
+				}
+			}
+
+			// if there are no activities that can earn points, no users are active
+			if (count($activities_with_points) == 0) {
+				return 0;
+			}
+
+			$in = implode(', ', $activities_with_points);
+
+			$query = 'SELECT count(*) AS total FROM (
+					SELECT user_id, count(*)
+					FROM '.UserConfig::$mysql_prefix.'activity a
+					INNER JOIN '.UserConfig::$mysql_prefix.'users u
+						ON a.user_id = u.id
+					WHERE a.time > DATE_ADD(u.regtime, INTERVAL 1 DAY)
+						AND a.time > DATE_SUB('.
+						(is_null($date) ? 'NOW()' : '?').
+						', INTERVAL 30 DAY)
+						AND a.activity_id IN ('.$in.')
+					GROUP BY user_id
+				) AS active';
+		} else {
+			$query = 'SELECT count(*) AS total FROM (
+					SELECT user_id, count(*)
+					FROM '.UserConfig::$mysql_prefix.'activity a
+					INNER JOIN '.UserConfig::$mysql_prefix.'users u
+						ON a.user_id = u.id
+					WHERE a.time > DATE_ADD(u.regtime, INTERVAL 1 DAY)
+						AND a.time > DATE_SUB('.
+						(is_null($date) ? 'NOW()' : '?').
+						', INTERVAL 30 DAY)
+					GROUP BY user_id
+				) AS active';
+		}
+
+		if ($stmt = $db->prepare($query))
 		{
 			if (!is_null($date)) {
 				if (!$stmt->bind_param('s', $date))

@@ -121,6 +121,11 @@ class UserConfig
 	public static $oauth_user_id_key = 'users-oauth-user-id';
 
 	/*
+	 * Admin insterface settings
+	 */
+	public static $adminActiveOnlyWithPoints = false;
+
+	/*
 	 * hooks
 	 */
 
