@@ -141,7 +141,7 @@ class GenerationCohorts extends CohortProvider {
 	 * A period of time between generations
 	 * Must be one of GenerationCohorts::MONTH or GenerationCohorts::WEEK
 	 */
-	private static $period;
+	private $period;
 
 	public function __construct($period = self::MONTH) {
 		$title = 'User genrations by ';
