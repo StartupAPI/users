@@ -152,8 +152,6 @@ class User
 
 			$stmt->fetch();
 			$stmt->close();
-
-			error_log($referer);
 		}
 		else
 		{
