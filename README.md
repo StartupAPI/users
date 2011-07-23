@@ -4,7 +4,9 @@ Startup API is a drop-in user management tool for on-line projects and SaaS (Sof
 
 It supports many registration and authentication methods, integrates with various useful services like newsletters and provides comprehensive administrative dashboard that helps make business decisions based on data collected from the users.
 
-One of main goals for the project is to allow fast idea-to-product cycle so we all can concentrate on know-how and not the infrastracture.
+One of main goals for the project is to allow fast idea-to-product cycle so we all can concentrate on know-how and not the infrastructure.
+
+It is distributed under [MIT license](http://opensource.org/licenses/MIT)
 
 ## Installation
 
@@ -53,6 +55,13 @@ Follow these steps:
 		 * Get User object or redirect to login page if user is not logged in
 		 */
 		$current_user = User::require_login();
+
+	you can get user ID to connect it to your dataset using getID() method
+
+		/**
+		 * Get user's unique ID
+		 */
+		$user_id = $current_user->getID();
 
 7. <s>Sit back and relax</s> Go implement the business logic now. You can call getID(), getName() and other methods on the user object to utilize it in your code.
 
