@@ -6,7 +6,7 @@ It supports many registration and authentication methods, integrates with variou
 
 One of main goals for the project is to allow fast idea-to-product cycle so we all can concentrate on know-how and not the infrastructure.
 
-It is distributed under [MIT license](http://opensource.org/licenses/MIT)
+It is distributed under [MIT license](http://opensource.org/licenses/MIT) distributed with the code in [LICENSE](LICENSE) file.
 
 ## Installation
 
