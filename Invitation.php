@@ -238,7 +238,7 @@ class Invitation
 
 		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'invitation SET sentto = ?, user = ? WHERE code = ?'))
 		{
-			if (!$stmt->bind_param('sis', $this->comment, $comment, $this->code))
+			if (!$stmt->bind_param('sis', $comment, $this->user, $this->code))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}
