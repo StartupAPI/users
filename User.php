@@ -822,7 +822,7 @@ class User
 			$orderby = 'points';
 		}
 
-		if ($stmt = $db->prepare('SELECT id, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users ORDER BY '.$orderby.' DESC LIMIT ?, ?'))
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users ORDER BY '.$orderby.' DESC LIMIT ?, ?'))
 		{
 			if (!$stmt->bind_param('ii', $first, $perpage))
 			{
@@ -832,14 +832,14 @@ class User
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
 
 			while($stmt->fetch() === TRUE)
 			{
-				$users[] = new self($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
+				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
 			}
 
 			$stmt->close();
@@ -863,7 +863,7 @@ class User
 		$first = $perpage * $pagenumber;
 
 		// TODO Replace with real, fast and powerful full-text search
-		if ($stmt = $db->prepare('SELECT id, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime) FROM '.UserConfig::$mysql_prefix.'users WHERE INSTR(name, ?) > 0 OR INSTR(username, ?) > 0 OR INSTR(email, ?) > 0 ORDER BY regtime DESC LIMIT ?, ?'))
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime) FROM '.UserConfig::$mysql_prefix.'users WHERE INSTR(name, ?) > 0 OR INSTR(username, ?) > 0 OR INSTR(email, ?) > 0 ORDER BY regtime DESC LIMIT ?, ?'))
 		{
 			if (!$stmt->bind_param('sssii', $search, $search, $search, $first, $perpage))
 			{
@@ -873,14 +873,14 @@ class User
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime))
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
 
 			while($stmt->fetch() === TRUE)
 			{
-				$users[] = new self($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime);
+				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime);
 			}
 
 			$stmt->close();
@@ -1029,7 +1029,7 @@ class User
 
 			while ($stmt->fetch() === TRUE)
 			{
-				$users[] = new User($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
+				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
 			}
 
 			$stmt->close();
@@ -1258,7 +1258,7 @@ class User
 
 			while ($stmt->fetch() === TRUE)
 			{
-				$users[] = new User($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
+				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
 			}
 
 			$stmt->close();
@@ -1383,7 +1383,7 @@ class User
 			{
 				if (sha1($salt.$entered_password) == $pass)
 				{
-					$user = new User($id, $status, $name, $username, $email, $requirespassreset, $fb_id);
+					$user = new self($id, $status, $name, $username, $email, $requirespassreset, $fb_id);
 
 				}
 			}
@@ -1425,7 +1425,7 @@ class User
 
 				if ($stmt->fetch() === TRUE)
 				{
-					$user = new User($id, $status, $name, $username, $email, null, $fb_id);
+					$user = new self($id, $status, $name, $username, $email, null, $fb_id);
 				}
 
 				$stmt->close();
@@ -1479,7 +1479,7 @@ class User
 
 			if ($stmt->fetch() === TRUE)
 			{
-				$user = new User($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
+				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
 			}
 
 			$stmt->close();
@@ -1517,7 +1517,7 @@ class User
 
 			if ($stmt->fetch() === TRUE)
 			{
-				$user = new User($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
+				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
 			}
 
 			$stmt->close();
@@ -1557,7 +1557,7 @@ class User
 
 			if ($stmt->fetch() === TRUE)
 			{
-				$user = new User($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
+				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
 			}
 
 			$stmt->close();
