@@ -22,6 +22,15 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 14
+ * Adding status field for a user to be able to disable access
+*/
+
+$versions[14]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."users` ADD `status` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT 'Status of the user (enabled/disabled)' AFTER `id`";
+
+$versions[14]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."users` DROP `status`";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 13
  * Converting to utf8
 */

@@ -63,6 +63,7 @@ class User
 
 	/*
 	 * Checks if user is logged in and returns use object or null if user is not logged in
+	 * Disabled users are not allowed to login unless they are being impersonated
 	 */
 	public static function get($impersonate = true)
 	{
@@ -83,6 +84,10 @@ class User
 			}
 			// don't event try impersonating if not admin
 			if (!$impersonate || !$user->isAdmin()) {
+				if ($user->isDisabled()) {
+					return null;
+				}
+
 				return $user;
 			}
 
@@ -92,6 +97,10 @@ class User
 
 			// do not impersonate unknown user or the same user
 			if (is_null($impersonated_user) || $user->isTheSameAs($impersonated_user)) {
+				if ($user->isDisabled()) {
+					return null;
+				}
+
 				return $user;
 			}
 
@@ -234,7 +243,6 @@ class User
 			UserConfig::$email_module->registerSubscriber($this);
 		}
 	}
-
 	/*
 	 * create new user based on Google Friend Connect info
 	 */
@@ -973,7 +981,7 @@ class User
 
 		$users = array();
 
-		if ($stmt = $db->prepare('SELECT id, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users WHERE username = ? OR email = ?'))
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users WHERE username = ? OR email = ?'))
 		{
 			if (!$stmt->bind_param('ss', $nameoremail, $nameoremail))
 			{
@@ -983,14 +991,14 @@ class User
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
 
 			while ($stmt->fetch() === TRUE)
 			{
-				$users[] = new User($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
+				$users[] = new User($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
 			}
 
 			$stmt->close();
@@ -1206,20 +1214,20 @@ class User
 
 		$idlist = join(', ', $ids);
 		
-		if ($stmt = $db->prepare('SELECT id, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users WHERE id IN ('.$idlist.')'))
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users WHERE id IN ('.$idlist.')'))
 		{
 			if (!$stmt->execute())
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
 
 			while ($stmt->fetch() === TRUE)
 			{
-				$users[] = new User($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
+				$users[] = new User($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
 			}
 
 			$stmt->close();
@@ -1317,6 +1325,104 @@ class User
 	}
 
 	/*
+	 * retrieves user information by username
+	 */
+	public static function getUserByUsernamePassword($entered_username, $entered_password)
+	{
+		$db = UserConfig::getDB();
+
+		$user = null;
+
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, pass, salt, temppass, requirespassreset, fb_id FROM '.UserConfig::$mysql_prefix.'users WHERE username = ?'))
+		{
+			if (!$stmt->bind_param('s', $entered_username))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($id, $status, $name, $username, $email, $pass, $salt, $temppass, $requirespassreset, $fb_id))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			if ($stmt->fetch() === TRUE)
+			{
+				if (sha1($salt.$entered_password) == $pass)
+				{
+					$user = new User($id, $status, $name, $username, $email, $requirespassreset, $fb_id);
+
+				}
+			}
+
+			$stmt->close();
+
+			// if user used password recovery and remembered his old password
+			// then clean temporary password and password reset flag
+			// (don't reset the flag if was was set for some other reasons)
+			if (!is_null($user) && !$user->isDisabled() && !is_null($temppass) && $user->requiresPasswordReset())
+			{
+				$user->setRequiresPasswordReset(false);
+				$user->save();
+
+				$user->resetTemporaryPassword();
+			}
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		if (is_null($user))
+		{
+			if ($stmt = $db->prepare('SELECT id, status, name, username, email, fb_id FROM '.UserConfig::$mysql_prefix.'users WHERE username = ? AND temppass = ? AND temppasstime > DATE_SUB(NOW(), INTERVAL 1 DAY)'))
+			{
+				if (!$stmt->bind_param('ss', $entered_username, $entered_password))
+				{
+					 throw new Exception("Can't bind parameter".$stmt->error);
+				}
+				if (!$stmt->execute())
+				{
+					throw new Exception("Can't execute statement: ".$stmt->error);
+				}
+				if (!$stmt->bind_result($id, $status, $name, $username, $email, $fb_id))
+				{
+					throw new Exception("Can't bind result: ".$stmt->error);
+				}
+
+				if ($stmt->fetch() === TRUE)
+				{
+					$user = new User($id, $status, $name, $username, $email, null, $fb_id);
+				}
+
+				$stmt->close();
+
+				if (!is_null($user))
+				{
+					$user->setRequiresPasswordReset(true);
+					$user->save();
+				}
+			}
+			else
+			{
+				throw new Exception("Can't prepare statement: ".$db->error);
+			}
+		}
+		else
+		{
+			$user->resetTemporaryPassword();
+		}
+
+		if ($user->isDisabled()) {
+			return null;
+		}
+
+		return $user;
+	}
+
+	/*
 	 * retrieves user information by Google Friend Connect ID
 	 */
 	public static function getUserByGoogleFriendConnectID($googleid)
@@ -1325,7 +1431,7 @@ class User
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT id, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users u INNER JOIN '.UserConfig::$mysql_prefix.'googlefriendconnect g ON u.id = g.user_id WHERE g.google_id = ?'))
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users u INNER JOIN '.UserConfig::$mysql_prefix.'googlefriendconnect g ON u.id = g.user_id WHERE g.google_id = ?'))
 		{
 			if (!$stmt->bind_param('s', $googleid))
 			{
@@ -1335,14 +1441,14 @@ class User
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
 
 			if ($stmt->fetch() === TRUE)
 			{
-				$user = new User($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
+				$user = new User($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
 			}
 
 			$stmt->close();
@@ -1363,7 +1469,7 @@ class User
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT id, name, username, email, requirespassreset, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users WHERE fb_id = ?'))
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users WHERE fb_id = ?'))
 		{
 			if (!$stmt->bind_param('i', $fb_id))
 			{
@@ -1373,14 +1479,14 @@ class User
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($userid, $name, $username, $email, $requirespassreset, $regtime, $points))
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $regtime, $points))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
 
 			if ($stmt->fetch() === TRUE)
 			{
-				$user = new User($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
+				$user = new User($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
 			}
 
 			$stmt->close();
@@ -1403,7 +1509,7 @@ class User
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users WHERE id = ?'))
+		if ($stmt = $db->prepare('SELECT status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users WHERE id = ?'))
 		{
 			if (!$stmt->bind_param('i', $userid))
 			{
@@ -1413,14 +1519,14 @@ class User
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
+			if (!$stmt->bind_result($status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
 
 			if ($stmt->fetch() === TRUE)
 			{
-				$user = new User($userid, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
+				$user = new User($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
 			}
 
 			$stmt->close();
@@ -1493,6 +1599,7 @@ class User
 
 	// statics are over - things below are for objects.
 	private $userid;
+	private $status;
 	private $name;
 	private $username;
 	private $email;
@@ -1502,9 +1609,10 @@ class User
 	private $points;
 	private $impersonator;
 
-	function __construct($userid, $name, $username = null, $email = null, $requirespassreset = false, $fbid = null, $regtime = null, $points = 0)
+	function __construct($userid, $status = 1, $name, $username = null, $email = null, $requirespassreset = false, $fbid = null, $regtime = null, $points = 0)
 	{
 		$this->userid = $userid;
+		$this->status = $status;
 		$this->name = $name;
 		$this->username = $username;
 		$this->email = $email;
@@ -1576,6 +1684,10 @@ class User
 	public function isTheSameAs($user)
 	{
 		return $this->getID() == $user->getID();
+	}
+	public function isDisabled()
+	{
+		return ($this->status == 0 ? true : false);
 	}
 
 	public function checkPass($password)

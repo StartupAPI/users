@@ -495,94 +495,13 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 
 		$db = UserConfig::getDB();
 
-		$user = null;
-
-		if ($stmt = $db->prepare('SELECT id, name, username, email, pass, salt, temppass, requirespassreset, fb_id FROM '.UserConfig::$mysql_prefix.'users WHERE username = ?'))
-		{
-			if (!$stmt->bind_param('s', $data['username']))
-			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
-			}
-			if (!$stmt->execute())
-			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
-			}
-			if (!$stmt->bind_result($id, $name, $username, $email, $pass, $salt, $temppass, $requirespassreset, $fb_id))
-			{
-				throw new Exception("Can't bind result: ".$stmt->error);
-			}
-
-			if ($stmt->fetch() === TRUE)
-			{
-				if (sha1($salt.$data['pass']) == $pass)
-				{
-					$user = new User($id, $name, $username, $email, $requirespassreset, $fb_id);
-
-				}
-			}
-
-			$stmt->close();
-
-			// if user used password recovery and remembered his old password
-			// then clean temporary password and password reset flag
-			// (don't reset the flag if was was set for some other reasons)
-			if (!is_null($user) && !is_null($temppass) && $user->requiresPasswordReset())
-			{
-				$user->setRequiresPasswordReset(false);
-				$user->save();
-
-				$user->resetTemporaryPassword();
-			}
-		}
-		else
-		{
-			throw new Exception("Can't prepare statement: ".$db->error);
-		}
-
-		if (is_null($user))
-		{
-			if ($stmt = $db->prepare('SELECT id, name, username, email, fb_id FROM '.UserConfig::$mysql_prefix.'users WHERE username = ? AND temppass = ? AND temppasstime > DATE_SUB(NOW(), INTERVAL 1 DAY)'))
-			{
-				if (!$stmt->bind_param('ss', $data['username'], $data['pass']))
-				{
-					 throw new Exception("Can't bind parameter".$stmt->error);
-				}
-				if (!$stmt->execute())
-				{
-					throw new Exception("Can't execute statement: ".$stmt->error);
-				}
-				if (!$stmt->bind_result($id, $name, $username, $email, $fb_id))
-				{
-					throw new Exception("Can't bind result: ".$stmt->error);
-				}
-
-				if ($stmt->fetch() === TRUE)
-				{
-					$user = new User($id, $name, $username, $email, null, $fb_id);
-				}
-
-				$stmt->close();
-
-				if (!is_null($user))
-				{
-					$user->setRequiresPasswordReset(true);
-					$user->save();
-				}
-			}
-			else
-			{
-				throw new Exception("Can't prepare statement: ".$db->error);
-			}
-		}
-		else
-		{
-			$user->resetTemporaryPassword();
-		}
+		$user = User::getUserByUsernamePassword($data['username'], $data['pass']);
 
 		if (!is_null($user))
 		{
 			$user->recordActivity(USERBASE_ACTIVITY_LOGIN_UPASS);
 		}
+
 		return $user;
 	}
 
