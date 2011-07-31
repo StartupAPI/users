@@ -139,6 +139,37 @@ class User
 		}
 	}
 
+	public function getReferer() {
+		$db = UserConfig::getDB();
+
+		$referer = null;
+
+		if ($stmt = $db->prepare('SELECT referer FROM '.UserConfig::$mysql_prefix.'users WHERE id = ?'))
+		{
+			if (!$stmt->bind_param('i', $this->userid))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->bind_result($referer))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+
+			$stmt->fetch();
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return $referer;
+	}
+
 	private function setRegCampaign() {
 		$campaign = CampaignTracker::getCampaign();
 		if (is_null($campaign) || !$campaign) {

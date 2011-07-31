@@ -46,6 +46,19 @@ if ($email) {
 <p><b>Total points:</b> <?php echo $user->getPoints(); ?> (<a href="activity.php?userid=<?php echo $user->getID() ?>">see activity</a>)
 </p>
 
+<h2>Source of registration</h2>
+<p>Referer: <?php
+
+$referer = $user->getReferer();
+
+if (is_null($referer)) {
+	?><i>unknown</i><?php
+} else {
+	?><a href="<?php echo UserTools::escape($referer)?>"><?php echo UserTools::escape($referer)?></a><?php
+}
+?>
+</p>
+
 <h2>Authentication Credentials</h2>
 <ul><?php
 foreach (UserConfig::$authentication_modules as $module)
