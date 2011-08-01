@@ -1,4 +1,6 @@
 <?php
+require_once(dirname(__FILE__).'/admin.php');
+
 $ADMIN_SECTION = 'dashboard';
 require_once(dirname(__FILE__).'/header.php');
 

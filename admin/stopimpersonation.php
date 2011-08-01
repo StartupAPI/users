@@ -1,6 +1,5 @@
 <?php
-require_once(dirname(dirname(__FILE__)).'/config.php');
-require_once(dirname(dirname(__FILE__)).'/User.php');
+require_once(dirname(__FILE__).'/admin.php');
 
 $real_user = User::get(false); // getting real user, ignoring impersonation
 

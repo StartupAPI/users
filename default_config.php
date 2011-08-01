@@ -28,6 +28,7 @@ class UserConfig
 
 	// session secret - must be unique for each installation
 	public static $SESSION_SECRET;
+	public static $csrf_nonce_key = 'users-csrf-nonce';
 
 	// Administrator users
 	public static $admins = array();

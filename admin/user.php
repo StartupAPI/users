@@ -1,5 +1,6 @@
 <?php
-require_once(dirname(dirname(__FILE__)).'/users.php');
+require_once(dirname(__FILE__).'/admin.php');
+
 if (!array_key_exists('id', $_GET) || !$_GET['id']) {
 	header("HTTP/1.0 400 User ID is not specified");
 	?><h1>400 User ID is not specified</h1><?php
@@ -63,6 +64,7 @@ if ($user->isDisabled()) {
 <form action="" method="POST">
 <b style="background: red; padding: 0.5em; color: white">Deactivated</b>
 <input type="submit" name="activate" value="activate" style="font: small" onclick="return confirm('Are you sure you want to activate this user?')"/>
+<?php UserTools::renderCSRFNonce(); ?>
 </form>
 <?php
 } else {
@@ -70,6 +72,7 @@ if ($user->isDisabled()) {
 <form action="" method="POST">
 Active
 <input type="submit" name="deactivate" value="deactivate" style="font: small" onclick="return confirm('Are you sure you want to disable access for this user?')"/>
+<?php UserTools::renderCSRFNonce(); ?>
 </form>
 <?php
 }
@@ -107,7 +110,9 @@ foreach (UserConfig::$authentication_modules as $module)
 
 if (!$user->isTheSameAs($current_user)) {
 ?>
-<form name="imp" action="" method="POST"><input type="submit" value="impersonate" style="font: small"/><input type="hidden" name="impersonate" value="<?php echo $user->getID()?>"/></form>
+<form name="imp" action="" method="POST"><input type="submit" value="impersonate" style="font: small"/><input type="hidden" name="impersonate" value="<?php echo $user->getID()?>"/>
+<?php UserTools::renderCSRFNonce(); ?>
+</form>
 <?php
 }
 
@@ -143,6 +148,7 @@ if (count($features) > 0) {
 		</div><?php
 	} ?>
 	<input type="submit" name="savefeatures" value="update features">
+	<?php UserTools::renderCSRFNonce(); ?>
 	</form>
 <?php
 }

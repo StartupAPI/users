@@ -1,7 +1,5 @@
 <?php
-require_once(dirname(dirname(__FILE__)).'/config.php');
-
-require_once(dirname(dirname(__FILE__)).'/User.php');
+require_once(dirname(__FILE__).'/admin.php');
 
 $user = User::require_login();
 
@@ -76,6 +74,7 @@ if (count($invitations) == 0)
 	?><div style="border: 1px dotted silver; text-align: center; padding: 2em">
 <form action="" method="POST">
 Generate <input name="add" size="4" value="5"> more <input type="submit" value="&gt;&gt;">
+	<?php UserTools::renderCSRFNonce(); ?>
 </form>
 </div>
 <?php
@@ -110,6 +109,7 @@ else
 <td><input type="submit" name="save" value="save &gt;&gt;" style="float: right"></td>
 <td></td></tr>
 </table>
+	<?php UserTools::renderCSRFNonce(); ?>
 </form>
 <?php
 }
