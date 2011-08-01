@@ -28,6 +28,16 @@ if (array_key_exists("savefeatures", $_POST)) {
 	$user->setFeatures($features_to_set);
 }
 
+if (array_key_exists("activate", $_POST)) {
+	$user->setStatus(true);
+	$user->save();
+}
+
+if (array_key_exists("deactivate", $_POST)) {
+	$user->setStatus(false);
+	$user->save();
+}
+
 #$ADMIN_SECTION = 'registrations';
 require_once(dirname(__FILE__).'/header.php');
 ?>
@@ -45,6 +55,26 @@ if ($email) {
 
 <p><b>Total points:</b> <?php echo $user->getPoints(); ?> (<a href="activity.php?userid=<?php echo $user->getID() ?>">see activity</a>)
 </p>
+
+<h2>Status</h2>
+<?php
+if ($user->isDisabled()) {
+?>
+<form action="" method="POST">
+<b style="background: red; padding: 0.5em; color: white">Deactivated</b>
+<input type="submit" name="activate" value="activate" style="font: small" onclick="return confirm('Are you sure you want to activate this user?')"/>
+</form>
+<?php
+} else {
+?>
+<form action="" method="POST">
+Active
+<input type="submit" name="deactivate" value="deactivate" style="font: small" onclick="return confirm('Are you sure you want to disable access for this user?')"/>
+</form>
+<?php
+}
+?>
+
 
 <h2>Source of registration</h2>
 <p>Referer: <?php

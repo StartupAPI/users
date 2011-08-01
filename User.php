@@ -1704,6 +1704,9 @@ class User
 	{
 		$this->fbid = $fbid;
 	}
+	public function setStatus($status) {
+		$this->status = $status ? 1 : 0;
+	}
 	public function getRegTime()
 	{
 		return $this->regtime;
@@ -1788,6 +1791,7 @@ class User
 		$db = UserConfig::getDB();
 
 		$passresetnum = $this->requirespassreset ? 1 : 0;
+		$status = $this->status == 0 ? 0 : 1;
 
 		if (!is_null(UserConfig::$email_module)) {
 			// !WARNING! it's not safe to do anything with this user except reading it's built-in
@@ -1803,9 +1807,9 @@ class User
 		$name = mb_convert_encoding($this->name, 'UTF-8');
 		$email = mb_convert_encoding($this->email, 'UTF-8');
 
-		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET username = ?, name = ?, email = ?, requirespassreset = ?, fb_id = ? WHERE id = ?'))
+		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET status = ?, username = ?, name = ?, email = ?, requirespassreset = ?, fb_id = ? WHERE id = ?'))
 		{
-			if (!$stmt->bind_param('sssiii', $username, $name, $email, $passresetnum, $this->fbid, $this->userid))
+			if (!$stmt->bind_param('isssiii', $status, $username, $name, $email, $passresetnum, $this->fbid, $this->userid))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}
