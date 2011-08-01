@@ -5,6 +5,8 @@ require_once(dirname(__FILE__).'/User.php');
 
 $user = User::require_login();
 
+UserTools::preventCSRF();
+
 $errors = array();
 
 $module = UserConfig::$authentication_modules[0];

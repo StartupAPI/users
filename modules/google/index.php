@@ -233,7 +233,7 @@ class GoogleAuthenticationModule extends AuthenticationModule
 
 		?>
 		<form action="<?php echo $action?>" method="POST">
-		<input type="hidden" name="save"value ="save"/>
+		<input type="hidden" name="save" value="save"/>
 		<?php
 		foreach ($associations as $association)
 		{
@@ -243,6 +243,7 @@ class GoogleAuthenticationModule extends AuthenticationModule
 			</div><?php
 		}
 
+		UserTools::renderCSRFNonce();
 		?>
 		</form>
 
@@ -273,6 +274,7 @@ class GoogleAuthenticationModule extends AuthenticationModule
 
 		<form action="<?php echo $action?>" method="POST" name="googleeditform">
 		<input type="hidden" name="save" value="Save &gt;&gt;&gt;"/>
+		<?php UserTools::renderCSRFNonce(); ?>
 		</form>
 		<?php
 	}

@@ -485,6 +485,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		<li><button id="userbase-usernamepass-edit-button" type="submit" name="save">Save</button></li>
 		</ul>
 		</fieldset>
+		<?php UserTools::renderCSRFNonce(); ?>
 		</form>
 		<?php
 	}

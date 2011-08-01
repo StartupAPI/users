@@ -481,6 +481,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		}
 		?>
 		<input type="hidden" name="save" value="Save &gt;&gt;&gt;"/>
+		<?php UserTools::renderCSRFNonce(); ?>
 		</form>
 		<?php
 	}

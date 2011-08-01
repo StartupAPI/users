@@ -183,6 +183,7 @@ class FacebookAuthenticationModule extends AuthenticationModule
 
 		<form action="<?php echo $action?>" method="POST" name="facebookconnectform">
 		<input type="hidden" name="<?php echo $formsubmit ?>" value="Connect &gt;&gt;&gt;"/>
+		<?php UserTools::renderCSRFNonce(); ?>
 		</form>
 		<a class="userbase-fb-connect" href="#" onclick="UserBaseFBConnect(); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); <?php echo $buttonspritestyle ?> display: block; cursor: hand;" title="<?php echo $buttontitle ?>"></span></a>
 
@@ -324,6 +325,7 @@ class FacebookAuthenticationModule extends AuthenticationModule
 			<form action="<?php echo $action?>" method="POST" name="facebookusereditform">
 			<input type="hidden" name="save" value="Save &gt;&gt;&gt;"/>
 			<input type="submit" name="remove" value="remove" style="font-size: xx-small"/>
+			<?php UserTools::renderCSRFNonce(); ?>
 			</form>
 			</td>
 			</tr></table>
