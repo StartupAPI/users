@@ -1803,9 +1803,12 @@ class User
 			$old_user = User::getUser($this->getID());
 		}
 
-		$username = mb_convert_encoding($this->username, 'UTF-8');
-		$name = mb_convert_encoding($this->name, 'UTF-8');
-		$email = mb_convert_encoding($this->email, 'UTF-8');
+		$username = is_null($this->username) || $this->username == '' ? null
+			: mb_convert_encoding($this->username, 'UTF-8');
+		$name = is_null($this->name) || $this->name == '' ? null
+			: mb_convert_encoding($this->name, 'UTF-8');
+		$email = is_null($this->email) || $this->email == '' ? null
+			: mb_convert_encoding($this->email, 'UTF-8');
 
 		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET status = ?, username = ?, name = ?, email = ?, requirespassreset = ?, fb_id = ? WHERE id = ?'))
 		{
