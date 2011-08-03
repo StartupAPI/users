@@ -1,4 +1,4 @@
 </div>
 
 <?php
-require_once(UserConfig::$footer);
+require_once(UserConfig::$admin_footer);

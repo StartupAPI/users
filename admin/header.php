@@ -27,7 +27,7 @@ if (array_key_exists('impersonate', $_POST)) {
 	}
 }
 
-require_once(UserConfig::$header);
+require_once(UserConfig::$admin_header);
 
 if (!isset($ADMIN_SECTION)) {
 	$ADMIN_SECTION = null;

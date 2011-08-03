@@ -51,6 +51,9 @@ class UserConfig
 	public static $footer;
 	public static $maillist;
 
+	public static $admin_header;
+	public static $admin_footer;
+
 	// a list of activities
 	public static $activities = array();
 
@@ -234,6 +237,9 @@ EOD;
 
 		UserConfig::$header = dirname(__FILE__).'/header.php';
 		UserConfig::$footer = dirname(__FILE__).'/footer.php';
+
+		UserConfig::$admin_header = dirname(__FILE__).'/header.php';
+		UserConfig::$admin_footer = dirname(__FILE__).'/footer.php';
 
 		// Built in activities 
 		define('USERBASE_ACTIVITY_LOGIN_UPASS',		1000);
