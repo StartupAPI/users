@@ -267,7 +267,7 @@ class User
 
 		if (!is_null(UserConfig::$onCreate))
 		{
-			eval(userConfig::$onCreate.'($this);');
+			call_user_func_array(UserConfig::$onCreate, array($this));
 		}
 
 		if (!is_null(UserConfig::$email_module)) {

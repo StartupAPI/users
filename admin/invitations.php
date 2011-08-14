@@ -97,8 +97,7 @@ else
 		if (!is_null(UserConfig::$onRenderUserInvitationAction))
 		{
 			?><td><?php
-			error_log(UserConfig::$onRenderUserInvitationAction.'($code);');
-			eval(UserConfig::$onRenderUserInvitationAction.'($code);');
+			call_user_func_array(UserConfig::$onRenderUserInvitationAction, array($code));
 			?></td><?php
 		}
 
@@ -136,7 +135,9 @@ if (count($invitations) > 0)
 		if (!is_null(UserConfig::$onRenderUserInvitationFollowUpAction))
 		{
 			?><td><?php
-			eval(UserConfig::$onRenderUserInvitationFollowUpAction.'($code, $comment);');
+			call_user_func_array(UserConfig::$onRenderUserInvitationFollowUpAction,
+				array($code, $comment)
+			);
 			?></td><?php
 		}
 

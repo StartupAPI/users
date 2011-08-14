@@ -27,8 +27,8 @@ if (array_key_exists('recover', $_POST))
 
 			$email = $user->getEmail();
 
-			$message = '';
-			eval('$message='.UserConfig::$onRenderTemporaryPasswordEmail.'($baseurl, $username, $temppass);');
+			$message = call_user_func_array(UserConfig::$onRenderTemporaryPasswordEmail,
+				array($baseurl, $username, $temppass));
 
 			mail($email, $subject, $message, $headers);
 		}
