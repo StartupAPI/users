@@ -3,6 +3,7 @@
 function _USERBASE_render_navbox()
 {
 	$current_user = User::get();
+	$current_account = null;
 
 	$accounts = array();
 	if (UserConfig::$useAccounts && !is_null($current_user)) {
@@ -11,7 +12,7 @@ function _USERBASE_render_navbox()
 		$current_account = Account::getCurrentAccount($current_user);
 	}
 	?>
-<div id="navbox">
+<div id="userbase-navbox">
 	<?php if (!is_null($current_user))
 	{
 		if ($current_user->isImpersonated()) {
@@ -24,7 +25,12 @@ function _USERBASE_render_navbox()
 
 		if (count($accounts) > 1)
 		{
-			?><select id="userbase-navbox-account-picker" name="account" onchange="document.location.href='<?php echo UserConfig::$USERSROOTURL ?>/change_account.php?return='+encodeURIComponent(document.location)+'&account='+this.value"><?php
+			$destination = "'+encodeURIComponent(document.location)+'";
+			if (!is_null(UserConfig::$accountSwitchDestination)) {
+				$destination = UserConfig::$accountSwitchDestination;
+			}
+
+			?><select id="userbase-navbox-account-picker" name="account" onchange="document.location.href='<?php echo UserConfig::$USERSROOTURL ?>/change_account.php?return=<?php echo $destination ?>&account='+this.value"><?php
 
 			foreach ($accounts as $account)
 			{
@@ -34,12 +40,29 @@ function _USERBASE_render_navbox()
 		<?php
 		}
 
-		if (UserConfig::$useAccounts && !is_null($current_account)) {
-		?>
-			<!-- <span id="profile"><a href="/p/<?php echo UserTools::escape($current_account->getID()) ?>/" title="<?php echo UserTools::escape($current_account->getName()) ?>'s public profile">Public profile</a></span> | -->
-		<?php
+		if (!is_null(UserConfig::$onLoginStripLinks)) {
+			$links = call_user_func_array(
+				UserConfig::$onLoginStripLinks,
+				array($current_user, $current_account)
+			);
+
+			foreach ($links as $link) {
+				?><span<?php
+					if (array_key_exists('id', $link)) {
+						?> id="<?php echo $link['id'] ?>"<?php
+					}
+				?>><a href="<?php echo $link['url'] ?>"<?php
+					if (array_key_exists('title', $link)) {
+						?> title="<?php echo $link['title'] ?>"<?php
+					}
+					if (array_key_exists('target', $link)) {
+						?> target="<?php echo $link['target'] ?>"<?php
+					}
+				?>><?php echo $link['text'] ?></a></span> | <?php
+			}
 		}
 		?>
+
 		<span id="userbase-navbox-username"><a href="<?php echo UserConfig::$USERSROOTURL ?>/edit.php" title="<?php echo UserTools::escape($current_user->getName())?>'s user information"><?php echo UserTools::escape($current_user->getName()) ?></a></span> |
 		<span id="userbase-navbox-logout"><a href="<?php echo UserConfig::$USERSROOTURL ?>/logout.php">logout</a></span>
 		<?php

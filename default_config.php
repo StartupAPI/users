@@ -118,6 +118,9 @@ class UserConfig
 	// use accounts or just users only
 	public static $useAccounts = true;
 
+	// account switch destination (curret page will be used if null)
+	public static $accountSwitchDestination = null;
+
 	// OAuth application name (not sent if null)
 	public static $OAuthAppName = null;
 
@@ -140,6 +143,8 @@ class UserConfig
 	public static $onRenderTemporaryPasswordEmail = 'UserConfig::renderTemporaryPasswordEmail';
 	// handler to be called when new user is created
 	public static $onCreate = null;
+	// create extra links on login strip
+	public static $onLoginStripLinks = null;
 			
 	public static function getDB()
 	{
