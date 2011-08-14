@@ -224,7 +224,7 @@ if (UserConfig::$enableRegistration)
 			<fieldset>
 			<legend><?php echo $message?></legend>
 			<p>
-			<input id="userbase-invite-code" name="invite" size="30" value="<?php echo UserTools::escape($_GET['invite'])?>"/>
+			<input id="userbase-invite-code" name="invite" size="30" value="<?php echo UserTools::escape(array_key_exists('invite', $_GET) ? $_GET['invite'] : '')?>"/>
 			<button id="userbase-invitation-button" type="submit">&gt;&gt;</button>
 			</p>
 			</fieldset>

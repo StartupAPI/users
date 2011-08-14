@@ -111,6 +111,8 @@ class Invitation
 
 	public static function getByCode($code)
 	{
+		$invitation = null;
+
 		$db = UserConfig::getDB();
 
 		if ($stmt = $db->prepare('SELECT code, created, issuedby, sentto, user FROM '.UserConfig::$mysql_prefix.'invitation WHERE code = ?'))
@@ -227,14 +229,14 @@ class Invitation
 	}
 	public function setComment($comment)
 	{
-		$this->comment = $comment;
+		$this->usagecomment = $comment;
 	}
 
 	public function save()
 	{
 		$db = UserConfig::getDB();
 
-		$comment = mb_convert_encoding($this->comment, 'UTF-8');
+		$comment = mb_convert_encoding($this->usagecomment, 'UTF-8');
 
 		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'invitation SET sentto = ?, user = ? WHERE code = ?'))
 		{
