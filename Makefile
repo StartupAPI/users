@@ -20,13 +20,11 @@ ifneq "$(wildcard .svn )" ""
 	mv _swfobject/* admin/swfobject
 	rm -rf _swfobject
 
+	rm -rf _php-sdk
 	mkdir modules/facebook/php-sdk
-	cd modules/facebook/php-sdk
-	git clone git://github.com/facebook/php-sdk.git
-	cd php-sdk
-	git archive v2.1.2 | tar -x -C ../
-	cd ..
-	rm -rf php-sdk
+	git clone git://github.com/facebook/php-sdk.git _php-sdk
+	( cd _php-sdk; git archive v2.1.2 | tar -x -C ../modules/facebook/php-sdk )
+	rm -rf _php-sdk
 endif
 ifneq "$(wildcard .git )" ""
 	git pull origin master
