@@ -18,14 +18,7 @@ class User
 
 		if (!is_null($user))
 		{
-			if ($user->requiresPasswordReset())
-			{
-				User::redirectToPasswordReset();
-			}
-			else
-			{
-				return $user;
-			}
+			return $user;
 		}
 		else
 		{
@@ -54,6 +47,14 @@ class User
 			if (is_null($user)) {
 				return null;
 			}
+
+			// only forsing password reset on non-impersonated users
+			if ($user->requiresPasswordReset() &&
+				!UsernamePasswordAuthenticationModule::$IGNORE_PASSWORD_RESET)
+			{
+				User::redirectToPasswordReset();
+			}
+
 			// don't event try impersonating if not admin
 			if (!$impersonate || !$user->isAdmin()) {
 				if ($user->isDisabled()) {
@@ -1446,7 +1447,7 @@ class User
 			$user->resetTemporaryPassword();
 		}
 
-		if ($user->isDisabled()) {
+		if (!is_null($user) && $user->isDisabled()) {
 			return null;
 		}
 

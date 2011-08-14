@@ -802,6 +802,10 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 
 		return true;
 	}
+
+	// THIS SHOULD ONLY BE SET ON PASSWORD RESET PAGE
+	// SETTING THIS ON OTHER PAGES CAN RESULT IN SECURITY BREACH
+	public static $IGNORE_PASSWORD_RESET = false;
 }
 
 class UsernamePassUserCredentials extends UserCredentials {

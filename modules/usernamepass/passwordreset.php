@@ -3,6 +3,8 @@ require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 
 require_once(dirname(dirname(dirname(__FILE__))).'/User.php');
 
+UsernamePasswordAuthenticationModule::$IGNORE_PASSWORD_RESET = true;
+
 $user = User::get();
 
 $errors = array();
