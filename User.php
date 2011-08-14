@@ -33,34 +33,6 @@ class User
 		}
 	}
 
-	public static function updateReturnActivity() {
-		$storage = new MrClay_CookieStorage(array(
-			'secret' => UserConfig::$SESSION_SECRET,
-			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
-			'path' => UserConfig::$SITEROOTURL,
-			'httponly' => true
-		));
-
-		$last = $storage->fetch(UserConfig::$last_login_key);
-		if (!$storage->store(UserConfig::$last_login_key, time())) { 
-			throw new Exception(implode('; ', $storage->errors));
-		}
-
-		$user = self::get();
-
-		if (!is_null($user) && $last > 0
-			&& $last < time() - UserConfig::$last_login_session_length * 60)
-		{
-			if ($last > time() - 86400) {
-				$user->recordActivity(USERBASE_ACTIVITY_RETURN_DAILY);
-			} else if ($last > time() - 7 * 86400) {
-				$user->recordActivity(USERBASE_ACTIVITY_RETURN_WEEKLY);
-			} else if ($last > time() - 30 * 86400) {
-				$user->recordActivity(USERBASE_ACTIVITY_RETURN_MONTHLY);
-			}
-		}
-	}
-
 	/*
 	 * Checks if user is logged in and returns use object or null if user is not logged in
 	 * Disabled users are not allowed to login unless they are being impersonated
@@ -109,6 +81,34 @@ class User
 			return $impersonated_user;
 		} else {
 			return null;
+		}
+	}
+
+	public static function updateReturnActivity() {
+		$storage = new MrClay_CookieStorage(array(
+			'secret' => UserConfig::$SESSION_SECRET,
+			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+			'path' => UserConfig::$SITEROOTURL,
+			'httponly' => true
+		));
+
+		$last = $storage->fetch(UserConfig::$last_login_key);
+		if (!$storage->store(UserConfig::$last_login_key, time())) { 
+			throw new Exception(implode('; ', $storage->errors));
+		}
+
+		$user = self::get();
+
+		if (!is_null($user) && $last > 0
+			&& $last < time() - UserConfig::$last_login_session_length * 60)
+		{
+			if ($last > time() - 86400) {
+				$user->recordActivity(USERBASE_ACTIVITY_RETURN_DAILY);
+			} else if ($last > time() - 7 * 86400) {
+				$user->recordActivity(USERBASE_ACTIVITY_RETURN_WEEKLY);
+			} else if ($last > time() - 30 * 86400) {
+				$user->recordActivity(USERBASE_ACTIVITY_RETURN_MONTHLY);
+			}
 		}
 	}
 
