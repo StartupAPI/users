@@ -350,7 +350,7 @@ class User
 		{
 			if (!$stmt->bind_param('ssi', $name, $email, $fb_id))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new Exception("Can't bind parameter".$stmt->error);
 			}
 			if (!$stmt->execute())
 			{
