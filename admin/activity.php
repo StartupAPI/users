@@ -30,20 +30,18 @@ if (array_key_exists('activityid', $_REQUEST) && is_numeric($_REQUEST['activityi
 		$activityuser = User::getUser($_REQUEST['userid']);
 	}
 	$daily_activity = User::getDailyActivityPoints($activityuser);
-	foreach ($daily_active_users as $record) {
+
+	foreach ($daily_active_users as $date => $active_users) {
+
+		$dates[$date]['users'] = $active_users;
+	}
+	foreach ($daily_activity as $record) {
 		if (!array_key_exists($record['date'], $dates)) {
 			$dates[$record['date']] = array();
 		}
 
 		if (!array_key_exists('users', $dates[$record['date']])) {
 			$dates[$record['date']]['users'] = 0;
-		}
-
-		$dates[$record['date']]['users'] += 1;
-	}
-	foreach ($daily_activity as $record) {
-		if (!array_key_exists($record['date'], $dates)) {
-			$dates[$record['date']] = array();
 		}
 
 		if (!array_key_exists('points', $dates[$record['date']])) {

@@ -22,6 +22,19 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 15
+ * Daily stats cache table
+*/
+
+$versions[15]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."admin_daily_stats_cache (
+day DATE NOT NULL COMMENT 'Date for which calculations are stored',
+active_users INT(10) NOT NULL COMMENT 'Number of active users calculated for this day',
+PRIMARY KEY (day)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+
+$versions[15]['down'][] = "DROP TABLE ".UserConfig::$mysql_prefix."admin_daily_stats_cache";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 14
  * Adding status field for a user to be able to disable access
 */
