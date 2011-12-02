@@ -524,7 +524,8 @@ class User
 					WHERE a.time > DATE_ADD(u.regtime, INTERVAL 1 DAY)
 						AND a.time > DATE_SUB('.
 						(is_null($date) ? 'NOW()' : '?').
-						', INTERVAL 30 DAY)
+						', INTERVAL 30 DAY)'.
+						(is_null($date) ? '' : ' AND a.time < ?').'
 						AND a.activity_id IN ('.$in.')
 					GROUP BY user_id
 				) AS active';
@@ -537,7 +538,8 @@ class User
 					WHERE a.time > DATE_ADD(u.regtime, INTERVAL 1 DAY)
 						AND a.time > DATE_SUB('.
 						(is_null($date) ? 'NOW()' : '?').
-						', INTERVAL 30 DAY)
+						', INTERVAL 30 DAY)'.
+						(is_null($date) ? '' : ' AND a.time < ?').'
 					GROUP BY user_id
 				) AS active';
 		}
@@ -545,7 +547,7 @@ class User
 		if ($stmt = $db->prepare($query))
 		{
 			if (!is_null($date)) {
-				if (!$stmt->bind_param('s', $date))
+				if (!$stmt->bind_param('ss', $date, $date))
 				{
 					 throw new Exception("Can't bind parameter".$stmt->error);
 				}
@@ -572,7 +574,7 @@ class User
 	}
 
 	/*
-	 * retrieves daily active users
+	 * retrieves daily active users based on algorythm defined in getActiveUsers($date)
 	 */
 	public static function getDailyActiveUsers()
 	{
@@ -580,20 +582,55 @@ class User
 
 		$daily_activity = array();
 
-		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, user_id FROM '.UserConfig::$mysql_prefix.'activity GROUP BY activity_date, user_id'))
+		$start_date = null;
+		$start_day = null;
+		$start_month = null;
+		$start_year = null;
+
+		// getting start date
+		if ($stmt = $db->prepare('SELECT CAST(MIN(time) AS DATE) AS activity_date,
+			DAYOFMONTH(MIN(time)) as day,
+			MONTH(MIN(time)) as month,
+			YEAR(MIN(time)) as year
+			FROM '.UserConfig::$mysql_prefix.'activity'))
 		{
 			if (!$stmt->execute())
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($date, $user_id))
+			if (!$stmt->bind_result($start_date, $start_day, $start_month, $start_year))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			$stmt->fetch();
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		// no activities recorded yet
+		if (is_null($start_date)) {
+			return array();
+		}
+
+		// now getting all cached numbers
+		if ($stmt = $db->prepare('SELECT day, active_users FROM '.UserConfig::$mysql_prefix.'admin_daily_stats_cache'))
+		{
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($date, $active_users))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
 
 			while($stmt->fetch() === TRUE)
 			{
-				$daily_activity[] = array('date' => $date, 'user' => $user_id);
+				$daily_activity[$date] = $active_users;
 			}
 
 			$stmt->close();
@@ -601,6 +638,56 @@ class User
 		else
 		{
 			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		$timestamp = mktime(0, 0, 1, $start_month, $start_day, $start_year);
+		$current_timestamp = time();
+
+		$updates = array();
+
+		while($timestamp < $current_timestamp) {
+			$date = date('Y-m-d', $timestamp);
+
+			if (!array_key_exists($date, $daily_activity)) {
+				$active_users = self::getActiveUsers($date);
+
+				$daily_activity[$date] = $active_users;
+				$updates[$date] = $active_users;
+			}
+
+			$timestamp = strtotime("+1 day", $timestamp);
+		}
+
+		// saving newly calculated values into cache
+		$totalupdates = count($updates);
+
+		if ($totalupdates > 0) {
+			$query = 'INSERT INTO '.UserConfig::$mysql_prefix.'admin_daily_stats_cache
+				(day, active_users) VALUES';
+
+			$first = true;
+			foreach ($updates as $date => $active_users) {
+				if (!$first) {
+					$query .= ',';
+				}
+				$query .= " ('$date', $active_users)";
+
+				$first = false;
+			}
+
+			if ($stmt = $db->prepare($query))
+			{
+				if (!$stmt->execute())
+				{
+					throw new Exception("Can't execute statement: ".$stmt->error);
+				}
+
+				$stmt->close();
+			}
+			else
+			{
+				throw new Exception("Can't prepare statement: ".$db->error);
+			}
 		}
 
 		return $daily_activity;
