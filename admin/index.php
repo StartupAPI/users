@@ -8,6 +8,16 @@ $total_users = User::getTotalUsers();
 $active_users = User::getActiveUsers();
 $daily_active_users = User::getDailyActiveUsers(60);
 
+$daily_active_users_vals = array_values($daily_active_users);
+$max_daily_active_users = max($daily_active_users_vals);
+$min_daily_active_users = 0; //min($daily_active_users_vals);
+
+$daily_active_users_ranked = array();
+for ($i = 0; $i < count($daily_active_users_vals); $i++) {
+	$daily_active_users_ranked[] = ($daily_active_users_vals[$i] - $min_daily_active_users)
+		/ ($max_daily_active_users - $min_daily_active_users) * 100;
+}
+
 $data = '';
 $legend = '';
 $legend_colors = '';
@@ -73,7 +83,7 @@ foreach (UserConfig::$authentication_modules as $module) {
 </tr>
 <tr id="metric_values">
 	<td>
-	<img src="https://chart.googleapis.com/chart?cht=ls&chxt=y&chs=250x100&chd=t:<?php echo implode(',',array_values($daily_active_users))?>" width="250" height="100" vspace="10">
+	<img src="https://chart.googleapis.com/chart?cht=ls&chxt=y&chxr=0,<?php echo $min_daily_active_users ?>,<?php echo $max_daily_active_users ?>&chs=250x100&chd=t:<?php echo implode(',',array_values($daily_active_users_ranked))?>" width="250" height="100" vspace="10">
 	<br/>
 	<?php echo sprintf('%.1f', $active_users * 100 / $total_users) ?>% (<?php echo $active_users ?>)
 	</td>
