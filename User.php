@@ -668,7 +668,7 @@ class User
 		$totalupdates = count($updates);
 
 		if ($totalupdates > 0) {
-			$query = 'INSERT INTO '.UserConfig::$mysql_prefix.'admin_daily_stats_cache
+			$query = 'REPLACE INTO '.UserConfig::$mysql_prefix.'admin_daily_stats_cache
 				(day, active_users) VALUES';
 
 			$first = true;
