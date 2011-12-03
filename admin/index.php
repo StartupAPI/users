@@ -6,6 +6,7 @@ require_once(dirname(__FILE__).'/header.php');
 
 $total_users = User::getTotalUsers();
 $active_users = User::getActiveUsers();
+$daily_active_users = User::getDailyActiveUsers(60);
 
 $data = '';
 $legend = '';
@@ -71,7 +72,11 @@ foreach (UserConfig::$authentication_modules as $module) {
 	<th>Registrations <a href="bymodule.php">by module</a></th>
 </tr>
 <tr id="metric_values">
-	<td><?php echo sprintf('%.1f', $active_users * 100 / $total_users) ?>% (<?php echo $active_users ?>)</td>
+	<td>
+	<img src="https://chart.googleapis.com/chart?cht=ls&chxt=y&chs=250x100&chd=t:<?php echo implode(',',array_values($daily_active_users))?>" width="250" height="100" vspace="10">
+	<br/>
+	<?php echo sprintf('%.1f', $active_users * 100 / $total_users) ?>% (<?php echo $active_users ?>)
+	</td>
 	<td><?php echo $total_users?></td>
 	<td><?php if ($firstmodule) { ?><span style="color: silver">none</span><?php } else { ?><img src="http://chart.apis.google.com/chart?chp=0.3&chma=|0,30&chxt=x&chxs=0,676767,12.5&chs=400x200&cht=p3&chco=<?php echo ($legend_colors) ?>&chd=<?php echo ('t:'.$data) ?>&chdl=<?php echo urlencode($legend) ?>&chdlp=b&chl=<?php echo urlencode($labels) ?>" alt="registrations by module"/><?php } ?></td>
 </tr>

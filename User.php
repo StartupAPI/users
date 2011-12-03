@@ -576,7 +576,7 @@ class User
 	/*
 	 * retrieves daily active users based on algorythm defined in getActiveUsers($date)
 	 */
-	public static function getDailyActiveUsers()
+	public static function getDailyActiveUsers($lastndays = null)
 	{
 		$db = UserConfig::getDB();
 
@@ -592,7 +592,10 @@ class User
 			DAYOFMONTH(MIN(time)) as day,
 			MONTH(MIN(time)) as month,
 			YEAR(MIN(time)) as year
-			FROM '.UserConfig::$mysql_prefix.'activity'))
+			FROM '.UserConfig::$mysql_prefix.'activity'.
+			((!is_null($lastndays) && is_int($lastndays)) ?
+				' WHERE time > DATE_SUB(NOW(), INTERVAL '.$lastndays.' DAY)' : '')
+		))
 		{
 			if (!$stmt->execute())
 			{
@@ -617,7 +620,10 @@ class User
 		}
 
 		// now getting all cached numbers
-		if ($stmt = $db->prepare('SELECT day, active_users FROM '.UserConfig::$mysql_prefix.'admin_daily_stats_cache'))
+		if ($stmt = $db->prepare('SELECT day, active_users
+			FROM '.UserConfig::$mysql_prefix.'admin_daily_stats_cache'.
+			((!is_null($lastndays) && is_int($lastndays)) ?
+				' WHERE day > DATE_SUB(NOW(), INTERVAL '.$lastndays.' DAY)' : '')))
 		{
 			if (!$stmt->execute())
 			{
