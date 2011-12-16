@@ -169,7 +169,7 @@ class GenerationCohorts extends CohortProvider {
 		// cohorts are chronological so it makes sense to compare to previous
 		$this->compare_to_previous_cohort = true;
 
-		$this->period = $period;
+		self::$period = $period;
 	}
 
 	public function getDimensionTitle() {
@@ -195,7 +195,7 @@ class GenerationCohorts extends CohortProvider {
 		/**
 		 * The query must return a unique cohort_id, title and total members
 		 */
-		switch ($this->period) {
+		switch (self::$period) {
 			case self::MONTH:
 				$query = "SELECT EXTRACT(YEAR_MONTH FROM regtime) AS cohort_id,
 					DATE_FORMAT(regtime, '%b %Y') AS title,
@@ -262,7 +262,7 @@ class GenerationCohorts extends CohortProvider {
 	 * @return string SQL statement for generating a resultset with id, regtime and cohort_id
 	 */
 	public function getCohortSQL() {
-		switch ($this->period) {
+		switch (self::$period) {
 			case self::MONTH:
 				$query = 'SELECT id, regtime, EXTRACT(YEAR_MONTH FROM regtime) AS cohort_id
 					FROM '.UserConfig::$mysql_prefix.'users';
