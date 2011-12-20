@@ -16,6 +16,10 @@ class UserConfig
 	// Only one email module can exist
 	public static $email_module;
 
+	// Debugger enabled/disabled
+	public static $DEBUG = false;
+
+	// paths
 	public static $ROOTPATH;
 	public static $USERSROOTURL;
 	public static $USERSROOTFULLURL;
@@ -85,6 +89,9 @@ class UserConfig
 		'cmp_content' => array('utm_content'),
 		'cmp_name' => array('utm_campaign')
 	);
+
+	// Facebook session storage key prefix
+	public static $facebook_storage_key_prefix = 'users-fb';
 
 	// don't display activity for some admin users
 	public static $dont_display_activity_for = array();

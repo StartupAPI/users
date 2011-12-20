@@ -44,6 +44,11 @@ if (array_key_exists('save', $_POST))
 	{
 		$errors[$module->getID()] = $ex->getErrors();
 	}
+	catch(ExistingUserException $ex)
+	{
+		$user_exists = true;
+		$errors[$module->getID()] = $ex->getErrors();
+	}
 }
 
 require_once(UserConfig::$header);

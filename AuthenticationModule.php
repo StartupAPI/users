@@ -4,6 +4,9 @@ interface IAuthenticationModule extends IUserBaseModule
 	public function renderLoginForm($action);
 	public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null);
 	public function processLogin($data, &$remember);
+	public function processAutoLogin();
+	public function getAutoLogoutURL($return);
+	public function renderAutoLogoutForm();
 	public function processRegistration($data, &$remember);
 
 	/**
@@ -40,6 +43,27 @@ abstract class AuthenticationModule extends UserBaseModule implements IAuthentic
 			}
 		}
 	}
+
+	/**
+	 * By default, do not auto-login, should be overriden by modules that support auto-login
+	 */
+	public function processAutoLogin() {
+		return null;
+	}
+
+	/**
+	 * By default, modules do not support auto-logout, don't try doing that
+	 */
+	public function getAutoLogoutURL($return) {
+		return null;
+	}
+
+	/**
+	 * By default, modules do not support auto-logout
+	 */
+	public function renderAutoLogoutForm() {
+		return null;
+	}
 }
 
 class InputValidationException extends Exception {
@@ -69,6 +93,21 @@ class ExistingUserException extends Exception {
 	public function getErrors()
 	{
 		return $this->errors;
+	}
+}
+
+class UserCreationException extends Exception {
+	private $field;
+
+	public function __construct($string, $code, $field)
+	{
+		parent::__construct($string, $code);
+		$this->field = $field;
+	}
+
+	public function getField()
+	{
+		return $this->field;
 	}
 }
 

@@ -50,4 +50,22 @@ class UserTools
 		?><input type="hidden" name="CSRF_NONCE" value="<?php echo self::escape(self::$CSRF_NONCE); ?>"/>
 <?php
 	}
+
+	/**
+	 * Debug wrapper for simplified debugging, call it like this:
+	 *
+	 *    UserTools::debug('... some message ...');
+	 */
+	public static function debug($message) {
+		if (UserConfig::$DEBUG) {
+			$trace = debug_backtrace();
+
+			error_log('[DEBUG] ' . $message .
+				' (' . $trace[1]['function'] .
+				'(' . var_export($trace[1]['args'], true) . ')' .
+				' on line ' . $trace[0]['line'] .
+				' in ' . $trace[0]['file'] .
+			')');
+		}
+	}
 }

@@ -3,6 +3,32 @@ require_once(dirname(__FILE__).'/config.php');
 
 require_once(dirname(__FILE__).'/User.php');
 
+// Allow modules to auto-login (if supported)
+$user = null;
+
+foreach (UserConfig::$authentication_modules as $module)
+{
+	$user = $module->processAutoLogin();
+	if (!is_null($user)) {
+		$remember = false;
+		$user->setSession($remember);
+
+		$return = User::getReturn();
+		User::clearReturn();
+
+		if (!is_null($return))
+		{
+			header('Location: '.$return);
+		}
+		else
+		{
+			header('Location: '.UserConfig::$DEFAULTLOGINRETURN);
+		}
+
+		exit;
+	}
+}
+
 if (array_key_exists('login', $_POST))
 {
 	$module = null;

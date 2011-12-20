@@ -1,8 +1,10 @@
 <?php
-require_once(dirname(__FILE__).'/php-sdk/src/facebook.php');
+require_once(dirname(__FILE__).'/facebook.php');
 
 class FacebookAuthenticationModule extends AuthenticationModule
 {
+	private $sdk;
+
 	private $appID;
 	private $secret;
 	private $permissions;
@@ -28,6 +30,13 @@ class FacebookAuthenticationModule extends AuthenticationModule
 		// TODO Replace it with immediate FB Connect call:
 		// http://code.google.com/p/userbase/issues/detail?id=16
 		$this->remember = $remember;
+
+		$config = array(
+			'appId'  => $this->appID,
+			'secret' => $this->secret
+		);
+
+		$this->sdk = new Facebook($config);
 	}
 
 	public function getID()
@@ -155,6 +164,38 @@ class FacebookAuthenticationModule extends AuthenticationModule
 		$this->renderForm($action, 'login');
 	}
 
+	public function renderAutoLogoutForm()
+	{
+?><html>
+<head><title>Logging out from Facebook...</title></head>
+<body>
+<div id="fb-root"></div>
+<script src="http://connect.facebook.net/en_US/all.js"></script>
+<script>
+FB.init({
+	appId  : '<?php echo $this->appID?>',
+	status : true, // check login status
+	cookie : true, // enable cookies to allow the server to access the session
+	channelURL : '<?php echo UserConfig::$USERSROOTFULLURL; ?>/modules/facebook/channel.php', // channel file
+	oauth  : true // enable OAuth 2.0
+});
+FB.getLoginStatus(function(response) {
+  if (response.authResponse) {
+	FB.logout(function(response) {
+		window.location.href = "<?php echo UserConfig::$USERSROOTFULLURL; ?>/logout.php?autologgedout=<?php echo $this->getID(); ?>";
+	});
+  } else {
+	window.location.href = "<?php echo UserConfig::$USERSROOTFULLURL; ?>/logout.php?autologgedout=<?php echo $this->getID(); ?>";
+  }
+});
+
+</script>
+Logging out from Facebook...
+</body>
+</html>
+<?php
+	}
+
 	private function renderForm($action, $form)
 	{
 		if ($form == 'login') {
@@ -171,25 +212,16 @@ class FacebookAuthenticationModule extends AuthenticationModule
 			$buttontitle = 'Connect to your Facebook Account';
 		}
 
-		$facebook = new Facebook(array(
-			'appId'  => $this->appID,
-			'secret' => $this->secret,
-			'cookie' => true, // enable optional cookie support
-		));
-
-		$session = $facebook->getSession();
-
 		?><div id="fb-root"></div>
 
 		<form action="<?php echo $action?>" method="POST" name="facebookconnectform">
 		<input type="hidden" name="<?php echo $formsubmit ?>" value="Connect &gt;&gt;&gt;"/>
 		<?php UserTools::renderCSRFNonce(); ?>
 		</form>
-		<a class="userbase-fb-connect" href="#" onclick="UserBaseFBConnect(); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); <?php echo $buttonspritestyle ?> display: block; cursor: hand;" title="<?php echo $buttontitle ?>"></span></a>
+		<a class="userbase-fb-connect" href="#" onclick="UserBaseFBConnectButtonClicked(); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); <?php echo $buttonspritestyle ?> display: block; cursor: hand;" title="<?php echo $buttontitle ?>"></span></a>
 
-		<script src="<?php echo UserConfig::$USERSROOTURL; ?>/modules/facebook/json2-min.js"></script>
 		<script>
-		var UserBaseFBConnect = function() {
+		var UserBaseFBConnectButtonClicked = function() {
 			// FB is not loaded yet
 		};
 
@@ -200,22 +232,36 @@ class FacebookAuthenticationModule extends AuthenticationModule
 
 			FB.init({
 				appId  : '<?php echo $this->appID?>',
-				session : <?php echo json_encode($session); ?>, // don't refetch the session when PHP already has it
 				status : true, // check login status
-				cookie : true // enable cookies to allow the server to access the session
+				cookie : true, // enable cookies to allow the server to access the session
+				oauth  : true, // enable OAuth 2.0
+				xfbml  : true, // parse XFBML
+				channelURL : '<?php echo UserConfig::$USERSROOTFULLURL; ?>/modules/facebook/channel.php' // channel file
 			});
 
-			UserBaseFBConnect = function() {
-				// here perms is just a comma-separated string
-				FB.login(function(response) {
-					if (response.session &&
-						(required_perms == '' || response.perms == required_perms)
-					) {
+			// when button is clicked, auto-login or popu-up a dialog
+			UserBaseFBConnectButtonClicked = function() {
+				FB.getLoginStatus(function(r) {
+					// TODO Also check if all permissions are set or we need more
+					if(r.status === 'connected') {
+						alert('already logged in');
 						document.facebookconnectform.submit();
-						return;
+					} else {
+						// here perms is just a comma-separated string
+						FB.login(function(response) {
+							if (response.session &&
+								(required_perms == '' || response.perms == required_perms)
+							) {
+								document.facebookconnectform.submit();
+								return;
+							}
+						}, {scope: required_perms_string});
 					}
-				}, {perms: required_perms_string});
+				});
 			};
+			FB.Event.subscribe('auth.login', function() {
+				document.facebookconnectform.submit();
+			});
 
 			(function() {
 				FB.getLoginStatus(function(response) {
@@ -253,8 +299,9 @@ class FacebookAuthenticationModule extends AuthenticationModule
 							}
 						}
 
-						// override login function with simple form submit
-						UserBaseFBConnect = function() {
+						// looks like we have enough permissions
+						// override login button to use simple form submit
+						UserBaseFBConnectButtonClicked = function() {
 							document.facebookconnectform.submit();
 						}
 						return;
@@ -304,16 +351,10 @@ class FacebookAuthenticationModule extends AuthenticationModule
 		}
 		else
 		{
-			$facebook = new Facebook(array(
-				'appId'  => $this->appID,
-				'secret' => $this->secret,
-				'cookie' => true, // enable optional cookie support
-			));
-
 			try {
-				$me = $facebook->api('/'.$fb_id);
+				$me = $this->sdk->api('/'.$fb_id);
 			} catch (FacebookApiException $e) {
-				error_log("Can't get /me API data");
+				UserTools::debug("Can't get /me API data");
 				return null;
 			}
 			?>
@@ -333,27 +374,50 @@ class FacebookAuthenticationModule extends AuthenticationModule
 		}
 	}
 
-	public function processLogin($post_data, &$remember)
+	public function processAutoLogin()
 	{
-		$remember = $this->remember; 
+		UserTools::debug('Automatic login start');
 
-		$facebook = new Facebook(array(
-			'appId'  => $this->appID,
-			'secret' => $this->secret,
-			'cookie' => true, // enable optional cookie support
-		));
+		$remember = false;
 
-		$session = $facebook->getSession();
+		return $this->processLogin(null, $remember, true);
+	}
 
-		if (!$session) {
+	public function getAutoLogoutURL($return) {
+		return UserConfig::$USERSROOTFULLURL.'/modules/facebook/logout.php';
+	}
+
+	public function processLogin($post_data, &$remember, $auto = false)
+	{
+		$remember = $this->remember;
+
+		try {
+			$fbuser = intval($this->sdk->getUser());
+		} catch (FacebookApiException $e) {
+			UserTools::debug("Can't get Facebook user");
 			return null;
 		}
 
-		try {
-			$fbuser = $facebook->getUser();
-		} catch (FacebookApiException $e) {
-			error_log("Can't get Facebook user");
-			return null;
+		UserTools::debug('Facebook user id: '.$fbuser);
+
+		if ($fbuser == 0) {
+			// if we're trying to auto-login, just return null
+			if ($auto) {
+				return null;
+			}
+
+			$errors['fbuserid'][] = 'No Facebook id is passed';
+			throw new InputValidationException('No facebook user id', 0, $errors);
+		}
+
+		$permissions = $this->sdk->api('/me/permissions');
+		UserTools::debug('User permissions: '.var_export($permissions, true));
+		foreach ($this->permissions as $perm) {
+			if (!array_key_exists($perm, $permissions['data'][0]) || $permissions['data'][0][$perm] !== 1) {
+				// looks like not all required permissions were granted
+				UserTools::debug("Can't login - not enough permissions granted");
+				return null;
+			}
 		}
 
 		$user = User::getUserByFacebookID($fbuser);
@@ -361,6 +425,10 @@ class FacebookAuthenticationModule extends AuthenticationModule
 		if (!is_null($user)) {
 			$user->recordActivity(USERBASE_ACTIVITY_LOGIN_FB);
 			return $user;
+		} else if ($auto) {
+			// do not auto-register if auto-logging-in
+			UserTools::debug('Auto-logged-in, not registering');
+			return null;
 		} else {
 			return $this->processRegistration($post_data, $remember);
 		}
@@ -370,26 +438,15 @@ class FacebookAuthenticationModule extends AuthenticationModule
 	{
 		$remember = $this->remember;
 
-		$facebook = new Facebook(array(
-			'appId'  => $this->appID,
-			'secret' => $this->secret,
-			'cookie' => true, // enable optional cookie support
-		));
-
-		$session = $facebook->getSession();
-		if (!$session) {
-			return null;
-		}
-
 		try {
-			$fbuser = $facebook->getUser();
+			$fbuser = intval($this->sdk->getUser());
 		} catch (FacebookApiException $e) {
-			error_log("Can't get Facebook user");
+			UserTools::debug("Can't get Facebook user");
 			return null;
 		}
 
 		$errors = array();
-		if (is_int($fbuser)) {
+		if ($fbuser == 0) {
 			$errors['fbuserid'][] = 'No Facebook id is passed';
 			throw new InputValidationException('No facebook user id', 0, $errors);
 		}
@@ -403,9 +460,9 @@ class FacebookAuthenticationModule extends AuthenticationModule
 		}
 
 		try {
-			$me = $facebook->api('/me');
+			$me = $this->sdk->api('/me');
 		} catch (FacebookApiException $e) {
-			error_log("Can't get /me API data");
+			UserTools::debug("Can't get /me API data");
 			return null;
 		}
 
@@ -418,13 +475,18 @@ class FacebookAuthenticationModule extends AuthenticationModule
 			$errors['username'][] = "User doesn't have a name";
 		}
 
+		// ok, let's create a user
+		try {
+			$user = User::createNewFacebookUser($name, $fbuser, $me);
+		} catch (UserCreationException $e) {
+			$errors[$e->getField()][] = $e->getMessage();
+		}
+
 		if (count($errors) > 0)
 		{
 			throw new ExistingUserException('User already exists', 0, $errors);
 		}
 
-		// ok, let's create a user
-		$user = User::createNewFacebookUser($name, $fbuser, $me);
 		$user->recordActivity(USERBASE_ACTIVITY_REGISTER_FB);
 		return $user;
 	}
@@ -447,26 +509,15 @@ class FacebookAuthenticationModule extends AuthenticationModule
 			return true;
 		}
 
-		$facebook = new Facebook(array(
-			'appId'  => $this->appID,
-			'secret' => $this->secret,
-			'cookie' => true, // enable optional cookie support
-		));
-
-		$session = $facebook->getSession();
-		if (!$session) {
-			return null;
-		}
-
 		try {
-			$fbuser = $facebook->getUser();
+			$fbuser = intval($this->sdk->getUser());
 		} catch (FacebookApiException $e) {
-			error_log("Can't get Facebook user");
+			UserTools::debug("Can't get Facebook user");
 			return null;
 		}
 
 		$errors = array();
-		if (is_int($fbuser)) {
+		if ($fbuser == 0) {
 			$errors['fbuserid'][] = 'No Facebook id is passed';
 			throw new InputValidationException('No facebook user id', 0, $errors);
 		}
@@ -486,9 +537,9 @@ class FacebookAuthenticationModule extends AuthenticationModule
 		// if user doesn't have email address and we required it for Facebook connection, let's save it
 		if (!$user->getEmail()) {
 			try {
-				$me = $facebook->api('/me');
+				$me = $this->sdk->api('/me');
 			} catch (FacebookApiException $e) {
-				error_log("Can't get /me API data");
+				UserTools::debug("Can't get /me API data");
 				return null;
 			}
 
