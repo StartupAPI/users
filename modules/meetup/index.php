@@ -5,7 +5,7 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 {
 	protected $userCredentialsClass = 'MeetupUserCredentials';
 
-	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret)
+	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret, $oAuthScope = 'basic')
 	{
 		parent::__construct(
 			'Meetup',
@@ -16,7 +16,7 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 			'https://api.meetup.com/oauth/access/',
 			'http://www.meetup.com/authenticate/',
 			array('HMAC-SHA1', 'PLAINTEXT'),
-			'http://api.meetup.com',
+			$oAuthScope,
 			UserConfig::$USERSROOTURL.'/modules/meetup/login-button.png',
 			UserConfig::$USERSROOTURL.'/modules/meetup/login-button.png',
 			UserConfig::$USERSROOTURL.'/modules/meetup/login-button.png',
