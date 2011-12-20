@@ -139,9 +139,12 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 			$this->initOAuthServer();
 
 			$params = array(
-				'scope' => $this->oAuthScope,
 				'oauth_callback' => $callback
 			);
+
+			if (!is_null($this->oAuthScope)) {
+				$params['scope'] = $this->oAuthScope;
+			}
 
 			if (!is_null(UserConfig::$OAuthAppName)) {
 				$params['xoauth_displayname'] = UserConfig::$OAuthAppName;
