@@ -189,6 +189,8 @@ FB.getLoginStatus(function(response) {
   }
 });
 
+// force logout sequence after a long timeout of 15 seconds
+setTimeout('window.location.href = "<?php echo UserConfig::$USERSROOTFULLURL; ?>/logout.php?autologgedout=<?php echo $this->getID(); ?>"', 15000);
 </script>
 Logging out from Facebook...
 </body>
