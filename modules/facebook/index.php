@@ -246,7 +246,7 @@ Logging out from Facebook...
 				FB.getLoginStatus(function(r) {
 					// TODO Also check if all permissions are set or we need more
 					if(r.status === 'connected') {
-						alert('already logged in');
+						// alert('already logged in');
 						document.facebookconnectform.submit();
 					} else {
 						// here perms is just a comma-separated string
