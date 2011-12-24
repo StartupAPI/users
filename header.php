@@ -50,7 +50,7 @@
 }
 
 #userbase_footerpad {
-	height: 3em;
+	height: 1em;
 	background-color: white;
 }
 
