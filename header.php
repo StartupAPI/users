@@ -5,14 +5,16 @@
 <title>Users</title>
 <style>
 #userbase_body {
+	color: #666666;
 	font-family: georgia, garamond, serif;
-	margin: 0; background-color: #68818D;
+	margin: 0;
+	background-color: #DCDCDC;
 }
 
 #userbase_header {
-	color: white;
-	font-weight: bold; padding: 0.3em;
-	border-bottom: 2px solid #51626b;
+	padding: 0.5em;
+	font-size: small;
+	border-bottom: 1px solid #c6c6c6;
 }
 
 #userbase_header_icon {
@@ -22,17 +24,19 @@
 }
 
 #userbase_navbox {
-	color: white;
+	color: #c6c6c6;
 	float: right;
 	margin-right: 0.5em;
 }
 
 #userbase_navbox a {
-	color: #efe8e8;
+	color: #666666;
+	text-shadow: #EEE 0px 1px 0px;
+	text-decoration: none;
 }
 
 #userbase_navbox a:hover {
-	color: white;
+	color: #69818d;
 }
 
 #userbase_main {
@@ -42,19 +46,19 @@
 
 #userbase_footer {
 	height: 1em;
-	border-top: 2px solid #8199a5;
+	border-top: 1px solid #c6c6c6;
 }
 
 #userbase_footerpad {
-	height: 0.5em;
+	height: 3em;
 	background-color: white;
 }
 
 #userbase_poweredby {
-	color: white;
+	color: #666;
 	float: right;
 	font-size: small;
-	padding: 0.5em 1em;
+	padding: 2em;
 }
 
 #userbase_poweredby a {
@@ -64,6 +68,21 @@
 #userbase_poweredby a:hover {
 	color: white;
 }
+
+#userbase_adminmenu {
+	padding: 1em;
+	color: black;
+	font-size: larger;
+}
+
+#userbase_adminmenu a {
+	color: #888;
+	text-decoration: none;
+}
+
+#userbase_adminmenu a:hover {
+	color: #69818d;
+}
 </style>
 </head>
 
@@ -72,6 +91,6 @@
 <div id="userbase_navbox">
 <?php include(dirname(__FILE__).'/navbox.php') ?>
 </div>
-<img src="<?php echo UserConfig::$USERSROOTURL ?>/images/header_icon.png" id="userbase_header_icon"/>
+<img src="<?php echo UserConfig::$USERSROOTURL ?>/images/header_icon.png" id="userbase_header_icon" title="Powered by Startup API"/>
 </div>
 <div id="userbase_main">

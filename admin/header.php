@@ -37,8 +37,7 @@ if (UserConfig::$enableInvitations) {
 	?><h2>Users | <a href="invitations.php">Invitations</a></h2><?php
 }
 ?>
-<div style="background: white; padding: 0">
-<h3>
+<div id="userbase_adminmenu">
 <?php if ($ADMIN_SECTION != 'dashboard') {
 	?><a href="./">Dashboard</a><?php
 } else {
@@ -62,6 +61,6 @@ if (UserConfig::$enableInvitations) {
 <?php if ($ADMIN_SECTION != 'bymodule') {
 	?><a href="bymodule.php">Registrations By Module</a><?php
 } else {
-	?>Registered Users<?php
+	?>Registrations By Module<?php
 } ?>
-</h3>
+</div>
