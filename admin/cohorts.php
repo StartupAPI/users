@@ -49,10 +49,10 @@ foreach (UserConfig::$activities as $id => $activity) {
 
 <?php 
 
-$boxes = array_key_exists('boxes', $_REQUEST);
+$boxes = !array_key_exists('boxes', $_REQUEST) || $_REQUEST['boxes'] !== 'set';
 $zoom = array_key_exists('zoom', $_REQUEST);
 ?>
-
+<input type="hidden" name="boxes" value="set"/>
 <span style="padding-left: 1em"><input type="checkbox" id="boxes" name="boxes"<?php if ($boxes) {?> checked<?php } ?> onchange="document.activities.submit();"/><?php if (!$boxes && $zoom) {?><input type="hidden" name="zoom" value="on"/><?php } ?> <label for="boxes">Show Boxes</label></span>
 <span style="padding-left: 1em" title="Zoom in to fit maximum velue into the box"><input type="checkbox"<?php if ($boxes) {?> id="zoom" name="zoom"<?php } else { ?> disabled<?php } ?><?php if ($boxes && $zoom) {?> checked<?php } ?> onchange="document.activities.submit();"/> <label for="zoom">Zoom in</label></span>
 
