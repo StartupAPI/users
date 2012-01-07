@@ -72,3 +72,6 @@ else
 	zip -r StartupAPI_${v}.zip StartupAPI_${v}
 	rm -rf StartupAPI_${v}
 endif
+
+documentation:
+	phpdoc -o HTML:frames:default -d . -t docs -i "*/oauth-php/*,*/modules/facebook/php-sdk/*,*/dbupgrade/*,*/admin/swfobject/*,*/docs/*"
