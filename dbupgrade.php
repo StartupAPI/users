@@ -22,6 +22,14 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 16
+ * Adding login link code
+*/
+$versions[16]['up'][] = "ALTER TABLE  `".UserConfig::$mysql_prefix."users` ADD  `loginlinkcode` VARCHAR( 10 ) NULL DEFAULT NULL COMMENT  'One time code used to login' AFTER  `temppass`";
+$versions[16]['down'][] = "ALTER TABLE  `".UserConfig::$mysql_prefix."users` DROP  `loginlinkcode`";
+
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 15
  * Daily stats cache table
 */
