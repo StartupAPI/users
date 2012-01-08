@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package StartupAPI
+ * @subpackage Authentication
+ */
 class GoogleAuthenticationModule extends AuthenticationModule
 {
 	private $siteid;

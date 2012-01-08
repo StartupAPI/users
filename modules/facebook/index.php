@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package StartupAPI
+ * @subpackage Authentication
+ */
 require_once(dirname(__FILE__).'/facebook.php');
 
 class FacebookAuthenticationModule extends AuthenticationModule

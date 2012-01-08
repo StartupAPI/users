@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package StartupAPI
+ * @subpackage Authentication
+ */
 class UsernamePasswordAuthenticationModule extends AuthenticationModule
 {
 	public function getID()

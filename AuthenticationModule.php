@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package StartupAPI
+ * @subpackage Authentication
+ */
 interface IAuthenticationModule extends IUserBaseModule
 {
 	public function renderLoginForm($action);

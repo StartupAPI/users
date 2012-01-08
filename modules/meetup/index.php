@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package StartupAPI
+ * @subpackage Authentication
+ */
 require_once(dirname(dirname(dirname(__FILE__))).'/OAuthModule.php');
 
 class MeetupAuthenticationModule extends OAuthAuthenticationModule
