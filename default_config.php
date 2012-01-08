@@ -280,6 +280,9 @@ EOD;
 		define('USERBASE_ACTIVITY_RETURN_WEEKLY',	1016);
 		define('USERBASE_ACTIVITY_RETURN_MONTHLY',	1017);
 
+		define('USERBASE_ACTIVITY_LOGIN_EMAIL',		1018);
+		define('USERBASE_ACTIVITY_REGISTER_EMAIL',	1019);
+
 		// Array of activities in the system.
 		// Key must be integer (best if specified using a constant).
 		// The values are an array with label and "points" value of activity.
@@ -308,7 +311,10 @@ EOD;
 
 			USERBASE_ACTIVITY_RETURN_DAILY => array('Returned to the site within a day',	3),
 			USERBASE_ACTIVITY_RETURN_WEEKLY => array('Returned to the site within a week',	2),
-			USERBASE_ACTIVITY_RETURN_MONTHLY => array('Returned to the site within a month', 1)
+			USERBASE_ACTIVITY_RETURN_MONTHLY => array('Returned to the site within a month', 1),
+
+			USERBASE_ACTIVITY_LOGIN_EMAIL => array('Logged in using email link',		1),
+			USERBASE_ACTIVITY_REGISTER_EMAIL => array('Registered using email',		1)
 		);
 
 		UserConfig::$cohort_providers[] = new GenerationCohorts(GenerationCohorts::MONTH);

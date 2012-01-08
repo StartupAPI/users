@@ -86,7 +86,6 @@ require_once(UserConfig::$header);
 
 #userbase-authlist {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-	background: white;
 	padding: 0 1em;
 	margin: 0 auto;
 	width: 480px;

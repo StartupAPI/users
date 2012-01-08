@@ -43,7 +43,6 @@ require_once(UserConfig::$header);
 <style>
 #userbase-passwordreset {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-	background: white;
 	padding: 0 1em;
 	margin: 0 auto;
 	width: 400px;
