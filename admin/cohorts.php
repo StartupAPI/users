@@ -84,8 +84,30 @@ if (is_null($cohort_provider)) {
 	$cohort_provider = UserConfig::$cohort_providers[0];
 }
 
+$actperiodtype = 'Month';
+$actperiodlength = 30;
+
+if (array_key_exists('periodlength', $_REQUEST)) {
+	if ($_REQUEST['periodlength'] == 'monthly') {
+		$actperiodtype = 'Month';
+		$actperiodlength = 30;
+	}
+	if ($_REQUEST['periodlength'] == 'weekly') {
+		$actperiodtype = 'Week';
+		$actperiodlength = 7;
+	}
+	if ($_REQUEST['periodlength'] == 'daily') {
+		$actperiodtype = 'Day';
+		$actperiodlength = 1;
+	}
+}
+
 ?>
 </select>
+agreggated
+<input type="radio" name="periodlength" value="monthly"<?php if ($actperiodlength == 30) { ?> checked="yes"<?php } ?> onchange="document.activities.submit();"/>Monthly
+<input type="radio" name="periodlength" value="weekly"<?php if ($actperiodlength == 7) { ?> checked="yes"<?php } ?> onchange="document.activities.submit();"/>Weekly
+<input type="radio" name="periodlength" value="daily"<?php if ($actperiodlength == 1) { ?> checked="yes"<?php } ?> onchange="document.activities.submit();"/>Daily
 </div>
 
 </form>
@@ -106,9 +128,6 @@ if (is_null($selectedactivityid)) {
 }
 
 $selectedactivity = UserConfig::$activities[$selectedactivityid];
-
-$actperiodtype = 'Month';
-$actperiodlength = 30;
 
 $aggregates = $cohort_provider->getActivityRate($selectedactivityid, $actperiodlength);
 
