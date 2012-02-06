@@ -2046,7 +2046,7 @@ class User
 			throw new Exception("Can't prepare statement: ".$db->error);
 		}
 	}
-
+ 
 	/*
 	 * Returns a list of user's accounts
 	 */
