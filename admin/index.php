@@ -14,8 +14,8 @@ $min_daily_active_users = 0; //min($daily_active_users_vals);
 
 $daily_active_users_ranked = array();
 for ($i = 0; $i < count($daily_active_users_vals); $i++) {
-	$daily_active_users_ranked[] = ($daily_active_users_vals[$i] - $min_daily_active_users)
-		/ ($max_daily_active_users - $min_daily_active_users) * 100;
+	$daily_active_users_ranked[] = round(($daily_active_users_vals[$i] - $min_daily_active_users)
+		/ ($max_daily_active_users - $min_daily_active_users) * 100, 1);
 }
 
 $data = '';
