@@ -152,8 +152,67 @@ class UserConfig
 	public static $onCreate = null;
 	// create extra links on login strip
 	public static $onLoginStripLinks = null;
-			
-	public static function getDB()
+
+
+        /*
+         * subscription data
+         */
+
+        public static $useSubscriptions = true; // works only if $useAccounts is true!!!
+        // free plan id, set to user with registration
+        public static $plan_free = 'PLAN_FREE';
+        // subscription plans list, MUST have free plan index
+        public static $PLANS = array(
+            'PLAN_FREE' => array(
+                'name' => 'Free account',
+                'description' => 'Free access with some basic functionality',
+                'details_url' => '/plans/free.html',
+                'capabilities' => array(
+                    'number-of-urls' => 1
+                )
+            ),
+            'personal-pro' => array(
+                'name' => 'Personal PRO',
+                'description' => 'Basic paid plan best suited for individual customers',
+                'details_url' => '/plans/personal_pro.html',
+                'capabilities' => array(
+                    'number-of-urls' => 100
+                ),
+                'base_price' => 5,
+                'base_period' => 31,
+                'base_period_units' => 'DAYS',
+                'payment_schedules' => array(
+                    'monthly' => array(
+                        'name' => 'Every month',
+                        'description' => 'Pay just $7 low payment month-to-month',
+                        'charge_amount' => 7,
+                        'charge_period' => 31,
+                        'charge_period_units' => 'DAYS'
+                    ),
+                    'every6months' => array(
+                        'name' => 'Every 6 months',
+                        'description' => 'As low as $5 / month when paid for 6 months',
+                        'charge_amount' => 30,
+                        'charge_period' => 183,
+                        'charge_period_units' => 'DAYS'
+                    ),
+                    'annual' => array(
+                        'name' => 'Annually',
+                        'description' => 'Get 2 months FREE when you pay for a year',
+                        'charge_amount' => 50,
+                        'charge_period' => 365,
+                        'charge_period_units' => 'DAYS'
+                    )
+                )
+            )
+        );
+        // default plan
+        public static $default_plan = 'PLAN_FREE';
+        // default schedule
+        public static $default_schedule = 'default';
+
+
+        public static function getDB()
 	{
 		if (is_null(self::$db))
 		{

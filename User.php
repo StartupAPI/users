@@ -264,6 +264,7 @@ class User
 							Plan::getFreePlan(), $this, Account::ROLE_ADMIN);
 
 			$personal->setAsCurrent($this);
+
 		}
 
 		if (!is_null(UserConfig::$onCreate))

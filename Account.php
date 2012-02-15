@@ -166,13 +166,15 @@ class Account
 
 		$db = UserConfig::getDB();
 		$plan_id = $plan->getID();
-
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'accounts (name, plan) VALUES (?, ?)'))
+                $sched_id = NULL;
+		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'accounts (name, plan, sched) VALUES (?, ?, ?)'))
 		{
-			if (!$stmt->bind_param('si', $name, $plan_id))
+			if (!$stmt->bind_param('sss', $name, $plan_id, $sched_id))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}
+//                                            var_dump($stmt->bind_result());die();
+
 			if (!$stmt->execute())
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
