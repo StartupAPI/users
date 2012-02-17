@@ -264,6 +264,7 @@ class User
 							Plan::getFreePlan(), $this, Account::ROLE_ADMIN);
 
 			$personal->setAsCurrent($this);
+
 		}
 
 		if (!is_null(UserConfig::$onCreate))
@@ -2046,7 +2047,7 @@ class User
 			throw new Exception("Can't prepare statement: ".$db->error);
 		}
 	}
-
+ 
 	/*
 	 * Returns a list of user's accounts
 	 */

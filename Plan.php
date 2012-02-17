@@ -1,5 +1,5 @@
 <?php
-
+require_once(dirname(__FILE__).'/config.php');
 class Plan {
 	private static $FREE;
 
@@ -24,13 +24,10 @@ class Plan {
 	}
 
 	public static function init() {
-		self::$FREE = new Plan(0, 'Free', true);
-		self::addPlan(self::$FREE);
-	}
-
-	public static function getFreePlan() {
-		return self::$FREE;
-	}
+            $plan_free_id = UserConfig::$plan_free;
+            self::$FREE = new Plan($plan_free_id, UserConfig::$PLANS[$plan_free_id]['name'], true);
+            self::addPlan(self::$FREE);
+        }
 
 	public function __construct($id, $name, $individual = false) {
 		$this->id = $id;
@@ -51,5 +48,10 @@ class Plan {
 	public function getName() {
 		return $this->name;
 	}
+
+        public function getFreePlan() {
+                return self::$FREE;
+        }
+
 }
 Plan::init();
