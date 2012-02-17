@@ -88,18 +88,22 @@ class Plan {
 	public function getPaymentScheduleIDs() {
 	
 		$ids = array();
-		foreach($this->payment_schedules as $s) {
-			$ids[] = $s->ID;
-		}
+
+		if(is_array($this->payment_schedules))
+  		foreach($this->payment_schedules as $x => $s)
+	  		$ids[] = $s->id;
+	  		
 		return $ids;
 	}
 	
 	public function getPaymentSchedule($id) {
 	
 		if($id === NULL) return FALSE;
-		foreach($this->payment_schedules as $s) {
-			if($s->ID == $id) return $s;
-		}
+
+		if(is_array($this->payment_schedules))
+  		foreach($this->payment_schedules as $x => $s)
+	  		if($s->id == $id) return $s;
+
 		return NULL;
 	}
 	

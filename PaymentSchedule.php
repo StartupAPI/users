@@ -42,7 +42,7 @@ class PaymentSchedule {
       throw new Exception("Following mandatory parameters were not found in init array: ".implode(',',$missing));
 
     # Set attributes according to init array
-    foreach($parameters as $p)
+    foreach($parameters as $p => $v)
       if(isset($a[$p])) $this->$p = $a[$p];
 	}
 
