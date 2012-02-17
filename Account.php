@@ -6,6 +6,10 @@ class Account
 	private $name;
 	private $role;
 	private $plan;
+	private $schedule;
+	private $charges;
+	
+	private $isIndividual;
 
 	const ROLE_USER = 0;
 	const ROLE_ADMIN = 1;
@@ -18,7 +22,7 @@ class Account
 		$db = UserConfig::getDB();
 		$account = null;
 
-		if ($stmt = $db->prepare('SELECT name, plan FROM '.UserConfig::$mysql_prefix.'accounts WHERE id = ?'))
+		if ($stmt = $db->prepare('SELECT name, plan, schedule FROM '.UserConfig::$mysql_prefix.'accounts WHERE id = ?'))
 		{
 			if (!$stmt->bind_param('i', $id))
 			{
@@ -28,14 +32,19 @@ class Account
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($name, $plan_id))
+			if (!$stmt->bind_result($name, $plan_id, $schedule_id))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
 
 			if ($stmt->fetch() === TRUE)
 			{
-				$account = new self($id, $name, Plan::getByID($plan_id), Account::ROLE_USER);
+				$charges = self::getCharges($id);
+				$account = new self($id, $name, 
+					PlanCollection::instance()->getPlan($plan_id), 
+					Account::ROLE_USER,
+					$schedule_id === NULL ? NULL : PlanCollection::instance()->getPlan($plan_id)->getPaymentSchedule($schedule_id),
+					$charges);
 			}
 
 			$stmt->close();
@@ -54,7 +63,7 @@ class Account
 		$accounts = array();
 		$userid = $user->getID();
 
-		if ($stmt = $db->prepare('SELECT a.id, a.name, a.plan, au.role FROM '.UserConfig::$mysql_prefix.'accounts a INNER JOIN '.UserConfig::$mysql_prefix.'account_users au ON a.id = au.account_id WHERE au.user_id = ?'))
+		if ($stmt = $db->prepare('SELECT a.id, a.name, a.plan, a.schedule, au.role,  FROM '.UserConfig::$mysql_prefix.'accounts a INNER JOIN '.UserConfig::$mysql_prefix.'account_users au ON a.id = au.account_id WHERE au.user_id = ?'))
 		{
 			if (!$stmt->bind_param('i', $userid))
 			{
@@ -64,14 +73,19 @@ class Account
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($id, $name, $plan_id, $role))
+			if (!$stmt->bind_result($id, $name, $plan_id, $schedule_id, $role))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
 
 			while($stmt->fetch() === TRUE)
 			{
-				$accounts[] = new self($id, $name, Plan::getByID($plan_id), $role);
+				$charges = self::getCharges($id);
+				$accounts[] = new self($id, $name, 
+					PlanCollection::instance()->getPlan($plan_id),
+					$role,
+					$schedule_id === NULL ? NULL : PlanCollection::instance()->getPlan($plan_id)->getPaymentSchedule($schedule_id),
+					$charges);
 			}
 
 			$stmt->close();
@@ -91,12 +105,15 @@ class Account
 	}
 
 
-	private function __construct($id, $name, $plan, $role)
+	private function __construct($id, $name, $plan, $role, $schedule = NULL, $charges = NULL)
 	{
 		$this->id = $id;
 		$this->name = $name;
 		$this->plan = $plan;
+		$this->schedule = $schedule;
 		$this->role = $role;
+		
+		$this->charges = $charges === NULL ? array() : $charges;
 	}
 
 	public function getID()
@@ -105,7 +122,7 @@ class Account
 	}
 	public function getName()
 	{
-		if ($this->plan->isIndividual())
+		if ($this->isIndividual())
 		{
 			$users = $this->getUsers();
 			return $users[0]->getName();
@@ -151,25 +168,30 @@ class Account
 
 		return $users;
 	}
+
 	public function getPlan()
 	{
 		return $this->plan;
 	}
+
+	public function getSchedule() {
+		return $this->schedule;
+	}
+
 	public function getUserRole()
 	{
 		return $this->role;
 	}
 
-	public static function createAccount($name, $plan, $user = null, $role = Account::ROLE_USER)
+	public static function createAccount($name, $plan, $schedule = null, $user = null, $role = Account::ROLE_USER)
 	{
 		$name = mb_convert_encoding($name, 'UTF-8');
 
 		$db = UserConfig::getDB();
-		$plan_id = $plan->getID();
-                $sched_id = NULL;
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'accounts (name, plan, sched) VALUES (?, ?, ?)'))
+
+		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'accounts (name, plan, schedule) VALUES (?, ?, ?)'))
 		{
-			if (!$stmt->bind_param('sss', $name, $plan_id, $sched_id))
+			if (!$stmt->bind_param('sss', $name, $plan, $schedule))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}
@@ -220,7 +242,7 @@ class Account
 
 		$userid = $user->getID();
 
-		if ($stmt = $db->prepare('SELECT a.id, a.name, a.plan, au.role FROM '.UserConfig::$mysql_prefix.'user_preferences up INNER JOIN '.UserConfig::$mysql_prefix.'accounts a ON a.id = up.current_account_id INNER JOIN '.UserConfig::$mysql_prefix.'account_users au ON a.id = au.account_id WHERE up.user_id = ? AND au.user_id = ?'))
+		if ($stmt = $db->prepare('SELECT a.id, a.name, a.plan, a.schedule, au.role FROM '.UserConfig::$mysql_prefix.'user_preferences up INNER JOIN '.UserConfig::$mysql_prefix.'accounts a ON a.id = up.current_account_id INNER JOIN '.UserConfig::$mysql_prefix.'account_users au ON a.id = au.account_id WHERE up.user_id = ? AND au.user_id = ?'))
 		{
 			$id = null;
 
@@ -232,7 +254,7 @@ class Account
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($id, $name, $plan_id, $role))
+			if (!$stmt->bind_result($id, $name, $plan_id, $schedule_id, $role))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
@@ -241,7 +263,12 @@ class Account
 			
 			if ($id)
 			{
-				return new self($id, $name, Plan::getByID($plan_id), $role);
+				$charges = self::getCharges($id);
+				return new self($id, $name, 
+					PlanCollection::instance()->getPlan($plan_id), 
+					$role,
+					$schedule_id === NULL ? NULL : PlanCollection::instance()->getPlan($plan_id)->getPaymentSchedule($schedule_id),
+					$charges);
 			}
 			else
 			{
@@ -325,4 +352,29 @@ class Account
 
 		return $feature->isEnabledForAccount($this);
 	}
+	
+	private static function getCharges($account_id) {
+
+		$db = UserConfig::getDB();
+	
+		if(!($stmt = $db->prepare('SELECT datetime, amount FROM '.UserConfig::$mysql_prefix.'account_charge WHERE account_id = ? ORDER BY datetime')))
+		throw new Exception("Can't prepare statement: ".$db->error);
+		
+		if (!$stmt->bind_param('i', $id))
+			throw new Exception("Can't bind parameter".$stmt->error);
+		
+		if (!$stmt->execute())
+			throw new Exception("Can't execute statement: ".$stmt->error);
+		
+		if (!$stmt->bind_result($datetime, $amount))
+			throw new Exception("Can't bind result: ".$stmt->error);
+	
+		$charges = array();	
+		while($stmt->fetch() === TRUE)
+			$charges[] = array('datetime' => $datetime, 'amount' => $amount);
+		
+		$stmt->close();
+		return $charges;
+	}
+
 }
