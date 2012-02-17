@@ -6,6 +6,7 @@ class Account
 	private $name;
 	private $role;
 	private $plan;
+	private $isIndividual;
 
 	const ROLE_USER = 0;
 	const ROLE_ADMIN = 1;
@@ -35,7 +36,7 @@ class Account
 
 			if ($stmt->fetch() === TRUE)
 			{
-				$account = new self($id, $name, Plan::getByID($plan_id), Account::ROLE_USER);
+				$account = new self($id, $name, PlanCollection::instance->getPlan($plan_id), Account::ROLE_USER);
 			}
 
 			$stmt->close();
@@ -71,7 +72,7 @@ class Account
 
 			while($stmt->fetch() === TRUE)
 			{
-				$accounts[] = new self($id, $name, Plan::getByID($plan_id), $role);
+				$accounts[] = new self($id, $name, PlanCollection::instance->getPlan($plan_id), $role);
 			}
 
 			$stmt->close();
@@ -105,7 +106,7 @@ class Account
 	}
 	public function getName()
 	{
-		if ($this->plan->isIndividual())
+		if ($this->isIndividual())
 		{
 			$users = $this->getUsers();
 			return $users[0]->getName();
@@ -165,8 +166,8 @@ class Account
 		$name = mb_convert_encoding($name, 'UTF-8');
 
 		$db = UserConfig::getDB();
-		$plan_id = $plan->getID();
-                $sched_id = NULL;
+		$plan_id = $plan->id;
+		$sched_id = NULL;
 		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'accounts (name, plan, sched) VALUES (?, ?, ?)'))
 		{
 			if (!$stmt->bind_param('sss', $name, $plan_id, $sched_id))
@@ -241,7 +242,7 @@ class Account
 			
 			if ($id)
 			{
-				return new self($id, $name, Plan::getByID($plan_id), $role);
+				return new self($id, $name, PlanCollection::instance->getPlan($plan_id), $role);
 			}
 			else
 			{
