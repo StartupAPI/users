@@ -8,11 +8,12 @@
  * Every account is associated with existing Plan using Plan ID and PaymentSchedule using PaymentScheduleID.
  */
 class PaymentSchedule {
-	public $id;
-	public $name;
-	public $description;
-	public $charge_amount;
-	public $charge_period;
+	private $id;
+	private $name;
+	private $description;
+	private $charge_amount;
+	private $charge_period;
+  
 
 	public function __construct($id,$a) {
 
@@ -23,6 +24,7 @@ class PaymentSchedule {
       'description' => '',
       'charge_amount' => NULL,
       'charge_period' => NULL,
+      'is_default' => 0,
     );
     
     if($id === NULL)
@@ -45,5 +47,14 @@ class PaymentSchedule {
     foreach($parameters as $p => $v)
       if(isset($a[$p])) $this->$p = $a[$p];
 	}
-
+	
+  # Making private variables visible, but read-only 
+  public function __get($v) {
+    return (!in_array($v,array('instance')) && isset($this->$v)) ? $this->$v : false;
+  }   
+  
+  public function setAsDefault() {
+    $this->is_default = 1;
+  }
+	          
 }

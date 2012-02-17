@@ -69,8 +69,11 @@ class Plan {
 	  	foreach($this->payment_schedules as $id => $s)
 		  	$schedules[] = new PaymentSchedule($id, $s);
   		$this->payment_schedules = $schedules;
+  		
+  		if(!$this->getDefaultPaymentSchedule())
+        $this->payment_schedules[0]->setAsDefault();
     }
-		
+    
 		# Check user hooks
 		if($this->user_activate_hook != '' && !function_exists($this->user_activate_hook))
 			throw new Exception("Activate hook function ".$this->user_activate_hook." is not defined");
@@ -107,6 +110,15 @@ class Plan {
 		return NULL;
 	}
 	
+	public function getDefaultPaymentSchedule() {
+	
+	  if(is_array($this->payment_schedules))
+	    foreach($this->payment_schedules as $x => $s) 
+	      if($s->is_default) return $s;
+	      
+    return NULL;
+  }
+	
 	public function expandTransaction($t) {
 		
 		return $t->comment;
@@ -114,12 +126,14 @@ class Plan {
 	
 	public function activate_hook($PlanID) {
 	
-		call_user_func_array($this->user_activate_hook,array('PlanID' => $PlanID));
+	  if($this->user_activate_hook == '') return;
+		call_user_func_array($this->user_activate_hook,array('OldPlanID' => $PlanID, 'NewPlanID' => $this->id));
 	}
 	
   public function deactivate_hook($PlanID) {
   	
-  	call_user_func_array($this->user_deactivate_hook,array('PlanID' => $PlanID));
+  	if($this->user_deactivate_hook == '') return;
+  	call_user_func_array($this->user_deactivate_hook,array('NewPlanID' => $PlanID, 'OldPlanID' => $this->id));
 	}
 }
 
