@@ -14,35 +14,41 @@ class Plan {
 	private $id;
 	private $name;
 	private $description;
-	private $basePrice;
-	private $period;
-	private $detailsURL;
+	private $base_price;
+	private $base_period;
+	private $detail_url;
 	private $capabilities;
-	private $downgradeTo;
-	private $gracePeriod;
+	private $downgrade_to;
+	private $grace_period;
 	
-	private $PaymentSchedules;
+	private $payment_schedules;
 	private $user_activate_hook;
 	private $user_deactivate_hook;
 
-	public function __construct($a) {
+	public function __construct($id,$a) {
 	
 		# Known parameters and their default values listed here:
 		$parameters = array(
 			'id' => NULL,
 			'name' => NULL,
 			'description' => '',
-			'basePrice' => 0,
-			'period' => NULL,
-			'detailsURL' => NULL,
-			'PaymentSchedules' => NULL,
+			'base_price' => 0,
+			'base_period' => 0,
+			'details_url' => NULL,
+			'payment_schedules' => array(),
 			'capabilities' => array(),
-			'downgradeTo' => 'FREE',
-			'gracePeriod' => 0,
+			'downgrade_to' => 'FREE',
+			'grace_period' => 0,
 			'user_activate_hook' => '',
 			'user_deactivate_hook' => '',
 		);
 		
+		if($id === NULL)
+  		throw new Exception("id required");
+    if(!is_array($a))
+      throw new Exception("configuration array required");
+		$a['id'] = $id;
+	
 		# Mandatory parameters are those whose default value is NULL
 		$mandatory = array();
 		foreach($parameters as $p => $v) {
@@ -51,22 +57,24 @@ class Plan {
 		
 		$missing = array_diff($mandatory,array_keys($a));
 		if(count($missing))
-			throw new Exception("Following mandatory parameters were not found in init array: ".implode(',',$missing));
+			throw new Exception("Following mandatory parameters were not found in init array for plan $id: ".implode(',',$missing));
 			
 		# Set attributes according to init array
-		foreach($parameters as $p)
+		foreach($parameters as $p => $v)
 			if(isset($a[$p])) $this->$p = $a[$p];
 			
 		# Instantiate PaymentSchedules
-		$schedules = array();
-		foreach($this->PaymentSchedules as $s)
-			$schedules[] = new PaymentSchedule($s);
-		$this->PaymentSchedules = $schedules;
+		if(is_array($this->payment_schedules)) {
+  		$schedules = array();
+	  	foreach($this->payment_schedules as $id => $s)
+		  	$schedules[] = new PaymentSchedule($id, $s);
+  		$this->payment_schedules = $schedules;
+    }
 		
 		# Check user hooks
-		if(!function_exists($this->user_activate_hook))
+		if($this->user_activate_hook != '' && !function_exists($this->user_activate_hook))
 			throw new Exception("Activate hook function ".$this->user_activate_hook." is not defined");
-		if(!function_exists($this->user_deactivate_hook))
+		if($this->user_deactivate_hook != '' && !function_exists($this->user_deactivate_hook))
 			throw new Exception("Deactivate hook function ".$this->user_deactivate_hook." is not defined");
 		
 		# We are set
@@ -74,13 +82,13 @@ class Plan {
 
   # Making private variables visible, but read-only 
 	public function __get($v) {
-  	return (!in_array($var,array('instance') && isset($this->$var)) ? $this->$var : false;
+  	return (!in_array($v,array('instance')) && isset($this->$v)) ? $this->$v : false;
 	}
 	
 	public function getPaymentScheduleIDs() {
 	
 		$ids = array();
-		foreach($this->PaymentSchedules as $s) {
+		foreach($this->payment_schedules as $s) {
 			$ids[] = $s->ID;
 		}
 		return $ids;
@@ -89,7 +97,7 @@ class Plan {
 	public function getPaymentSchedule($id) {
 	
 		if($id === NULL) return FALSE;
-		foreach($this->PaymentSchedules as $s) {
+		foreach($this->payment_schedules as $s) {
 			if($s->ID == $id) return $s;
 		}
 		return NULL;
@@ -133,8 +141,8 @@ class PlanCollection {
     if(count($this->Plans))
       throw new Exception("Already initialized");
       
-    foreach($a as $p)
-      $this->Plans[] = new Plan($p);
+    foreach($a as $id => $p)
+      $this->Plans[] = new Plan($id,$p);
   }
   
   public function getPlan($id) {

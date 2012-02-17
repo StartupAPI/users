@@ -36,7 +36,7 @@ class Account
 
 			if ($stmt->fetch() === TRUE)
 			{
-				$account = new self($id, $name, PlanCollection::instance->getPlan($plan_id), Account::ROLE_USER);
+				$account = new self($id, $name, PlanCollection::instance()->getPlan($plan_id), Account::ROLE_USER);
 			}
 
 			$stmt->close();
@@ -72,7 +72,7 @@ class Account
 
 			while($stmt->fetch() === TRUE)
 			{
-				$accounts[] = new self($id, $name, PlanCollection::instance->getPlan($plan_id), $role);
+				$accounts[] = new self($id, $name, PlanCollection::instance()->getPlan($plan_id), $role);
 			}
 
 			$stmt->close();
@@ -242,7 +242,7 @@ class Account
 			
 			if ($id)
 			{
-				return new self($id, $name, PlanCollection::instance->getPlan($plan_id), $role);
+				return new self($id, $name, PlanCollection::instance()->getPlan($plan_id), $role);
 			}
 			else
 			{

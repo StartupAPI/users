@@ -261,7 +261,7 @@ class User
 			}
 
 			$personal = Account::createAccount('FREE ('.$this->getName().')',
-							Plan::getFreePlan(), $this, Account::ROLE_ADMIN);
+							PlanCollection::instance()->getPlan('FREE'), $this, Account::ROLE_ADMIN);
 
 			$personal->setAsCurrent($this);
 

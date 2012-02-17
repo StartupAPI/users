@@ -374,6 +374,9 @@ EOD;
 		UserConfig::$cohort_providers[] = new GenerationCohorts(GenerationCohorts::WEEK);
 		UserConfig::$cohort_providers[] = new GenerationCohorts(GenerationCohorts::YEAR);
 		UserConfig::$cohort_providers[] = new RegMethodCohorts();
+		
+		if(UserConfig::$useAccounts && UserConfig::$useSubscriptions)
+			PlanCollection::instance()->init(UserConfig::$PLANS);
 	}
 
 	// Couldn't reuse it, but keeping it here because it might be still populated in user configs

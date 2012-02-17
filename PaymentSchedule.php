@@ -11,19 +11,25 @@ class PaymentSchedule {
 	public $id;
 	public $name;
 	public $description;
-	public $chargeAmount;
-	public $chargePeriod;
+	public $charge_amount;
+	public $charge_period;
 
-	public function __construct($a) {
+	public function __construct($id,$a) {
 
     # Known parameters and their default values listed here:
     $parameters = array(
       'id' => NULL,
       'name' => NULL,
       'description' => '',
-      'chargeAmount' => NULL,
-      'chargePeriod' => NULL,
+      'charge_amount' => NULL,
+      'charge_period' => NULL,
     );
+    
+    if($id === NULL)
+      throw new Exception("id required");
+    if(!is_array($a))
+      throw new Exception("configuration array required");
+    $a['id'] = $id;
 
     # Mandatory parameters are those whose default value is NULL
     $mandatory = array();
