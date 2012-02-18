@@ -59,6 +59,38 @@ class TestSimple1 extends UnitTestCase {
     $this -> assertEqual( $plan -> getDefaultPaymentSchedule() -> id, 0 );
   }
 
+  function testGetSchedule()
+  {
+    $plan = new Plan(0,array('name' => 'test plan', 
+      'details_url' => 'lalala',
+      'payment_schedules' => array(
+                                    0 => array('id' => '0', 
+                                   'name' => 'some schedule',
+                                   'charge_amount' => '5',
+                                   'charge_period' => '10'),
+
+                                    1 => array('id' => '1', 
+                                   'name' => 'some other schedule',
+                                   'charge_amount' => '6',
+                                   'charge_period' => '11'), 
+       )));
+    $this -> assertEqual( $plan -> getPaymentScheduleIDs(), array(0, 1));
+
+    $this -> assertNotNull( $plan -> getPaymentSchedule( 0 ));
+    $this -> assertEqual( $plan -> getPaymentSchedule( 0 ) -> id, 0 );
+    $this -> assertEqual( $plan -> getPaymentSchedule( 0 ) -> name, 'some schedule' );
+    $this -> assertEqual( $plan -> getPaymentSchedule( 0 ) -> charge_amount, 5 );
+    $this -> assertEqual( $plan -> getPaymentSchedule( 0 ) -> charge_period, 10 );
+
+    $this -> assertNotNull( $plan -> getPaymentSchedule( 1 ) );
+    $this -> assertEqual( $plan -> getPaymentSchedule( 1 ) -> id, 1 );
+    $this -> assertEqual( $plan -> getPaymentSchedule( 1 ) -> name, 'some other schedule' );
+    $this -> assertEqual( $plan -> getPaymentSchedule( 1 ) -> charge_amount, 6 );
+    $this -> assertEqual( $plan -> getPaymentSchedule( 1 ) -> charge_period, 11 );
+
+    $this -> assertNull( $plan -> getPaymentSchedule( 2 ) );
+
+  }
 
   /* uncomment me
   function testIDCorrespondence()
