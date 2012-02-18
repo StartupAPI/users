@@ -34,11 +34,15 @@ class Account
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
+			
+			if (!$stmt->store_result())
+			  throw new Exception("Can't store result: ".$stmt->error);
+			
 			if (!$stmt->bind_result($name, $plan_id, $schedule_id, $engine_id))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
-
+			
 			if ($stmt->fetch() === TRUE)
 			{
 				$charges = self::getCharges($id);
@@ -61,7 +65,7 @@ class Account
 		$accounts = array();
 		$userid = $user->getID();
 
-		if ($stmt = $db->prepare('SELECT a.id, a.name, a.plan, a.schedule, a.engine, au.role,  FROM '.UserConfig::$mysql_prefix.'accounts a INNER JOIN '.UserConfig::$mysql_prefix.'account_users au ON a.id = au.account_id WHERE au.user_id = ?'))
+		if ($stmt = $db->prepare('SELECT a.id, a.name, a.plan, a.schedule, a.engine, au.role  FROM '.UserConfig::$mysql_prefix.'accounts a INNER JOIN '.UserConfig::$mysql_prefix.'account_users au ON a.id = au.account_id WHERE au.user_id = ?'))
 		{
 			if (!$stmt->bind_param('i', $userid))
 			{
@@ -71,11 +75,15 @@ class Account
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
+
+			if (!$stmt->store_result())
+			  throw new Exception("Can't store result: ".$stmt->error);
+
 			if (!$stmt->bind_result($id, $name, $plan_id, $schedule_id, $engine_id, $role))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
-
+			  
 			while($stmt->fetch() === TRUE)
 			{
 				$charges = self::getCharges($id);
@@ -189,7 +197,7 @@ class Account
 
 		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'accounts (name, plan, schedule, engine) VALUES (?, ?, ?, ?)'))
 		{
-			if (!$stmt->bind_param('sss', $name, $plan, $schedule, $engine))
+			if (!$stmt->bind_param('ssss', $name, $plan, $schedule, $engine))
 			{
 				 throw new Exception("Can't bind parameter".$stmt->error);
 			}
@@ -212,7 +220,7 @@ class Account
 		{
 			$userid = $user->getID();
 
-			if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'account_users (account_id, user_id, role, engine) VALUES (?, ?, ?, ?)'))
+			if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'account_users (account_id, user_id, role) VALUES (?, ?, ?)'))
 			{
 				if (!$stmt->bind_param('iii', $id, $userid, $role))
 				{
@@ -351,7 +359,7 @@ class Account
 
 		$db = UserConfig::getDB();
 	
-		if(!($stmt = $db->prepare('SELECT datetime, amount FROM '.UserConfig::$mysql_prefix.'account_charge WHERE account_id = ? ORDER BY datetime')))
+		if(!($stmt = $db->prepare('SELECT date_time, amount FROM '.UserConfig::$mysql_prefix.'account_charge WHERE account_id = ? ORDER BY date_time')))
 		throw new Exception("Can't prepare statement: ".$db->error);
 		
 		if (!$stmt->bind_param('i', $id))
@@ -382,7 +390,7 @@ class Account
 		if(!($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'account_charge (account_id, date_time, amount) VALUES (?, ?, ?)')))
 			throw new Exception("Can't prepare statement: ".$db->error);
 		
-		if (!$stmt->bind_param('i s d', $this->id, $charge['datetime'], $charge['amount']))
+		if (!$stmt->bind_param('isd', $this->id, $charge['datetime'], $charge['amount']))
 			throw new Exception("Can't bind parameter".$stmt->error);
 		
 		if (!$stmt->execute())
@@ -410,7 +418,7 @@ class Account
 				if(!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'account_charge SET amount = ? WHERE account_id = ? and date_time = ?')))
 					throw new Exception("Can't prepare statement: ".$db->error);
 					
-				if (!$stmt->bind_param('d i s', $this->charges[$k]['amount'], $this->id, $v['datetime']))
+				if (!$stmt->bind_param('dis', $this->charges[$k]['amount'], $this->id, $v['datetime']))
 					throw new Exception("Can't bind parameter".$stmt->error);
 					
 				if (!$stmt->execute())
@@ -425,7 +433,7 @@ class Account
 			if(!($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.'account_charge WHERE account_id = ? and date_time = ?')))
 				throw new Exception("Can't prepare statement: ".$db->error);
 				
-			if (!$stmt->bind_param('i s', $charge['amount'], $this->id, $charge['datetime']))
+			if (!$stmt->bind_param('is', $charge['amount'], $this->id, $charge['datetime']))
 				throw new Exception("Can't bind parameter".$stmt->error);
 				
 			if (!$stmt->execute())
