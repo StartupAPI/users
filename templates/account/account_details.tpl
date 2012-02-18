@@ -25,6 +25,7 @@
   <div>
   	<p>Account Debts</p>
   	<ul>
+  	{$total = 0}
   	{foreach $charges as $c}
   		<li>{$c.datetime} ${$c.amount}</li>
   		{$total = $total + $c.amount}

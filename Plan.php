@@ -55,7 +55,7 @@ class Plan {
 		# Mandatory parameters are those whose default value is NULL
 		$mandatory = array();
 		foreach($parameters as $p => $v) {
-			if($v === NULL) $mandatory[] = $p;
+			if(is_null($v)) $mandatory[] = $p;
 		}
 		
 		$missing = array_diff($mandatory,array_keys($a));
@@ -65,6 +65,7 @@ class Plan {
 		# Set attributes according to init array
 		foreach($parameters as $p => $v)
 			if(isset($a[$p])) $this->$p = $a[$p];
+			else $this->$p = $v;
 			
 		# Instantiate PaymentSchedules, replacing stored parameters arrays with actual objects
 		if(is_array($this->payment_schedules)) {
@@ -73,7 +74,7 @@ class Plan {
 		  	$schedules[] = new PaymentSchedule($id, $s);
   		$this->payment_schedules = $schedules;
   		
-  		if(!$this->getDefaultPaymentSchedule())
+  		if(!$this->getDefaultPaymentSchedule() && count($this->payment_schedules))
         $this->payment_schedules[0]->setAsDefault();
     }
     
