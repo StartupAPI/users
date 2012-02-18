@@ -2,13 +2,13 @@
 <body>
   <div>
     <p>Account Name: <b>{$account_name}</b></p>
-    <p>Account Role: <b>{$account_role}</b></p>
+    <p>Account Role: <b>{if $account_role == Account::ROLE_ADMIN}Account Administrator{else}User{/if}</b></p>
     <p>Account Status: <b>{if $account_isActive}Active{else}Suspended{/if}</b></p>
-    <p>Payment Engine used: <b>{if $account_engine}{$account_engine}{else}None{/if}<b></p>
+    <p>Payment Engine used: <b>{if $account_engine}{$account_engine}{else}None{/if}</b></p>
   </div>
 
   <div>
-    <p><b>Plan Name: <b>{$plan_name}</b></p>
+    <p>Plan Name: <b>{$plan_name}</b></p>
     <p>Plan Description: {$plan_description}</p>
     <p>Plan Details: <a href="{$plan_details_url}">{$plan_details_url}</a></p>
     {if $plan_downgrade_to}
@@ -26,9 +26,11 @@
   	<p>Account Debts</p>
   	<ul>
   	{foreach $charges as $c}
-  		<li>$c.datetime $c.amount</li>
+  		<li>{$c.datetime} ${$c.amount}</li>
+  		{$total = $total + $c.amount}
   	{/foreach}
   	</ul>
+  	<p>Total debt: <b>${$total}</b></p>
   </div>
   {/if}
 </body>
