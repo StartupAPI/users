@@ -16,10 +16,16 @@ class TestUser extends UnitTestCase {
   {
     $users = User::getUsers();
     $this -> assertNotNull( $users );
-    $me = $users[5]; // spacediver
+    $me = $users[5]; 
     $this -> assertNotNull( $me );
+    $this -> assertEqual( $me -> getUsername(), 'spacediver' );
     //$this -> dump($me);
+   }
 
+  function testGetCurrentAccount()
+  {
+    $me = User::getUsers();
+    $me = $me[5];
     $acc = Account::getCurrentAccount($me);
     //$this -> dump($acc);
     $this -> assertNotNull( $acc );
