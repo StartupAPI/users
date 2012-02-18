@@ -213,9 +213,13 @@ class UserConfig
         
         // Smarty base directory
         public static $SMARTY_DIR = '/usr/share/php/smarty3';
+        public static $smarty_compile;
+        public static $smarty_cache;
+        public static $smarty_templates;
 
 
-        public static function getDB()
+
+  public static function getDB()
 	{
 		if (is_null(self::$db))
 		{
@@ -380,7 +384,13 @@ EOD;
 		
 		if(UserConfig::$useAccounts && UserConfig::$useSubscriptions)
 			Plan::init(UserConfig::$PLANS);
+
+    UserConfig::$smarty_cache = dirname(__FILE__).'/cache/smarty/cache';
+    UserConfig::$smarty_compile = dirname(__FILE__).'/cache/smarty/templates_c';
+    UserConfig::$smarty_templates = dirname(__FILE__).'/templates';
+
 	}
+	
 
 	// Couldn't reuse it, but keeping it here because it might be still populated in user configs
 	// Use UserConfig::$all_modules array instead of needed
