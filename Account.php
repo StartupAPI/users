@@ -130,7 +130,7 @@ class Account
 	}
 	public function getName()
 	{
-		if ($this->isIndividual())
+		if ($this->isIndividual)
 		{
 			$users = $this->getUsers();
 			return $users[0]->getName();

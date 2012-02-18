@@ -9,6 +9,7 @@ class AllTests extends TestSuite {
   {
     $this->TestSuite('All tests');
     $this->addFile('TestPlan.php');
+    $this->addFile('TestUser.php');
   }
 }
 
