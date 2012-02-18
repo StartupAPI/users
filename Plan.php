@@ -17,7 +17,7 @@ class Plan {
 	private $description;
 	private $base_price;
 	private $base_period;
-	private $detail_url;
+	private $details_url;
 	private $capabilities;
 	private $downgrade_to;
 	private $grace_period;
@@ -40,7 +40,7 @@ class Plan {
 			'details_url' => NULL,
 			'payment_schedules' => array(),
 			'capabilities' => array(),
-			'downgrade_to' => 'FREE',
+			'downgrade_to' => UserConfig::$default_plan,
 			'grace_period' => 0,
 			'user_activate_hook' => '',
 			'user_deactivate_hook' => '',

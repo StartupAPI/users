@@ -46,7 +46,7 @@ class Account
 			
 			if ($stmt->fetch() === TRUE)
 			{
-				$charges = self::getCharges($id);
+				$charges = self::fillCharges($id);
 				$account = new self($id, $name, $plan_id, Account::ROLE_USER, $engine_id, $schedule_id, $charges, $active);
 			}
 
@@ -87,7 +87,7 @@ class Account
 			  
 			while($stmt->fetch() === TRUE)
 			{
-				$charges = self::getCharges($id);
+				$charges = self::fillCharges($id);
 				$accounts[] = new self($id, $name, $plan_id, $role,	$schedule_id, $engine_id, $charges, $active);
 			}
 
@@ -112,7 +112,7 @@ class Account
 	{
 		$this->id = $id;
 		$this->name = $name;
-		$this->plan = Plan::getPlan($plan);
+		$this->plan = Plan::getPlan($plan) || Plan::getPlan(UserConfig::$default_plan);
 		$this->schedule = $schedule === NULL ? NULL : $this->plan->getPaymentSchedule($schedule);
 		$this->role = $role;
 		$this->isActive = $active;
@@ -190,6 +190,14 @@ class Account
 	{
 		return $this->role;
 	}
+	
+	public function isActive() {
+	  return $this->isActive;
+  }
+	
+  public function getCharges() {
+    return $this->charges;
+  }
 
 	public static function createAccount($name, $plan, $schedule = null, $user = null, $role = Account::ROLE_USER, $engine = null)
 	{
@@ -271,7 +279,7 @@ class Account
 
 			if ($id)
 			{
-				$charges = self::getCharges($id);
+				$charges = self::fillCharges($id);
 				return new self($id, $name, $plan_id, $role, $schedule_id, $engine, $charges, $active);
 			}
 			else
@@ -357,7 +365,7 @@ class Account
 		return $feature->isEnabledForAccount($this);
 	}
 	
-	private static function getCharges($account_id) {
+	private static function fillCharges($account_id) {
 
 		$db = UserConfig::getDB();
 
