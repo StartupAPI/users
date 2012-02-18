@@ -13,7 +13,7 @@ if (preg_match("/^Smarty-3/",$smarty->_version)) {
   $smarty->compile_dir(UserConfig::$smarty_compile);
   $smarty->cache_dir(UserConfig::$smarty_cache);
 } else {
-  die "Cannot handle smarty version ".$smarty->_version;
+  die("Cannot handle smarty version ".$smarty->_version);
 }
 
 require_once(UserConfig::$header);
