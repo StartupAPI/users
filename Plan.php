@@ -63,7 +63,7 @@ class Plan {
 		foreach($parameters as $p => $v)
 			if(isset($a[$p])) $this->$p = $a[$p];
 			
-		# Instantiate PaymentSchedules
+		# Instantiate PaymentSchedules, replacing stored parameters arrays with actual objects
 		if(is_array($this->payment_schedules)) {
   		$schedules = array();
 	  	foreach($this->payment_schedules as $id => $s)
