@@ -34,7 +34,7 @@ class TestUser extends UnitTestCase {
     // lookup again, and check back from DB
     $found = User::getUsersByEmailOrUsername('me');
     $this -> assertEqual( count($found), 1 );
-    $user1 = $found[0];
+    $user = $found[0];
 
     $acc = Account::getCurrentAccount($user);
     $this -> assertNotNull( $acc );
