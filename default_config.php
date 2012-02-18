@@ -210,6 +210,9 @@ class UserConfig
         public static $default_plan = 'PLAN_FREE';
         // default schedule
         public static $default_schedule = 'default';
+        
+        // Smarty base directory
+        public static $SMARTY_DIR = '/usr/share/php/smarty3';
 
 
         public static function getDB()
