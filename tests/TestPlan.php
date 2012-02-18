@@ -92,46 +92,10 @@ class TestSimple1 extends UnitTestCase {
 
   }
 
-  /* uncomment me
-  function testIDCorrespondence()
-  {
-    $plan = new Plan(0,array('name' => 'test plan', 
-      'details_url' => 'lalala',
-      'payment_schedules' => array(
-                                    0 => array('id' => '1',  // these are actual IDs
-                                   'name' => 'some schedule',
-                                   'charge_amount' => '5',
-                                   'charge_period' => '10'),
-
-                                    1 => array('id' => '2',  // these are actual IDs
-                                   'name' => 'some other schedule',
-                                   'charge_amount' => '6',
-                                   'charge_period' => '11'), 
-       )));
-    $this -> assertEqual( $plan -> getPaymentScheduleIDs(), array(1, 2)); // should match!
-    $this -> assertNotNull( $plan -> getDefaultPaymentSchedule() );
-    $this -> assertEqual( $plan -> getDefaultPaymentSchedule() -> id, 0 );
-  }
-   */
-
-  /* uncomment me
+  /* TODO
   function testDuplicateIDsInSchedules()
   {
-    $this -> expectException(); // because of duplicate IDs in schedule initializer list
-    $plan = new Plan(0,array('name' => 'test plan', 
-      'details_url' => 'lalala',
-      'payment_schedules' => array(
-                                    0 => array('id' => '0', 
-                                   'name' => 'some schedule',
-                                   'charge_amount' => '5',
-                                   'charge_period' => '10'),
-
-                                    1 => array('id' => '0',  // the same id! 
-                                   'name' => 'some schedule',
-                                   'charge_amount' => '5',
-                                   'charge_period' => '10'), 
-       )));
-    $this -> assertEqual( $plan -> getPaymentScheduleIDs(), array(0, 1));
+    // TEST what happens if there are duplicate IDs of plans specified 
   }
    */
 
