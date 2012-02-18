@@ -5,7 +5,7 @@ require_once('../Plan.php');
 require_once('../users.php');
 
 class TestUser extends UnitTestCase {
-  private $plan = null;
+  private $user = null;
 
   function testSimple()
   {
@@ -16,15 +16,29 @@ class TestUser extends UnitTestCase {
   {
     $users = User::getUsers();
     $this -> assertNotNull( $users );
-    $me = $users[5]; // spacediver
+    $me = $users[5]; 
     $this -> assertNotNull( $me );
+    $this -> assertEqual( $me -> getUsername(), 'spacediver' );
     //$this -> dump($me);
+   }
 
-    $acc = Account::getCurrentAccount($me);
-    //$this -> dump($acc);
+  function testSetAccount()
+  {
+		$user = User::createNew('me', 'me', 'me@internet.com', 'password');
+    $acc = Account::getCurrentAccount($user);
     $this -> assertNotNull( $acc );
-    $this -> assertEqual( $acc -> getName(), 'FREE (Paul)' );
+    $this -> assertEqual( $acc -> getPlan() -> id, 'PLAN_FREE');
+    $acc->activatePlan('personal-pro','monthly');
+    $this -> assertEqual( $acc -> getPlan() -> id, 'personal-pro');
 
+    // lookup again, and check back from DB
+    $found = User::getUsersByEmailOrUsername('me');
+    $this -> assertEqual( count($found), 1 );
+    $user = $found[0];
+
+    $acc = Account::getCurrentAccount($user);
+    $this -> assertNotNull( $acc );
+    $this -> assertEqual( $acc -> getPlan() -> id, 'personal-pro');
   }
 
 }
