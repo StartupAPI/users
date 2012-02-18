@@ -4,11 +4,11 @@ require_once(dirname(__FILE__).'/User.php');
 
 include(dirname(__FILE__).'/view/account/account_details.php');
 # this yields Smarty onbject as $smarty 
-if (strstr($smarty->_version,"Smarty-3")) {
+if (preg_match("/^Smarty-3/",$smarty->_version)) {
   $smarty->setTemplateDir(UserConfig::$smarty_templates.'/account');
   $smarty->setCompileDir(UserConfig::$smarty_compile);
   $smarty->setCacheDir(UserConfig::$smarty_cache);
-} elseif (strstr($smarty->_version,"Smarty-2")) {
+} elseif (preg_match("/^2\./",$smarty->_version)) {
   $smarty->template_dir(UserConfig::$smarty_templates.'/account');
   $smarty->compile_dir(UserConfig::$smarty_compile);
   $smarty->cache_dir(UserConfig::$smarty_cache);
