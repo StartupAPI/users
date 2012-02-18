@@ -22,6 +22,28 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 16
+ * Payment Plans and Engines
+*/
+
+$versions[16]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."account_charge (
+  account_id int(11) NOT NULL,
+  date_time datetime NOT NULL,
+  amount decimal(10,0) DEFAULT NULL,
+  UNIQUE KEY acct_id_datetime (account_id,date_time),
+  KEY account_idx (account_id)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+$versions[16]['up'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
+  CHANGE COLUMN plan plan varchar(256), 
+  ADD COLUMN schedule varchar(256), 
+  ADD COLUMN engine varchar(256), 
+  ADD COLUMN active tinyint(1) DEFAULT '1'";
+$versions[16]['down'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
+  CHANGE COLUMN plan plan tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'Payment plan ID',
+  DROP COLUMN schedule, DROP COLUMN engine, DROP COLUMN active";
+$versions[16]['down'][] = "DROP TABLE ".UserConfig::$mysql_prefix."account_charge";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 15
  * Daily stats cache table
 */
