@@ -112,8 +112,10 @@ class Account
 	{
 		$this->id = $id;
 		$this->name = $name;
-		$this->plan = Plan::getPlan($plan) || Plan::getPlan(UserConfig::$default_plan);
-		$this->schedule = $schedule === NULL ? NULL : $this->plan->getPaymentSchedule($schedule);
+		$this->plan = Plan::getPlan($plan);
+		if(is_null($this->plan))
+		  $this->plan = Plan::getPlan(UserConfig::$default_plan);
+		$this->schedule = is_null($schedule) ? NULL : $this->plan->getPaymentSchedule($schedule);
 		$this->role = $role;
 		$this->isActive = $active;
 		if($engine !== NULL) {
@@ -121,7 +123,7 @@ class Account
 			$this->paymentEngine = new $engine;
 		}
 		
-		$this->charges = $charges === NULL ? array() : $charges;
+		$this->charges = is_null($charges) ? array() : $charges;
 	}
 
 	public function getID()
@@ -391,7 +393,7 @@ class Account
 	
 	public function paymentIsDue() {
 	
-		if($this->schedule === NULL) return;
+		if(is_null($this->schedule)) return;
 		$charge = array('datetime' => date('Y-m-d H:i:s'), 'amount' => $this->schedule->charge_amount);
 		$this->charges[] = $charge;
 		
@@ -457,7 +459,7 @@ class Account
 	public function activatePlan($plan_id, $schedule_id = NULL) {
 
 		$new_plan = Plan::getPlan($plan_id);
-		if($new_plan === NULL || $new_plan === FALSE) return FALSE;	
+		if(is_null($new_plan) || $new_plan === FALSE) return FALSE;	
 		$new_schedule = $new_plan->getPaymentSchedule($schedule_id);
 
 		$old_plan = $this->plan->id;
@@ -503,7 +505,7 @@ class Account
 			if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'accounts SET plan = ?, schedule = ?, active = 1 WHERE id = ?')))
 			  throw new Exception("Can't prepare statement: ".$db->error);
 			  
-      if (!$stmt->bind_param('ssi', $this->plan->id, $this->schedule === NULL ? NULL : $this->schedule->id, $this->id))
+      if (!$stmt->bind_param('ssi', $this->plan->id, is_null($this->schedule) ? NULL : $this->schedule->id, $this->id))
         throw new Exception("Can't bind parameters: ".$stmt->error);
         
       if (!$stmt->execute())
