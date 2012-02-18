@@ -496,7 +496,7 @@ class Account
 
 		$this->plan->deactivate_hook($this->downgrade_to);
 
-		if($this->downgrade_to !== NULL) {
+		if(!is_null($this->downgrade_to)) {
 			$this->plan = Plan::getPlan($this->downgrade_to);
 			$this->schedule = $this->plan->getDefaultPaymentSchedule();
 			$this->isActive = TRUE;

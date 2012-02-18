@@ -67,6 +67,10 @@ class Plan {
 			if(isset($a[$p])) $this->$p = $a[$p];
 			else $this->$p = $v;
 			
+    # If downgrade_to has the same id as we have, reset it to null
+    if($this->id == $this->downgrade_to)
+      $this->downgrade_to = NULL;
+
 		# Instantiate PaymentSchedules, replacing stored parameters arrays with actual objects
 		if(is_array($this->payment_schedules)) {
   		$schedules = array();
