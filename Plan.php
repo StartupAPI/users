@@ -11,6 +11,7 @@
 require_once (dirname(__FILE__).'/PaymentSchedule.php');
 
 class Plan {
+
 	private $id;
 	private $name;
 	private $description;
@@ -143,6 +144,9 @@ class Plan {
     if(count(self::$Plans))
       throw new Exception("Already initialized");
       
+    if(!is_array($a))
+      throw new Exception("Parameter is not an array");
+
     foreach($a as $id => $p)
       self::$Plans[] = new self($id,$p);
   }
@@ -154,11 +158,6 @@ class Plan {
       if($p->id == $id) return $p;
     }
     return NULL;
-  }
-  
-  public static function createPlan($a) {
-
-    self::$Plans[] = new Plan($a);
   }
   
   public static function getPlanIDs() {
