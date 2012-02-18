@@ -25,6 +25,8 @@ class Plan {
 	private $user_activate_hook;
 	private $user_deactivate_hook;
 
+	private static $Plans = array();
+
 	public function __construct($id,$a) {
 	
 		# Known parameters and their default values listed here:
@@ -135,52 +137,35 @@ class Plan {
   	if($this->user_deactivate_hook == '') return;
   	call_user_func_array($this->user_deactivate_hook,array('NewPlanID' => $PlanID, 'OldPlanID' => $this->id));
 	}
-}
 
-class PlanCollection {
-
-  private static $instance;
-  private $Plans;
+  public static function init($a) {
   
-  private function __construct() {}
-  
-  public static function instance() {
-  
-    if(!isset(self::$instance)) {
-    
-      $className = __CLASS__;
-      self::$instance = new $className;
-    }
-    return self::$instance;
-  }
-
-  public function init($a) {
-  
-    if(count($this->Plans))
+    if(count(self::$Plans))
       throw new Exception("Already initialized");
       
     foreach($a as $id => $p)
-      $this->Plans[] = new Plan($id,$p);
+      self::$Plans[] = new self($id,$p);
   }
   
-  public function getPlan($id) {
+  public static function getPlan($id) {
   
-    if($id === NULL) return FALSE;
-    foreach($this->Plans as $p) {
+    if($id === NULL || !count(self::$Plans)) return FALSE;
+    foreach(self::$Plans as $p) {
       if($p->id == $id) return $p;
     }
     return NULL;
   }
   
-  public function createPlan($a) {
+  public static function createPlan($a) {
 
-    $this->Plans[] = new Plan($a);
+    self::$Plans[] = new Plan($a);
   }
   
-  public function getPlanIDs() {
+  public static function getPlanIDs() {
   
+    if(!count(self::$Plans)) return FALSE;
     $ids = array();
-    foreach($this->Plans as $p)
+    foreach(self::$Plans as $p)
       $ids[] = $p->id;
     return $ids;
   }

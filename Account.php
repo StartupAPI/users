@@ -103,7 +103,7 @@ class Account
 	{
 		$this->id = $id;
 		$this->name = $name;
-		$this->plan = PlanCollection::instance()->GetPlan($plan);
+		$this->plan = Plan::getPlan($plan);
 		$this->schedule = $schedule === NULL ? NULL : $this->plan->getPaymentSchedule($schedule);
 		$this->role = $role;
 		if($engine !== NULL) {
@@ -435,7 +435,7 @@ class Account
 	
 	public function activatePlan($plan_id, $schedule_id = NULL) {
 
-		$new_plan = PlanCollection::instance()->getPlan($plan_id);
+		$new_plan = Plan::getPlan($plan_id);
 		if($new_plan === NULL || $new_plan === FALSE) return FALSE;	
 		$new_schedule = $new_plan->getPaymentSchedule($schedule_id);
 
@@ -453,7 +453,7 @@ class Account
 	
 		$this->plan->deactivate_hook($this->downgrade_to);
 		if($this->downgrade_to !== NULL) {
-			$this->plan = PlanCollection::instance()->getPlan($this->downgrade_to);
+			$this->plan = Plan::getPlan($this->downgrade_to);
 			$this->schedule = $this->plan->getDefaultPaymentSchedule();
 			return TRUE;
 		}
