@@ -570,6 +570,10 @@ class Account
 		return $this->paymentEngine; # do we need class or just id?
 	}
 	
+	public function isIndividual() {
+	  return $this->isIndividual;
+	}
+	
 	public function setPaymentEngine($engine) {
 	
     if($engine == NULL)

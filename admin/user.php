@@ -124,7 +124,7 @@ if (UserConfig::$useAccounts) { ?>
 
 	foreach ($accounts as $user_account) {
 		?><li>
-		<?php echo UserTools::escape($user_account->getName()) ?> (<?php echo UserTools::escape($user_account->getPlan()->getName()) ?>)<?php
+		<?php echo UserTools::escape($user_account->getName()) ?> (<?php echo UserTools::escape($user_account->getPlan()->name) ?>)<?php
 		if ($user_account->getUserRole() == Account::ROLE_ADMIN) {
 			?> (admin)<?php
 		}
