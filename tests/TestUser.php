@@ -65,8 +65,8 @@ class TestUser extends UnitTestCase {
   
   function _activatePlan( $user, $acc, $plan_id, $schedule_id )
   {
-    $acc->activatePlan('personal-pro','monthly');
-    $this -> assertEqual( $acc -> getPlan() -> id, 'personal-pro');
+    $acc->activatePlan($plan_id, $schedule_id);
+    $this -> assertEqual( $acc -> getPlan() -> id, $plan_id );
 
     // lookup again, and check back from DB
     $found = User::getUsersByEmailOrUsername($user -> getUsername());
@@ -79,8 +79,10 @@ class TestUser extends UnitTestCase {
     $this -> assertNotNull( $plan );
     $this -> assertEqual( $plan -> id, $plan_id );
     $schedule = $acc -> getSchedule();
-    $this -> assertNotNull( $schedule );
-    $this -> assertEqual( $schedule -> id, $schedule_id );
+    if( $plan_id != 'PLAN_FREE' ) {
+      $this -> assertNotNull( $schedule );
+      $this -> assertEqual( $schedule -> id, $schedule_id );
+    }
     //$this -> dump($schedule);
   }
 
@@ -92,6 +94,9 @@ class TestUser extends UnitTestCase {
     $this -> assertNotNull( $acc );
     $this -> assertEqual( $acc -> getPlan() -> id, 'PLAN_FREE');
 
+    $this -> _activatePlan( $user, $acc, 'personal-pro', 'monthly' );
+    $this -> _activatePlan( $user, $acc, 'PLAN_FREE', NULL );
+    $this -> _activatePlan( $user, $acc, 'personal-pro', 'every6months' );
     $this -> _activatePlan( $user, $acc, 'personal-pro', 'monthly' );
 
   }
