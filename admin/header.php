@@ -62,5 +62,10 @@ if (UserConfig::$enableInvitations) {
 	?><a href="bymodule.php">Registrations By Module</a><?php
 } else {
 	?>Registrations By Module<?php
+} ?> |
+<?php if ($ADMIN_SECTION != 'features') {
+	?><a href="features.php">Features</a><?php
+} else {
+	?>Features<?php
 } ?>
 </div>

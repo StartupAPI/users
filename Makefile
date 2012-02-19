@@ -73,5 +73,6 @@ else
 	rm -rf StartupAPI_${v}
 endif
 
+docs:	documentation
 documentation:
 	phpdoc -o HTML:frames:default -d . -t docs -i "*/oauth-php/*,*/modules/facebook/php-sdk/*,*/dbupgrade/*,*/admin/swfobject/*,*/docs/*"
