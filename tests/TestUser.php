@@ -21,8 +21,38 @@ class TestUser extends UnitTestCase {
     $this -> assertNotNull( $me );
     $this -> assertEqual( $me -> getUsername(), 'spacediver' );
     //$this -> dump($me);
-   }
+  }
 
+  function testAddUser()
+  {
+    $found = User::getUsersByEmailOrUsername('me1');
+    $this -> assertEqual( count($found), 0 );
+
+		$user = User::createNew('me1', 'me1', 'me1@internet.com', 'password');
+
+    $found = User::getUsersByEmailOrUsername('me1');
+    $this -> assertEqual( count($found), 1 );
+    $user = $found[0];
+    $this -> assertEqual( $user -> getName(), 'me1' );
+
+    $user -> delete();
+  }
+
+  function testDeleteUser()
+  {
+		$user = User::createNew('me2', 'me2', 'me2@internet.com', 'password');
+
+    $found = User::getUsersByEmailOrUsername('me2');
+    $this -> assertEqual( count($found), 1 );
+    $user = $found[0];
+    $this -> assertEqual( $user -> getName(), 'me2' );
+
+    $user->delete();
+
+    $found = User::getUsersByEmailOrUsername('me2');
+    $this -> assertEqual( count($found), 0 );
+  }
+  
   function testSetAccount()
   {
 		$user = User::createNew('me', 'me', 'me@internet.com', 'password');
@@ -40,6 +70,8 @@ class TestUser extends UnitTestCase {
     $acc = Account::getCurrentAccount($user);
     $this -> assertNotNull( $acc );
     $this -> assertEqual( $acc -> getPlan() -> id, 'personal-pro');
+
+    $user -> delete();
   }
 
 }
