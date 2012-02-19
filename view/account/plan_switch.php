@@ -65,3 +65,4 @@ foreach($plan_ids as $p) { # Iterate over all configured plans
 }
   
 $smarty->assign('plans',$plans);
+$smarty->assign('USERSROOTURL',UserConfig::$USERSROOTURL);

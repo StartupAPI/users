@@ -38,10 +38,10 @@ $versions[16]['up'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
   ADD COLUMN schedule varchar(256) DEFAULT NULL,
   ADD COLUMN engine varchar(256) DEFAULT NULL, 
   ADD COLUMN active tinyint(1) DEFAULT '1',
-  ADD COLUMN schedule_changed datetime DEFAULT NULL";
+  ADD COLUMN next_charge datetime DEFAULT NULL";
 $versions[16]['down'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
   CHANGE COLUMN plan plan tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'Payment plan ID',
-  DROP COLUMN schedule, DROP COLUMN engine, DROP COLUMN active, DROP COLUMN schedule_changed";
+  DROP COLUMN schedule, DROP COLUMN engine, DROP COLUMN active, DROP COLUMN next_charge";
 $versions[16]['down'][] = "DROP TABLE ".UserConfig::$mysql_prefix."account_charge";
 
 /* -------------------------------------------------------------------------------------------------------

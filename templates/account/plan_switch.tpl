@@ -26,7 +26,7 @@
 		{/literal}
 	</style>
 
-	<form action="{php}echo UserConfig::$USERSROOTURL{/php}/controller/account/plan_switch.php" method="POST">
+	<form action="{$USERSROOTURL}/controller/account/plan_switch.php" method="POST">
 	<p>
 	{$m = 0}
 	{foreach from=$plans item=plan}
