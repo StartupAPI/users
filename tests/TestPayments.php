@@ -44,12 +44,46 @@ class TestPayments extends UnitTestCase {
     $user = $this -> user;
     $acc = Account::getCurrentAccount($user);
     $acc -> paymentIsDue();
-    $this -> assertNotNull( $acc -> getCharges());
-    $this -> assertEqual( count($acc -> getCharges()), 1);
-    $charges = $acc -> getCharges();
-    $this -> assertEqual( $charges[0]['amount'], $acc->getSchedule()->charge_amount);
     $acc -> paymentReceived( $acc->getSchedule()->charge_amount  );
     $this -> assertEqual( count($acc -> getCharges()), 0);
+  }
+
+  function testAddPaymentPartial()
+  {
+    $user = $this -> user;
+    $acc = Account::getCurrentAccount($user);
+    $acc -> paymentIsDue();
+    $acc -> paymentReceived( $acc->getSchedule()->charge_amount - 1  );
+    $this -> assertEqual( count($acc -> getCharges()), 1);
+    $charges = $acc -> getCharges();
+    $this -> assertEqual( $charges[0]['amount'], 1 );
+  }
+
+  function testAddPaymentInMultipleParts()
+  {
+    $user = $this -> user;
+    $acc = Account::getCurrentAccount($user);
+    $acc -> paymentIsDue();
+    $this -> assertTrue( $acc->getSchedule()->charge_amount > 3 );
+    $acc -> paymentReceived( $acc->getSchedule()->charge_amount - 3  );
+    $this -> assertEqual( count($acc -> getCharges()), 1);
+    $charges = $acc -> getCharges();
+    $this -> assertEqual( $charges[0]['amount'], 3 );
+    $acc -> paymentReceived( 1 );
+    $charges = $acc -> getCharges();
+    $this -> assertEqual( $charges[0]['amount'], 2 );
+    $acc -> paymentReceived( 2 );
+    $this -> assertEqual( count($acc -> getCharges()), 0);
+  }
+
+  function testAddPaymentExcessive() {
+    $user = $this -> user;
+    $acc = Account::getCurrentAccount($user);
+    $acc -> paymentIsDue();
+    $acc -> paymentReceived( $acc->getSchedule()->charge_amount + 3 );
+    $this -> assertEqual( count($acc -> getCharges()), 0);
+
+    // TODO test excessive payment storage
   }
 
 }
