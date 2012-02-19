@@ -62,9 +62,9 @@ class TestPayments extends UnitTestCase {
   function testAddPaymentInMultipleParts()
   {
     $user = $this -> user;
+    $acc = Account::getCurrentAccount($user);
     $amount = $acc->getSchedule()->charge_amount;
 
-    $acc = Account::getCurrentAccount($user);
     $acc -> paymentIsDue();
     $this -> assertTrue( $amount > 3 );
     $acc -> paymentReceived( $amount - 3  );
@@ -83,7 +83,14 @@ class TestPayments extends UnitTestCase {
     $acc = Account::getCurrentAccount($user);
     $acc -> paymentIsDue();
     $acc -> paymentReceived( $acc->getSchedule()->charge_amount + 3 );
+
     $this -> assertEqual( count($acc -> getCharges()), 0);
+
+    $acc -> paymentIsDue();
+
+    $acc -> paymentReceived( $acc->getSchedule()->charge_amount - 3 );
+    
+    $this -> assertEqual( count($acc -> getCharges()), 0, 'should use my excessive money!');
 
     // TODO test excessive payment storage
   }
@@ -91,9 +98,9 @@ class TestPayments extends UnitTestCase {
   function testManyCharges()
   {
     $user = $this -> user;
+    $acc = Account::getCurrentAccount($user);
     $amount = $acc->getSchedule()->charge_amount;
 
-    $acc = Account::getCurrentAccount($user);
     $acc -> paymentIsDue();
     sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
     $acc -> paymentIsDue();
@@ -122,9 +129,9 @@ class TestPayments extends UnitTestCase {
   function testSInglePaymentCoveringManyCharges()
   {
     $user = $this -> user;
+    $acc = Account::getCurrentAccount($user);
     $amount = $acc->getSchedule()->charge_amount;
 
-    $acc = Account::getCurrentAccount($user);
     $acc -> paymentIsDue();
     sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
     $acc -> paymentIsDue();
