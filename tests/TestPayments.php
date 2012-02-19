@@ -84,8 +84,8 @@ class TestPayments extends UnitTestCase {
     $acc -> paymentIsDue();
     $acc -> paymentReceived( $acc->getSchedule()->charge_amount + 3 );
 
-    $this -> assertEqual( count($acc -> getCharges()), 0);
-
+    $this -> assertEqual( count($acc -> getCharges()), 1);
+    sleep(1);
     $acc -> paymentIsDue();
 
     $acc -> paymentReceived( $acc->getSchedule()->charge_amount - 3 );

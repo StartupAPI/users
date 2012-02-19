@@ -399,10 +399,11 @@ class Account
 
 		$charge_amount = $this->schedule->charge_amount;
 		# Look if there is a negative charge, it should be a single element
-		if ($this->charges[0]['amount'] < 0) {
-		  if ($this->charges[0]['amount'] + $charge_amount > 0) { # This charge is greater than we owe to user
+		$c = reset(array_keys($this->charges));
+		if ($c !== FALSE && $this->charges[$c]['amount'] < 0) {
+		  if ($this->charges[$c]['amount'] + $charge_amount > 0) { # This charge is greater than we owe to user
 
-		    $charge_amount += $this->charges[0]['amount'];
+		    $charge_amount += $this->charges[$c]['amount'];
 		    
 		    if (!($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.'account_charge WHERE account_id = ?')))
 		      throw new Exception("Can't prepare statement: ".$db->error);
@@ -420,13 +421,13 @@ class Account
         if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'account_charge SET amount = ? WHERE account_id = ?')))
           throw new Exception("Can't prepare statement: ".$db->error);
           
-        if (!$stmt->bind_param('i', $this->charges[0]['amount'] + $charge_amount, $this->id))
+        if (!$stmt->bind_param('i', $this->charges[$c]['amount'] + $charge_amount, $this->id))
           throw new Exception("Can't bind parameter".$stmt->error);
           
         if (!$stmt->execute())
           throw new Exception("Can't execute statement: ".$stmt->error);
           
-        $this->charges[0]['amount'] += $charge_amount;
+        $this->charges[$c]['amount'] += $charge_amount;
         $stmt->close();
         return TRUE;
       }
@@ -495,15 +496,18 @@ class Account
 		
 		# Store excessive payment as negative charge
 		if($amount > 0) {
-      if(!($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'account_charge (account_id, date_time, amount) VALUES (?, now(), ?)')))
+		  $charge = array('datetime' => date('Y-m-d H:i:s'), 'amount' => -$amount);
+		  $this->charges[] = $charge;
+
+      if(!($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'account_charge (account_id, date_time, amount) VALUES (?, ?, ?)')))
         throw new Exception("Can't prepare statement: ".$db->error);
       
-      if (!$stmt->bind_param('id', $this->id, -$amount))
+      if (!$stmt->bind_param('isd', $this->id, $charge['datetime'], $charge['amount']))
         throw new Exception("Can't bind parameter".$stmt->error);
       
       if (!$stmt->execute())
         throw new Exception("Can't execute statement: ".$stmt->error);
-
+        
       $stmt->close();
     }
 		
