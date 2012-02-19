@@ -143,7 +143,7 @@ if (count($features) > 0) {
 	<?php foreach ($features as $id => $feature) {
 		?><div<?php if (!$feature->isEnabled()) {?> style="color: grey; text-decoration: line-through"<?php } ?>>
 		<label>
-		<input id="feature_<?php echo UserTools::escape($feature->getID()) ?>" type="checkbox" name="feature[<?php echo UserTools::escape($feature->getID()) ?>]"<?php echo $feature->isEnabledForUser($user) ? ' checked="true"' : '' ?><?php echo !$feature->isEnabled() ? ' disabled="disabled"' : '' ?>>
+		<input id="feature_<?php echo UserTools::escape($feature->getID()) ?>" type="checkbox" name="feature[<?php echo UserTools::escape($feature->getID()) ?>]"<?php echo $feature->isEnabledForUser($user) ? ' checked="true"' : '' ?><?php echo !$feature->isEnabled() || $feature->isRolledOutToAllUsers() ? ' disabled="disabled"' : '' ?>>
 		<?php echo UserTools::escape($feature->getName()) ?></label>
 		</div><?php
 	} ?>
