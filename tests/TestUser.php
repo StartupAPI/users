@@ -45,6 +45,12 @@ class TestUser extends UnitTestCase {
     $user = $found[0];
     $this -> assertEqual( $user -> getName(), 'me1' );
 
+    $acc = Account::getCurrentAccount($user);
+    $this -> assertNotNull( $acc );
+    $plan = $acc -> getPlan();
+    $this -> assertNotNull( $plan );
+    $this -> assertEqual( $plan -> id, 'PLAN_FREE');
+
     $user -> delete();
   }
 
