@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(dirname(dirname(__FILE__))).'/simpletest/autorun.php');
+
 require_once(dirname(dirname(__FILE__)).'/Plan.php');
 require_once(dirname(dirname(__FILE__)).'/users.php');
 
