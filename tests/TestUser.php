@@ -8,6 +8,16 @@ require_once(dirname(dirname(__FILE__)).'/users.php');
 class TestUser extends UnitTestCase {
   private $user = null;
 
+  function setUp()
+  {
+    $this -> user = User::createNew('me', 'me', 'me@internet.com', 'password');
+  }
+
+  function tearDown()
+  {
+    $this -> user -> delete();
+  }
+
   function testSimple()
   {
     $this->assertTrue(true, 'should be true');
@@ -17,7 +27,7 @@ class TestUser extends UnitTestCase {
   {
     $users = User::getUsers();
     $this -> assertNotNull( $users );
-    $me = $users[5]; 
+    $me = $users[6]; 
     $this -> assertNotNull( $me );
     $this -> assertEqual( $me -> getUsername(), 'spacediver' );
     //$this -> dump($me);
@@ -55,7 +65,8 @@ class TestUser extends UnitTestCase {
   
   function testSetAccount()
   {
-		$user = User::createNew('me', 'me', 'me@internet.com', 'password');
+    $user = $this -> user; 
+
     $acc = Account::getCurrentAccount($user);
     $this -> assertNotNull( $acc );
     $this -> assertEqual( $acc -> getPlan() -> id, 'PLAN_FREE');
@@ -69,9 +80,15 @@ class TestUser extends UnitTestCase {
 
     $acc = Account::getCurrentAccount($user);
     $this -> assertNotNull( $acc );
-    $this -> assertEqual( $acc -> getPlan() -> id, 'personal-pro');
+    $plan = $acc -> getPlan();
+    $this -> assertNotNull( $plan );
+    $this -> assertEqual( $plan -> id, 'personal-pro');
+    $schedule = $acc -> getSchedule();
+    $this -> assertNotNull( $schedule );
+    $this -> assertEqual( $schedule -> id, 'monthly' );
+    //$this -> dump($schedule);
 
-    $user -> delete();
+    //$this -> assertEquals( $lan
   }
 
 }
