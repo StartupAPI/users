@@ -90,6 +90,38 @@ class Account
 		return $accounts;
 	}
 
+	/*
+	 * Returns total number of accounts in the system
+	 */
+	public static function getTotalAccounts()
+	{
+		$db = UserConfig::getDB();
+
+		$total = 0;
+
+		if ($stmt = $db->prepare('SELECT COUNT(*) FROM '.UserConfig::$mysql_prefix.'accounts'))
+		{
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+			if (!$stmt->bind_result($total))
+			{
+				throw new Exception("Can't bind result: ".$stmt->error);
+			}
+
+			$stmt->fetch();
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+
+		return $total;
+	}
+
+
 
 	private function __construct($id, $name, $plan, $role)
 	{
