@@ -62,10 +62,12 @@ class TestPayments extends UnitTestCase {
   function testAddPaymentInMultipleParts()
   {
     $user = $this -> user;
+    $amount = $acc->getSchedule()->charge_amount;
+
     $acc = Account::getCurrentAccount($user);
     $acc -> paymentIsDue();
-    $this -> assertTrue( $acc->getSchedule()->charge_amount > 3 );
-    $acc -> paymentReceived( $acc->getSchedule()->charge_amount - 3  );
+    $this -> assertTrue( $amount > 3 );
+    $acc -> paymentReceived( $amount - 3  );
     $this -> assertEqual( count($acc -> getCharges()), 1);
     $charges = $acc -> getCharges();
     $this -> assertEqual( $charges[0]['amount'], 3 );
@@ -86,6 +88,53 @@ class TestPayments extends UnitTestCase {
     // TODO test excessive payment storage
   }
 
+  function testManyCharges()
+  {
+    $user = $this -> user;
+    $amount = $acc->getSchedule()->charge_amount;
+
+    $acc = Account::getCurrentAccount($user);
+    $acc -> paymentIsDue();
+    sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
+    $acc -> paymentIsDue();
+    sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
+    $acc -> paymentIsDue();
+
+    $acc -> paymentReceived( $amount );
+
+    $this -> assertEqual( count($acc -> getCharges()), 2);
+    $charges = $acc -> getCharges();
+    $this -> assertEqual( $charges[0]['amount'], $amount );
+    $this -> assertEqual( $charges[1]['amount'], $amount );
+
+    $acc -> paymentReceived( $amount );
+
+    $this -> assertEqual( count($acc -> getCharges()), 1);
+    $charges = $acc -> getCharges();
+    $this -> assertEqual( $charges[0]['amount'], $amount );
+
+    $acc -> paymentReceived( $amount );
+
+    $this -> assertEqual( count($acc -> getCharges()), 0);
+
+  }
+
+  function testSInglePaymentCoveringManyCharges()
+  {
+    $user = $this -> user;
+    $amount = $acc->getSchedule()->charge_amount;
+
+    $acc = Account::getCurrentAccount($user);
+    $acc -> paymentIsDue();
+    sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
+    $acc -> paymentIsDue();
+    sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
+    $acc -> paymentIsDue();
+    
+    $acc -> paymentReceived( $amount * 3);
+
+    $this -> assertEqual( count($acc -> getCharges()), 0);
+  }
 }
 
 ?>
