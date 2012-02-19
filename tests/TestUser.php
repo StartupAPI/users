@@ -1,8 +1,8 @@
 <?php
 
-require_once('../../simpletest/autorun.php');
-require_once('../Plan.php');
-require_once('../users.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/simpletest/autorun.php');
+require_once(dirname(dirname(__FILE__)).'/Plan.php');
+require_once(dirname(dirname(__FILE__)).'/users.php');
 
 class TestUser extends UnitTestCase {
   private $user = null;
