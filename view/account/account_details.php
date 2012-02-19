@@ -23,14 +23,14 @@ $smarty->assign('account_isActive',$account->isActive());
 $smarty->assign('account_engine', $account->getPaymentEngine());
   
 $plan = Plan::getPlan($account->getPlanID());
-foreach($plan_data as $k => $d)
+foreach($plan_data as $d)
   $smarty->assign('plan_'.$d, $plan->$d);
 
 $schedule_id = $account->getScheduleID();
 if($schedule_id)
   $schedule = $plan->getPaymentSchedule($schedule_id);
 if($schedule)
-  foreach($schedule_data as $k => $d)
+  foreach($schedule_data as $d)
     $smarty->assign('schedule_'.$d, $schedule->$d);
     
 $smarty->assign('charges',$account->getCharges());

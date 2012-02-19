@@ -2,7 +2,7 @@
 require_once(dirname(__FILE__).'/config.php');
 require_once(dirname(__FILE__).'/User.php');
 
-include(dirname(__FILE__).'/view/account/account_details.php');
+include(dirname(__FILE__).'/view/account/plan_switch.php');
 # this yields Smarty object as $smarty 
 if (preg_match("/^Smarty-3/",$smarty->_version)) {
   $smarty->setTemplateDir(UserConfig::$smarty_templates.'/account');
@@ -18,6 +18,6 @@ if (preg_match("/^Smarty-3/",$smarty->_version)) {
 
 require_once(UserConfig::$header);
 
-$smarty->display('account_details.tpl');
+$smarty->display('plan_switch.tpl');
 
 require_once(UserConfig::$footer);
