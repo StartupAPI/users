@@ -15,10 +15,12 @@
     <p>Plan automatically downgrades to: <b>{$plan_downgrade_to}</b> 
     	if payment is due more than {$plan_grace_period} day(s)</p>
     {/if}
+		{if $schedule_name}
     <p>Payment Schedule: <b>{$schedule_name}</b></p>
     <p>Payment Schedule description: {$schedule_description}</p>
     <p>Charge Amount: <b>${$schedule_charge_amount}</b></p>
     <p>Charge Period: <b>{$schedule_charge_period}</b> days</p>
+    {/if}
   </div>
   
   {if count($charges)}
