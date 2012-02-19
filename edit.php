@@ -98,7 +98,7 @@ require_once(UserConfig::$header);
 
 	foreach ($accounts as $user_account) {
 		?><div>
-		<?php echo $user_account->getName() ?> (<?php echo $user_account->getPlan()->getName() ?>)<?php
+		<?php echo $user_account->getName() ?> (<?php echo $user_account->getPlan()->name ?>)<?php
 		if ($user_account->getUserRole() == Account::ROLE_ADMIN) {
 			?> - <a href="<?php echo UserConfig::$USERSROOTURL.'/manage_account.php?account='.$user_account->getID(); ?>">manage</a><?php
 		}

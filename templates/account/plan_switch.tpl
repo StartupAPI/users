@@ -10,6 +10,7 @@
 		Choose your payment plan:
   </div>
 	<style>
+		{literal}
 		.userbase-account-plan-container {
 			float: left;
 		}
@@ -22,9 +23,10 @@
 		.userbase-account-top-paragraph {
 			margin-top: 0px;
 		}
+		{/literal}
 	</style>
 
-	<form action="{UserConfig::$USERSROOTURL}/controller/account/plan_switch.php" method="POST">
+	<form action="{php}echo UserConfig::$USERSROOTURL{/php}/controller/account/plan_switch.php" method="POST">
 	<p>
 	{$m = 0}
 	{foreach from=$plans item=plan}
