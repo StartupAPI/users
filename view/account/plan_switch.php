@@ -7,10 +7,22 @@ $user = User::require_login();
 $account = Account::getCurrentAccount($user);
 
 $smarty = new Smarty();
+session_start();
+
+if(isset($_SESSION['message'])) {
+  $smarty->assign('message',$_SESSION['message']);
+  unset($_SESSION['message']);
+  $fatal = isset($_SESSION['fatal']) ? $_SESSION['fatal'] : 0;
+  unset($_SESSION['fatal']);
+  if($fatal) {
+    $smarty->assign('fatal',1);
+    exit;
+  }
+}
 
 if(!$account->isActive()) {
-  
-  $smarty->assign('message','This account is not active. Please activate it first.');
+  $smarty->assign('message',array('This account is not active. Please activate it first.'));
+  $smarty->assign('fatal',1);
   exit;
 }
 

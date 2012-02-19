@@ -536,7 +536,8 @@ class Account
 		if(!($schedule = $this->plan->getPaymentSchedule($schedule_id)))
 			return FALSE;
 			
-		$this->paymentEngine->ChangeSubscription($schedule);
+    if($this->paymentEngine)
+  		$this->paymentEngine->ChangeSubscription($schedule);
 		$this->schedule = $schedule;
 		
     # Update db
