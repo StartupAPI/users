@@ -393,11 +393,49 @@ class Account
 	
 	public function paymentIsDue() {
 	
-		if(is_null($this->schedule)) return;
-		$charge = array('datetime' => date('Y-m-d H:i:s'), 'amount' => $this->schedule->charge_amount);
-		$this->charges[] = $charge;
+		if (is_null($this->schedule)) return;
+
+		$db = UserConfig::getDB();		
+
+		$charge_amount = $this->schedule->charge_amount;
+		# Look if there is a negative charge, it should be a single element
+		if ($this->charges[0]['amount'] < 0) {
+		  if ($this->charges[0]['amount'] + $charge_amount > 0) { # This charge is greater than we owe to user
+
+		    $charge_amount += $this->charges[0]['amount'];
+		    
+		    if (!($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.'account_charge WHERE account_id = ?')))
+		      throw new Exception("Can't prepare statement: ".$db->error);
+        
+        if (!$stmt->bind_param('i', $this->id))
+          throw new Exception("Can't bind parameter".$stmt->error);
+          
+        if (!$stmt->execute())
+          throw new Exception("Can't execute statement: ".$stmt->error);
+          
+        $this->charges = array();
+        $stmt->close();
+      } else { # We still owe to user
+      
+        if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'account_charge SET amount = ? WHERE account_id = ?')))
+          throw new Exception("Can't prepare statement: ".$db->error);
+          
+        if (!$stmt->bind_param('i', $this->charges[0]['amount'] + $charge_amount, $this->id))
+          throw new Exception("Can't bind parameter".$stmt->error);
+          
+        if (!$stmt->execute())
+          throw new Exception("Can't execute statement: ".$stmt->error);
+          
+        $this->charges[0]['amount'] += $charge_amount;
+        $stmt->close();
+        return TRUE;
+      }
+    }
+
+    # Rest of $charge_amount should be charged
 		
-		$db = UserConfig::getDB();
+		$charge = array('datetime' => date('Y-m-d H:i:s'), 'amount' => $charge_amount);
+		$this->charges[] = $charge;
 
 		if(!($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'account_charge (account_id, date_time, amount) VALUES (?, ?, ?)')))
 			throw new Exception("Can't prepare statement: ".$db->error);
@@ -453,6 +491,22 @@ class Account
 				throw new Exception("Can't execute statement: ".$stmt->error);
 		}
 		
+		$stmt->close();
+		
+		# Store excessive payment as negative charge
+		if($amount > 0) {
+      if(!($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'account_charge (account_id, date_time, amount) VALUES (?, now(), ?)')))
+        throw new Exception("Can't prepare statement: ".$db->error);
+      
+      if (!$stmt->bind_param('id', $this->id, -$amount))
+        throw new Exception("Can't bind parameter".$stmt->error);
+      
+      if (!$stmt->execute())
+        throw new Exception("Can't execute statement: ".$stmt->error);
+
+      $stmt->close();
+    }
+		
 		return TRUE;
 	}
 	
@@ -478,8 +532,9 @@ class Account
 		
 		$db = UserConfig::getDB();
 		
-		if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'accounts SET plan = ?, schedule = ?, active = 1 WHERE id = ?')))
-		  throw new Exception("Can't prepare statement: ".$db->error);
+		if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.
+		  'accounts SET plan = ?, schedule = ?, active = 1, schedule_changed = now() WHERE id = ?')))
+		    throw new Exception("Can't prepare statement: ".$db->error);
 		  
     if (!$stmt->bind_param('ssi', $plan_id, $schedule_id, $this->id))
       throw new Exception("Can't bind parameter".$stmt->error);
@@ -502,8 +557,9 @@ class Account
 			$this->isActive = TRUE;
 			
 			# Update db
-			if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'accounts SET plan = ?, schedule = ?, active = 1 WHERE id = ?')))
-			  throw new Exception("Can't prepare statement: ".$db->error);
+			if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.
+			  'accounts SET plan = ?, schedule = ?, active = 1, schedule_changed = now() WHERE id = ?')))
+			    throw new Exception("Can't prepare statement: ".$db->error);
 			  
       if (!$stmt->bind_param('ssi', $this->plan->id, is_null($this->schedule) ? NULL : $this->schedule->id, $this->id))
         throw new Exception("Can't bind parameters: ".$stmt->error);
