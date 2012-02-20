@@ -33,6 +33,8 @@ $schedule_data = array(
   
 $plans = array();
 
+$balance = $account->getBalance();
+$smarty->assign('balance',$balance);
 $plan_ids = Plan::getPlanIDs();  
 foreach($plan_ids as $p) { # Iterate over all configured plans
 
@@ -54,11 +56,16 @@ foreach($plan_ids as $p) { # Iterate over all configured plans
     foreach($schedule_data as $sd)                       # Put all schedule properties
       $schedule[$sd] = $this_schedule->$sd;
       
+    $schedule['available'] = TRUE;  
     if($plan['current'] && $account->getSchedule()->id == $this_schedule->id)
       $schedule['current'] = TRUE;
-    else
+    else {
       $schedule['current'] = FALSE;
-  
+      # If user has enough on his balance, schedule could be activated
+      if($balance < $this_schedule->charge_amount)
+        $schedule['available'] = FALSE;
+    }
+
     $plan['schedules'][] = $schedule;
   }
   $plans[] = $plan;

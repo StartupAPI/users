@@ -9,6 +9,8 @@ class Account
 	private $schedule;
 	private $charges;
 	private $nextCharge;
+	private $nextPlan;
+	private $nextSchedule;
 	
 	private $paymentEngine;
 
@@ -26,7 +28,8 @@ class Account
 		$db = UserConfig::getDB();
 		$account = null;
 
-		if ($stmt = $db->prepare('SELECT name, plan, schedule, engine, active, next_charge FROM '.UserConfig::$mysql_prefix.'accounts WHERE id = ?'))
+		if ($stmt = $db->prepare('SELECT name, plan, schedule, engine, active, next_charge, next_plan, next_schedule FROM '.
+		  UserConfig::$mysql_prefix.'accounts WHERE id = ?'))
 		{
 			if (!$stmt->bind_param('i', $id))
 			{
@@ -40,7 +43,7 @@ class Account
 			if (!$stmt->store_result())
 			  throw new Exception("Can't store result: ".$stmt->error);
 			
-			if (!$stmt->bind_result($name, $plan_id, $schedule_id, $engine_id, $active, $next_charge))
+			if (!$stmt->bind_result($name, $plan_id, $schedule_id, $engine_id, $active, $next_charge, $next_plan, $next_schedule))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
@@ -48,7 +51,8 @@ class Account
 			if ($stmt->fetch() === TRUE)
 			{
 				$charges = self::fillCharges($id);
-				$account = new self($id, $name, $plan_id, Account::ROLE_USER, $engine_id, $schedule_id, $charges, $active, $next_charge);
+				$account = 
+				  new self($id, $name, $plan_id, Account::ROLE_USER, $engine_id, $schedule_id, $charges, $active, $next_charge, $next_plan, $next_schedule);
 			}
 
 			$stmt->close();
@@ -67,7 +71,10 @@ class Account
 		$accounts = array();
 		$userid = $user->getID();
 
-		if ($stmt = $db->prepare('SELECT a.id, a.name, a.plan, a.schedule, a.engine, a.active, a.next_charge, au.role  FROM '.UserConfig::$mysql_prefix.'accounts a INNER JOIN '.UserConfig::$mysql_prefix.'account_users au ON a.id = au.account_id WHERE au.user_id = ?'))
+		if ($stmt = $db->prepare(
+		  'SELECT a.id, a.name, a.plan, a.schedule, a.engine, a.active, a.next_charge, a.next_plan, a.next_schedule, au.role  FROM '.
+		    UserConfig::$mysql_prefix.'accounts a INNER JOIN '.UserConfig::$mysql_prefix.
+		    'account_users au ON a.id = au.account_id WHERE au.user_id = ?'))
 		{
 			if (!$stmt->bind_param('i', $userid))
 			{
@@ -81,7 +88,7 @@ class Account
 			if (!$stmt->store_result())
 			  throw new Exception("Can't store result: ".$stmt->error);
 
-			if (!$stmt->bind_result($id, $name, $plan_id, $schedule_id, $engine_id, $active, $next_charge, $role))
+			if (!$stmt->bind_result($id, $name, $plan_id, $schedule_id, $engine_id, $active, $next_charge, $role, $next_plan, $next_schedule))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
@@ -89,7 +96,8 @@ class Account
 			while($stmt->fetch() === TRUE)
 			{
 				$charges = self::fillCharges($id);
-				$accounts[] = new self($id, $name, $plan_id, $role,	$schedule_id, $engine_id, $charges, $active, $next_charge);
+				$accounts[] = 
+				  new self($id, $name, $plan_id, $role,	$schedule_id, $engine_id, $charges, $active, $next_charge, $next_plan, $next_schedule);
 			}
 
 			$stmt->close();
@@ -109,7 +117,8 @@ class Account
 	}
 
 
-	private function __construct($id, $name, $plan, $role, $schedule = NULL, $engine = NULL, $charges = NULL, $active = TRUE, $next_charge = NULL)
+	private function __construct($id, $name, $plan, $role, $schedule = NULL, $engine = NULL, $charges = NULL, $active = TRUE, 
+	  $next_charge = NULL, $next_plan = NULL, $next_schedule = NULL)
 	{
 		$this->id = $id;
 		$this->name = $name;
@@ -120,6 +129,9 @@ class Account
 		$this->nextCharge = is_null($schedule) ? NULL : $next_charge;
 		$this->role = $role;
 		$this->isActive = $active;
+		$this->nextPlan = $next_plan;
+		$this->nextSchedule = $next_schedule;
+		
 		if($engine !== NULL) {
 			UserConfig::loadModule($engine);
 			$this->paymentEngine = new $engine;
@@ -206,6 +218,14 @@ class Account
   public function getNextCharge() {
     return $this->nextCharge;
   }
+  
+  public function getNextPlan() {
+    return $this->nextPlan;
+  }
+  
+  public function getNextSchedule() {
+    return $this->nextSchedule;
+  }
 
 	public static function createAccount($name, $plan, $schedule = null, $user = null, $role = Account::ROLE_USER, $engine = null)
 	{
@@ -268,7 +288,8 @@ class Account
 
 		$userid = $user->getID();
 
-		if ($stmt = $db->prepare('SELECT a.id, a.name, a.plan, a.schedule, a.engine, a.active, a.next_charge, au.role FROM '.
+		if ($stmt = $db->prepare(
+		  'SELECT a.id, a.name, a.plan, a.schedule, a.engine, a.active, a.next_charge, a.next_plan, a.next_schedule, au.role FROM '.
 		  UserConfig::$mysql_prefix.'user_preferences up INNER JOIN '.
 		  UserConfig::$mysql_prefix.'accounts a ON a.id = up.current_account_id INNER JOIN '.
 		  UserConfig::$mysql_prefix.'account_users au ON a.id = au.account_id WHERE up.user_id = ? AND au.user_id = ?'))
@@ -283,7 +304,7 @@ class Account
 			{
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
-			if (!$stmt->bind_result($id, $name, $plan_id, $schedule_id, $engine, $active, $next_charge, $role))
+			if (!$stmt->bind_result($id, $name, $plan_id, $schedule_id, $engine, $active, $next_charge, $role, $next_plan, $next_schedule))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
@@ -293,7 +314,7 @@ class Account
 			if ($id)
 			{
 				$charges = self::fillCharges($id);
-				return new self($id, $name, $plan_id, $role, $schedule_id, $engine, $charges, $active, $next_charge);
+				return new self($id, $name, $plan_id, $role, $schedule_id, $engine, $charges, $active, $next_charge, $next_plan, $next_schedule);
 			}
 			else
 			{
@@ -522,6 +543,9 @@ class Account
       $stmt->close();
     }
 		
+		if ($this->getBalance() >= 0)
+		  $this->activate();
+		  
 		return TRUE;
 	}
 	
@@ -537,13 +561,15 @@ class Account
       $new_schedule = NULL;
     }
 
+    # if no schedule specified and no default schedule found and new plan has at least one shcedule, fail
+    if(count($new_plan->getPaymentScheduleIDs()) && is_null($new_schedule))
+      return FALSE;
+
 		$old_plan = $this->plan->id;
 		$old_schedule = is_null($this->schedule) ? NULL : $this->schedule->id;
 		$this->plan->deactivate_hook($plan_id, $schedule_id);
 		$this->plan = $new_plan;
 		$this->schedule = $new_schedule;
-		if($this->paymentEngine)
-			$this->paymentEngine->ChangeSubscription($plan_id, $schedule_id, $old_plan, $old_schedule);
 		$this->plan->activate_hook($old_plan,$old_schedule);
 		$this->isActive = 1;
 		$this->nextCharge = is_null($this->schedule) ? NULL : date('Y-m-d H:i:s',time() + $this->schedule->charge_period * 86400);
@@ -555,7 +581,7 @@ class Account
 		$db = UserConfig::getDB();
 		
 		if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.
-		  'accounts SET plan = ?, schedule = ?, active = 1, next_charge =? WHERE id = ?')))
+		  'accounts SET plan = ?, schedule = ?, active = 1, next_charge = ?, next_plan = NULL, next_schedule = NULL WHERE id = ?')))
 		    throw new Exception("Can't prepare statement: ".$db->error);
 		  
     if (!$stmt->bind_param('sssi', $plan_id, $schedule_id, $this->nextCharge, $this->id))
@@ -564,6 +590,7 @@ class Account
     if (!$stmt->execute())
       throw new Exception("Can't execute statement: ".$stmt->error);
       
+    $this->paymentIsDue();
     return TRUE;
 	}
 	
@@ -601,16 +628,15 @@ class Account
 		if(!($schedule = $this->plan->getPaymentSchedule($schedule_id)))
 			return FALSE;
 			
-    if($this->paymentEngine)
-  		$this->paymentEngine->ChangeSubscription($schedule);
 		$this->schedule = $schedule;
 		$this->nextCharge = date('Y-m-d H:i:s',time() + $this->schedule->charge_period * 86400);
 		
     # Update db
 		$db = UserConfig::getDB();
 
-    if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'accounts SET schedule = ?, next_charge = ? WHERE id = ?')))
-      throw new Exception("Can't prepare statement: ".$db->error);
+    if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.
+      'accounts SET schedule = ?, next_charge = ?, next_plan = NULL, next_schedule = NULL WHERE id = ?')))
+        throw new Exception("Can't prepare statement: ".$db->error);
       
     if (!$stmt->bind_param('ssi', $schedule_id, $this->nextCharge, $this->id))
       throw new Exception("Can't bind parameters: ".$stmt->error);
@@ -618,6 +644,8 @@ class Account
     if (!$stmt->execute())
       throw new Exception("Can't execute statement: ".$stmt->error);
 
+    # Bill user
+    $this->paymentIsDue();
     return TRUE;
 	}
 	
@@ -655,6 +683,105 @@ class Account
       throw new Exception("Can't prepare statement: ".$db->error);
       
     if (!$stmt->bind_param('si', $engine, $this->id))
+      throw new Exception("Can't bind parameters: ".$stmt->error);
+      
+    if (!$stmt->execute())
+      throw new Exception("Can't execute statement: ".$stmt->error);
+      
+    return TRUE;
+	}
+	
+	public function getBalance() {
+	
+	  if(is_null($this->charges)) return 0;
+	  
+	  $balance = 0;
+	  foreach($this->charges as $c)
+	    $balance += $c['amount'];
+    
+    return $balance;
+  }
+  
+  public function planChangeRequest($plan_id, $schedule_id) {
+
+    # Sanity checks
+		$new_plan = Plan::getPlan($plan_id);
+		if(is_null($new_plan) || $new_plan === FALSE) return FALSE;	
+		if(!is_null($schedule_id)) {
+  		$new_schedule = $new_plan->getPaymentSchedule($schedule_id);
+	  	if(is_null($new_schedule))
+		    $new_schedule = $new_plan->getDefaultPaymentSchedule();
+    } else {
+      $new_schedule = NULL;
+    }
+
+    # if no schedule specified and no default schedule found and new plan has at least one shcedule, fail
+    if(count($new_plan->getPaymentScheduleIDs()) && is_null($new_schedule))
+      return FALSE;
+
+    # Update db
+		$db = UserConfig::getDB();
+
+    if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'accounts SET next_plan = ?, next_schedule = ? WHERE id = ?')))
+      throw new Exception("Can't prepare statement: ".$db->error);
+      
+    if (!$stmt->bind_param('ssi', $plan_id, $schedule_id, $this->id))
+      throw new Exception("Can't bind parameters: ".$stmt->error);
+      
+    if (!$stmt->execute())
+      throw new Exception("Can't execute statement: ".$stmt->error);
+      
+    return TRUE;
+	}
+	
+	public function scheduleChangeRequest($schedule_id) {
+	
+		if(!($schedule = $this->plan->getPaymentSchedule($schedule_id)))
+			return FALSE;
+	  
+    # Update db
+		$db = UserConfig::getDB();
+
+    if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'accounts SET next_schedule = ? WHERE id = ?')))
+      throw new Exception("Can't prepare statement: ".$db->error);
+      
+    if (!$stmt->bind_param('si', $schedule_id, $this->id))
+      throw new Exception("Can't bind parameters: ".$stmt->error);
+      
+    if (!$stmt->execute())
+      throw new Exception("Can't execute statement: ".$stmt->error);
+      
+    return TRUE;
+	}
+
+	public function suspend() {
+	
+	  $this->isActive = 0;
+	  
+		$db = UserConfig::getDB();
+
+    if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'accounts SET active = 0 WHERE id = ?')))
+      throw new Exception("Can't prepare statement: ".$db->error);
+      
+    if (!$stmt->bind_param('i', $this->id))
+      throw new Exception("Can't bind parameters: ".$stmt->error);
+      
+    if (!$stmt->execute())
+      throw new Exception("Can't execute statement: ".$stmt->error);
+      
+    return TRUE;
+	}
+
+	public function activate() {
+	
+	  $this->isActive = 1;
+	  
+		$db = UserConfig::getDB();
+
+    if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'accounts SET active = 1 WHERE id = ?')))
+      throw new Exception("Can't prepare statement: ".$db->error);
+      
+    if (!$stmt->bind_param('i', $this->id))
       throw new Exception("Can't bind parameters: ".$stmt->error);
       
     if (!$stmt->execute())

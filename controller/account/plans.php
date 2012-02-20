@@ -23,12 +23,20 @@ try {
   exit;
 }
 
-if($account->getPlanID() != $data[0]) {
+# Check balance
+if($schedule && $schedule->charge_amount > $account->getBalance()) {
+
+  $_SESSION['message'][] = "Not enough funds to activate plan/schedule";
+
+} elseif($account->getPlanID() != $data[0]) {
+
   if($account->activatePlan($data[0],$data[1]))
     $_SESSION['message'][] = "Plan activated";
   else
     $_SESSION['message'][] = "Error activating plan";
+
 } elseif(!is_null($data[1]) && $account->getScheduleID() != $data[1]) {
+
   if($account->setPaymentSchedule($data[1]))
     $_SESSION['message'][] = "Payment schedule changed";
   else
