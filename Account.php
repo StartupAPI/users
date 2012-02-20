@@ -529,12 +529,16 @@ class Account
 
 		$new_plan = Plan::getPlan($plan_id);
 		if(is_null($new_plan) || $new_plan === FALSE) return FALSE;	
-		$new_schedule = $new_plan->getPaymentSchedule($schedule_id);
-		if(is_null($new_schedule))
-		  $new_schedule = $new_plan->getDefaultPaymentSchedule();
+		if(!is_null($schedule_id)) {
+  		$new_schedule = $new_plan->getPaymentSchedule($schedule_id);
+	  	if(is_null($new_schedule))
+		    $new_schedule = $new_plan->getDefaultPaymentSchedule();
+    } else {
+      $new_schedule = NULL;
+    }
 
 		$old_plan = $this->plan->id;
-		$old_schedule = $this->schedule ? $this->schedule->id : NULL;
+		$old_schedule = is_null($this->schedule) ? NULL : $this->schedule->id;
 		$this->plan->deactivate_hook($plan_id, $schedule_id);
 		$this->plan = $new_plan;
 		$this->schedule = $new_schedule;
@@ -542,7 +546,7 @@ class Account
 			$this->paymentEngine->ChangeSubscription($plan_id, $schedule_id, $old_plan, $old_schedule);
 		$this->plan->activate_hook($old_plan,$old_schedule);
 		$this->isActive = 1;
-		$this->nextCharge = date('Y-m-d H:i:s',time() + $this->schedule->charge_period * 86400);
+		$this->nextCharge = is_null($this->schedule) ? NULL : date('Y-m-d H:i:s',time() + $this->schedule->charge_period * 86400);
 		
 		# Update db
 		# There is a risk that this query fail. If so, object state will differ from db state.
