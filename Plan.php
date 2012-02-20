@@ -9,6 +9,7 @@
  */
 
 require_once (dirname(__FILE__).'/PaymentSchedule.php');
+require_once(dirname(__FILE__).'/config.php');
 
 class Plan {
 
