@@ -1,3 +1,3 @@
 test:
-	./clear_db.sh
+	./upload_test_dataset.sh
 	php all_tests.php
