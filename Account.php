@@ -404,7 +404,7 @@ class Account
 		$db = UserConfig::getDB();
 
 		if(!($stmt = $db->prepare('SELECT date_time, amount FROM '.UserConfig::$mysql_prefix.'account_charge WHERE account_id = ? ORDER BY date_time')))
-		throw new Exception("Can't prepare statement: ".$db->error);
+  		throw new Exception("Can't prepare statement: ".$db->error);
 		
 		if (!$stmt->bind_param('i', $account_id))
 			throw new Exception("Can't bind parameter".$stmt->error);
@@ -615,17 +615,8 @@ class Account
 		} else {
 		
 		  # Nothing to downgrade to - mark account as not active
-		  $this->isActive = FALSE;
-		  
-		  if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'accounts SET active = 0 WHERE id = ?')))
-		    throw new Exception("Can't prepare statement: ".$db->error);
-		    
-      if (!$stmt->bind_param('i', $this->id))
-        throw new Exception("Can't bind parameters: ".$stmt->error);
-        
-      if (!$stmt->execute())
-        throw new Exception("Can't execute statement: ".$stmt->error);
-        
+		  $this->suspend();
+
   		return FALSE;
     }
 	}
@@ -721,6 +712,14 @@ class Account
     } else {
       $new_schedule = NULL;
     }
+    # Check, if plan/schedule could be activated immediately
+    if(is_null($this->nextCharge) && (is_null($new_schedule) || $this->getBalance() >= $new_schedule->charge_amount)) {
+
+      if(!is_null($this->paymentEngine))
+        $this->paymentEngine->changeSubscription($new_plan, $new_schedule);
+      return $this->activatePlan($plan_id, $schedule_id);
+    
+    }
 
     # if no schedule specified and no default schedule found and new plan has at least one shcedule, fail
     if(count($new_plan->getPaymentScheduleIDs()) && is_null($new_schedule))
@@ -745,11 +744,20 @@ class Account
 	
 		if(!($schedule = $this->plan->getPaymentSchedule($schedule_id)))
 			return FALSE;
+
+    # Check, if schedule could be activated immediately
+    if(is_null($this->nextCharge) && $this->getBalance() >= $schedule->charge_amount) {
+
+      if(!is_null($this->paymentEngine))
+        $this->paymentEngine->changeSubscription($this->plan,$schedule);
+      return $this->setPaymentSchedule($schedule_id);
+    
+    }
 	  
     # Update db
 		$db = UserConfig::getDB();
 
-    if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'accounts SET next_schedule = ? WHERE id = ?')))
+    if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'accounts SET next_plan = plan, next_schedule = ? WHERE id = ?')))
       throw new Exception("Can't prepare statement: ".$db->error);
       
     if (!$stmt->bind_param('si', $schedule_id, $this->id))
