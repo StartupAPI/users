@@ -26,9 +26,6 @@ class TestUser extends UnitTestCase {
   {
     $users = User::getUsers();
     $this -> assertNotNull( $users );
-    $me = $users[6]; 
-    $this -> assertNotNull( $me );
-    $this -> assertEqual( $me -> getUsername(), 'spacediver' );
     //$this -> dump($me);
   }
 
