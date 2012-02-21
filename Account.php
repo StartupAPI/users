@@ -432,6 +432,9 @@ class Account
 		$charge_amount = $this->schedule->charge_amount;
 		# Look if there is a negative charge, it should be a single element
 		$c = reset(array_keys($this->charges));
+		
+		# Lock tables
+		$db->query("LOCK TABLES ".UserConfig::$mysql_prefix."account_charge WRITE");
 		if ($c !== FALSE && $this->charges[$c]['amount'] < 0) {
 		  if ($this->charges[$c]['amount'] + $charge_amount > 0) { # This charge is greater than we owe to user
 
@@ -480,7 +483,7 @@ class Account
 			throw new Exception("Can't execute statement: ".$stmt->error);
 
 		$stmt->close();
-		
+		$db->query("UNLOCK TABLES");
 		return TRUE;
 	}
 	
@@ -489,6 +492,8 @@ class Account
 		$cleared = array();
 		$db = UserConfig::getDB();
 
+		# Lock tables
+		$db->query("LOCK TABLES ".UserConfig::$mysql_prefix."account_charge WRITE");
 		foreach(array_reverse(array_keys($this->charges)) as $n => $k) {
 
 			if($amount <= 0) break;
@@ -543,9 +548,11 @@ class Account
       $stmt->close();
     }
 		
+    $db->query("UNLOCK TABLES");
+
 		if ($this->getBalance() >= 0)
 		  $this->activate();
-		  
+
 		return TRUE;
 	}
 	
