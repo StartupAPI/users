@@ -122,15 +122,15 @@ class Account
 	{
 		$this->id = $id;
 		$this->name = $name;
-		$this->plan = Plan::getPlan($plan);
+		$this->plan = is_null($plan) ? NULL : Plan::getPlan($plan);
 		if(is_null($this->plan))
 		  $this->plan = Plan::getPlan(UserConfig::$default_plan);
-		$this->schedule = is_null($schedule) ? NULL : $this->plan->getPaymentSchedule($schedule);
+		$this->schedule = is_null($schedule) || is_null($this->plan) ? NULL : $this->plan->getPaymentSchedule($schedule);
 		$this->nextCharge = is_null($schedule) ? NULL : $next_charge;
 		$this->role = $role;
 		$this->isActive = $active;
-		$this->nextPlan = $next_plan;
-		$this->nextSchedule = $next_schedule;
+		$this->nextPlan = is_null($next_plan) ? NULL : Plan::getPlan($next_plan);
+		$this->nextSchedule = is_null($next_schedule) || is_null($this->nextPlan) ? NULL : $this->nextPlan->getPaymentSchedule($next_schedule);
 		
 		if($engine !== NULL) {
 			UserConfig::loadModule($engine);
