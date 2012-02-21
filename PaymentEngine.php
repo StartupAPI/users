@@ -66,7 +66,7 @@
         if (is_null($plan = $account->getPlan()))
           continue;
           
-        if($plan->grace_period && $plan->grace_period * 86400 + $date_time > time())
+        if ($plan->grace_period && $plan->grace_period * 86400 + $date_time > time())
           $account->deactivatePlan();
       }
         
@@ -126,7 +126,7 @@
           $account->paymentIsDue();
             
           $plan = $account->getPlan();
-          if(!is_null($schedule = $plan->getPaymentSchedule())) {
+          if (!is_null($schedule = $plan->getPaymentSchedule())) {
             
             # Set new next_charge
             if (!($stmt2 = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.

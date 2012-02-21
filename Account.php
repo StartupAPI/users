@@ -123,7 +123,7 @@ class Account
 		$this->id = $id;
 		$this->name = $name;
 		$this->plan = is_null($plan) ? NULL : Plan::getPlan($plan);
-		if(is_null($this->plan))
+		if (is_null($this->plan))
 		  $this->plan = Plan::getPlan(UserConfig::$default_plan);
 		$this->schedule = is_null($schedule) || is_null($this->plan) ? NULL : $this->plan->getPaymentSchedule($schedule);
 		$this->nextCharge = is_null($schedule) ? NULL : $next_charge;
@@ -132,7 +132,7 @@ class Account
 		$this->nextPlan = is_null($next_plan) ? NULL : Plan::getPlan($next_plan);
 		$this->nextSchedule = is_null($next_schedule) || is_null($this->nextPlan) ? NULL : $this->nextPlan->getPaymentSchedule($next_schedule);
 		
-		if($engine !== NULL) {
+		if ($engine !== NULL) {
 			UserConfig::loadModule($engine);
 			$this->paymentEngine = new $engine;
 		}
@@ -403,7 +403,7 @@ class Account
 
 		$db = UserConfig::getDB();
 
-		if(!($stmt = $db->prepare('SELECT date_time, amount FROM '.UserConfig::$mysql_prefix.'account_charge WHERE account_id = ? ORDER BY date_time')))
+		if (!($stmt = $db->prepare('SELECT date_time, amount FROM '.UserConfig::$mysql_prefix.'account_charge WHERE account_id = ? ORDER BY date_time')))
   		throw new Exception("Can't prepare statement: ".$db->error);
 		
 		if (!$stmt->bind_param('i', $account_id))
@@ -473,7 +473,7 @@ class Account
 		$charge = array('datetime' => date('Y-m-d H:i:s'), 'amount' => $charge_amount);
 		$this->charges[] = $charge;
 
-		if(!($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'account_charge (account_id, date_time, amount) VALUES (?, ?, ?)')))
+		if (!($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'account_charge (account_id, date_time, amount) VALUES (?, ?, ?)')))
 			throw new Exception("Can't prepare statement: ".$db->error);
 		
 		if (!$stmt->bind_param('isd', $this->id, $charge['datetime'], $charge['amount']))
@@ -496,15 +496,15 @@ class Account
 		$db->query("LOCK TABLES ".UserConfig::$mysql_prefix."account_charge WRITE");
 		foreach(array_reverse(array_keys($this->charges)) as $n => $k) {
 
-			if($amount <= 0) break;
-			if($this->charges[$k]['amount'] <= $amount) {
+			if ($amount <= 0) break;
+			if ($this->charges[$k]['amount'] <= $amount) {
 				$amount -= $this->charges[$k]['amount'];
 				$cleared[] = $this->charges[$k];
 				unset($this->charges[$k]); 
 			} else {
 				$this->charges[$k]['amount'] -= $amount;
 				
-				if(!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'account_charge SET amount = ? WHERE account_id = ? and date_time = ?')))
+				if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'account_charge SET amount = ? WHERE account_id = ? and date_time = ?')))
 					throw new Exception("Can't prepare statement: ".$db->error);
 					
 				if (!$stmt->bind_param('dis', $this->charges[$k]['amount'], $this->id, $this->charges[$k]['datetime']))
@@ -519,7 +519,7 @@ class Account
 		
 		foreach($cleared as $n => $k) {
 
-			if(!($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.'account_charge WHERE account_id = ? and date_time = ?')))
+			if (!($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.'account_charge WHERE account_id = ? and date_time = ?')))
 				throw new Exception("Can't prepare statement: ".$db->error);
 				
 			if (!$stmt->bind_param('is', $this->id, $k['datetime']))
@@ -532,11 +532,11 @@ class Account
 		$stmt->close();
 		
 		# Store excessive payment as negative charge
-		if($amount > 0) {
+		if ($amount > 0) {
 		  $charge = array('datetime' => date('Y-m-d H:i:s'), 'amount' => -$amount);
 		  $this->charges[] = $charge;
 
-      if(!($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'account_charge (account_id, date_time, amount) VALUES (?, ?, ?)')))
+      if (!($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'account_charge (account_id, date_time, amount) VALUES (?, ?, ?)')))
         throw new Exception("Can't prepare statement: ".$db->error);
       
       if (!$stmt->bind_param('isd', $this->id, $charge['datetime'], $charge['amount']))
@@ -559,17 +559,17 @@ class Account
 	public function activatePlan($plan_id, $schedule_id = NULL) {
 
 		$new_plan = Plan::getPlan($plan_id);
-		if(is_null($new_plan) || $new_plan === FALSE) return FALSE;	
-		if(!is_null($schedule_id)) {
+		if (is_null($new_plan) || $new_plan === FALSE) return FALSE;	
+		if (!is_null($schedule_id)) {
   		$new_schedule = $new_plan->getPaymentSchedule($schedule_id);
-	  	if(is_null($new_schedule))
+	  	if (is_null($new_schedule))
 		    $new_schedule = $new_plan->getDefaultPaymentSchedule();
     } else {
       $new_schedule = NULL;
     }
 
     # if no schedule specified and no default schedule found and new plan has at least one shcedule, fail
-    if(count($new_plan->getPaymentScheduleIDs()) && is_null($new_schedule))
+    if (count($new_plan->getPaymentScheduleIDs()) && is_null($new_schedule))
       return FALSE;
 
 		$old_plan = $this->plan->id;
@@ -607,7 +607,7 @@ class Account
 
 		$this->plan->deactivate_hook($this->downgrade_to);
 
-		if(!is_null($this->downgrade_to)) {
+		if (!is_null($this->downgrade_to)) {
 
 		  $this->activatePlan($this->downgrade_to);
 			return TRUE;
@@ -623,7 +623,7 @@ class Account
 	
 	public function setPaymentSchedule($schedule_id) {
 	
-		if(!($schedule = $this->plan->getPaymentSchedule($schedule_id)))
+		if (!($schedule = $this->plan->getPaymentSchedule($schedule_id)))
 			return FALSE;
 			
 		$this->schedule = $schedule;
@@ -668,7 +668,7 @@ class Account
 	
 	public function setPaymentEngine($engine) {
 	
-    if($engine == NULL)
+    if ($engine == NULL)
       return FALSE;
 
     UserConfig::loadModule($engine);
@@ -691,7 +691,7 @@ class Account
 	
 	public function getBalance() {
 	
-	  if(is_null($this->charges)) return 0;
+	  if (is_null($this->charges)) return 0;
 	  
 	  $balance = 0;
 	  foreach($this->charges as $c)
@@ -704,25 +704,25 @@ class Account
 
     # Sanity checks
 		$new_plan = Plan::getPlan($plan_id);
-		if(is_null($new_plan) || $new_plan === FALSE) return FALSE;	
-		if(!is_null($schedule_id)) {
+		if (is_null($new_plan) || $new_plan === FALSE) return FALSE;	
+		if (!is_null($schedule_id)) {
   		$new_schedule = $new_plan->getPaymentSchedule($schedule_id);
-	  	if(is_null($new_schedule))
+	  	if (is_null($new_schedule))
 		    $new_schedule = $new_plan->getDefaultPaymentSchedule();
     } else {
       $new_schedule = NULL;
     }
     # Check, if plan/schedule could be activated immediately
-    if(is_null($this->nextCharge) && (is_null($new_schedule) || $this->getBalance() >= $new_schedule->charge_amount)) {
+    if (is_null($this->nextCharge) && (is_null($new_schedule) || $this->getBalance() >= $new_schedule->charge_amount)) {
 
-      if(!is_null($this->paymentEngine))
+      if (!is_null($this->paymentEngine))
         $this->paymentEngine->changeSubscription($new_plan, $new_schedule);
       return $this->activatePlan($plan_id, $schedule_id);
     
     }
 
     # if no schedule specified and no default schedule found and new plan has at least one shcedule, fail
-    if(count($new_plan->getPaymentScheduleIDs()) && is_null($new_schedule))
+    if (count($new_plan->getPaymentScheduleIDs()) && is_null($new_schedule))
       return FALSE;
 
     # Update db
@@ -742,13 +742,13 @@ class Account
 	
 	public function scheduleChangeRequest($schedule_id) {
 	
-		if(!($schedule = $this->plan->getPaymentSchedule($schedule_id)))
+		if (!($schedule = $this->plan->getPaymentSchedule($schedule_id)))
 			return FALSE;
 
     # Check, if schedule could be activated immediately
-    if(is_null($this->nextCharge) && $this->getBalance() >= $schedule->charge_amount) {
+    if (is_null($this->nextCharge) && $this->getBalance() >= $schedule->charge_amount) {
 
-      if(!is_null($this->paymentEngine))
+      if (!is_null($this->paymentEngine))
         $this->paymentEngine->changeSubscription($this->plan,$schedule);
       return $this->setPaymentSchedule($schedule_id);
     

@@ -46,46 +46,46 @@ class Plan {
 			'user_deactivate_hook' => '',
 		);
 		
-		if($id === NULL)
+		if ($id === NULL)
   		throw new Exception("id required");
-    if(!is_array($a))
+    if (!is_array($a))
       throw new Exception("configuration array required");
 		$a['id'] = $id;
 	
 		# Mandatory parameters are those whose default value is NULL
 		$mandatory = array();
 		foreach($parameters as $p => $v) {
-			if(is_null($v)) $mandatory[] = $p;
+			if (is_null($v)) $mandatory[] = $p;
 		}
 		
 		$missing = array_diff($mandatory,array_keys($a));
-		if(count($missing))
+		if (count($missing))
 			throw new Exception("Following mandatory parameters were not found in init array for plan $id: ".implode(',',$missing));
 			
 		# Set attributes according to init array
 		foreach($parameters as $p => $v)
-			if(isset($a[$p])) $this->$p = $a[$p];
+			if (isset($a[$p])) $this->$p = $a[$p];
 			else $this->$p = $v;
 			
     # If downgrade_to has the same id as we have, reset it to null
-    if($this->id == $this->downgrade_to)
+    if ($this->id == $this->downgrade_to)
       $this->downgrade_to = NULL;
 
 		# Instantiate PaymentSchedules, replacing stored parameters arrays with actual objects
-		if(is_array($this->payment_schedules)) {
+		if (is_array($this->payment_schedules)) {
   		$schedules = array();
 	  	foreach($this->payment_schedules as $id => $s)
 		  	$schedules[] = new PaymentSchedule($id, $s);
   		$this->payment_schedules = $schedules;
   		
-  		if(!$this->getDefaultPaymentSchedule() && count($this->payment_schedules))
+  		if (!$this->getDefaultPaymentSchedule() && count($this->payment_schedules))
         $this->payment_schedules[0]->setAsDefault();
     }
     
 		# Check user hooks
-		if($this->user_activate_hook != '' && !function_exists($this->user_activate_hook))
+		if ($this->user_activate_hook != '' && !function_exists($this->user_activate_hook))
 			throw new Exception("Activate hook function ".$this->user_activate_hook." is not defined");
-		if($this->user_deactivate_hook != '' && !function_exists($this->user_deactivate_hook))
+		if ($this->user_deactivate_hook != '' && !function_exists($this->user_deactivate_hook))
 			throw new Exception("Deactivate hook function ".$this->user_deactivate_hook." is not defined");
 		
 		# We are set
@@ -100,7 +100,7 @@ class Plan {
 	
 		$ids = array();
 
-		if(is_array($this->payment_schedules))
+		if (is_array($this->payment_schedules))
   		foreach($this->payment_schedules as $x => $s)
 	  		$ids[] = $s->id;
 	  		
@@ -109,20 +109,20 @@ class Plan {
 	
 	public function getPaymentSchedule($id) {
 	
-		if($id === NULL) return FALSE;
+		if ($id === NULL) return FALSE;
 
-		if(is_array($this->payment_schedules))
+		if (is_array($this->payment_schedules))
   		foreach($this->payment_schedules as $x => $s)
-	  		if($s->id == $id) return $s;
+	  		if ($s->id == $id) return $s;
 
 		return NULL;
 	}
 	
 	public function getDefaultPaymentSchedule() {
 	
-	  if(is_array($this->payment_schedules))
+	  if (is_array($this->payment_schedules))
 	    foreach($this->payment_schedules as $x => $s) 
-	      if($s->is_default) return $s;
+	      if ($s->is_default) return $s;
 	      
     return NULL;
   }
@@ -134,22 +134,22 @@ class Plan {
 	
 	public function activate_hook($PlanID) {
 	
-	  if($this->user_activate_hook == '') return;
+	  if ($this->user_activate_hook == '') return;
 		call_user_func_array($this->user_activate_hook,array('OldPlanID' => $PlanID, 'NewPlanID' => $this->id));
 	}
 	
   public function deactivate_hook($PlanID) {
   	
-  	if($this->user_deactivate_hook == '') return;
+  	if ($this->user_deactivate_hook == '') return;
   	call_user_func_array($this->user_deactivate_hook,array('NewPlanID' => $PlanID, 'OldPlanID' => $this->id));
 	}
 
   public static function init($a) {
   
-    if(count(self::$Plans))
+    if (count(self::$Plans))
       throw new Exception("Already initialized");
       
-    if(!is_array($a))
+    if (!is_array($a))
       throw new Exception("Parameter is not an array");
 
     foreach($a as $id => $p)
@@ -158,16 +158,16 @@ class Plan {
   
   public static function getPlan($id) {
   
-    if($id === NULL || !count(self::$Plans)) return FALSE;
+    if ($id === NULL || !count(self::$Plans)) return FALSE;
     foreach(self::$Plans as $p) {
-      if($p->id == $id) return $p;
+      if ($p->id == $id) return $p;
     }
     return NULL;
   }
   
   public static function getPlanIDs() {
   
-    if(!count(self::$Plans)) return FALSE;
+    if (!count(self::$Plans)) return FALSE;
     $ids = array();
     foreach(self::$Plans as $p)
       $ids[] = $p->id;
