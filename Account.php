@@ -322,7 +322,7 @@ class Account
 				throw new Exception("Can't execute statement: ".$stmt->error);
 			}
       if (!$stmt->bind_result($id, $name, $plan_id, $schedule_id, $engine, 
-        $active, $next_charge, $role, $next_plan, $next_schedule))
+        $active, $next_charge, $next_plan, $next_schedule, $role))
 			{
 				throw new Exception("Can't bind result: ".$stmt->error);
 			}
@@ -743,7 +743,7 @@ class Account
 	  
 	  $balance = 0;
 	  foreach($this->charges as $c)
-	    $balance += $c['amount'];
+	    $balance -= $c['amount'];
     
     return $balance;
   }
