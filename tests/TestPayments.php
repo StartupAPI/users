@@ -30,19 +30,21 @@ class TestPayments extends UnitTestCase {
     $acc = Account::getCurrentAccount($user);
     $this -> assertNotNull( $acc );
     $this -> assertNotNull( $acc -> getCharges());
-    $this -> assertEqual( count($acc -> getCharges()), 0);
-    $acc -> paymentIsDue();
-    $this -> assertNotNull( $acc -> getCharges());
     $this -> assertEqual( count($acc -> getCharges()), 1);
     $charges = $acc -> getCharges();
     $this -> assertEqual( $charges[0]['amount'], $acc->getSchedule()->charge_amount);
+    $acc -> paymentIsDue();
+    $this -> assertNotNull( $acc -> getCharges());
+    $this -> assertEqual( count($acc -> getCharges()), 2);
+    $charges = $acc -> getCharges();
+    $this -> assertEqual( $charges[0]['amount'], $acc->getSchedule()->charge_amount);
+    $this -> assertEqual( $charges[1]['amount'], $acc->getSchedule()->charge_amount);
   }
 
   function testAddPaymentExact()
   {
     $user = $this -> user;
     $acc = Account::getCurrentAccount($user);
-    $acc -> paymentIsDue();
     $acc -> paymentReceived( $acc->getSchedule()->charge_amount  );
     $this -> assertEqual( count($acc -> getCharges()), 0);
   }
@@ -51,7 +53,6 @@ class TestPayments extends UnitTestCase {
   {
     $user = $this -> user;
     $acc = Account::getCurrentAccount($user);
-    $acc -> paymentIsDue();
     $acc -> paymentReceived( $acc->getSchedule()->charge_amount - 1  );
     $this -> assertEqual( count($acc -> getCharges()), 1);
     $charges = $acc -> getCharges();
@@ -64,7 +65,6 @@ class TestPayments extends UnitTestCase {
     $acc = Account::getCurrentAccount($user);
     $amount = $acc->getSchedule()->charge_amount;
 
-    $acc -> paymentIsDue();
     $this -> assertTrue( $amount > 3 );
     $acc -> paymentReceived( $amount - 3  );
     $this -> assertEqual( count($acc -> getCharges()), 1);
@@ -80,7 +80,6 @@ class TestPayments extends UnitTestCase {
   function testAddPaymentExcessive() {
     $user = $this -> user;
     $acc = Account::getCurrentAccount($user);
-    $acc -> paymentIsDue();
     $acc -> paymentReceived( $acc->getSchedule()->charge_amount + 3 );
 
     $this -> assertEqual( count($acc -> getCharges()), 1);
@@ -99,8 +98,6 @@ class TestPayments extends UnitTestCase {
     $user = $this -> user;
     $acc = Account::getCurrentAccount($user);
     $amount = $acc->getSchedule()->charge_amount;
-
-    $acc -> paymentIsDue();
     sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
     $acc -> paymentIsDue();
     sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
@@ -130,8 +127,6 @@ class TestPayments extends UnitTestCase {
     $user = $this -> user;
     $acc = Account::getCurrentAccount($user);
     $amount = $acc->getSchedule()->charge_amount;
-
-    $acc -> paymentIsDue();
     sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
     $acc -> paymentIsDue();
     sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
