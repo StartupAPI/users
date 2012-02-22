@@ -25,9 +25,10 @@ class TestPayments extends UnitTestCase {
 
   function testPaymentIsDue()
   {
-    $this -> user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $user = $this -> user;
+    $user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $acc = Account::getCurrentAccount($user);
+
     $this -> assertNotNull( $acc );
     $this -> assertNotNull( $acc -> getCharges());
     $this -> assertEqual( count($acc -> getCharges()), 1);
@@ -43,18 +44,20 @@ class TestPayments extends UnitTestCase {
 
   function testAddPaymentExact()
   {
-    $this -> user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $user = $this -> user;
+    $user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $acc = Account::getCurrentAccount($user);
+
     $acc -> paymentReceived( $acc->getSchedule()->charge_amount  );
     $this -> assertEqual( count($acc -> getCharges()), 0);
   }
 
   function testAddPaymentPartial()
   {
-    $this -> user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $user = $this -> user;
+    $user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $acc = Account::getCurrentAccount($user);
+
     $acc -> paymentReceived( $acc->getSchedule()->charge_amount - 1  );
     $this -> assertEqual( count($acc -> getCharges()), 1);
     $charges = $acc -> getCharges();
@@ -63,8 +66,8 @@ class TestPayments extends UnitTestCase {
 
   function testAddPaymentInMultipleParts()
   {
-    $this -> user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $user = $this -> user;
+    $user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $acc = Account::getCurrentAccount($user);
     $amount = $acc->getSchedule()->charge_amount;
 
@@ -81,13 +84,14 @@ class TestPayments extends UnitTestCase {
   }
 
   function testAddPaymentExcessive() {
-    $this -> user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $user = $this -> user;
+    $user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $acc = Account::getCurrentAccount($user);
+
     $acc -> paymentReceived( $acc->getSchedule()->charge_amount + 3 );
 
     $this -> assertEqual( count($acc -> getCharges()), 1);
-    sleep(1);
+    //sleep(1);
     $acc -> paymentIsDue();
 
     $acc -> paymentReceived( $acc->getSchedule()->charge_amount - 3 );
@@ -99,13 +103,14 @@ class TestPayments extends UnitTestCase {
 
   function testManyCharges()
   {
-    $this -> user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $user = $this -> user;
+    $user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $acc = Account::getCurrentAccount($user);
     $amount = $acc->getSchedule()->charge_amount;
-    sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
+
+    //sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
     $acc -> paymentIsDue();
-    sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
+    //sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
     $acc -> paymentIsDue();
 
     $acc -> paymentReceived( $amount );
@@ -129,13 +134,14 @@ class TestPayments extends UnitTestCase {
 
   function testSInglePaymentCoveringManyCharges()
   {
-    $this -> user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $user = $this -> user;
+    $user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $acc = Account::getCurrentAccount($user);
     $amount = $acc->getSchedule()->charge_amount;
-    sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
+
+    //sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
     $acc -> paymentIsDue();
-    sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
+    //sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
     $acc -> paymentIsDue();
     
     $acc -> paymentReceived( $amount * 3);
@@ -144,9 +150,6 @@ class TestPayments extends UnitTestCase {
 
   }
 
-  function testSwitchingWithZeroBalance()
-  {
-  }
 }
 
 ?>
