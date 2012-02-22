@@ -10,7 +10,6 @@ class TestPayments extends UnitTestCase {
   function setUp()
   {
     $this -> user = User::createNew('me', 'me', 'me@internet.com', 'password');
-    $this -> user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
 
   }
 
@@ -26,6 +25,7 @@ class TestPayments extends UnitTestCase {
 
   function testPaymentIsDue()
   {
+    $this -> user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $user = $this -> user;
     $acc = Account::getCurrentAccount($user);
     $this -> assertNotNull( $acc );
@@ -43,6 +43,7 @@ class TestPayments extends UnitTestCase {
 
   function testAddPaymentExact()
   {
+    $this -> user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $user = $this -> user;
     $acc = Account::getCurrentAccount($user);
     $acc -> paymentReceived( $acc->getSchedule()->charge_amount  );
@@ -51,6 +52,7 @@ class TestPayments extends UnitTestCase {
 
   function testAddPaymentPartial()
   {
+    $this -> user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $user = $this -> user;
     $acc = Account::getCurrentAccount($user);
     $acc -> paymentReceived( $acc->getSchedule()->charge_amount - 1  );
@@ -61,6 +63,7 @@ class TestPayments extends UnitTestCase {
 
   function testAddPaymentInMultipleParts()
   {
+    $this -> user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $user = $this -> user;
     $acc = Account::getCurrentAccount($user);
     $amount = $acc->getSchedule()->charge_amount;
@@ -78,6 +81,7 @@ class TestPayments extends UnitTestCase {
   }
 
   function testAddPaymentExcessive() {
+    $this -> user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $user = $this -> user;
     $acc = Account::getCurrentAccount($user);
     $acc -> paymentReceived( $acc->getSchedule()->charge_amount + 3 );
@@ -95,6 +99,7 @@ class TestPayments extends UnitTestCase {
 
   function testManyCharges()
   {
+    $this -> user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $user = $this -> user;
     $acc = Account::getCurrentAccount($user);
     $amount = $acc->getSchedule()->charge_amount;
@@ -124,6 +129,7 @@ class TestPayments extends UnitTestCase {
 
   function testSInglePaymentCoveringManyCharges()
   {
+    $this -> user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $user = $this -> user;
     $acc = Account::getCurrentAccount($user);
     $amount = $acc->getSchedule()->charge_amount;
@@ -135,6 +141,11 @@ class TestPayments extends UnitTestCase {
     $acc -> paymentReceived( $amount * 3);
 
     $this -> assertEqual( count($acc -> getCharges()), 0);
+
+  }
+
+  function testSwitchingWithZeroBalance()
+  {
   }
 }
 
