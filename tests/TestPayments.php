@@ -91,7 +91,7 @@ class TestPayments extends UnitTestCase {
     $acc -> paymentReceived( $acc->getSchedule()->charge_amount + 3 );
 
     $this -> assertEqual( count($acc -> getCharges()), 1);
-    //sleep(1);
+
     $acc -> paymentIsDue();
 
     $acc -> paymentReceived( $acc->getSchedule()->charge_amount - 3 );
@@ -108,9 +108,7 @@ class TestPayments extends UnitTestCase {
     $acc = Account::getCurrentAccount($user);
     $amount = $acc->getSchedule()->charge_amount;
 
-    //sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
     $acc -> paymentIsDue();
-    //sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
     $acc -> paymentIsDue();
 
     $acc -> paymentReceived( $amount );
@@ -139,9 +137,7 @@ class TestPayments extends UnitTestCase {
     $acc = Account::getCurrentAccount($user);
     $amount = $acc->getSchedule()->charge_amount;
 
-    //sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
     $acc -> paymentIsDue();
-    //sleep(1); // FIXME due to second-wise uniqueness of datetime key in charges
     $acc -> paymentIsDue();
     
     $acc -> paymentReceived( $amount * 3);
