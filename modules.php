@@ -32,4 +32,4 @@ abstract class UserBaseModule implements IUserBaseModule {
 
 require_once(dirname(__FILE__).'/AuthenticationModule.php');
 require_once(dirname(__FILE__).'/EmailModule.php');
-
+require_once(dirname(__FILE__).'/PaymentEngineModule.php');

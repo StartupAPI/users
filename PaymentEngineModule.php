@@ -1,7 +1,16 @@
 <?php
 
   require_once(dirname(__FILE__).'/Account.php');
-  abstract class PaymentEngine {
+
+  interface IPaymentEngine extends IUserBaseModule {
+  
+    public function changeSubscription($plan_id, $schedule_id);
+    public function paymentReceived($data);
+    public function unsubscribe($account_id);
+    public function cronHandler();
+  }
+    
+  abstract class PaymentEngine extends UserBaseModule implements IPaymentEngine {
   
     protected $engineID;
     # ???
