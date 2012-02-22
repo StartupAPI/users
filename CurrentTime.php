@@ -8,9 +8,31 @@ class RealCurrentTime  {
 }
 
 class ModelledCurrentTime {
+  private $datetime;
+
+  function __construct() {
+    $this -> datetime = new DateTime( '00010101T000000' );
+  }
+
   function getDateTime()
   {
-    return new DateTime('0000-00-00 00:00:00');
+    return $this -> datetime;
   }
+
+  function addTime( $interval )
+  {
+    $this -> datetime -> add( $interval );
+  }
+
+  function format( $format )
+  {
+    return $this -> datetime -> format ( $format );
+  }
+
+  function date ( $format )
+  {
+    return $this -> format ( $format );
+  }
+
 }
 
