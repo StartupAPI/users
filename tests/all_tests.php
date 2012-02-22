@@ -11,6 +11,7 @@ class AllTests extends TestSuite {
     $this->addFile('TestPlan.php');
     $this->addFile('TestUser.php');
     $this->addFile('TestPayments.php');
+    $this->addFile('TestPaymentEngine.php');
   }
 }
 
