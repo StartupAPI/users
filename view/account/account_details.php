@@ -18,7 +18,7 @@ $smarty->assign('account_name',$account->getName());
 $smarty->assign('account_role',$account->getUserRole());
 $smarty->assign('account_isActive',$account->isActive());
 $smarty->assign('account_engine', $account->getPaymentEngine());
-$smarty->assign('account_next_charge', $account->getNextCharge());
+$smarty->assign('account_next_charge', preg_replace("/ .*/","",$account->getNextCharge()));
   
 $plan = $account->getPlan();
 foreach($plan_data as $d)
