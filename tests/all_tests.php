@@ -12,7 +12,7 @@ class AllTests extends TestSuite {
     $this->addFile('TestUser.php');
     $this->addFile('TestPayments.php');
     $this->addFile('TestPaymentEngine.php');
-    $this->addFile('TestCurrentTime.php');
+    $this->addFile('TestClock.php');
   }
 }
 
