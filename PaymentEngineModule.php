@@ -15,8 +15,6 @@
     protected $engineID;
     # ???
     
-    abstract public function changeSubscription($plan_id, $schedule_id);
-
     public function paymentReceived($data) {
     
       # data is array with following required keys:
