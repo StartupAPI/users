@@ -14,6 +14,9 @@ class UserConfig
 	// multiple email modules can be assigned for the same instance
 	public static $authentication_modules = array();
 
+	// payment modules
+	public static $payment_modules = array();
+
 	// Only one email module can exist
 	public static $email_module;
 

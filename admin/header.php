@@ -63,4 +63,10 @@ if (UserConfig::$enableInvitations) {
 } else {
 	?>Registrations By Module<?php
 } ?>
+<?php
+	foreach (UserConfig::$all_modules as $m)
+		if (method_exists($m,'renderAdminMenuItem'))
+			echo $menu_item = $m->renderAdminMenuItem();
+			
+?>
 </div>

@@ -3,7 +3,8 @@
   class PaymentEngine_Manual extends PaymentEngine {
   
     public function __construct() {
-    
+
+      parent::__construct();
       $this->engineID = 'PaymentEngine_Manual';
     }
 
@@ -22,5 +23,15 @@
       # Okay
       return TRUE;
     }
+    
+    public function renderAdminMenuItem() {
+      
+      global $ADMIN_SECTION;
+      if($ADMIN_SECTION == $this->engineID)
+        echo "Payments (manual mode)";
+      else
+        echo " | <a href=\"".UserConfig::$USERSROOTURL."/modules/paymentengine_manual/admin.php\">Payments (manual mode)</a>\n";
+    }
+    
   }
     

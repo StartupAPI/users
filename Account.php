@@ -54,9 +54,8 @@ class Account
 			{
 				$charges = self::fillCharges($id);
 				$account = 
-          new self($id, $name, $plan_id, Account::ROLE_USER, $engine_id, 
-          $schedule_id, $charges, $active, $next_charge, 
-          $next_plan, $next_schedule);
+          new self($id, $name, $plan_id, Account::ROLE_USER, $schedule_id, $engine_id, 
+          $charges, $active, $next_charge, $next_plan, $next_schedule);
 			}
 
 			$stmt->close();

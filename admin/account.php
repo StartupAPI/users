@@ -1,9 +1,9 @@
 <?php
 require_once(dirname(__FILE__).'/admin.php');
 
-$ADMIN_SECTION = 'debtors';
+$ADMIN_SECTION = 'account';
 
-include(dirname(__FILE__).'/view/debtors.php');
+include(dirname(__FILE__).'/view/account.php');
 # this yields Smarty object as $smarty 
 if (preg_match("/^Smarty-3/",$smarty->_version)) {
   $smarty->setTemplateDir(dirname(__FILE__).'/templates');
@@ -19,6 +19,6 @@ if (preg_match("/^Smarty-3/",$smarty->_version)) {
 
 require_once(dirname(__FILE__).'/header.php');
 
-$smarty->display('debtors.tpl');
+$smarty->display('account.tpl');
 
 require_once(dirname(__FILE__).'/footer.php');

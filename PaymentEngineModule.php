@@ -17,6 +17,7 @@
     
     public function __construct() {
       parent::__construct();
+      UserConfig::$payment_modules[] = $this;
     }
 
     public function paymentReceived($data) {

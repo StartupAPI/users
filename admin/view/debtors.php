@@ -1,11 +1,9 @@
 <?php
 
-#require_once(dirname(dirname(dirname(__FILE__))).'/users.php');
+require_once(dirname(dirname(__FILE__)).'/admin.php');
 require_once(UserConfig::$SMARTY_DIR.'/Smarty.class.php');
 
 $smarty = new Smarty();
-
-$user = User::require_login();
 
 # Getting users one by one is quite ineffective, so building query to do this
 
@@ -28,4 +26,5 @@ while($stmt->fetch() === TRUE)
 $stmt->close();
 
 $smarty->assign('debtors', $debtors);
+$smarty->assign('USERSROOTURL',UserConfig::$USERSROOTURL);
  
