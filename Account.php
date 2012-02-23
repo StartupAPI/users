@@ -294,7 +294,7 @@ class Account
 		
 		$account = new self($id, $name, $plan, $role, NULL, $engine);
 		$account->activatePlan($plan, $schedule);
-		TransactionLogger::Log($id,$engine,0,'Account created');
+		TransactionLogger::Log($id,is_null($engine) ? NULL : $account->paymentEngine->getID(),0,'Account created');
 		return $account;
 	}
 
@@ -398,7 +398,7 @@ class Account
 		{
 			throw new Exception("Can't update user preferences (set current account)");
 		}
-		TransactionLogger::Log($this->id,$this->engine,0,'Account set as current');
+		TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getID(),0,'Account set as current');
 	}
 
 	public function isTheSameAs($account)
@@ -519,7 +519,8 @@ class Account
 
 		$stmt->close();
 		$db->query("UNLOCK TABLES");
-		TransactionLogger::Log($this->id,$this->engine,$this->schedule->charge_amount,'Payment Schedule charge');
+		TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getID(),
+		  $this->schedule->charge_amount,'Payment Schedule charge');
 		return TRUE;
 	}
 	
@@ -596,11 +597,13 @@ class Account
     $db->query("UNLOCK TABLES");
 
 		if ($this->getBalance() >= 0) {
-      TransactionLogger::Log($this->id,$this->engine,0,'Account activated due to positive balance');
+      TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getID(),
+        0,'Account activated due to positive balance');
 		  $this->activate();
     }
 
-		TransactionLogger::Log($this->id,$this->engine,$amount_to_log,'Payment received');
+		TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getID(),
+		  -$amount_to_log,'Payment received');
 		return TRUE;
 	}
 	
@@ -651,7 +654,8 @@ class Account
       throw new Exception("Can't execute statement: ".$stmt->error);
       
     $this->paymentIsDue();
-		TransactionLogger::Log($this->id,$this->engine,0,'Plan "'.$this->plan->name.'" activated');
+		TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getID(),
+		  0,'Plan "'.$this->plan->name.'" activated');
     return TRUE;
 	}
 	
@@ -664,14 +668,16 @@ class Account
 		if (!is_null($this->downgrade_to)) {
 
 		  $this->activatePlan($this->downgrade_to);
-		  TransactionLogger::Log($this->id,$this->engine,0,'Plan downgraded to "'.$this->plan->name.'"');
+		  TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getID(),
+		    0,'Plan downgraded to "'.$this->plan->name.'"');
 			return TRUE;
 
 		} else {
 		
 		  # Nothing to downgrade to - mark account as not active
 		  $this->suspend();
-  		TransactionLogger::Log($this->id,$this->engine,0,'Account suspended due to plan "'.$this->plan->name.'" deactivation');
+  		TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getID(),
+  		  0,'Account suspended due to plan "'.$this->plan->name.'" deactivation');
   		return FALSE;
     }
 	}
@@ -702,7 +708,8 @@ class Account
 
     # Bill user
     $this->paymentIsDue();
-    TransactionLogger::Log($this->id,$this->engine,0,'Payment schedule "'.$this->schedule->name.'" set.');
+    TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getID(),
+      0,'Payment schedule "'.$this->schedule->name.'" set.');
     return TRUE;
 	}
 	
@@ -746,7 +753,8 @@ class Account
     if (!$stmt->execute())
       throw new Exception("Can't execute statement: ".$stmt->error);
       
-    TransactionLogger::Log($this->id,$this->engine,0,'Payment engine "'.$this->schedule->name.'" set.');
+    TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getID(),
+      0,'Payment engine "'.$this->schedule->name.'" set.');
     return TRUE;
 	}
 	
@@ -801,7 +809,8 @@ class Account
     if (!$stmt->execute())
       throw new Exception("Can't execute statement: ".$stmt->error);
 
-    TransactionLogger::Log($this->id,$this->engine,0,'Request to change plan to "'.$new_plan->name.
+    TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getID(),
+      0,'Request to change plan to "'.$new_plan->name.
       (is_null($new_schedule) ? '"' : '" and schedule to "'.$new_schedule->name).
       '" stored.');
     return TRUE;
@@ -835,7 +844,8 @@ class Account
     if (!$stmt->execute())
       throw new Exception("Can't execute statement: ".$stmt->error);
 
-    TransactionLogger::Log($this->id,$this->engine,0,'Request to change schedule to "'.$schedule->name.'" stored.');      
+    TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getID(),
+      0,'Request to change schedule to "'.$schedule->name.'" stored.');      
     return TRUE;
 	}
 
