@@ -15,6 +15,10 @@
     protected $engineID;
     # ???
     
+    public function __construct() {
+      parent::__construct();
+    }
+
     public function paymentReceived($data) {
     
       # data is array with following required keys:

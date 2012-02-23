@@ -2,15 +2,15 @@
 
   class TransactionLogger {
   
-    public static Log($user_id, $account_id, $amount, $message) {
+    public static function Log($account_id, $engine, $amount, $message) {
     
       $db = UsersConfig::getDB();
       
       if (!($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.
-        'transaction_log (date_time, user_id, account_id, amount, message) VALUES (?, ?, ?, ?, ?)')))
+        'transaction_log (date_time, account_id, engine, amount, message) VALUES (?, ?, ?, ?, ?, ?)')))
           throw new Exception("Can't prepare statement: ".$db->error);
           
-      if (!$stmt->bind_param('siids',date('Y-m-d H:i:s'),$user_id,$account_id,$amount,$message))
+      if (!$stmt->bind_param('sisds',date('Y-m-d H:i:s'),$account_id,$engine,$amount,$message))
         throw new Exception("Can't bind parameter".$stmt->error);
         
       if (!$stmt->execute())
@@ -21,11 +21,38 @@
       return $id;
     }
     
-    public static getUserTransactions($user_id, $from = NULL, $to = NULL) {
-    
-    }
-    
-    public static getAccountTransactions($acccount_id, $from = NULL, $to = NULL) {
-    
+    public static function getAccountTransactions($account_id, $from = NULL, $to = NULL) {
+
+      $db = UsersConfig::getDB();
+      
+      $query = 'SELECT date_time, engine, amount, message FROM '.
+        UserConfig::$mysql_prefix.'transaction_log WHERE account_id = ?'.
+        (is_null($from) ? '' : ' AND date_time >= ?').
+        (is_null($to)   ? '' : ' AND date_time <= ?');
+        
+      if (!($stmt = $db->prepare($query)))
+        throw new Exception("Can't prepare statement: ".$db->error);
+        
+      if (!$stmt->bind_param('i'.(is_null($from) ? '' : 's').(is_null($to) ? '' : 's'), $account_id, $from, $to))
+        throw new Exception("Can't bind parameter".$stmt->error);
+        
+      if (!$stmt->execute())
+        throw new Exception("Can't execute statement: ".$stmt->error);
+        
+      if(!$stmt->bind_result($date_time, $engine, $amount, $message))
+        throw new Exception("Can't bind result: ".$stmt->error);
+        
+      $t = array();
+      while($stmt->fetch() === TRUE)
+        $t[] = array(
+          'date_time' => $date_time, 
+          'account_id' => $account_id,
+          'engine' => $engine,
+          'amount' => $amount,
+          'message' => $message);
+      
+      $stmt->close();
+                    
+      return $t;   
     }
   }

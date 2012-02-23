@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'/Plan.php');
+
 class Account
 {
 	private $id;
@@ -294,6 +294,7 @@ class Account
 		
 		$account = new self($id, $name, $plan, $role, NULL, $engine);
 		$account->activatePlan($plan, $schedule);
+		TransactionLogger::Log($id,$engine,0,'Account created');
 		return $account;
 	}
 
@@ -397,6 +398,7 @@ class Account
 		{
 			throw new Exception("Can't update user preferences (set current account)");
 		}
+		TransactionLogger::Log($this->id,$this->engine,0,'Account set as current');
 	}
 
 	public function isTheSameAs($account)
@@ -452,6 +454,8 @@ class Account
 
 		$db = UserConfig::getDB();		
 
+		if(is_null($this->schedule))
+		  return;
 		$charge_amount = $this->schedule->charge_amount;
 		# Look if there is a negative charge, it should be a single element
 		$c = reset(array_keys($this->charges));
@@ -515,6 +519,7 @@ class Account
 
 		$stmt->close();
 		$db->query("UNLOCK TABLES");
+		TransactionLogger::Log($this->id,$this->engine,$this->schedule->charge_amount,'Payment Schedule charge');
 		return TRUE;
 	}
 	
@@ -522,6 +527,7 @@ class Account
 	
 		$cleared = array();
 		$db = UserConfig::getDB();
+		$amount_to_log = $amount;
 
 		# Lock tables
     $db->query("LOCK TABLES ".UserConfig::$mysql_prefix.
@@ -589,9 +595,12 @@ class Account
 		
     $db->query("UNLOCK TABLES");
 
-		if ($this->getBalance() >= 0)
+		if ($this->getBalance() >= 0) {
+      TransactionLogger::Log($this->id,$this->engine,0,'Account activated due to positive balance');
 		  $this->activate();
+    }
 
+		TransactionLogger::Log($this->id,$this->engine,$amount_to_log,'Payment received');
 		return TRUE;
 	}
 	
@@ -642,6 +651,7 @@ class Account
       throw new Exception("Can't execute statement: ".$stmt->error);
       
     $this->paymentIsDue();
+		TransactionLogger::Log($this->id,$this->engine,0,'Plan "'.$this->plan->name.'" activated');
     return TRUE;
 	}
 	
@@ -654,13 +664,14 @@ class Account
 		if (!is_null($this->downgrade_to)) {
 
 		  $this->activatePlan($this->downgrade_to);
+		  TransactionLogger::Log($this->id,$this->engine,0,'Plan downgraded to "'.$this->plan->name.'"');
 			return TRUE;
 
 		} else {
 		
 		  # Nothing to downgrade to - mark account as not active
 		  $this->suspend();
-
+  		TransactionLogger::Log($this->id,$this->engine,0,'Account suspended due to plan "'.$this->plan->name.'" deactivation');
   		return FALSE;
     }
 	}
@@ -691,6 +702,7 @@ class Account
 
     # Bill user
     $this->paymentIsDue();
+    TransactionLogger::Log($this->id,$this->engine,0,'Payment schedule "'.$this->schedule->name.'" set.');
     return TRUE;
 	}
 	
@@ -734,6 +746,7 @@ class Account
     if (!$stmt->execute())
       throw new Exception("Can't execute statement: ".$stmt->error);
       
+    TransactionLogger::Log($this->id,$this->engine,0,'Payment engine "'.$this->schedule->name.'" set.');
     return TRUE;
 	}
 	
@@ -787,7 +800,10 @@ class Account
       
     if (!$stmt->execute())
       throw new Exception("Can't execute statement: ".$stmt->error);
-      
+
+    TransactionLogger::Log($this->id,$this->engine,0,'Request to change plan to "'.$new_plan->name.
+      (is_null($new_schedule) ? '"' : '" and schedule to "'.$new_schedule->name).
+      '" stored.');
     return TRUE;
 	}
 	
@@ -818,7 +834,8 @@ class Account
       
     if (!$stmt->execute())
       throw new Exception("Can't execute statement: ".$stmt->error);
-      
+
+    TransactionLogger::Log($this->id,$this->engine,0,'Request to change schedule to "'.$schedule->name.'" stored.');      
     return TRUE;
 	}
 

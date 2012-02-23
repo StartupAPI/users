@@ -2,6 +2,11 @@
 
   class PaymentEngine_Manual extends PaymentEngine {
   
+    public function __construct() {
+    
+      $this->engineID = 'PaymentEngine_Manual';
+    }
+
     public function getID() {
       
       return "PaymentEngine_Manual";

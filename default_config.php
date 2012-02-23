@@ -1,5 +1,6 @@
 <?php
 require_once(dirname(__FILE__).'/Plan.php');
+require_once(dirname(__FILE__).'/TransactionLogger.php');
 require_once(dirname(__FILE__).'/Cohort.php');
 require_once(dirname(__FILE__).'/Feature.php');
 require_once(dirname(__FILE__).'/modules.php');
