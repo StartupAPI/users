@@ -26,10 +26,20 @@ $versions[_]['down'][]	= "";
  * Payment Plans and Engines
 */
 
+$versions[16]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."transaction_log (
+  `transaction_id` int(11) NOT NULL AUTO_INCREMENT,
+  `date_time` datetime NOT NULL,
+  `account_id` int(11) NOT NULL,
+  `engine` varchar(256) DEFAULT NULL,
+  `amount` float DEFAULT NULL,
+  `message` text,
+  PRIMARY KEY (`transaction_id`),
+  KEY `acctid_dt` (`account_id`,`date_time`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8";
 $versions[16]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."account_charge (
   account_id int(11) NOT NULL,
   date_time datetime NOT NULL,
-  amount decimal(10,0) DEFAULT NULL,
+  amount float DEFAULT NULL,
   UNIQUE KEY acct_id_datetime (account_id,date_time),
   KEY account_idx (account_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
@@ -45,6 +55,7 @@ $versions[16]['down'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
   CHANGE COLUMN plan plan tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'Payment plan ID',
   DRP COLUMN next_plan, DROP COLUMN schedule, DROP COLUMN next_schedule, DROP COLUMN engine, DROP COLUMN active, DROP COLUMN next_charge";
 $versions[16]['down'][] = "DROP TABLE ".UserConfig::$mysql_prefix."account_charge";
+$versions[16]['down'][] = "DROP TABLE ".UserConfig::$mysql_prefix."transaction_log";
 
 /* -------------------------------------------------------------------------------------------------------
  * VERSION 15

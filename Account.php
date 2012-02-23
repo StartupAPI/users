@@ -524,7 +524,7 @@ class Account
 	}
 	
 	public function paymentReceived($amount) {
-	
+
 		$cleared = array();
 		$db = UserConfig::getDB();
 		$amount_to_log = $amount;
@@ -555,6 +555,7 @@ class Account
 					throw new Exception("Can't execute statement: ".$stmt->error);   
 
 				$amount = 0;
+				$stmt->close();
 			}
 		}
 		
@@ -569,9 +570,9 @@ class Account
 				
 			if (!$stmt->execute())
 				throw new Exception("Can't execute statement: ".$stmt->error);
+
+      $stmt->close();
 		}
-		
-		$stmt->close();
 		
 		# Store excessive payment as negative charge
 		if ($amount > 0) {
@@ -595,7 +596,7 @@ class Account
 		
     $db->query("UNLOCK TABLES");
 
-		if ($this->getBalance() >= 0) {
+		if ($this->getBalance() >= 0 && !$this->isActive) {
       TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getID(),
         0,'Account activated due to positive balance');
 		  $this->activate();
@@ -724,7 +725,7 @@ class Account
 	
 	public function getPaymentEngine() {
 	
-		return $this->paymentEngine; # do we need class or just id?
+		return $this->paymentEngine;
 	}
 	
 	public function isIndividual() {
@@ -753,7 +754,7 @@ class Account
       throw new Exception("Can't execute statement: ".$stmt->error);
       
     TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getID(),
-      0,'Payment engine "'.$this->schedule->name.'" set.');
+      0,'Payment engine "'.$this->paymentEngine->getID().'" set.');
     return TRUE;
 	}
 	

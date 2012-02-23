@@ -9,7 +9,7 @@
       if (!($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.
         'transaction_log (date_time, account_id, engine, amount, message) VALUES (?, ?, ?, ?, ?)')))
           throw new Exception("Can't prepare statement: ".$db->error);
-          
+
       if (!$stmt->bind_param('sisds',date('Y-m-d H:i:s'),$account_id,$engine,$amount,$message))
         throw new Exception("Can't bind parameter".$stmt->error);
         

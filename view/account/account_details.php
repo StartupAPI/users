@@ -17,7 +17,7 @@ $smarty = new Smarty();
 $smarty->assign('account_name',$account->getName());
 $smarty->assign('account_role',$account->getUserRole());
 $smarty->assign('account_isActive',$account->isActive());
-$smarty->assign('account_engine', $account->getPaymentEngine());
+$smarty->assign('account_engine', is_null($account->getPaymentEngine()) ? 'None' : $account->getPaymentEngine()->getTitle());
 $smarty->assign('account_next_charge', preg_replace("/ .*/","",$account->getNextCharge()));
   
 $plan = $account->getPlan();

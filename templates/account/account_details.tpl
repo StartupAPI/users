@@ -2,7 +2,7 @@
     <p>Account Name: <b>{$account_name}</b></p>
     <p>Account Role: <b>{if $account_role == constant("Account::ROLE_ADMIN")}Account Administrator{else}User{/if}</b></p>
     <p>Account Status: <b>{if $account_isActive}Active{else}Suspended{/if}</b></p>
-    <p>Payment Engine used: <b>{if $account_engine}{$account_engine}{else}None{/if}</b></p>
+    <p>Payment Engine used: <b>{$account_engine}</b></p>
   </div>
 
   <div>

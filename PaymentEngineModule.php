@@ -27,12 +27,12 @@
       # amount
       # This method should be called by successor class which actually receives information about payment
 
-      if (!(isset($d['account_id']) && isset($d['amount'])))
-        throw new Exception("No account_id in element ".print_r($d,1));
-      $account = Account::getByID($d['account_id']);
+      if (!(isset($data['account_id']) && isset($data['amount'])))
+        throw new Exception("No account_id in element ".print_r($data,1));
+      $account = Account::getByID($data['account_id']);
       if (is_null($account))
         return FALSE;
-      $account->paymentReceived($d['amount']);
+      $account->paymentReceived($data['amount']);
       
       return TRUE;
     
@@ -40,7 +40,7 @@
     
     public function unsubscribe($account_id) {
     
-      $account = Account::getByID($d['account_id']);  
+      $account = Account::getByID($account_id);  
       if (is_null($account))
         return FALSE;
       while($account->deactivatePlan()) {}

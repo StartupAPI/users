@@ -2,10 +2,14 @@
 
   class PaymentEngine_Manual extends PaymentEngine {
   
+    public static $loaded = 0;
     public function __construct() {
 
-      parent::__construct();
       $this->engineID = 'PaymentEngine_Manual';
+      if(!self::$loaded) {
+        parent::__construct();
+        self::$loaded = 1;
+      }
     }
 
     public function getID() {
@@ -15,7 +19,7 @@
     
     public function getTitle() {
     
-      return "Payment Engine for handling manual processing";
+      return "Manual Payment Processing";
     }
     
     public function changeSubscription($plan_id, $schedule_id) {
@@ -28,9 +32,9 @@
       
       global $ADMIN_SECTION;
       if($ADMIN_SECTION == $this->engineID)
-        echo "Payments (manual mode)";
+        echo " | Payments (manual mode)";
       else
-        echo " | <a href=\"".UserConfig::$USERSROOTURL."/modules/paymentengine_manual/admin.php\">Payments (manual mode)</a>\n";
+        echo " | <a href=\"".UserConfig::$USERSROOTURL."/modules/".$this->engineID."/admin.php\">Payments (manual mode)</a>\n";
     }
     
   }
