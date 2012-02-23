@@ -1,5 +1,3 @@
-<html>
-<body>
   <div>
     <p>Account Name: <b>{$account_name}</b></p>
     <p>Account Role: <b>{if $account_role == constant("Account::ROLE_ADMIN")}Account Administrator{else}User{/if}</b></p>
@@ -58,6 +56,3 @@
     <p>Charge Amount: <b>${$next_schedule_charge_amount}</b></p>
     <p>Charge Period: <b>{$next_schedule_charge_period}</b> days</p>
   {/if}
-
-</body>
-</html>

@@ -1,5 +1,3 @@
-<html>
-<body>
 	{if !empty($message) } 
 		{foreach from=$message item=msg}
 		<h2>{$msg}</h2>
@@ -82,5 +80,3 @@
 	<input type="submit" value="Switch" />
 	</form>  
 	{/if}
-</body>
-</html>
