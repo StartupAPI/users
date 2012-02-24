@@ -38,11 +38,11 @@ require_once(UserConfig::$header);
 ?>
 <h2>Account Info (<?php echo $managed_account->getName() ?>)</h2>
 <div id="plan">
-<p>Subscription plan: <b><?php echo $managed_account->getPlan()->getName() ?></b>
+<p>Subscription plan: <b><?php echo $managed_account->getPlan()->name ?></b>
 </div>
 
 <?php
-if (!$managed_account->getPlan()->isIndividual() && $managed_account->getUserRole() == Account::ROLE_ADMIN) {
+if (!$managed_account->isIndividual() && $managed_account->getUserRole() == Account::ROLE_ADMIN) {
 ?>
 <div id="members">
 <h2>Account Members</h2>

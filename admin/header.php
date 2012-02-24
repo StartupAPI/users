@@ -36,36 +36,33 @@ if (!isset($ADMIN_SECTION)) {
 if (UserConfig::$enableInvitations) {
 	?><h2>Users | <a href="invitations.php">Invitations</a></h2><?php
 }
+
+$links = array(
+	'dashboard' => 'Dashboard',
+	'cohorts' => 'Cohort Analysis',
+	'activity' => 'Activity',
+	'registrations' => 'Registered Users',
+	'bymodule' => 'Registrations By Module',
+	'features' => 'Features'
+	);
 ?>
 <div id="userbase_adminmenu">
-<?php if ($ADMIN_SECTION != 'dashboard') {
-	?><a href="./">Dashboard</a><?php
-} else {
-	?>Dashboard<?php
-} ?> |
-<?php if ($ADMIN_SECTION != 'cohorts') {
-	?><a href="cohorts.php">Cohort Analysis</a><?php
-} else {
-	?>Cohort Analysis<?php
-} ?> |
-<?php if ($ADMIN_SECTION != 'activity') {
-	?><a href="activity.php">Activity</a><?php
-} else {
-	?>Activity<?php
-} ?> |
-<?php if ($ADMIN_SECTION != 'registrations') {
-	?><a href="registrations.php">Registered Users</a><?php
-} else {
-	?>Registered Users<?php
-} ?> |
-<?php if ($ADMIN_SECTION != 'bymodule') {
-	?><a href="bymodule.php">Registrations By Module</a><?php
-} else {
-	?>Registrations By Module<?php
-} ?> |
-<?php if ($ADMIN_SECTION != 'features') {
-	?><a href="features.php">Features</a><?php
-} else {
-	?>Features<?php
-} ?>
+<?
+	$first = !UserConfig::$enableInvitations;
+	foreach($links as $k => $v) {
+		if(!$first)
+			echo " | ";
+		$first = 0;
+		
+		if($ADMIN_SECTION == $k)
+			echo $v;
+		else 
+			echo "<a href=\"".UserConfig::$USERSROOTURL."/admin/".$k.".php\">".$v."</a>";
+	}
+
+	foreach (UserConfig::$all_modules as $m)
+		if (method_exists($m,'renderAdminMenuItem'))
+			echo $menu_item = $m->renderAdminMenuItem();
+			
+?>
 </div>

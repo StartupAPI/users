@@ -260,10 +260,10 @@ class User
 				throw new Exception("Can't update user preferences (set current account)");
 			}
 
-			$personal = Account::createAccount('FREE ('.$this->getName().')',
-							Plan::getFreePlan(), $this, Account::ROLE_ADMIN);
+			$personal = Account::createAccount($this->getName(), UserConfig::$default_plan, NULL, $this, Account::ROLE_ADMIN, NULL);
 
 			$personal->setAsCurrent($this);
+
 		}
 
 		if (!is_null(UserConfig::$onCreate))
@@ -458,6 +458,35 @@ class User
 
 		return $user;
 	}
+
+  /*
+   * delete this user 
+   */
+  public function delete()
+  {
+
+    $username = mb_convert_encoding($this -> username, 'UTF-8');
+
+		$db = UserConfig::getDB();
+
+		if ($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix."users WHERE username = ?"))
+		{
+			if (!$stmt->bind_param('s', $username))
+			{
+				 throw new Exception("Can't bind parameter".$stmt->error);
+			}
+			if (!$stmt->execute())
+			{
+				throw new Exception("Can't execute statement: ".$stmt->error);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new Exception("Can't prepare statement: ".$db->error);
+		}
+  }
 
 	/*
 	 * Returns total number of users in the system
@@ -2046,7 +2075,7 @@ class User
 			throw new Exception("Can't prepare statement: ".$db->error);
 		}
 	}
-
+ 
 	/*
 	 * Returns a list of user's accounts
 	 */

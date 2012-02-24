@@ -1,5 +1,6 @@
 <?php
 require_once(dirname(__FILE__).'/Plan.php');
+require_once(dirname(__FILE__).'/TransactionLogger.php');
 require_once(dirname(__FILE__).'/Cohort.php');
 require_once(dirname(__FILE__).'/Feature.php');
 require_once(dirname(__FILE__).'/modules.php');
@@ -12,6 +13,9 @@ class UserConfig
 
 	// multiple email modules can be assigned for the same instance
 	public static $authentication_modules = array();
+
+	// payment modules
+	public static $payment_modules = array();
 
 	// Only one email module can exist
 	public static $email_module;
@@ -152,8 +156,74 @@ class UserConfig
 	public static $onCreate = null;
 	// create extra links on login strip
 	public static $onLoginStripLinks = null;
-			
-	public static function getDB()
+
+
+        /*
+         * subscription data
+         */
+
+        public static $useSubscriptions = true; // works only if $useAccounts is true!!!
+        // free plan id, set to user with registration
+        public static $plan_free = 'PLAN_FREE';
+        // subscription plans list, MUST have free plan index
+        public static $PLANS = array(
+            'PLAN_FREE' => array(
+                'name' => 'Free account',
+                'description' => 'Free access with some basic functionality',
+                'details_url' => '/plans/free.html',
+                'capabilities' => array(
+                    'number-of-urls' => 1
+                )
+            ),
+            'personal-pro' => array(
+                'name' => 'Personal PRO',
+                'description' => 'Basic paid plan best suited for individual customers',
+                'details_url' => '/plans/personal_pro.html',
+                'capabilities' => array(
+                    'number-of-urls' => 100
+                ),
+                'base_price' => 5,
+                'base_period' => 31,
+                'base_period_units' => 'DAYS',
+                'payment_schedules' => array(
+                    'monthly' => array(
+                        'name' => 'Every month',
+                        'description' => 'Pay just $7 low payment month-to-month',
+                        'charge_amount' => 7,
+                        'charge_period' => 31,
+                        'charge_period_units' => 'DAYS'
+                    ),
+                    'every6months' => array(
+                        'name' => 'Every 6 months',
+                        'description' => 'As low as $5 / month when paid for 6 months',
+                        'charge_amount' => 30,
+                        'charge_period' => 183,
+                        'charge_period_units' => 'DAYS'
+                    ),
+                    'annual' => array(
+                        'name' => 'Annually',
+                        'description' => 'Get 2 months FREE when you pay for a year',
+                        'charge_amount' => 50,
+                        'charge_period' => 365,
+                        'charge_period_units' => 'DAYS'
+                    )
+                )
+            )
+        );
+        // default plan
+        public static $default_plan = 'PLAN_FREE';
+        // default schedule
+        public static $default_schedule = 'default';
+        
+        // Smarty base directory
+        public static $SMARTY_DIR = '/usr/share/php/smarty3';
+        public static $smarty_compile;
+        public static $smarty_cache;
+        public static $smarty_templates;
+
+
+
+  public static function getDB()
 	{
 		if (is_null(self::$db))
 		{
@@ -321,7 +391,16 @@ EOD;
 		UserConfig::$cohort_providers[] = new GenerationCohorts(GenerationCohorts::WEEK);
 		UserConfig::$cohort_providers[] = new GenerationCohorts(GenerationCohorts::YEAR);
 		UserConfig::$cohort_providers[] = new RegMethodCohorts();
+		
+		if(UserConfig::$useAccounts && UserConfig::$useSubscriptions)
+			Plan::init(UserConfig::$PLANS);
+
+    UserConfig::$smarty_cache = dirname(__FILE__).'/cache/smarty/cache';
+    UserConfig::$smarty_compile = dirname(__FILE__).'/cache/smarty/templates_c';
+    UserConfig::$smarty_templates = dirname(__FILE__).'/templates';
+
 	}
+	
 
 	// Couldn't reuse it, but keeping it here because it might be still populated in user configs
 	// Use UserConfig::$all_modules array instead of needed

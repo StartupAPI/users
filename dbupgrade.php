@@ -22,12 +22,46 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
- * VERSION 16
+ * VERSION 17
  * Adding login link code
 */
-$versions[16]['up'][] = "ALTER TABLE  `".UserConfig::$mysql_prefix."users` ADD  `loginlinkcode` VARCHAR( 10 ) NULL DEFAULT NULL COMMENT  'One time code used to login' AFTER  `temppass`";
-$versions[16]['down'][] = "ALTER TABLE  `".UserConfig::$mysql_prefix."users` DROP  `loginlinkcode`";
+$versions[17]['up'][] = "ALTER TABLE  `".UserConfig::$mysql_prefix."users` ADD  `loginlinkcode` VARCHAR( 10 ) NULL DEFAULT NULL COMMENT  'One time code used to login' AFTER  `temppass`";
+$versions[17]['down'][] = "ALTER TABLE  `".UserConfig::$mysql_prefix."users` DROP  `loginlinkcode`";
 
+/* -------------------------------------------------------------------------------------------------------
+ * VERSION 16
+ * Payment Plans and Engines
+*/
+$versions[16]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."transaction_log (
+  `transaction_id` int(11) NOT NULL AUTO_INCREMENT,
+  `date_time` datetime NOT NULL,
+  `account_id` int(11) NOT NULL,
+  `engine` varchar(256) DEFAULT NULL,
+  `amount` float DEFAULT NULL,
+  `message` text,
+  PRIMARY KEY (`transaction_id`),
+  KEY `acctid_dt` (`account_id`,`date_time`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8";
+$versions[16]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."account_charge (
+  account_id int(11) NOT NULL,
+  date_time datetime NOT NULL,
+  amount float DEFAULT NULL,
+  UNIQUE KEY acct_id_datetime (account_id,date_time),
+  KEY account_idx (account_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+$versions[16]['up'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
+  CHANGE COLUMN plan plan varchar(256) DEFAULT NULL,
+  ADD COLUMN next_plan varchar(256) DEFAULT NULL,
+  ADD COLUMN schedule varchar(256) DEFAULT NULL,
+  ADD COLUMN next_schedule varchar(256) DEFAULT NULL,
+  ADD COLUMN engine varchar(256) DEFAULT NULL,
+  ADD COLUMN active tinyint(1) DEFAULT '1',
+  ADD COLUMN next_charge datetime DEFAULT NULL";
+$versions[16]['down'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
+  CHANGE COLUMN plan plan tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'Payment plan ID',
+  DRP COLUMN next_plan, DROP COLUMN schedule, DROP COLUMN next_schedule, DROP COLUMN engine, DROP COLUMN active, DROP COLUMN next_charge";
+$versions[16]['down'][] = "DROP TABLE ".UserConfig::$mysql_prefix."account_charge";
+$versions[16]['down'][] = "DROP TABLE ".UserConfig::$mysql_prefix."transaction_log";
 
 /* -------------------------------------------------------------------------------------------------------
  * VERSION 15
