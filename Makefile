@@ -2,7 +2,7 @@ all:	updatecode updatedb
 
 updatecode:
 ifneq "$(wildcard .svn )" ""
-	rm -rf dbupgrade oauth-php admin/swfobject modules/facebook/php-sdk
+	rm -rf dbupgrade oauth-php admin/swfobject modules/facebook/php-sdk smarty
 	svn update
 
 	mkdir dbupgrade/
@@ -25,6 +25,12 @@ ifneq "$(wildcard .svn )" ""
 	git clone git://github.com/facebook/php-sdk.git _php-sdk
 	( cd _php-sdk; git archive v2.1.2 | tar -x -C ../modules/facebook/php-sdk )
 	rm -rf _php-sdk
+
+	rm -rf smarty
+	mkdir smarty
+	svn export git://github.com/ericingram/smarty.git _smarty
+	mv _smarty/* smarty/
+	rm -rf _smarty
 endif
 ifneq "$(wildcard .git )" ""
 	git pull origin master
@@ -74,4 +80,4 @@ else
 endif
 
 documentation:
-	phpdoc -o HTML:frames:default -d . -t docs -i "*/oauth-php/*,*/modules/facebook/php-sdk/*,*/dbupgrade/*,*/admin/swfobject/*,*/docs/*"
+	phpdoc -o HTML:frames:default -d . -t docs -i "*/oauth-php/*,*/modules/facebook/php-sdk/*,*/dbupgrade/*,*/admin/swfobject/*,*/docs/*,*/smarty/*"

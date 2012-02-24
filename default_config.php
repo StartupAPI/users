@@ -216,7 +216,6 @@ class UserConfig
         public static $default_schedule = 'default';
         
         // Smarty base directory
-        public static $SMARTY_DIR = '/usr/share/php/smarty3';
         public static $smarty_compile;
         public static $smarty_cache;
         public static $smarty_templates;
