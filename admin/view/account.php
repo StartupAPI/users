@@ -1,7 +1,7 @@
 <?php
 
 require_once(dirname(dirname(__FILE__)).'/admin.php');
-require_once(UserConfig::$SMARTY_DIR.'/Smarty.class.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/smarty/libs/Smarty.class.php');
 
 $smarty = new Smarty();
 

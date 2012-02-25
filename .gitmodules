@@ -10,3 +10,6 @@
 [submodule "dbupgrade"]
 	path = dbupgrade
 	url = git://github.com/sergeychernyshev/DBUpgrade.git
+[submodule "smarty"]
+	path = smarty
+	url = git://github.com/ericingram/smarty.git
