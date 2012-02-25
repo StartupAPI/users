@@ -59,7 +59,7 @@ $versions[16]['up'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
   ADD COLUMN next_charge datetime DEFAULT NULL";
 $versions[16]['down'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
   CHANGE COLUMN plan plan tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'Payment plan ID',
-  DRP COLUMN next_plan, DROP COLUMN schedule, DROP COLUMN next_schedule, DROP COLUMN engine, DROP COLUMN active, DROP COLUMN next_charge";
+  DROP COLUMN next_plan, DROP COLUMN schedule, DROP COLUMN next_schedule, DROP COLUMN engine, DROP COLUMN active, DROP COLUMN next_charge";
 $versions[16]['down'][] = "DROP TABLE ".UserConfig::$mysql_prefix."account_charge";
 $versions[16]['down'][] = "DROP TABLE ".UserConfig::$mysql_prefix."transaction_log";
 

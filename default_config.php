@@ -33,6 +33,7 @@ class UserConfig
 	public static $DEFAULTLOGOUTRETURN;
 	public static $DEFAULTREGISTERRETURN;
 	public static $DEFAULTUPDATEPASSWORDRETURN;
+	public static $SMARTY_DIR;
 
 	// session secret - must be unique for each installation
 	public static $SESSION_SECRET;
@@ -216,7 +217,6 @@ class UserConfig
         public static $default_schedule = 'default';
         
         // Smarty base directory
-        public static $SMARTY_DIR = '/usr/share/php/smarty3';
         public static $smarty_compile;
         public static $smarty_cache;
         public static $smarty_templates;
