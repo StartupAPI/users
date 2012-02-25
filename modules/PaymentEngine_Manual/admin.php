@@ -10,10 +10,12 @@
   switch($action) {
   
     case 'ProcessAddPayment':
+    case 'ProcessRefund':
     
       $account_id = isset($_REQUEST['account_id']) ? intval(htmlspecialchars($_REQUEST['account_id'])) : NULL;
       $amount = isset($_REQUEST['howmuch']) ? sprintf("%.2f",htmlspecialchars($_REQUEST['howmuch'])) : NULL;
 
+      $subject = $action == 'ProcessRefund' ? 'Refund' : 'Payment';
       if (is_null($account = Account::getByID($account_id))) {
       ?>
         <p>Can't find account with ID <?php echo $account_id ?></p>
@@ -32,21 +34,26 @@
           break;
         } else {
           $data = array('account_id' => $account_id, 'amount' => $amount);
-          if($engine->paymentReceived($data)) {
-          ?>
-            <p>Payment of $<?php echo $amount ?> recorded</p>
-          <?php
+
+          if($action == 'ProcessRefund')
+            $ret_code = $engine->refund($data);
+          else
+            $ret_code = $engine->paymentReceived($data);
+
+          if($ret_code) {
+            echo "<p>", $subject, " of ", $amount, " recorded.</p>\n";
           } else {
-          ?>
-            <p>Error recording payment!</p>
-          <?php
+            echo "<p>",$subject," can not be recorded - please check server logs.</p>";
           }
         }
       }
 
 
     case 'DisplayAddPayment':
+    case 'DisplayMakeRefund':
     
+      $hint = $action == 'DisplayMakeRefund' ? 'Make refund' : 'Add funds';
+      $process = $action == 'DisplayMakeRefund' ? 'ProcessRefund' : 'ProcessAddPayment';
       $account_id = isset($_REQUEST['account_id']) ? intval(htmlspecialchars($_REQUEST['account_id'])) : NULL;
       if (is_null($account = Account::getByID($account_id))) {
       ?>
@@ -58,11 +65,11 @@
       ?>
       <div>
         <form action="">
-        <input type="hidden" name="action" value="ProcessAddPayment" />
+        <input type="hidden" name="action" value="<?php echo $process ?>" />
         <input type="hidden" name="account_id" value="<?php echo $account_id ?>" />
-        <p>Add funds for account '<b><?php echo $account->getName() ?></b>' (Current Balance: <b><?php echo $balance ?></b>
+        <p><?php echo $hint ?> for account '<b><?php echo $account->getName() ?></b>' (Current Balance: <b><?php echo $balance ?></b>
           ID: <b><?php echo $account_id?>)</b></p>
-        <p>How much:<input type="text" id="howmuch" name="howmuch" /></p>
+        <p>Amount:<input type="text" id="howmuch" name="howmuch" /></p>
         <p><input type="submit" value="Ok" /></p>
         </form>
       </div>
@@ -70,7 +77,7 @@
       <?php
       }
       break;
-      
+
     default:
 
       # Display account list and filter form
@@ -172,7 +179,7 @@
         echo "<td>".$a['plan']."</td><td>".$a['schedule']."</td><td>".($a['active'] ? 'Active' : 'Suspended')."</td>\n";
         $a['balance'] = preg_replace("/(^|-)/","$$1",sprintf("%.2f",-$a['balance']),1);
         echo "<td>".$a['balance']."</td><td><a href=\"?action=DisplayAddPayment&account_id=".$a['id']."\">Add funds</a></td>";
-        echo "<td><a href=\"?action=Refund&account_id=".$a['id']."\">Refund</a></td></tr>\n";
+        echo "<td><a href=\"?action=DisplayMakeRefund&account_id=".$a['id']."\">Refund</a></td></tr>\n";
       }
       ?>
       <tr><td colspan="8">

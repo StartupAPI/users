@@ -37,7 +37,7 @@
         {$total = $total + $c.amount}
       {/foreach}
       </ul>
-      <p>Total debt: <b>${$total}</b></p>
+      <p>Total debt: <b>${sprintf("%.2f",$total)}</b></p>
     </div>
     {/if}
     {if isset($account_next_charge)}

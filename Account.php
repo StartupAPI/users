@@ -441,27 +441,27 @@ class Account
 	
 		$charges = array();	
 		while($stmt->fetch() === TRUE)
-			$charges[] = array('datetime' => $datetime, 'amount' => $amount);
+			$charges[] = array('datetime' => $datetime, 'amount' => sprintf("%.2f",$amount));
 		
 		$stmt->close();
 		return $charges;
 	}
 	
-	public function paymentIsDue() {
+	public function paymentIsDue($refund = NULL) { # refund is almost the same, as general payment
 	
 		if (is_null($this->schedule)) return;
 
 		$db = UserConfig::getDB();		
 
-		if(is_null($this->schedule))
+		if(is_null($this->schedule) && is_null($refund))
 		  return;
-		$charge_amount = $this->schedule->charge_amount;
+		$charge_amount = is_null($refund) ? $this->schedule->charge_amount : $refund;
 		# Look if there is a negative charge, it should be a single element
 		$c = reset(array_keys($this->charges));
 		
 		# Lock tables
-    $db->query("LOCK TABLES ".UserConfig::$mysql_prefix.
-      "account_charge WRITE");
+    $db->query("LOCK TABLES ".UserConfig::$mysql_prefix."account_charge WRITE");
+
 		if ($c !== FALSE && $this->charges[$c]['amount'] < 0) {
       if ($this->charges[$c]['amount'] + $charge_amount > 0) { 
         # This charge is greater than we owe to user
@@ -486,8 +486,8 @@ class Account
           'account_charge SET amount = ? WHERE account_id = ?')))
           throw new Exception("Can't prepare statement: ".$db->error);
           
-        if (!$stmt->bind_param('i', 
-          $this->charges[$c]['amount'] + $charge_amount, $this->id))
+        $amt = $this->charges[$c]['amount'] + $charge_amount;
+        if (!$stmt->bind_param('di', $amt, $this->id))
           throw new Exception("Can't bind parameter".$stmt->error);
           
         if (!$stmt->execute())
@@ -495,31 +495,42 @@ class Account
           
         $this->charges[$c]['amount'] += $charge_amount;
         $stmt->close();
-        return TRUE;
+        
+        $charge_amount += $this->charges[$c]['amount'];
       }
     }
 
     # Rest of $charge_amount should be charged
 		
-    $charge = array('datetime' => date('Y-m-d H:i:s'), 
-      'amount' => $charge_amount);
-		$this->charges[] = $charge;
+		if($charge_amount > 0) {
 
-    if (!($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.
-      'account_charge (account_id, date_time, amount) VALUES (?, ?, ?)')))
-			throw new Exception("Can't prepare statement: ".$db->error);
-		
-    if (!$stmt->bind_param('isd', $this->id, $charge['datetime'], 
-      $charge['amount']))
-			throw new Exception("Can't bind parameter".$stmt->error);
-		
-		if (!$stmt->execute())
-			throw new Exception("Can't execute statement: ".$stmt->error);
+      $charge = array('datetime' => date('Y-m-d H:i:s'), 
+        'amount' => $charge_amount);
+      $this->charges[] = $charge;
 
-		$stmt->close();
+      if (!($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.
+        'account_charge (account_id, date_time, amount) VALUES (?, ?, ?)')))
+        throw new Exception("Can't prepare statement: ".$db->error);
+      
+      if (!$stmt->bind_param('isd', $this->id, $charge['datetime'], 
+        $charge['amount']))
+        throw new Exception("Can't bind parameter".$stmt->error);
+      
+      if (!$stmt->execute())
+        throw new Exception("Can't execute statement: ".$stmt->error);
+
+      $stmt->close();
+    }
+
 		$db->query("UNLOCK TABLES");
-		TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getID(),
-		  $this->schedule->charge_amount,'Payment Schedule charge');
+
+		if(is_null($refund))
+  		TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getID(),
+	  	  $this->schedule->charge_amount,'Payment Schedule charge');
+    else
+      TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getID(),
+        $refund,'Refund recorded');
+
 		return TRUE;
 	}
 	
@@ -602,8 +613,9 @@ class Account
 		  $this->activate();
     }
 
-		TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getID(),
-		  -$amount_to_log,'Payment received');
+ 		TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getID(),
+  	  -$amount_to_log,'Payment received');
+
 		return TRUE;
 	}
 	
