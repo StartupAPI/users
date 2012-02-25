@@ -10,46 +10,26 @@ if (!UserConfig::$useAccounts) {
 
 $user = User::require_login();
 
-$accounts = Account::getUserAccounts($user);
+$account = Account::getCurrentAccount($user);
 
-$manageable_accounts = array();
-foreach ($accounts as $account) {
-	if ($account->getUserRole() == Account::ROLE_ADMIN) {
-		$manageable_accounts[] = $account;
-	}
-}
-
-$managed_account = null;
-if (array_key_exists('account', $_GET)) {
-	foreach ($manageable_accounts as $account) {
-		if ($account->getID() == $_GET['account']) {
-			$managed_account = $account;
-			break;	
-		}
-	}
-}
-
-if (is_null($managed_account)) {
+if($account->getUserRole() != Account::ROLE_ADMIN) {
 	header('Location: '.UserConfig::$DEFAULTLOGOUTRETURN);
 	exit;
 }
 
 require_once(UserConfig::$header);
 ?>
-<h2>Account Info (<?php echo $managed_account->getName() ?>)</h2>
+<h2>Account Info (<?php echo $account->getName() ?>)</h2>
 <div id="plan">
-<p>Subscription plan: <b><?php echo $managed_account->getPlan()->name ?></b>
+<p>Subscription plan: <b><?php echo $account->getPlan()->name ?></b> - 
+<a href="<?php echo UserConfig::$USERSROOTURL ?>/account_details.php">details</a>
 </div>
-
-<?php
-if (!$managed_account->isIndividual() && $managed_account->getUserRole() == Account::ROLE_ADMIN) {
-?>
 <div id="members">
 <h2>Account Members</h2>
 <ul>
 <?php
 
-$members = $managed_account->getUsers();
+$members = $account->getUsers();
 
 foreach ($members as $member) {
 	?><li><?php echo $member->getName(); ?></li><?php
@@ -57,27 +37,6 @@ foreach ($members as $member) {
 ?>
 </ul>
 </div>
-
 <?php
-}
-if (count($manageable_accounts) > 1) {
-?>
-<h2>Other accounts</h2>
-<p>Click on account name to open it:</p>
-<ul>
-<?php
-	foreach ($manageable_accounts as $account)
-	{
-		if ($account->isTheSameAs($managed_account)) {
-			?><li><b><?php echo UserTools::escape($account->getName())?></b></li><?php
-		} else {
-			?><li><a href="<?php echo UserConfig::$USERSROOTURL ?>/manage_account.php?account=<?php echo $account->getID()?>"><?php echo UserTools::escape($account->getName())?></a></li><?php
-		}
-	}
-
-?>
-</ul>
-<?php
-}
 
 require_once(UserConfig::$footer);

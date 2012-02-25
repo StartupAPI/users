@@ -12,7 +12,7 @@
     case 'ProcessAddPayment':
     
       $account_id = isset($_REQUEST['account_id']) ? intval(htmlspecialchars($_REQUEST['account_id'])) : NULL;
-      $amount = isset($_REQUEST['howmuch']) ? htmlspecialchars($_REQUEST['howmuch']) : NULL;
+      $amount = isset($_REQUEST['howmuch']) ? sprintf("%.2f",htmlspecialchars($_REQUEST['howmuch'])) : NULL;
 
       if (is_null($account = Account::getByID($account_id))) {
       ?>

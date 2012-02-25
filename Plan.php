@@ -34,16 +34,16 @@ class Plan {
 		$parameters = array(
 			'id' => NULL,
 			'name' => NULL,
-			'description' => '',
-			'base_price' => 0,
-			'base_period' => 0,
+			'description' => NULL,
+			'base_price' => NULL,
+			'base_period' => NULL,
 			'details_url' => NULL,
 			'payment_schedules' => array(),
 			'capabilities' => array(),
 			'downgrade_to' => UserConfig::$default_plan,
-			'grace_period' => 0,
-			'user_activate_hook' => '',
-			'user_deactivate_hook' => '',
+			'grace_period' => NULL,
+			'user_activate_hook' => NULL,
+			'user_deactivate_hook' => NULL,
 		);
 		
 		if ($id === NULL)
@@ -53,10 +53,7 @@ class Plan {
 		$a['id'] = $id;
 	
 		# Mandatory parameters are those whose default value is NULL
-		$mandatory = array();
-		foreach($parameters as $p => $v) {
-			if (is_null($v)) $mandatory[] = $p;
-		}
+		$mandatory = array('id','name');
 		
 		$missing = array_diff($mandatory,array_keys($a));
 		if (count($missing))

@@ -34,7 +34,7 @@
   	<p>Total debt: <b>${$total}</b></p>
   </div>
   {/if}
-  {if isset($account_next_charge)}
+  {if !empty($account_next_charge)}
   <div>
   	<p>Next charge: <b>{$account_next_charge}</b></p>
   </div>

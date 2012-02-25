@@ -55,8 +55,10 @@ $links = array(
 		
 		if($ADMIN_SECTION == $k)
 			echo $v;
-		else 
+		else {
+			if($k == 'dashboard') $k = 'index';
 			echo "<a href=\"".UserConfig::$USERSROOTURL."/admin/".$k.".php\">".$v."</a>";
+		}
 	}
 
 	foreach (UserConfig::$all_modules as $m)
