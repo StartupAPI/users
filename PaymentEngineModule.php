@@ -6,6 +6,7 @@
   
     public function changeSubscription($plan_id, $schedule_id);
     public function paymentReceived($data);
+    public function refund($data);
     public function unsubscribe($account_id);
     public function cronHandler();
   }
@@ -33,6 +34,21 @@
       if (is_null($account))
         return FALSE;
       $account->paymentReceived($data['amount']);
+      
+      return TRUE;
+    
+    }
+
+    public function refund($data) {
+    
+      # refund is generally the same, as payment
+
+      if (!(isset($data['account_id']) && isset($data['amount'])))
+        throw new Exception("No account_id in element ".print_r($data,1));
+      $account = Account::getByID($data['account_id']);
+      if (is_null($account))
+        return FALSE;
+      $account->paymentIsDue($data['amount']);
       
       return TRUE;
     

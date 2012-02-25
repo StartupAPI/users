@@ -33,7 +33,6 @@ class UserConfig
 	public static $DEFAULTLOGOUTRETURN;
 	public static $DEFAULTREGISTERRETURN;
 	public static $DEFAULTUPDATEPASSWORDRETURN;
-	public static $SMARTY_DIR;
 
 	// session secret - must be unique for each installation
 	public static $SESSION_SECRET;

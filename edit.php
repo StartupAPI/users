@@ -92,19 +92,17 @@ require_once(UserConfig::$header);
 <div style="float: right; width: 400px">
 <div>
 <?php if (UserConfig::$useAccounts) { ?>
-<h2>Accounts:</h2>
+	<h2>Current account:</h2>
+	<div>
 <?php
-	$accounts = $user->getAccounts();
-
-	foreach ($accounts as $user_account) {
-		?><div>
-		<?php echo $user_account->getName() ?> (<?php echo $user_account->getPlan()->name ?>)<?php
-		if ($user_account->getUserRole() == Account::ROLE_ADMIN) {
-			?> - <a href="<?php echo UserConfig::$USERSROOTURL.'/manage_account.php?account='.$user_account->getID(); ?>">manage</a><?php
-		}
-		?></div><?php
+	$account = Account::getCurrentAccount($user);
+	echo $account->getName()," ( ",$account->getPlan()->name," )";
+	if($account->getUserRole() == Account::ROLE_ADMIN)
+		echo " - <a href=\"",UserConfig::$USERSROOTURL."/manage_account.php\">manage</a>\n";
+?>
+	</div>
+<?php
 	}
-}
 ?>
 </div>
 
