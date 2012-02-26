@@ -16,13 +16,12 @@
 		{if isset($schedule_name)}
     <p>Payment Schedule: <b>{$schedule_name}</b></p>
     <p>Payment Schedule description: {$schedule_description}</p>
-    <p>Charge Amount: <b>${$schedule_charge_amount}</b></p>
+    <p>Charge Amount: <b>${sprintf("%.2f",$schedule_charge_amount)}</b></p>
     <p>Charge Period: <b>{$schedule_charge_period}</b> days</p>
     {/if}
   </div>
-  
-  {if count($charges)}
   <div>
+  {if count($charges) && $balance < 0}
   	<p>Account Debts</p>
   	<ul>
   	{$total = 0}
@@ -33,7 +32,10 @@
   	</ul>
   	<p>Total debt: <b>${sprintf("%.2f",$total)}</b></p>
   </div>
+  {else}
+  	<p>Account Balance: <b>{sprintf("$%.2f",$balance)}</b></p>
   {/if}
+  </div>
   {if !empty($account_next_charge)}
   <div>
   	<p>Next charge: <b>{$account_next_charge}</b></p>
@@ -56,3 +58,6 @@
     <p>Charge Amount: <b>${$next_schedule_charge_amount}</b></p>
     <p>Charge Period: <b>{$next_schedule_charge_period}</b> days</p>
   {/if}
+	<div>
+	<a href="{$USERSROOTURL}/transaction_log.php" >View account transactions</a>
+	</div>

@@ -9,7 +9,7 @@ $account_id = htmlspecialchars($_REQUEST['account_id']);
 if(is_null($account = Account::getByID($account_id))) {
   $smarty->assign('message',array("Can't find account with id $account_id"));
   $smarty->assign('fatal',1);
-  exit;
+  return;
 }
 
 $plan_data = array(
@@ -18,6 +18,7 @@ $plan_data = array(
 $schedule_data = array(
   'name', 'description', 'charge_amount', 'charge_period');
   
+$smarty->assign('account_id',$account_id);
 $smarty->assign('account_name',$account->getName());
 $smarty->assign('account_role',$account->getUserRole());
 $smarty->assign('account_isActive',$account->isActive());

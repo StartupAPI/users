@@ -16,14 +16,14 @@ if(isset($_SESSION['message'])) {
   unset($_SESSION['fatal']);
   if($fatal) {
     $smarty->assign('fatal',1);
-    exit;
+    return;
   }
 }
 
 if(!$account->isActive()) {
   $smarty->assign('message',array('This account is not active. Please activate it first.'));
   $smarty->assign('fatal',1);
-  exit;
+  return;
 }
 
 $plan_data = array(

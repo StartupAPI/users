@@ -43,3 +43,5 @@ if($schedule)
     $smarty->assign('next_schedule_'.$d, $schedule->$d);
 
 $smarty->assign('charges',$account->getCharges());
+$smarty->assign('balance',$account->getBalance());
+$smarty->assign('USERSROOTURL',UserConfig::$USERSROOTURL);
