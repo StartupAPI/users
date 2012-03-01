@@ -116,7 +116,7 @@
       if (!($stmt = $db->prepare('SELECT id,name,plan_slug,schedule_slug,active,COALESCE(SUM(amount),0) AS balance FROM '.
         UserConfig::$mysql_prefix.'accounts AS a LEFT JOIN '.UserConfig::$mysql_prefix.'account_charge AS c '.
         'ON c.account_id = a.id WHERE engine_slug = "PaymentEngine_Manual" '.(is_null($search) ? '' : 'AND name like ? ').
-        'GROUP BY c.account_id ORDER BY '.$sortby.' LIMIT '.$perpage.' OFFSET '.$pagenumber * $perpage)))
+        'GROUP BY a.id ORDER BY '.$sortby.' LIMIT '.$perpage.' OFFSET '.$pagenumber * $perpage)))
           throw new Exception("Can't prepare statement: ".$db->error);
 
       if(!is_null($search)) {
@@ -142,6 +142,7 @@
           'balance' => $balance);
           
       $stmt->close();
+
       ?>
       <tr><td colspan="8" valign="middle">
       <?php

@@ -12,10 +12,10 @@ session_start();
 
 try {
   # Check if plan and schedule exists
-  if(!($plan = Plan::getPlan($data[0])))
+  if(!($plan = Plan::getPlanBySlug($data[0])))
     throw new Exception("Unknown plan '".$data[0].'"');
     
-  if(!is_null($data[1]) && !($schedule = $plan->getPaymentSchedule($data[1])))
+  if(!is_null($data[1]) && !($schedule = $plan->getPaymentScheduleBySlug($data[1])))
     throw new Exception("Unknown schedule '".$data[1]."' for plan '".$data[0]."'");
 } catch (Exception $e) {
   $_SESSION['message'][] = $e->getMessage();
