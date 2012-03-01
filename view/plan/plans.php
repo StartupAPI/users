@@ -1,4 +1,4 @@
-kfid_<?php
+<?php
 
 require_once(dirname(dirname(dirname(__FILE__))).'/users.php');
 require_once(dirname(dirname(dirname(__FILE__))).'/smarty/libs/Smarty.class.php');
@@ -38,7 +38,7 @@ $smarty->assign('balance',$balance);
 $plan_slugs = Plan::getPlanSlugs();  
 foreach($plan_slugs as $p) { # Iterate over all configured plans
 
-  $this_plan = Plan::getPlan($p);
+  $this_plan = Plan::getPlanBySlug($p);
   $plan = array();
   foreach($plan_data as $d) # Put all plan properties
     $plan[$d] = $this_plan->$d;
@@ -52,7 +52,7 @@ foreach($plan_slugs as $p) { # Iterate over all configured plans
   $schedule_slugs = $this_plan->getPaymentScheduleSlugs(); # Iterate over all schedules of this plan
   foreach($schedule_slugs as $s) {
     
-    $this_schedule = $this_plan->getPaymentSchedule($s);
+    $this_schedule = $this_plan->getPaymentScheduleBySlug($s);
     foreach($schedule_data as $sd)                       # Put all schedule properties
       $schedule[$sd] = $this_schedule->$sd;
       
