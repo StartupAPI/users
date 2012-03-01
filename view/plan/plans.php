@@ -1,4 +1,4 @@
-<?php
+kfid_<?php
 
 require_once(dirname(dirname(dirname(__FILE__))).'/users.php');
 require_once(dirname(dirname(dirname(__FILE__))).'/smarty/libs/Smarty.class.php');
@@ -27,37 +27,37 @@ if(!$account->isActive()) {
 }
 
 $plan_data = array(
-  'id', 'name', 'description', 'base_price', 'base_period', 'details_url', 'downgrade_to', 'grace_period');
+  'slug', 'name', 'description', 'base_price', 'base_period', 'details_url', 'downgrade_to', 'grace_period');
 $schedule_data = array(
-  'id', 'name', 'description', 'charge_amount', 'charge_period');
+  'slug', 'name', 'description', 'charge_amount', 'charge_period');
   
 $plans = array();
 
 $balance = $account->getBalance();
 $smarty->assign('balance',$balance);
-$plan_ids = Plan::getPlanIDs();  
-foreach($plan_ids as $p) { # Iterate over all configured plans
+$plan_slugs = Plan::getPlanSlugs();  
+foreach($plan_slugs as $p) { # Iterate over all configured plans
 
   $this_plan = Plan::getPlan($p);
   $plan = array();
   foreach($plan_data as $d) # Put all plan properties
     $plan[$d] = $this_plan->$d;
     
-  if($account->getPlan()->id == $this_plan->id) # Mark plan as current if so
+  if($account->getPlan()->slug == $this_plan->slug) # Mark plan as current if so
     $plan['current'] = TRUE;
   else
     $plan['current'] = FALSE;
     
   $schedule = array();
-  $schedule_ids = $this_plan->getPaymentScheduleIDs(); # Iterate over all schedules of this plan
-  foreach($schedule_ids as $s) {
+  $schedule_slugs = $this_plan->getPaymentScheduleSlugs(); # Iterate over all schedules of this plan
+  foreach($schedule_slugs as $s) {
     
     $this_schedule = $this_plan->getPaymentSchedule($s);
     foreach($schedule_data as $sd)                       # Put all schedule properties
       $schedule[$sd] = $this_schedule->$sd;
       
     $schedule['available'] = TRUE;  
-    if($plan['current'] && $account->getSchedule()->id == $this_schedule->id)
+    if($plan['current'] && $account->getSchedule()->slug == $this_schedule->slug)
       $schedule['current'] = TRUE;
     else {
       $schedule['current'] = FALSE;

@@ -5,14 +5,15 @@
  */
 
 /**
- * Every account is associated with existing Plan using Plan ID and PaymentSchedule using PaymentScheduleID.
+ * Every account is associated with existing Plan using Plan Slug and PaymentSchedule using PaymentSchedule Slug.
  */
 
 require_once (dirname(__FILE__).'/PaymentSchedule.php');
 
-class Plan {
+class Plan 
+{
 
-	private $id;
+	private $slug;
 	private $name;
 	private $description;
 	private $base_price;
@@ -28,51 +29,51 @@ class Plan {
 
 	private static $Plans = array();
 
-	public function __construct($id,$a) {
+	public function __construct($slug,$a) {
 	
 		# Known parameters and their default values listed here:
 		$parameters = array(
-			'id' => NULL,
-			'name' => NULL,
-			'description' => NULL,
-			'base_price' => NULL,
-			'base_period' => NULL,
-			'details_url' => NULL,
+			'slug'         => NULL,
+			'name'         => NULL,
+			'description'  => NULL,
+			'base_price'   => NULL,
+			'base_period'  => NULL,
+			'details_url'  => NULL,
 			'payment_schedules' => array(),
 			'capabilities' => array(),
-			'downgrade_to' => UserConfig::$default_plan,
+			'downgrade_to' => UserConfig::$default_plan_slug,
 			'grace_period' => NULL,
 			'user_activate_hook' => NULL,
 			'user_deactivate_hook' => NULL,
 		);
 		
-		if ($id === NULL)
-  		throw new Exception("id required");
+		if ($slug === NULL)
+  		throw new Exception("slug required");
     if (!is_array($a))
       throw new Exception("configuration array required");
-		$a['id'] = $id;
+		$a['slug'] = $slug;
 	
 		# Mandatory parameters are those whose default value is NULL
-		$mandatory = array('id','name');
+		$mandatory = array('slug','name');
 		
 		$missing = array_diff($mandatory,array_keys($a));
 		if (count($missing))
-			throw new Exception("Following mandatory parameters were not found in init array for plan $id: ".implode(',',$missing));
+			throw new Exception("Following mandatory parameters were not found in init array for plan $slug: ".implode(',',$missing));
 			
 		# Set attributes according to init array
 		foreach($parameters as $p => $v)
 			if (isset($a[$p])) $this->$p = $a[$p];
 			else $this->$p = $v;
 			
-    # If downgrade_to has the same id as we have, reset it to null
-    if ($this->id == $this->downgrade_to)
+    # If downgrade_to has the same slug as we have, reset it to null
+    if ($this->slug == $this->downgrade_to)
       $this->downgrade_to = NULL;
 
 		# Instantiate PaymentSchedules, replacing stored parameters arrays with actual objects
 		if (is_array($this->payment_schedules)) {
   		$schedules = array();
-	  	foreach($this->payment_schedules as $id => $s)
-		  	$schedules[] = new PaymentSchedule($id, $s);
+	  	foreach($this->payment_schedules as $slug => $s)
+		  	$schedules[] = new PaymentSchedule($slug, $s);
   		$this->payment_schedules = $schedules;
   		
   		if (!$this->getDefaultPaymentSchedule() && count($this->payment_schedules))
@@ -93,24 +94,24 @@ class Plan {
   	return (!in_array($v,array('instance')) && isset($this->$v)) ? $this->$v : false;
 	}
 	
-	public function getPaymentScheduleIDs() {
+	public function getPaymentScheduleSlugs() {
 	
-		$ids = array();
+		$slugs = array();
 
 		if (is_array($this->payment_schedules))
   		foreach($this->payment_schedules as $x => $s)
-	  		$ids[] = $s->id;
+	  		$slugs[] = $s->slug;
 	  		
-		return $ids;
+		return $slugs;
 	}
 	
-	public function getPaymentSchedule($id) {
+	public function getPaymentScheduleBySlug($slug) {
 	
-		if ($id === NULL) return FALSE;
+		if ($slug === NULL) return FALSE;
 
 		if (is_array($this->payment_schedules))
   		foreach($this->payment_schedules as $x => $s)
-	  		if ($s->id == $id) return $s;
+	  		if ($s->slug == $slug) return $s;
 
 		return NULL;
 	}
@@ -126,19 +127,29 @@ class Plan {
 	
 	public function expandTransaction($t) {
 		
-		return $t->comment;
+		return $t['message'];
 	}
 	
-	public function activate_hook($PlanID) {
+	public function activate_hook($account_id, $plan_slug, $schedule_slug) {
 	
 	  if ($this->user_activate_hook == '') return;
-		call_user_func_array($this->user_activate_hook,array('OldPlanID' => $PlanID, 'NewPlanID' => $this->id));
+		call_user_func_array($this->user_activate_hook,
+		  array(
+		    'AccountID' => $account_id,
+		    'OldPlanSlug' => $plan_slug,
+		    'OldScheduleSlug' => $schedule_slug,
+      ));
 	}
 	
-  public function deactivate_hook($PlanID) {
+  public function deactivate_hook($account_id, $plan_slug, $schedule_slug) {
   	
   	if ($this->user_deactivate_hook == '') return;
-  	call_user_func_array($this->user_deactivate_hook,array('NewPlanID' => $PlanID, 'OldPlanID' => $this->id));
+  	call_user_func_array($this->user_deactivate_hook,
+  	  array(
+  	    'AccountID' => $account_id,
+  	    'NewPlanSlug' => $plan_slug, 
+  	    'NewScheduleSlug' => $schedule_slug,
+      ));
 	}
 
   public static function init($a) {
@@ -149,25 +160,25 @@ class Plan {
     if (!is_array($a))
       throw new Exception("Parameter is not an array");
 
-    foreach($a as $id => $p)
-      self::$Plans[] = new self($id,$p);
+    foreach($a as $slug => $p)
+      self::$Plans[] = new self($slug,$p);
   }
   
-  public static function getPlan($id) {
+  public static function getPlanBySlug($slug) {
   
-    if ($id === NULL || !count(self::$Plans)) return FALSE;
+    if ($slug === NULL || !count(self::$Plans)) return FALSE;
     foreach(self::$Plans as $p) {
-      if ($p->id == $id) return $p;
+      if ($p->slug == $slug) return $p;
     }
     return NULL;
   }
   
-  public static function getPlanIDs() {
+  public static function getPlanSlugs() {
   
     if (!count(self::$Plans)) return FALSE;
-    $ids = array();
+    $slugs = array();
     foreach(self::$Plans as $p)
-      $ids[] = $p->id;
-    return $ids;
+      $slugs[] = $p->slug;
+    return $slugs;
   }
 }

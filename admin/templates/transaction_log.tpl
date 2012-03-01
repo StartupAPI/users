@@ -65,7 +65,7 @@
 		<span style="float: left; margin: 0 2em 0 1em;">Page {$page+1}</span>
 		</td></tr>
     {foreach from=$log item=tr}
-    <tr><td>{$tr.date_time}</td><td align="center">{preg_replace("/^(-?)/","$1$",sprintf("%.2f",$tr.amount),1)}</td><td>{$tr.message}</td><td>{$tr.engine}</td></tr>
+    <tr><td>{$tr.date_time}</td><td align="center">{preg_replace("/^(-?)/","$1$",sprintf("%.2f",$tr.amount),1)}</td><td>{$tr.message}</td><td>{$tr.engine_slug}</td></tr>
     {/foreach}
 		<tr><td colspan="4">
 		{if count($log) == $perpage}

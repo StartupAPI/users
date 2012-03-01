@@ -8,18 +8,18 @@
  * Every account is associated with existing Plan using Plan ID and PaymentSchedule using PaymentScheduleID.
  */
 class PaymentSchedule {
-	private $id;
+	private $slug;
 	private $name;
 	private $description;
 	private $charge_amount;
 	private $charge_period;
   
 
-	public function __construct($id,$a) {
+	public function __construct($slug,$a) {
 
     # Known parameters and their default values listed here:
     $parameters = array(
-      'id' => NULL,
+      'slug' => NULL,
       'name' => NULL,
       'description' => '',
       'charge_amount' => NULL,
@@ -27,11 +27,11 @@ class PaymentSchedule {
       'is_default' => 0,
     );
     
-    if ($id === NULL)
-      throw new Exception("id required");
+    if ($slug === NULL)
+      throw new Exception("slug required");
     if (!is_array($a))
       throw new Exception("configuration array required");
-    $a['id'] = $id;
+    $a['slug'] = $slug;
 
     # Mandatory parameters are those whose default value is NULL
     $mandatory = array();

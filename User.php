@@ -260,7 +260,7 @@ class User
 				throw new Exception("Can't update user preferences (set current account)");
 			}
 
-			$personal = Account::createAccount($this->getName(), UserConfig::$default_plan, NULL, $this, Account::ROLE_ADMIN, NULL);
+			$personal = Account::createAccount($this->getName(), UserConfig::$default_plan_slug, NULL, $this, Account::ROLE_ADMIN, NULL);
 
 			$personal->setAsCurrent($this);
 

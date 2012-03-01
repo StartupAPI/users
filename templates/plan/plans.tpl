@@ -43,7 +43,7 @@
 			{foreach from=$plan.schedules item=schedule}
 			<div class="userbase-account-plan-container container-{$m}-{$n}">
         <div class="userbase-account-plan-element">
-          <input type="radio" name="plan" value="{$plan.id}.{$schedule.id}" id="plan-radio-{$m}-{$n}" 
+          <input type="radio" name="plan" value="{$plan.slug}.{$schedule.slug}" id="plan-radio-{$m}-{$n}" 
           	{if $schedule.current}checked{/if} {if !$schedule.available}disabled{/if}/>
         </div>
         <div class="userbase-account-plan-element">
@@ -63,7 +63,7 @@
   	 Plan does not use payment schedules
   	 	<div class="userbase-account-plan-container">
   	 		<div class="userbase-account-plan-element">
-	  	 		<input type="radio" name="plan" value="{$plan.id}" id="plan-radio-{$m}" {if $plan.current}checked{/if} />
+	  	 		<input type="radio" name="plan" value="{$plan.slug}" id="plan-radio-{$m}" {if $plan.current}checked{/if} />
 	  	 	</div>
 	  	 	<div class="userbase-account-plan-element">
 	  	 		<label for="plan-radio-{$m}">

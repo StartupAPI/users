@@ -65,10 +65,10 @@ foreach(UserConfig::$payment_modules as $pm)
   $mods[$pm->getID()] = $pm->getTitle();
 
 foreach($log as $k => $l)
-  if(array_key_exists($l['engine'],$mods))
-    $log[$k]['engine'] = $mods[$l['engine']];
+  if(array_key_exists($l['engine_slug'],$mods))
+    $log[$k]['engine_slug'] = $mods[$l['engine_slug']];
   else
-    $log[$k]['engine'] = 'Unknown';
+    $log[$k]['engine_slug'] = 'Unknown';
 
 $smarty->assign('log',$log);
 $smarty->assign('USERSROOTURL',UserConfig::$USERSROOTURL);
