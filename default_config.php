@@ -211,9 +211,9 @@ class UserConfig
             )
         );
         // default plan
-        public static $default_plan = 'PLAN_FREE';
+        public static $default_plan_slug = 'PLAN_FREE';
         // default schedule
-        public static $default_schedule = 'default';
+        public static $default_schedule_slug = 'default';
         
         // Smarty base directory
         public static $smarty_compile;

@@ -24,7 +24,7 @@ $plan = $account->getPlan();
 foreach($plan_data as $d)
   $smarty->assign('plan_'.$d, $plan->$d);
   
-$downgrade = Plan::getPlan($plan->downgrade_to);
+$downgrade = Plan::getPlanBySlug($plan->downgrade_to);
 if($downgrade) $smarty->assign('plan_downgrade_to', $downgrade->name);
 
 $plan = $account->getNextPlan();
@@ -43,3 +43,5 @@ if($schedule)
     $smarty->assign('next_schedule_'.$d, $schedule->$d);
 
 $smarty->assign('charges',$account->getCharges());
+$smarty->assign('balance',$account->getBalance());
+$smarty->assign('USERSROOTURL',UserConfig::$USERSROOTURL);

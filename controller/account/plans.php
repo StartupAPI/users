@@ -12,10 +12,10 @@ session_start();
 
 try {
   # Check if plan and schedule exists
-  if(!($plan = Plan::getPlan($data[0])))
+  if(!($plan = Plan::getPlanBySlug($data[0])))
     throw new Exception("Unknown plan '".$data[0].'"');
     
-  if(!is_null($data[1]) && !($schedule = $plan->getPaymentSchedule($data[1])))
+  if(!is_null($data[1]) && !($schedule = $plan->getPaymentScheduleBySlug($data[1])))
     throw new Exception("Unknown schedule '".$data[1]."' for plan '".$data[0]."'");
 } catch (Exception $e) {
   $_SESSION['message'][] = $e->getMessage();
@@ -28,14 +28,14 @@ if($schedule && $schedule->charge_amount > $account->getBalance()) {
 
   $_SESSION['message'][] = "Not enough funds to activate plan/schedule";
 
-} elseif($account->getPlanID() != $data[0]) {
+} elseif($account->getPlanSlug() != $data[0]) {
 
   if($account->activatePlan($data[0],$data[1]))
     $_SESSION['message'][] = "Plan activated";
   else
     $_SESSION['message'][] = "Error activating plan";
 
-} elseif(!is_null($data[1]) && $account->getScheduleID() != $data[1]) {
+} elseif(!is_null($data[1]) && $account->getScheduleSlug() != $data[1]) {
 
   if($account->setPaymentSchedule($data[1]))
     $_SESSION['message'][] = "Payment schedule changed";

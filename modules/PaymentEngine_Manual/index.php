@@ -5,14 +5,14 @@
     public static $loaded = 0;
     public function __construct() {
 
-      $this->engineID = 'PaymentEngine_Manual';
+      $this->engineSlug = 'PaymentEngine_Manual';
       if(!self::$loaded) {
         parent::__construct();
         self::$loaded = 1;
       }
     }
 
-    public function getID() {
+    public function getSlug() {
       
       return "PaymentEngine_Manual";
     }
@@ -22,7 +22,7 @@
       return "Manual Payment Processing";
     }
     
-    public function changeSubscription($plan_id, $schedule_id) {
+    public function changeSubscription($plan_slug, $schedule_slug) {
     
       # Okay
       return TRUE;
@@ -31,10 +31,10 @@
     public function renderAdminMenuItem() {
       
       global $ADMIN_SECTION;
-      if($ADMIN_SECTION == $this->engineID)
+      if($ADMIN_SECTION == $this->engineSlug)
         echo " | Payments (manual mode)";
       else
-        echo " | <a href=\"".UserConfig::$USERSROOTURL."/modules/".$this->engineID."/admin.php\">Payments (manual mode)</a>\n";
+        echo " | <a href=\"".UserConfig::$USERSROOTURL."/modules/".$this->engineSlug."/admin.php\">Payments (manual mode)</a>\n";
     }
     
   }

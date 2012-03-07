@@ -70,4 +70,7 @@
       <p><a href="{$USERSROOTURL}/admin/user.php?id={$user.id}">{$user.name}</a></p>
     {/foreach}
     </div>
+    <div>
+    	<a href="transaction_log.php?account_id={$account_id}">View account transaction log</a>
+    </div>
   {/if}

@@ -101,8 +101,8 @@
       $sort_by = array(
         'id' => 'ID',
         'name' => 'Account Name',
-        'plan' => 'Payment Plan',
-        'schedule' => 'Payment Schedule',
+        'plan_slug' => 'Payment Plan',
+        'schedule_slug' => 'Payment Schedule',
         'active' => 'Account status',
         'balance' => 'Account balance');
         
@@ -113,10 +113,10 @@
 
       $db = UserConfig::getDB();
 
-      if (!($stmt = $db->prepare('SELECT id,name,plan,schedule,active,COALESCE(SUM(amount),0) AS balance FROM '.
+      if (!($stmt = $db->prepare('SELECT id,name,plan_slug,schedule_slug,active,COALESCE(SUM(amount),0) AS balance FROM '.
         UserConfig::$mysql_prefix.'accounts AS a LEFT JOIN '.UserConfig::$mysql_prefix.'account_charge AS c '.
-        'ON c.account_id = a.id WHERE engine = "PaymentEngine_Manual" '.(is_null($search) ? '' : 'AND name like ? ').
-        'GROUP BY c.account_id ORDER BY '.$sortby.' LIMIT '.$perpage.' OFFSET '.$pagenumber * $perpage)))
+        'ON c.account_id = a.id WHERE engine_slug = "PaymentEngine_Manual" '.(is_null($search) ? '' : 'AND name like ? ').
+        'GROUP BY a.id ORDER BY '.$sortby.' LIMIT '.$perpage.' OFFSET '.$pagenumber * $perpage)))
           throw new Exception("Can't prepare statement: ".$db->error);
 
       if(!is_null($search)) {
@@ -128,7 +128,7 @@
       if (!$stmt->execute())
         throw new Exception("Can't execute statement: ".$stmt->error);
 
-      if (!$stmt->bind_result($id, $name, $plan, $schedule, $active, $balance))
+      if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $active, $balance))
         throw new Exception("Can't bind result: ".$stmt->error);
 
       $accounts = array();
@@ -136,12 +136,13 @@
         $accounts[] = array(
           'id' => $id, 
           'name' => $name, 
-          'plan' => $plan, 
-          'schedule' => $schedule, 
+          'plan_slug' => $plan_slug, 
+          'schedule_slug' => $schedule_slug, 
           'active' => $active, 
           'balance' => $balance);
           
       $stmt->close();
+
       ?>
       <tr><td colspan="8" valign="middle">
       <?php
@@ -176,7 +177,7 @@
         echo "<tr valign=\"top\">\n";
         echo "<td><a href=\"".UserConfig::$USERSROOTURL."/admin/account.php?account_id=".$a['id']."\">".$a['id']."</a></td>\n";
         echo "<td><a href=\"".UserConfig::$USERSROOTURL."/admin/account.php?account_id=".$a['id']."\">".$a['name']."</a></td>\n";
-        echo "<td>".$a['plan']."</td><td>".$a['schedule']."</td><td>".($a['active'] ? 'Active' : 'Suspended')."</td>\n";
+        echo "<td>".$a['plan_slug']."</td><td>".$a['schedule_slug']."</td><td>".($a['active'] ? 'Active' : 'Suspended')."</td>\n";
         $a['balance'] = preg_replace("/(^|-)/","$$1",sprintf("%.2f",-$a['balance']),1);
         echo "<td>".$a['balance']."</td><td><a href=\"?action=DisplayAddPayment&account_id=".$a['id']."\">Add funds</a></td>";
         echo "<td><a href=\"?action=DisplayMakeRefund&account_id=".$a['id']."\">Refund</a></td></tr>\n";
