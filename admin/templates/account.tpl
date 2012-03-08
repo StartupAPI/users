@@ -29,7 +29,7 @@
     
     {if count($charges)}
     <div>
-      <p>Account Debts</p>
+      <p>Amount owed</p>
       <ul>
       {$total = 0}
       {foreach from=$charges item=c}
