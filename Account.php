@@ -851,7 +851,13 @@ class Account
     else {
       $new_schedule = NULL;
     }
-    // Check, if plan/schedule could be activated immediately
+    /* Check, if plan/schedule could be activated immediately
+       It could, if: 
+       1. current plan has no schedule
+       2. Account balance is equal or greater than next schedule charge
+         or next plan also has no schedule
+    */
+    
     if (is_null($this->nextCharge) && (is_null($new_schedule) || 
       $this->getBalance() >= $new_schedule->charge_amount)) {
 
