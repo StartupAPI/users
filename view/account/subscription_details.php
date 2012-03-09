@@ -42,6 +42,8 @@ if($schedule)
   foreach($schedule_data as $d)
     $smarty->assign('next_schedule_'.$d, $schedule->$d);
 
+$engine = $account->getPaymentEngine();
+$smarty->assign('payment_engine',empty($engine) ? NULL : $engine->getTitle());
 $smarty->assign('charges',$account->getCharges());
 $smarty->assign('balance',$account->getBalance());
 $smarty->assign('USERSROOTURL',UserConfig::$USERSROOTURL);

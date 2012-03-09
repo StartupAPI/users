@@ -4,7 +4,7 @@
 
   interface IPaymentEngine extends IUserBaseModule 
   {
-    public function changeSubscription($plan_slug, $schedule_slug);
+    public function changeSubscription($account_id, $plan_slug, $schedule_slug);
     public function paymentReceived($data);
     public function refund($data);
     public function unsubscribe($account_id);

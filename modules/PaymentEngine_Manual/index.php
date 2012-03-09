@@ -22,7 +22,7 @@
       return "Manual Payment Processing";
     }
     
-    public function changeSubscription($plan_slug, $schedule_slug) {
+    public function changeSubscription($account_id, $plan_slug, $schedule_slug) {
     
       # Okay
       return TRUE;
