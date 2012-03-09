@@ -64,11 +64,13 @@ $mods = array();
 foreach(UserConfig::$payment_modules as $pm)
   $mods[$pm->getID()] = $pm->getTitle();
 
-foreach($log as $k => $l)
+foreach($log as $k => $l) {
+  $log[$k]['amount'] *= -1;
   if(array_key_exists($l['engine_slug'],$mods))
     $log[$k]['engine_slug'] = $mods[$l['engine_slug']];
   else
     $log[$k]['engine_slug'] = 'Unknown';
+}
 
 $smarty->assign('log',$log);
 $smarty->assign('USERSROOTURL',UserConfig::$USERSROOTURL);
