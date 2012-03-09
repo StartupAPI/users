@@ -50,6 +50,14 @@ foreach($plan_slugs as $p) { # Iterate over all configured plans
     
   $schedule = array();
   $schedule_slugs = $this_plan->getPaymentScheduleSlugs(); # Iterate over all schedules of this plan
+  
+  if(empty($schedule_slugs) && $account->getNextPlan()->slug == $this_plan->slug) {
+    $plan['chosen'] = TRUE;
+  }
+  else {
+    $plan['chosen'] = FALSE;
+  }
+  
   foreach($schedule_slugs as $s) {
     
     $this_schedule = $this_plan->getPaymentScheduleBySlug($s);
@@ -64,6 +72,13 @@ foreach($plan_slugs as $p) { # Iterate over all configured plans
       # If user has enough on his balance, schedule could be activated
       if($balance < $this_schedule->charge_amount)
         $schedule['available'] = FALSE;
+    }
+    
+    if($account->getNextSchedule()->slug == $this_schedule->slug) {
+      $schedule['chosen'] = TRUE;
+    } 
+    else {
+      $schedule['chosen'] = FALSE;
     }
 
     $plan['schedules'][] = $schedule;

@@ -532,11 +532,11 @@ class Account
 
 		if(is_null($refund)) {
   		TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
-	  	  $this->schedule->charge_amount,'Payment Schedule charge');
+	  	  -$this->schedule->charge_amount,'Payment Schedule charge');
     }
     else {
       TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
-        $refund,'Refund recorded');
+        -$refund,'Refund recorded');
     }
 
 		return TRUE;

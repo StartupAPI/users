@@ -26,9 +26,9 @@
       <p>Charge Period: <b>{$schedule_charge_period}</b> days</p>
       {/if}
     </div>
-    
-    {if count($charges)}
+
     <div>
+    {if $balance < 0}
       <p>Amount owed</p>
       <ul>
       {$total = 0}
@@ -38,8 +38,11 @@
       {/foreach}
       </ul>
       <p>Total debt: <b>${sprintf("%.2f",$total)}</b></p>
-    </div>
+		{else}
+			<p>Balance: <b>${sprintf("%.2f",$balance)}</b></p>
     {/if}
+    </div>
+
     {if isset($account_next_charge)}
     <div>
       <p>Next charge: <b>{$account_next_charge}</b></p>

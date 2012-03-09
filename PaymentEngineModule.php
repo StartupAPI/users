@@ -166,7 +166,7 @@
             
             if ($next_plan_slug == $plan_slug) { // only change schedule
             
-              $account->setPaymentScheduleBySlug($next_schedule_slug); // schedule changed, user billed automatically
+              $account->setPaymentSchedule($next_schedule_slug); // schedule changed, user billed automatically
               $billed = 1;
 
             } 

@@ -6,7 +6,7 @@
   </div>
 
   <div>
-    <p>Plan Name: <b>{$plan_name}</b></p>
+    <p>Plan Name: <b>{$plan_name}</b> <a href="{$USERSROOTURL}/plans.php">(change)</a></p>
     <p>Plan Description: {$plan_description}</p>
     <p>Plan Details: <a href="{$plan_details_url}">{$plan_details_url}</a></p>
     {if $plan_downgrade_to}
