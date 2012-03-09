@@ -22,7 +22,8 @@ require_once(UserConfig::$header);
 <h2>Account Info (<?php echo $account->getName() ?>)</h2>
 <div id="plan">
 <p>Subscription plan: <b><?php echo $account->getPlan()->name ?></b> - 
-<a href="<?php echo UserConfig::$USERSROOTURL ?>/account_details.php">details</a>
+<a href="<?php echo UserConfig::$USERSROOTURL ?>/subscription_details.php">[ details ]</a>
+<a href="<?php echo UserConfig::$USERSROOTURL ?>/plans.php">[ change ]</a>
 </div>
 <div id="members">
 <h2>Account Members</h2>

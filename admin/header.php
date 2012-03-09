@@ -42,7 +42,8 @@ $links = array(
 	'cohorts' => 'Cohort Analysis',
 	'activity' => 'Activity',
 	'registrations' => 'Registered Users',
-	'bymodule' => 'Registrations By Module'
+	'bymodule' => 'Registrations By Module',
+	'debtors' => 'Accounts with debts',
 	);
 ?>
 <div id="userbase_adminmenu">
