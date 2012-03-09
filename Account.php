@@ -445,17 +445,17 @@ class Account
 		  return;
     }
 		$charge_amount = is_null($refund) ? $this->schedule->charge_amount : $refund;
-		// Look if there is a negative charge, it should be a single element
+		// Look if there is a positive charge (actually, account surplus), it should be a single element
 		$c = reset(array_keys($this->charges));
 		
 		// Lock tables
     $db->query("LOCK TABLES ".UserConfig::$mysql_prefix."account_charge WRITE");
 
-		if ($c !== FALSE && $this->charges[$c]['amount'] < 0) {
-      if ($this->charges[$c]['amount'] + $charge_amount > 0) { 
+		if ($c !== FALSE && $this->charges[$c]['amount'] > 0) {
+      if ($this->charges[$c]['amount'] - $charge_amount < 0) { 
         // This charge is greater than we owe to user
 
-		    $charge_amount += $this->charges[$c]['amount'];
+		    $charge_amount -= $this->charges[$c]['amount'];
 		    
         if (!($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.
           'account_charge WHERE account_id = ?')))
@@ -482,7 +482,7 @@ class Account
           throw new Exception("Can't prepare statement: ".$db->error);
         }
           
-        $amt = $this->charges[$c]['amount'] + $charge_amount;
+        $amt = $this->charges[$c]['amount'] - $charge_amount;
         if (!$stmt->bind_param('di', $amt, $this->id)) {
           throw new Exception("Can't bind parameter".$stmt->error);
         }
@@ -491,10 +491,13 @@ class Account
           throw new Exception("Can't execute statement: ".$stmt->error);
         }
           
-        $this->charges[$c]['amount'] += $charge_amount;
+        // Put into the object
+        $this->charges[$c]['amount'] -= $charge_amount;
         $stmt->close();
         
-        $charge_amount += $this->charges[$c]['amount'];
+        // ???
+        // $charge_amount += $this->charges[$c]['amount'];
+        $charge_amount = 0;
       }
     }
 
@@ -503,7 +506,7 @@ class Account
 		if($charge_amount > 0) {
 
       $charge = array('datetime' => date('Y-m-d H:i:s'), 
-        'amount' => $charge_amount);
+        'amount' => -$charge_amount);
       $this->charges[] = $charge;
 
       if (!($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.
@@ -554,13 +557,13 @@ class Account
 			if ($amount <= 0) {
 			  break;
       }
-			if ($this->charges[$k]['amount'] <= $amount) {
-				$amount -= $this->charges[$k]['amount'];
+			if (-$this->charges[$k]['amount'] <= $amount) {
+				$amount += $this->charges[$k]['amount'];
 				$cleared[] = $this->charges[$k];
 				unset($this->charges[$k]); 
 			} 
 			else {
-				$this->charges[$k]['amount'] -= $amount;
+				$this->charges[$k]['amount'] += $amount;
 				
         if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.
           'account_charge SET amount = ? '.
@@ -603,10 +606,10 @@ class Account
       $stmt->close();
 		}
 		
-		// Store excessive payment as negative charge
+		// Store excessive payment as positive charge (account surplus)
 		if ($amount > 0) {
       $charge = array('datetime' => date('Y-m-d H:i:s'), 
-      'amount' => -$amount);
+      'amount' => $amount);
 		  $this->charges[] = $charge;
 
       if (!($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.
