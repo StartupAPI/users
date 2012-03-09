@@ -640,7 +640,7 @@ class Account
     }
 
  		TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
-  	  -$amount_to_log,'Payment received');
+  	  $amount_to_log,'Payment received');
 
 		return TRUE;
 	}
@@ -829,7 +829,7 @@ class Account
 	  
 	  $balance = 0;
 	  foreach($this->charges as $c) {
-	    $balance -= $c['amount'];
+	    $balance += $c['amount'];
     }
     
     return $balance;

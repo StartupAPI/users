@@ -178,7 +178,7 @@
         echo "<td><a href=\"".UserConfig::$USERSROOTURL."/admin/account.php?account_id=".$a['id']."\">".$a['id']."</a></td>\n";
         echo "<td><a href=\"".UserConfig::$USERSROOTURL."/admin/account.php?account_id=".$a['id']."\">".$a['name']."</a></td>\n";
         echo "<td>".$a['plan_slug']."</td><td>".$a['schedule_slug']."</td><td>".($a['active'] ? 'Active' : 'Suspended')."</td>\n";
-        $a['balance'] = preg_replace("/(^|-)/","$$1",sprintf("%.2f",-$a['balance']),1);
+        $a['balance'] = preg_replace("/(^|-)/","$$1",sprintf("%.2f",$a['balance']),1);
         echo "<td>".$a['balance']."</td><td><a href=\"?action=DisplayAddPayment&account_id=".$a['id']."\">Add funds</a></td>";
         echo "<td><a href=\"?action=DisplayMakeRefund&account_id=".$a['id']."\">Refund</a></td></tr>\n";
       }

@@ -33,7 +33,7 @@ class TestPayments extends UnitTestCase {
     $this -> assertNotNull( $acc -> getCharges());
     $this -> assertEqual( count($acc -> getCharges()), 1);
     $charges = $acc -> getCharges();
-    $this -> assertEqual( $charges[0]['amount'], $acc->getSchedule()->charge_amount);
+    $this -> assertEqual( $charges[0]['amount'], -$acc->getSchedule()->charge_amount);
     $acc -> paymentIsDue();
     $this -> assertNotNull( $acc -> getCharges());
     $this -> assertEqual( count($acc -> getCharges()), 2);
@@ -75,10 +75,10 @@ class TestPayments extends UnitTestCase {
     $acc -> paymentReceived( $amount - 3  );
     $this -> assertEqual( count($acc -> getCharges()), 1);
     $charges = $acc -> getCharges();
-    $this -> assertEqual( $charges[0]['amount'], 3 );
+    $this -> assertEqual( $charges[0]['amount'], -3 );
     $acc -> paymentReceived( 1 );
     $charges = $acc -> getCharges();
-    $this -> assertEqual( $charges[0]['amount'], 2 );
+    $this -> assertEqual( $charges[0]['amount'], -2 );
     $acc -> paymentReceived( 2 );
     $this -> assertEqual( count($acc -> getCharges()), 0);
   }
