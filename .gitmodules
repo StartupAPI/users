@@ -15,4 +15,4 @@
 	url = git://github.com/ericingram/smarty.git
 [submodule "calendarview"]
 	path = calendarview
-	url = https://github.com/jsmecham/calendarview.git
+	url = git://github.com/jsmecham/calendarview.git
