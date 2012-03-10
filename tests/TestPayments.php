@@ -33,13 +33,13 @@ class TestPayments extends UnitTestCase {
     $this -> assertNotNull( $acc -> getCharges());
     $this -> assertEqual( count($acc -> getCharges()), 1);
     $charges = $acc -> getCharges();
-    $this -> assertEqual( $charges[0]['amount'], $acc->getSchedule()->charge_amount);
+    $this -> assertEqual( $charges[0]['amount'], -$acc->getSchedule()->charge_amount);
     $acc -> paymentIsDue();
     $this -> assertNotNull( $acc -> getCharges());
     $this -> assertEqual( count($acc -> getCharges()), 2);
     $charges = $acc -> getCharges();
-    $this -> assertEqual( $charges[0]['amount'], $acc->getSchedule()->charge_amount);
-    $this -> assertEqual( $charges[1]['amount'], $acc->getSchedule()->charge_amount);
+    $this -> assertEqual( $charges[0]['amount'], -$acc->getSchedule()->charge_amount);
+    $this -> assertEqual( $charges[1]['amount'], -$acc->getSchedule()->charge_amount);
   }
 
   function testAddPaymentExact()
@@ -61,7 +61,7 @@ class TestPayments extends UnitTestCase {
     $acc -> paymentReceived( $acc->getSchedule()->charge_amount - 1  );
     $this -> assertEqual( count($acc -> getCharges()), 1);
     $charges = $acc -> getCharges();
-    $this -> assertEqual( $charges[0]['amount'], 1 );
+    $this -> assertEqual( $charges[0]['amount'], -1 );
   }
 
   function testAddPaymentInMultipleParts()
@@ -75,10 +75,10 @@ class TestPayments extends UnitTestCase {
     $acc -> paymentReceived( $amount - 3  );
     $this -> assertEqual( count($acc -> getCharges()), 1);
     $charges = $acc -> getCharges();
-    $this -> assertEqual( $charges[0]['amount'], 3 );
+    $this -> assertEqual( $charges[0]['amount'], -3 );
     $acc -> paymentReceived( 1 );
     $charges = $acc -> getCharges();
-    $this -> assertEqual( $charges[0]['amount'], 2 );
+    $this -> assertEqual( $charges[0]['amount'], -2 );
     $acc -> paymentReceived( 2 );
     $this -> assertEqual( count($acc -> getCharges()), 0);
   }
@@ -115,14 +115,14 @@ class TestPayments extends UnitTestCase {
 
     $this -> assertEqual( count($acc -> getCharges()), 2);
     $charges = $acc -> getCharges();
-    $this -> assertEqual( $charges[0]['amount'], $amount );
-    $this -> assertEqual( $charges[1]['amount'], $amount );
+    $this -> assertEqual( $charges[0]['amount'], -$amount );
+    $this -> assertEqual( $charges[1]['amount'], -$amount );
 
     $acc -> paymentReceived( $amount );
 
     $this -> assertEqual( count($acc -> getCharges()), 1);
     $charges = $acc -> getCharges();
-    $this -> assertEqual( $charges[0]['amount'], $amount );
+    $this -> assertEqual( $charges[0]['amount'], -$amount );
 
     $acc -> paymentReceived( $amount );
 
@@ -130,7 +130,7 @@ class TestPayments extends UnitTestCase {
 
   }
 
-  function testSInglePaymentCoveringManyCharges()
+  function testSinglePaymentCoveringManyCharges()
   {
     $user = $this -> user;
     $user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');

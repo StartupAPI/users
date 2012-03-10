@@ -8,7 +8,8 @@
       <p>Account Name: <b>{$account_name}</b></p>
       <p>Account Role: <b>{if $account_role == constant("Account::ROLE_ADMIN")}Account Administrator{else}User{/if}</b></p>
       <p>Account Status: <b>{if $account_isActive}Active{else}Suspended{/if}</b></p>
-      <p>Payment Engine used: <b>{$account_engine}</b></p>
+      <p>Payment Engine used: <b>{$account_engine}</b> 
+      	<a href="{$USERSROOTURL}/admin/choose_engine.php?account_id={$account_id}">[ change ]</a></p>
     </div>
 
     <div>
@@ -26,10 +27,10 @@
       <p>Charge Period: <b>{$schedule_charge_period}</b> days</p>
       {/if}
     </div>
-    
-    {if count($charges)}
+
     <div>
-      <p>Account Debts</p>
+    {if $balance < 0}
+      <p>Amount owed</p>
       <ul>
       {$total = 0}
       {foreach from=$charges item=c}
@@ -38,8 +39,11 @@
       {/foreach}
       </ul>
       <p>Total debt: <b>${sprintf("%.2f",$total)}</b></p>
-    </div>
+		{else}
+			<p>Balance: <b>${sprintf("%.2f",$balance)}</b></p>
     {/if}
+    </div>
+
     {if isset($account_next_charge)}
     <div>
       <p>Next charge: <b>{$account_next_charge}</b></p>
@@ -71,6 +75,6 @@
     {/foreach}
     </div>
     <div>
-    	<a href="transaction_log.php?account_id={$account_id}">View account transaction log</a>
+    	<a href="{$USERSROOTURL}/admin/transaction_log.php?account_id={$account_id}">View account transaction log</a>
     </div>
   {/if}

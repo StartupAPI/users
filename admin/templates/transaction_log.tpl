@@ -50,36 +50,40 @@
     <input type="submit" value="Show" /></p>
     </form>
     <table>
-    <tr><th>Date and time</th><th>Transaction Amount</th><th>Transaction Details</th><th>Via</th></tr>
-		<tr><td colspan="4">
-		{if count($log) == $perpage}
-			<a style="float: right" href="?account_id={$account_id}&page={$page+1}{$from_to}">next &gt;&gt;&gt;</a>
-		{else}
-			<span style="color: silver; float: right">next &gt;&gt;&gt;</span>
-		{/if}
-		{if $page > 0}
-			<a style="float: left" href="?account_id={$account_id}&page={$page-1}{$from_to}">&lt;&lt;&lt;prev</a>
-		{else}
-			<span style="color: silver; float: left">&lt;&lt;&lt;prev</span>
-		{/if}
-		<span style="float: left; margin: 0 2em 0 1em;">Page {$page+1}</span>
-		</td></tr>
-    {foreach from=$log item=tr}
-    <tr><td>{$tr.date_time}</td><td align="center">{preg_replace("/^(-?)/","$1$",sprintf("%.2f",$tr.amount),1)}</td><td>{$tr.message}</td><td>{$tr.engine_slug}</td></tr>
-    {/foreach}
-		<tr><td colspan="4">
-		{if count($log) == $perpage}
-			<a style="float: right" href="?account_id={$account_id}&page={$page+1}{$from_to}">next &gt;&gt;&gt;</a>
-		{else}
-			<span style="color: silver; float: right">next &gt;&gt;&gt;</span>
-		{/if}
-		{if $page > 0}
-			<a style="float: left" href="?account_id={$account_id}&page={$page-1}{$from_to}">&lt;&lt;&lt;prev</a>
-		{else}
-			<span style="color: silver; float: left">&lt;&lt;&lt;prev</span>
-		{/if}
-		<span style="float: left; margin: 0 2em 0 1em;">Page {$page+1}</span>
-		</td></tr>
-    </table>
+    {if !count($log) }
+      <h2>No transactions found</h2>
+    {else}
+      <tr><th>Date and time</th><th>Transaction Amount</th><th>Transaction Details</th><th>Via</th></tr>
+      <tr><td colspan="4">
+      {if count($log) == $perpage}
+        <a style="float: right" href="?account_id={$account_id}&page={$page+1}{$from_to}">next &gt;&gt;&gt;</a>
+      {else}
+        <span style="color: silver; float: right">next &gt;&gt;&gt;</span>
+      {/if}
+      {if $page > 0}
+        <a style="float: left" href="?account_id={$account_id}&page={$page-1}{$from_to}">&lt;&lt;&lt;prev</a>
+      {else}
+        <span style="color: silver; float: left">&lt;&lt;&lt;prev</span>
+      {/if}
+      <span style="float: left; margin: 0 2em 0 1em;">Page {$page+1}</span>
+      </td></tr>
+      {foreach from=$log item=tr}
+      <tr><td>{$tr.date_time}</td><td align="center">{preg_replace("/^(-?)/","$1$",sprintf("%.2f",$tr.amount),1)}</td><td>{$tr.message}</td><td>{$tr.engine_slug}</td></tr>
+      {/foreach}
+      <tr><td colspan="4">
+      {if count($log) == $perpage}
+        <a style="float: right" href="?account_id={$account_id}&page={$page+1}{$from_to}">next &gt;&gt;&gt;</a>
+      {else}
+        <span style="color: silver; float: right">next &gt;&gt;&gt;</span>
+      {/if}
+      {if $page > 0}
+        <a style="float: left" href="?account_id={$account_id}&page={$page-1}{$from_to}">&lt;&lt;&lt;prev</a>
+      {else}
+        <span style="color: silver; float: left">&lt;&lt;&lt;prev</span>
+      {/if}
+      <span style="float: left; margin: 0 2em 0 1em;">Page {$page+1}</span>
+      </td></tr>
+      </table>
+    {/if}
   </div>
 	{/if}

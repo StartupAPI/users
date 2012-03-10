@@ -6,7 +6,7 @@
   </div>
 
   <div>
-    <p>Plan Name: <b>{$plan_name}</b></p>
+    <p>Plan Name: <b>{$plan_name}</b> <a href="{$USERSROOTURL}/plans.php">(change)</a></p>
     <p>Plan Description: {$plan_description}</p>
     <p>Plan Details: <a href="{$plan_details_url}">{$plan_details_url}</a></p>
     {if $plan_downgrade_to}
@@ -58,6 +58,13 @@
     <p>Charge Amount: <b>${$next_schedule_charge_amount}</b></p>
     <p>Charge Period: <b>{$next_schedule_charge_period}</b> days</p>
   {/if}
+  {if !empty($payment_engine)}
 	<div>
-	<a href="{$USERSROOTURL}/transaction_log.php" >View account transactions</a>
+		<p>Payments processed by: {$payment_engine}
+		<a href="{$USERSROOTURL}/choose_engine.php" >[ change ]</a>
+		</p>
+	</div>
+	{/if}
+	<div>
+		<a href="{$USERSROOTURL}/transaction_log.php" >View account transactions</a>
 	</div>

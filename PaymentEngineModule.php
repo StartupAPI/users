@@ -4,7 +4,7 @@
 
   interface IPaymentEngine extends IUserBaseModule 
   {
-    public function changeSubscription($plan_slug, $schedule_slug);
+    public function changeSubscription($account_id, $plan_slug, $schedule_slug);
     public function paymentReceived($data);
     public function refund($data);
     public function unsubscribe($account_id);
@@ -166,7 +166,7 @@
             
             if ($next_plan_slug == $plan_slug) { // only change schedule
             
-              $account->setPaymentScheduleBySlug($next_schedule_slug); // schedule changed, user billed automatically
+              $account->setPaymentSchedule($next_schedule_slug); // schedule changed, user billed automatically
               $billed = 1;
 
             } 

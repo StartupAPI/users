@@ -4,7 +4,7 @@ require_once(dirname(__FILE__).'/User.php');
 
 User::require_login();
 
-include(dirname(__FILE__).'/view/account/account_details.php');
+include(dirname(__FILE__).'/view/account/subscription_details.php');
 
 # this yields Smarty object as $smarty 
 $smarty->setTemplateDir(UserConfig::$smarty_templates.'/account');
@@ -13,6 +13,6 @@ $smarty->setCacheDir(UserConfig::$smarty_cache);
 
 require_once(UserConfig::$header);
 
-$smarty->display('account_details.tpl');
+$smarty->display('subscription_details.tpl');
 
 require_once(UserConfig::$footer);

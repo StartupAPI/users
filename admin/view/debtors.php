@@ -9,8 +9,8 @@ $smarty = new Smarty();
 
 $db = UserConfig::getDB();
 
-if (!($stmt = $db->prepare('SELECT a.id, a.name, a.plan, a.schedule, SUM(c.amount) debt FROM '.UserConfig::$mysql_prefix.
-  'accounts AS a JOIN '.UserConfig::$mysql_prefix.'account_charge AS c ON a.id = c.account_id GROUP BY c.account_id HAVING debt > 0')))
+if (!($stmt = $db->prepare('SELECT a.id, a.name, a.plan_slug, a.schedule_slug, SUM(c.amount) AS debt FROM '.UserConfig::$mysql_prefix.
+  'accounts AS a JOIN '.UserConfig::$mysql_prefix.'account_charge AS c ON a.id = c.account_id GROUP BY c.account_id HAVING debt < 0')))
     throw new Exception("Can't prepare statement: ".$db->error);
     
 if (!$stmt->execute())

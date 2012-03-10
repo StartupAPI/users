@@ -48,6 +48,7 @@ if($schedule)
     $smarty->assign('next_schedule_'.$d, $schedule->$d);
 
 $smarty->assign('charges',$account->getCharges());
+$smarty->assign('balance',$account->getBalance());
 
 $acct_users = $account->getUsers();
 $users = array();

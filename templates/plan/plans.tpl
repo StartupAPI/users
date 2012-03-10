@@ -36,6 +36,9 @@
     <p>Plan automatically downgraded to: <b>{$plan.downgrade_to}</b> 
     	if payment is due more than {$plan.grace_period} day(s)</p>
     {/if}
+    {if $plan.chosen}
+    <p>You have already chosen to swtich to this plan.</p>
+    {/if}
     <p>
 		{if !empty($plan.schedules) && count($plan.schedules)}
 		Following schedule(s) available:
@@ -44,7 +47,7 @@
 			<div class="userbase-account-plan-container container-{$m}-{$n}">
         <div class="userbase-account-plan-element">
           <input type="radio" name="plan" value="{$plan.slug}.{$schedule.slug}" id="plan-radio-{$m}-{$n}" 
-          	{if $schedule.current}checked{/if} {if !$schedule.available}disabled{/if}/>
+          	{if $schedule.current}checked{/if} {if !$schedule.available || $schedule.chosen}disabled{/if}/>
         </div>
         <div class="userbase-account-plan-element">
         	<label for="plan-radio-{$m}-{$n}">
@@ -52,7 +55,8 @@
           <p>Payment Schedule description: {$schedule.description}</p>
           <p>Charge Amount: <b>${$schedule.charge_amount}</b></p>
           <p>Charge Period: <b>{$schedule.charge_period}</b> days</p>
-          {if !$schedule.available}<p><b>Your balance of ${$balance} is not sufficient to switch to this schedule</b></p>{/if}
+          {if $schedule.chosen}<p><b>You have already chosen to switch to this schedule.</b></p>
+          {elseif !$schedule.available}<p><b>Your balance of ${$balance} is not sufficient to switch to this schedule.</b></p>{/if}
           </label>
         </div>
        </div>
@@ -63,7 +67,8 @@
   	 Plan does not use payment schedules
   	 	<div class="userbase-account-plan-container">
   	 		<div class="userbase-account-plan-element">
-	  	 		<input type="radio" name="plan" value="{$plan.slug}" id="plan-radio-{$m}" {if $plan.current}checked{/if} />
+	  	 		<input type="radio" name="plan" value="{$plan.slug}" id="plan-radio-{$m}" {if $plan.current}checked{/if} 
+	  	 			{if $plan.chosen}disabled{/if} />
 	  	 	</div>
 	  	 	<div class="userbase-account-plan-element">
 	  	 		<label for="plan-radio-{$m}">
