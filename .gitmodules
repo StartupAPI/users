@@ -16,3 +16,6 @@
 [submodule "calendarview"]
 	path = calendarview
 	url = git://github.com/jsmecham/calendarview.git
+[submodule "phptidy"]
+	path = phptidy
+	url = git://github.com/sergeychernyshev/phptidy.git
