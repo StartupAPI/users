@@ -76,3 +76,10 @@ endif
 docs:	documentation
 documentation:
 	phpdoc -o HTML:frames:default -d . -t docs -i "*/oauth-php/*,*/modules/facebook/php-sdk/*,*/dbupgrade/*,*/admin/swfobject/*,*/docs/*"
+
+code:
+	php phptidy/phptidy.php replace
+	find . -name '*.phptidybak~' | xargs -n10 rm
+
+
+                              

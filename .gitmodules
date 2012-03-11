@@ -10,3 +10,6 @@
 [submodule "dbupgrade"]
 	path = dbupgrade
 	url = git://github.com/sergeychernyshev/DBUpgrade.git
+[submodule "phptidy"]
+	path = phptidy
+	url = git://github.com/sergeychernyshev/phptidy.git
