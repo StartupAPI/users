@@ -10,15 +10,15 @@ $project_files = array(
 );
 
 $project_files_excludes = array(
-	"cache/*",
-	"docs/*",
-	"tags/*",
-	"oauth-php/*",
-	"modules/facebook/php-sdk/*",
-	"dbupgrade/*",
-	"phptidy/*",
-	"smarty/*"
+	"|^cache/|",
+	"|^docs/|",
+	"|^tags/|",
+	"|^oauth-php/|",
+	"|^modules/facebook/php-sdk/|",
+	"|^dbupgrade/|",
+	"|^phptidy/|",
+	"|^smarty/|"
 );
 
 $default_package = "StartupAPI";
-$indent_char = "        ";
+$indent_char = "\t";
