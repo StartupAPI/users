@@ -9,7 +9,7 @@ $project_files = array(
 	"*/*/*/*/*/*/*.php"
 );
 
-$project_files_excludes = array(
+$project_files_exclude_regexes = array(
 	"|^cache/|",
 	"|^docs/|",
 	"|^tags/|",
