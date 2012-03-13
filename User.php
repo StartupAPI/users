@@ -55,7 +55,7 @@ class User
 				User::redirectToPasswordReset();
 			}
 
-			// don't event try impersonating if not admin
+			// don't even try impersonating if not admin
 			if (!$impersonate || !$user->isAdmin()) {
 				if ($user->isDisabled()) {
 					return null;

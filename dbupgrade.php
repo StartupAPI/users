@@ -22,10 +22,16 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 17
+ * Adding login link code
+*/
+$versions[17]['up'][] = "ALTER TABLE  `".UserConfig::$mysql_prefix."users` ADD  `loginlinkcode` VARCHAR( 10 ) NULL DEFAULT NULL COMMENT  'One time code used to login' AFTER  `temppass`";
+$versions[17]['down'][] = "ALTER TABLE  `".UserConfig::$mysql_prefix."users` DROP  `loginlinkcode`";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 16
  * Payment Plans and Engines
 */
-
 $versions[16]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."transaction_log (
   `transaction_id` int(11) NOT NULL AUTO_INCREMENT,
   `date_time` datetime NOT NULL,

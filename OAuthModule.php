@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package StartupAPI
+ * @subpackage Authentication
+ */
 include_once(dirname(__FILE__).'/oauth-php/library/OAuthStore.php');
 include_once(dirname(__FILE__).'/oauth-php/library/OAuthRequester.php');
 

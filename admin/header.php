@@ -38,11 +38,12 @@ if (UserConfig::$enableInvitations) {
 }
 
 $links = array(
-	'dashboard' => 'Dashboard',
+	'index' => 'Dashboard',
 	'cohorts' => 'Cohort Analysis',
 	'activity' => 'Activity',
 	'registrations' => 'Registered Users',
 	'bymodule' => 'Registrations By Module',
+	'features' => 'Features',
 	'debtors' => 'Accounts with debts',
 	);
 ?>
@@ -57,7 +58,6 @@ $links = array(
 		if($ADMIN_SECTION == $k)
 			echo $v;
 		else {
-			if($k == 'dashboard') $k = 'index';
 			echo "<a href=\"".UserConfig::$USERSROOTURL."/admin/".$k.".php\">".$v."</a>";
 		}
 	}
