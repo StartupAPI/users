@@ -16,6 +16,8 @@ class Account
 
 	private $isIndividual;
 	private $active;
+	
+	private $lastTransactionID;
 
 	const ROLE_USER = 0;
 	const ROLE_ADMIN = 1;
@@ -173,6 +175,7 @@ class Account
 		}
 		
 		$this->charges = is_null($charges) ? array() : $charges;
+		$this->lastTransactionID = NULL;
 	}
 
 	public function getID()
@@ -313,7 +316,8 @@ class Account
 		
 		$account = new self($id, $name, $plan_slug, $role, NULL, $engine_slug);
 		$account->activatePlan($plan_slug, $schedule_slug);
-		TransactionLogger::Log($id,is_null($engine_slug) ? NULL : $account->paymentEngine->getSlug(),0,'Account created');
+		$this->lastTransactionID = 
+		  TransactionLogger::Log($id,is_null($engine_slug) ? NULL : $account->paymentEngine->getSlug(),0,'Account created');
 		return $account;
 	}
 
@@ -406,7 +410,8 @@ class Account
 		else {
 			throw new Exception("Can't update user preferences (set current account)");
 		}
-		TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),0,'Account set as current');
+		$this->lastTransactionID = 
+		  TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),0,'Account set as current');
 	}
 
 	public function isTheSameAs($account)
@@ -563,12 +568,14 @@ class Account
 		$db->query("UNLOCK TABLES");
 
 		if(is_null($refund)) {
-  		TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
-	  	  -$this->schedule->charge_amount,'Payment Schedule charge');
+  		$this->lastTransactionID =
+  		  TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
+	  	    -$this->schedule->charge_amount,'Payment Schedule charge');
     }
     else {
-      TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
-        -$refund,'Refund recorded');
+      $this->lastTransactionID =
+        TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
+          -$refund,'Refund recorded');
     }
 
 		return TRUE;
@@ -671,8 +678,9 @@ class Account
 		  $this->activate();
     }
 
- 		TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
-  	  $amount_to_log,'Payment received');
+ 		$this->lastTransactionID =
+ 		  TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
+  	    $amount_to_log,'Payment received');
 
 		return TRUE;
 	}
@@ -736,8 +744,9 @@ class Account
     }
       
     $this->paymentIsDue();
-		TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
-		  0,'Plan "'.$this->plan->name.'" activated');
+		$this->lastTransactionID =
+		  TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
+		    0,'Plan "'.$this->plan->name.'" activated');
     return TRUE;
 	}
 	
@@ -750,16 +759,18 @@ class Account
 		if (!is_null($this->downgrade_to)) {
 
 		  $this->activatePlan($this->downgrade_to);
-		  TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
-		    0,'Plan downgraded to "'.$this->plan->name.'"');
+		  $this->lastTransactionID =
+		    TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
+		      0,'Plan downgraded to "'.$this->plan->name.'"');
 			return TRUE;
 		} 
 		else {
 		
 		  // Nothing to downgrade to - mark account as not active
 		  $this->suspend();
-  		TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
-  		  0,'Account suspended due to plan "'.$this->plan->name.'" deactivation');
+  		$this->lastTransactionID =
+  		  TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
+  		    0,'Account suspended due to plan "'.$this->plan->name.'" deactivation');
   		return FALSE;
     }
 	}
@@ -796,8 +807,9 @@ class Account
 
     // Bill user
     $this->paymentIsDue();
-    TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
-      0,'Payment schedule "'.$this->schedule->name.'" set.');
+    $this->lastTransactionID =
+      TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
+        0,'Payment schedule "'.$this->schedule->name.'" set.');
     return TRUE;
 	}
 	
@@ -847,8 +859,9 @@ class Account
       throw new Exception("Can't execute statement: ".$stmt->error);
     }
       
-    TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
-      0,'Payment engine "'.$this->paymentEngine->getSlug().'" set.');
+    $this->lastTransactionID =
+      TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
+        0,'Payment engine "'.$this->paymentEngine->getSlug().'" set.');
     return TRUE;
 	}
 	
@@ -923,10 +936,10 @@ class Account
       throw new Exception("Can't execute statement: ".$stmt->error);
     }
 
-    TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
-      0,'Request to change plan to "'.$new_plan->name.
-      (is_null($new_schedule) ? '"' : '" and schedule to "'.$new_schedule->name).
-      '" stored.');
+    $this->lastTransactionID =
+      TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
+        0,'Request to change plan to "'.$new_plan->name.
+        (is_null($new_schedule) ? '"' : '" and schedule to "'.$new_schedule->name).'" stored.');
     return TRUE;
 	}
 	
@@ -964,8 +977,9 @@ class Account
       throw new Exception("Can't execute statement: ".$stmt->error);
     }
 
-    TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
-      0,'Request to change schedule to "'.$schedule->name.'" stored.');      
+    $this->lastTransactionID =
+      TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
+        0,'Request to change schedule to "'.$schedule->name.'" stored.');      
     return TRUE;
 	}
 
@@ -1014,5 +1028,9 @@ class Account
       
     return TRUE;
 	}
-
+	
+	public function getLastTransactionID() 
+	{
+	  return $this->lastTransactionID;
+  }
 }

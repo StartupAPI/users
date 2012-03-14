@@ -125,11 +125,6 @@ class Plan
     return NULL;
   }
 	
-	public function expandTransaction($t) {
-		
-		return $t['message'];
-	}
-	
 	public function activate_hook($account_id, $plan_slug, $schedule_slug) {
 	
 	  if ($this->user_activate_hook == '') return;
@@ -154,8 +149,8 @@ class Plan
 
   public static function init($a) {
   
-    if (count(self::$Plans))
-      throw new Exception("Already initialized");
+//    if (count(self::$Plans))
+//      throw new Exception("Already initialized");
       
     if (!is_array($a))
       throw new Exception("Parameter is not an array");

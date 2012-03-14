@@ -22,6 +22,21 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 18
+ * Adding transaciton details table for PaymentEngine_Manual
+*/
+$versions[18]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."transaction_details_PaymentEngine_Manual` (
+  `transaction_id` int(11) NOT NULL,
+  `operator_id` int(11) NOT NULL,
+  `funds_source` varchar(256) DEFAULT NULL,
+  `comment` varchar(256) DEFAULT NULL,
+  PRIMARY KEY (`transaction_id`),
+  CONSTRAINT `transaction_details_PaymentEngine_Manual_acct_id` FOREIGN KEY `account_id` REFERENCES `".
+  UserConfig::$mysql_prefix."accounts` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
+) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+$versions[18]['down'][] = "DROP TABLE `".UserConfig::$mysql_prefix."transaction_details_PaymentEngine_Manual`";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 17
  * Adding login link code
 */
@@ -40,14 +55,18 @@ $versions[16]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."transaction_l
   `amount` float DEFAULT NULL,
   `message` text,
   PRIMARY KEY (`transaction_id`),
-  KEY `acctid_dt` (`account_id`,`date_time`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8";
+  KEY `acctid_dt` (`account_id`,`date_time`),
+  CONSTRAINT `transaction_acct_id` FOREIGN KEY `account_id` REFERENCES `".
+  UserConfig::$mysql_prefix."accounts` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
+) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 $versions[16]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."account_charge (
   account_id int(11) NOT NULL,
   date_time datetime NOT NULL,
   amount float DEFAULT NULL,
   UNIQUE KEY acct_id_datetime (account_id,date_time),
-  KEY account_idx (account_id)
+  KEY account_idx (account_id),
+  CONSTRAINT `charge_acct_id` FOREIGN KEY `account_id` REFERENCES `".
+  UserConfig::$mysql_prefix."accounts` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 $versions[16]['up'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
   CHANGE COLUMN plan plan_slug varchar(256) DEFAULT NULL,
@@ -59,7 +78,8 @@ $versions[16]['up'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
   ADD COLUMN next_charge datetime DEFAULT NULL";
 $versions[16]['down'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
   CHANGE COLUMN plan_slug plan tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'Payment plan ID',
-  DROP COLUMN next_plan_slug, DROP COLUMN schedule_slug, DROP COLUMN next_schedule_slug, DROP COLUMN engine_slug, DROP COLUMN active, DROP COLUMN next_charge";
+  DROP COLUMN next_plan_slug, DROP COLUMN schedule_slug, DROP COLUMN next_schedule_slug, 
+  DROP COLUMN engine_slug, DROP COLUMN active, DROP COLUMN next_charge";
 $versions[16]['down'][] = "DROP TABLE ".UserConfig::$mysql_prefix."account_charge";
 $versions[16]['down'][] = "DROP TABLE ".UserConfig::$mysql_prefix."transaction_log";
 

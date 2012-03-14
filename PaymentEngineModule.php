@@ -10,6 +10,8 @@
     public function unsubscribe($account_id);
     public function cronHandler();
     public function getSlug();
+    public function storeTransactionDetails($transaction_id,$details);
+    public function expandTransactionDetails($transaction_id);
   }
     
   abstract class PaymentEngine extends UserBaseModule implements IPaymentEngine 

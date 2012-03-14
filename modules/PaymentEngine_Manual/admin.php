@@ -35,12 +35,20 @@
         } else {
           $data = array('account_id' => $account_id, 'amount' => $amount);
 
-          if($action == 'ProcessRefund')
+          $operator = Account::getCurrent();
+
+          if($action == 'ProcessRefund') {
             $ret_code = $engine->refund($data);
-          else
+          }
+          else {
             $ret_code = $engine->paymentReceived($data);
+          }
 
           if($ret_code) {
+
+            $engine->storeTransactionDetails($account->getLastTransactionID(),
+              array('operator_id' => $operator->getID()));
+
             echo "<p>", $subject, " of ", $amount, " recorded.</p>\n";
           } else {
             echo "<p>",$subject," can not be recorded - please check server logs.</p>";
