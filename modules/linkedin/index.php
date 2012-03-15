@@ -45,8 +45,6 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule
 		if ($result['code'] == 200) {
 			$userdata = json_decode($result['body'], true);
 
-			error_log(var_export($result['body'], true));
-
 			if (array_key_exists('id', $userdata) && array_key_exists('formattedName', $userdata)) {
 				$userdata['name'] = $userdata['formattedName'];
 				unset($userdata['formattedName']);
