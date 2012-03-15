@@ -48,6 +48,8 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule
 			error_log(var_export($result['body'], true));
 
 			if (array_key_exists('id', $userdata) && array_key_exists('formattedName', $userdata)) {
+				$userdata['name'] = $userdata['formattedName'];
+				unset($userdata['formattedName']);
 				return $userdata;
 			}
 		}
@@ -65,6 +67,6 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule
 
 class LinkedInUserCredentials extends OAuthUserCredentials {
 	public function getHTML() {
-		return '<a href="'.UserTools::escape($this->userinfo['publicProfileUrl']).'" target="_blank">'.$this->userinfo['formattedName'].'</a>';
+		return '<a href="'.UserTools::escape($this->userinfo['publicProfileUrl']).'" target="_blank">'.$this->userinfo['name'].'</a>';
 	}
 }
