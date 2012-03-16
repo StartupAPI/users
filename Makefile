@@ -23,7 +23,7 @@ ifneq "$(wildcard .svn )" ""
 	rm -rf _php-sdk
 	mkdir modules/facebook/php-sdk
 	git clone git://github.com/facebook/php-sdk.git _php-sdk
-	( cd _php-sdk; git archive v2.1.2 | tar -x -C ../modules/facebook/php-sdk )
+	( cd _php-sdk; git archive HEAD | tar -x -C ../modules/facebook/php-sdk )
 	rm -rf _php-sdk
 
 	rm -rf smarty

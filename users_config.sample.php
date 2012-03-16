@@ -112,3 +112,10 @@ new UsernamePasswordAuthenticationModule();
 #UserConfig::loadModule('meetup');
 #new MeetupAuthenticationModule('...OAuth.key.goes.here...', '...OAuth.secret.goes.here...');
 
+/**
+ * LinkedIn Authentication configuration
+ * Register your app here: https://www.linkedin.com/secure/developer
+ * And then uncomment two lines below and copy API Key and Secret Key
+ */
+#UserConfig::loadModule('linkedin');
+#new LinkedInAuthenticationModule('...OAuth.key.goes.here...', '...OAuth.secret.goes.here...');
