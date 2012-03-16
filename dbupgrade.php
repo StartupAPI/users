@@ -30,9 +30,8 @@ $versions[18]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."transaction_
   `operator_id` int(11) NOT NULL,
   `funds_source` varchar(256) DEFAULT NULL,
   `comment` varchar(256) DEFAULT NULL,
-  PRIMARY KEY (`transaction_id`),
-  CONSTRAINT `transaction_details_PaymentEngine_Manual_acct_id` FOREIGN KEY `account_id` REFERENCES `".
-  UserConfig::$mysql_prefix."accounts` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT `transaction_id_fk1` FOREIGN KEY (`transaction_id`) REFERENCES `".
+  UserConfig::$mysql_prefix."transaction_log` (`transaction_id`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 $versions[18]['down'][] = "DROP TABLE `".UserConfig::$mysql_prefix."transaction_details_PaymentEngine_Manual`";
 
