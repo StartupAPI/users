@@ -85,7 +85,8 @@ class Plan
 			throw new Exception("Activate hook function ".$this->user_activate_hook." is not defined");
 		if ($this->user_deactivate_hook != '' && !function_exists($this->user_deactivate_hook))
 			throw new Exception("Deactivate hook function ".$this->user_deactivate_hook." is not defined");
-		
+
+		self::$Plans[] = $this;
 		# We are set
 	}
 
@@ -156,7 +157,7 @@ class Plan
       throw new Exception("Parameter is not an array");
 
     foreach($a as $slug => $p)
-      self::$Plans[] = new self($slug,$p);
+      new self($slug,$p);
   }
   
   public static function getPlanBySlug($slug) {
