@@ -138,7 +138,7 @@
 	{$col = 0}
 	<tr>
 	{foreach from=$plans item=plan}
-		<td class="userbase-account-pay-button {if $col == $current_plan_col} userbase-account-plan-current{/if}"><input type="submit" value="{if is_null($current_plan_col)}{if !empty($plan.base_price) }Pay Now{else}Sign Up{/if}{else}{if $col == $current_price_col }Update{else}Change{/if}{/if}"/></td>
+		<td class="userbase-account-pay-button {if $col == $current_plan_col} userbase-account-plan-current{/if}"><input type="submit" value="{if is_null($current_plan_col)}{if !empty($plan.base_price) }Pay Now{else}Sign Up{/if}{else}{if $col == $current_plan_col }Update{else}Change{/if}{/if}"/></td>
 		{$col = $col + 1}
 	{/foreach}
 	</tr>
