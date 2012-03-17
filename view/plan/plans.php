@@ -7,6 +7,8 @@ $user = User::require_login();
 $account = Account::getCurrentAccount($user);
 
 $smarty = new Smarty();
+$smarty->assign('account', array('name' => $account->getName()));
+
 session_start();
 
 if(isset($_SESSION['message'])) {

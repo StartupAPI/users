@@ -4,9 +4,7 @@
 		{/foreach}
 	{/if}
 	{if empty($fatal) }
-  <div>
-		Choose your payment plan:
-  </div>
+	<h2>Choose Subscription Plan for {$account.name}</h2>
 	<style>
 		{literal}
 		.userbase-account-plan-container {
@@ -21,67 +19,159 @@
 		.userbase-account-top-paragraph {
 			margin-top: 0px;
 		}
+		.userbase-account-plan-title {
+			font-size: x-large;
+			margin-bottom: 0;
+		}
+		.userbase-account-plan-base-price {
+			margin-top: 0;
+			font-weight: normal;
+		}
+		label.userbase-account-current-schedule .userbase-account-schedule-name {
+			font-weight: bold;
+		}
+		table.userbase-account-plans-table  {
+			border-width: 2px;
+			border-spacing: 0px;
+			border-style: solid;
+			border-color: black;
+			border-collapse: separate;
+		}
+		table.userbase-account-plans-table th {
+			border-width: 1px;
+			padding: 1em;
+			border-style: solid;
+			border-color: gray;
+		}
+		table.userbase-account-plans-table td {
+			border-width: 1px;
+			padding: 1em;
+			border-style: solid;
+			border-color: gray;
+		}
+		td.userbase-account-pay-button {
+			text-align: center;
+		}
+		table.userbase-account-plans-table th.userbase-account-plan-current {
+			background-color: silver;
+		}
+		table.userbase-account-plans-table td.userbase-account-plan-current {
+			background-color: silver;
+		}
+		table.userbase-account-plans-table tr.userbase-account-schedule-selector {
+			vertical-align: top;
+		}
+
+		table.userbase-account-plan-schedules {
+		}
+		table.userbase-account-plan-schedules td {
+			vertical-align: top;
+			padding: 0.2em;
+			border: 0;
+		}
+		.userbase-account-schedule-name {
+			font-size: large;
+		}
+		.userbase-account-schedule-details {
+			color: gray;
+		}
 		{/literal}
 	</style>
 
 	<form action="{$USERSROOTURL}/controller/account/plans.php" method="POST">
-	<p>
-	{$m = 0}
+	{$next_chosen = false}
+	{$current_plan_col = null}
+	{$col = 0}
 	{foreach from=$plans item=plan}
-  <div class="container-{$m}">
-    <p>Plan Name: <b>{$plan.name}</b></p>
-    <p>Plan Description: {$plan.description}</p>
-    <p>Plan Details: <a href="{$plan.details_url}">{$plan.details_url}</a></p>
-    {if $plan.downgrade_to}
-    <p>Plan automatically downgraded to: <b>{$plan.downgrade_to}</b> 
-    	if payment is due more than {$plan.grace_period} day(s)</p>
-    {/if}
-    {if $plan.chosen}
-    <p>You have already chosen to swtich to this plan.</p>
-    {/if}
-    <p>
+		{if $plan.chosen}
+			{$next_chosen = true}
+		{/if}
+		{if !empty($current_plan_col)}
+			{break}
+		{/if}
+		{if $plan.current}
+			{$current_plan_col = $col}
+			{break}
+		{/if}
+		{foreach from=$plan.schedules item=schedule}
+			{if $schedule.chosen}
+				{$next_chosen = true}
+			{/if}
+		{/foreach}
+		{$col = $col + 1}
+	{/foreach}
+	<table class="userbase-account-plans-table">
+	{$col = 0}
+	<tr>
+	{foreach from=$plans item=plan}
+		<th{if $col == $current_plan_col} class="userbase-account-plan-current"{/if}>
+			<p class="userbase-account-plan-title">
+				{if !empty($plan.details_url)}
+				<a href="{$plan.details_url}">{$plan.name}</a>
+				{else}
+				{$plan.name}
+				{/if}
+			</p>
+			<p class="userbase-account-plan-base-price">{if !empty($plan.base_price) } ${$plan.base_price} / {$plan.base_period}{else}free{/if}</p>
+		</th>
+		{$col = $col + 1}
+	{/foreach}
+	</tr>
+
+	{$col = 0}
+	<tr>
+	{foreach from=$plans item=plan}
+		<td{if $col == $current_plan_col} class="userbase-account-plan-current"{/if}>{$plan.description}</td>
+		{$col = $col + 1}
+	{/foreach}
+	</tr>
+
+	{$col = 0}
+	<tr class="userbase-account-schedule-selector">
+	{foreach from=$plans item=plan}
+		<td{if $col == $current_plan_col} class="userbase-account-plan-current"{/if}>
 		{if !empty($plan.schedules) && count($plan.schedules)}
-		Following schedule(s) available:
 			{$n = 0}
+			<table class="userbase-account-plan-schedules">
 			{foreach from=$plan.schedules item=schedule}
-			<div class="userbase-account-plan-container container-{$m}-{$n}">
-        <div class="userbase-account-plan-element">
-          <input type="radio" name="plan" value="{$plan.slug}.{$schedule.slug}" id="plan-radio-{$m}-{$n}" 
-          	{if $schedule.current}checked{/if} {if !$schedule.available || $schedule.chosen}disabled{/if}/>
-        </div>
-        <div class="userbase-account-plan-element">
-        	<label for="plan-radio-{$m}-{$n}">
-          <p class="userbase-account-top-paragraph">Payment Schedule: <b>{$schedule.name}</b></p>
-          <p>Payment Schedule description: {$schedule.description}</p>
-          <p>Charge Amount: <b>${$schedule.charge_amount}</b></p>
-          <p>Charge Period: <b>{$schedule.charge_period}</b> days</p>
-          {if $schedule.chosen}<p><b>You have already chosen to switch to this schedule.</b></p>
-          {elseif !$schedule.available}<p><b>Your balance of ${$balance} is not sufficient to switch to this schedule.</b></p>{/if}
-          </label>
-        </div>
-       </div>
-       <div class="userbase-account-spacer"></div>
-       {$n = $n + 1}
-  	  {/foreach}
-  	 {else}
-  	 Plan does not use payment schedules
-  	 	<div class="userbase-account-plan-container">
-  	 		<div class="userbase-account-plan-element">
-	  	 		<input type="radio" name="plan" value="{$plan.slug}" id="plan-radio-{$m}" {if $plan.current}checked{/if} 
-	  	 			{if $plan.chosen}disabled{/if} />
-	  	 	</div>
-	  	 	<div class="userbase-account-plan-element">
-	  	 		<label for="plan-radio-{$m}">
-	  	 		<p class="userbase-account-top-paragraph">Choose this plan</p>
-	  	 		</label>
-	  	 	</div>
-  	 	</div>
-  	 	<div class="userbase-account-spacer"></div>
-  	 {/if}
-  	</p>
-  </div>
-  {/foreach}
-	</p>
-	<input type="submit" value="Switch" />
+				<tr>
+				<td><input type="radio" name="plan"
+					id="plan-radio-{$col}-{$n}"
+					value="{$plan.slug}.{$schedule.slug}"
+					{if !$schedule.available}disabled{/if}
+					{if $schedule.chosen}checked{/if}
+					{if $next_chosen}{if $schedule.chosen}checked{/if}{else}{if $schedule.current}checked{/if}{/if}
+				/></td>
+				<td><label for="plan-radio-{$col}-{$n}"{if $schedule.current} class="userbase-account-current-schedule"{/if}>
+					<span class="userbase-account-schedule-name">{$schedule.name}</span><br/>
+					<span class="userbase-account-schedule-details">{$schedule.description}</span></div>
+				</label>
+				</td>
+				</tr>
+				{$n = $n + 1}
+			{/foreach}
+			</table>
+		{else}
+			<input type="radio" name="plan" value="{$plan.slug}"
+				id="plan-radio-{$col}"
+				{if $next_chosen}{if $plan.chosen}checked{/if}{else}{if $plan.curent}checked{/if}{/if}
+			/>
+			<label for="plan-radio-{$col}">free</label>
+		{/if}
+		</td>
+		{$col = $col + 1}
+	{/foreach}
+	</tr>
+
+	{$col = 0}
+	<tr>
+	{foreach from=$plans item=plan}
+		<td class="userbase-account-pay-button {if $col == $current_plan_col} userbase-account-plan-current{/if}"><input type="submit" value="{if is_null($current_plan_col)}{if !empty($plan.base_price) }Pay Now{else}Sign Up{/if}{else}{if $col == $current_plan_col }Update{else}Change{/if}{/if}"/></td>
+		{$col = $col + 1}
+	{/foreach}
+	</tr>
+
+	</table>
+
 	</form>  
 	{/if}

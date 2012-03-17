@@ -183,8 +183,7 @@ class UserConfig
         public static $smarty_templates;
 
 
-
-  public static function getDB()
+	public static function getDB()
 	{
 		if (is_null(self::$db))
 		{
@@ -240,6 +239,12 @@ EOD;
 		require_once(dirname(__FILE__).'/modules/'.$modulename.'/index.php');
 	}
 
+	/**
+	 * Initializing static variables *BEFORE* user overrides them.
+	 *
+	 * If any initialization needs to happen after user changes are done,
+	 * you have toput them into config.php
+	 */
 	public static function init()
 	{
 		UserConfig::$ROOTPATH = dirname(__FILE__);
@@ -353,13 +358,9 @@ EOD;
 		UserConfig::$cohort_providers[] = new GenerationCohorts(GenerationCohorts::YEAR);
 		UserConfig::$cohort_providers[] = new RegMethodCohorts();
 		
-		if(UserConfig::$useAccounts && UserConfig::$useSubscriptions)
-			Plan::init(UserConfig::$PLANS);
-
-    UserConfig::$smarty_cache = dirname(__FILE__).'/cache/smarty/cache';
-    UserConfig::$smarty_compile = dirname(__FILE__).'/cache/smarty/templates_c';
-    UserConfig::$smarty_templates = dirname(__FILE__).'/templates';
-
+		UserConfig::$smarty_cache = dirname(__FILE__).'/cache/smarty/cache';
+		UserConfig::$smarty_compile = dirname(__FILE__).'/cache/smarty/templates_c';
+		UserConfig::$smarty_templates = dirname(__FILE__).'/templates';
 	}
 	
 
