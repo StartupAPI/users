@@ -681,7 +681,6 @@ class Account
  		$this->lastTransactionID =
  		  TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
   	    $amount_to_log,'Payment received');
-
 		return TRUE;
 	}
 	

@@ -42,7 +42,7 @@
       }
       $account->paymentReceived($data['amount']);
       
-      return TRUE;
+      return $account->getLastTransactionID();
     }
 
     public function refund($data) 
@@ -59,7 +59,7 @@
       }
       $account->paymentIsDue($data['amount']);
       
-      return TRUE;
+      return $account->getLastTransactionID();
     
     }
     

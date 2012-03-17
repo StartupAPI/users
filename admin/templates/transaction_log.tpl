@@ -49,7 +49,7 @@
     	To: <input type="text" name="to" id="to" value="{$to}" /><!--<span class="calendarButton" id="toButton" >..</span>-->
     <input type="submit" value="Show" /></p>
     </form>
-    <table>
+    <table border="1">
     {if !count($log) }
       <h2>No transactions found</h2>
     {else}
@@ -68,7 +68,9 @@
       <span style="float: left; margin: 0 2em 0 1em;">Page {$page+1}</span>
       </td></tr>
       {foreach from=$log item=tr}
-      <tr><td>{$tr.date_time}</td><td align="center">{preg_replace("/^(-?)/","$1$",sprintf("%.2f",$tr.amount),1)}</td><td>{$tr.message}</td><td>{$tr.engine_slug}</td></tr>
+      <tr valign="top">
+        <td>{$tr.date_time}</td><td align="center">{preg_replace("/^(-?)/","$1$",sprintf("%.2f",$tr.amount),1)}</td>
+        <td>{$tr.message}{$tr.details}</td><td>{$tr.engine_slug}</td></tr>
       {/foreach}
       <tr><td colspan="4">
       {if count($log) == $perpage}

@@ -95,7 +95,7 @@
       $details = array();    
       if ($stmt->fetch() === TRUE) {
   		  foreach(array('operator_id','funds_source','comment') as $i) {
-	  	    $details[$i] = $$i;
+	  	    $details[$i] = stripslashes($$i);
         }
         return $details;
       }
@@ -114,6 +114,16 @@
         echo " | Payments (manual mode)";
       else
         echo " | <a href=\"".UserConfig::$USERSROOTURL."/modules/".$this->engineSlug."/admin.php\">Payments (manual mode)</a>\n";
+    }
+    
+    public function renderTransactionLogDetails($transaction_id) 
+    {
+      $details = $this->expandTransactionDetails($transaction_id);
+      $operator = User::getUser($details['operator_id']);
+      $name = is_null($operator) ? 'Unknown' : $operator->getName();
+      $source = is_null($details['funds_source']) ? 'Unknown' : $details['funds_source'];
+      $comment = is_null($details['comment']) ? '-' : $details['comment'];
+      return "<div>Operator: <b>$name</b>, Source: <b>$source</b>, Comment: $comment</div>";
     }
     
   }

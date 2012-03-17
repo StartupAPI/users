@@ -74,13 +74,16 @@ $log = TransactionLogger::getAccountTransactions($account->getID(),$date['from']
 # Cheating on payment modules :)
 
 $mods = array();
+$pms = array();
 foreach(UserConfig::$payment_modules as $pm) {
   $mods[$pm->getID()] = $pm->getTitle();
+  $pms[$pm->getID()] = $pm;
 }
 
 foreach($log as $k => $l) {
   if(array_key_exists($l['engine_slug'],$mods)) {
     $log[$k]['engine_slug'] = $mods[$l['engine_slug']];
+    $log[$k]['details'] = $pms[$l['engine_slug']]->renderTransactionLogDetails($l['transaction_id']);
   }
   else {
     $log[$k]['engine_slug'] = 'Unknown';

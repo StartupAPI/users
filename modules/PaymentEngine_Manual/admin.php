@@ -35,19 +35,22 @@
         } else {
           $data = array('account_id' => $account_id, 'amount' => $amount);
 
-          $operator = Account::getCurrent();
+          $operator = User::require_login();
 
           if($action == 'ProcessRefund') {
-            $ret_code = $engine->refund($data);
+            $tr_id = $engine->refund($data);
           }
           else {
-            $ret_code = $engine->paymentReceived($data);
+            $tr_id = $engine->paymentReceived($data);
           }
 
-          if($ret_code) {
+          if($tr_id) {
 
-            $engine->storeTransactionDetails($account->getLastTransactionID(),
-              array('operator_id' => $operator->getID()));
+            $engine->storeTransactionDetails($tr_id, array(
+              'operator_id' => $operator->getID(),
+              'funds_source' => htmlspecialchars($_REQUEST['funds_source']),
+              'comment' => htmlspecialchars($_REQUEST['comment']) 
+            ));
 
             echo "<p>", $subject, " of ", $amount, " recorded.</p>\n";
           } else {
@@ -62,6 +65,7 @@
     
       $hint = $action == 'DisplayMakeRefund' ? 'Make refund' : 'Add funds';
       $process = $action == 'DisplayMakeRefund' ? 'ProcessRefund' : 'ProcessAddPayment';
+      $source = $action == 'DisplayMakeRefund' ? 'Reason' : 'Funds source';
       $account_id = isset($_REQUEST['account_id']) ? intval(htmlspecialchars($_REQUEST['account_id'])) : NULL;
       if (is_null($account = Account::getByID($account_id))) {
       ?>
@@ -77,7 +81,11 @@
         <input type="hidden" name="account_id" value="<?php echo $account_id ?>" />
         <p><?php echo $hint ?> for account '<b><?php echo $account->getName() ?></b>' (Current Balance: <b><?php echo $balance ?></b>
           ID: <b><?php echo $account_id?>)</b></p>
-        <p>Amount:<input type="text" id="howmuch" name="howmuch" /></p>
+        <table>
+        <tr><td>Amount:</td><td><input type="text" id="howmuch" name="howmuch" /></td></tr>
+        <tr><td><?php echo $source ?>:</td><td><input type="text" id="funds_source" name="funds_source" /></td></tr>
+        <tr><td>Comment:</td><td><input type="text" id="comment" name="comment" /></td></tr>
+        </table>
         <p><input type="submit" value="Ok" /></p>
         </form>
       </div>
