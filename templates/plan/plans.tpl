@@ -27,7 +27,7 @@
 			margin-top: 0;
 			font-weight: normal;
 		}
-		label.userbase-account-current-schedule{
+		label.userbase-account-current-schedule .userbase-account-schedule-name {
 			font-weight: bold;
 		}
 		table.userbase-account-plans-table  {
@@ -36,21 +36,18 @@
 			border-style: solid;
 			border-color: black;
 			border-collapse: separate;
-			background-color: white;
 		}
 		table.userbase-account-plans-table th {
 			border-width: 1px;
 			padding: 1em;
 			border-style: solid;
 			border-color: gray;
-			background-color: white;
 		}
 		table.userbase-account-plans-table td {
 			border-width: 1px;
 			padding: 1em;
 			border-style: solid;
 			border-color: gray;
-			background-color: white;
 		}
 		td.userbase-account-pay-button {
 			text-align: center;
@@ -64,13 +61,31 @@
 		table.userbase-account-plans-table tr.userbase-account-schedule-selector {
 			vertical-align: top;
 		}
+
+		table.userbase-account-plan-schedules {
+		}
+		table.userbase-account-plan-schedules td {
+			vertical-align: top;
+			padding: 0.2em;
+			border: 0;
+		}
+		.userbase-account-schedule-name {
+			font-size: large;
+		}
+		.userbase-account-schedule-details {
+			color: gray;
+		}
 		{/literal}
 	</style>
 
 	<form action="{$USERSROOTURL}/controller/account/plans.php" method="POST">
+	{$next_chosen = false}
 	{$current_plan_col = null}
 	{$col = 0}
 	{foreach from=$plans item=plan}
+		{if $plan.chosen}
+			{$next_chosen = true}
+		{/if}
 		{if !empty($current_plan_col)}
 			{break}
 		{/if}
@@ -78,6 +93,11 @@
 			{$current_plan_col = $col}
 			{break}
 		{/if}
+		{foreach from=$plan.schedules item=schedule}
+			{if $schedule.chosen}
+				{$next_chosen = true}
+			{/if}
+		{/foreach}
 		{$col = $col + 1}
 	{/foreach}
 	<table class="userbase-account-plans-table">
@@ -112,21 +132,29 @@
 		<td{if $col == $current_plan_col} class="userbase-account-plan-current"{/if}>
 		{if !empty($plan.schedules) && count($plan.schedules)}
 			{$n = 0}
+			<table class="userbase-account-plan-schedules">
 			{foreach from=$plan.schedules item=schedule}
-				<div><input type="radio" name="plan"
+				<tr>
+				<td><input type="radio" name="plan"
 					id="plan-radio-{$col}-{$n}"
 					value="{$plan.slug}.{$schedule.slug}"
-					{if !$schedule.available || $schedule.chosen}checked{/if}
-				/>
-				<label for="plan-radio-{$col}-{$n}"{if $schedule.current} class="userbase-account-current-schedule"{/if}>
-					${$schedule.charge_amount} {$schedule.name}
-				</label></div>
+					{if !$schedule.available}disabled{/if}
+					{if $schedule.chosen}checked{/if}
+					{if $next_chosen}{if $schedule.chosen}checked{/if}{else}{if $schedule.current}checked{/if}{/if}
+				/></td>
+				<td><label for="plan-radio-{$col}-{$n}"{if $schedule.current} class="userbase-account-current-schedule"{/if}>
+					<span class="userbase-account-schedule-name">{$schedule.name}</span><br/>
+					<span class="userbase-account-schedule-details">{$schedule.description}</span></div>
+				</label>
+				</td>
+				</tr>
 				{$n = $n + 1}
 			{/foreach}
+			</table>
 		{else}
 			<input type="radio" name="plan" value="{$plan.slug}"
 				id="plan-radio-{$col}"
-				{if $plan.chosen}checked{/if}
+				{if $next_chosen}{if $plan.chosen}checked{/if}{else}{if $plan.curent}checked{/if}{/if}
 			/>
 			<label for="plan-radio-{$col}">free</label>
 		{/if}
