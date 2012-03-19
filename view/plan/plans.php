@@ -34,6 +34,8 @@ $schedule_data = array(
   
 $plans = array();
 
+$smarty->assign('next_charge', $account->getNextCharge());
+
 $balance = $account->getBalance();
 $smarty->assign('balance',$balance);
 $plan_slugs = Plan::getPlanSlugs();  

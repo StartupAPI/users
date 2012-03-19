@@ -30,6 +30,9 @@
 		label.userbase-account-current-schedule .userbase-account-schedule-name {
 			font-weight: bold;
 		}
+		label.userbase-account-current-plan .userbase-account-plan-name {
+			font-weight: bold;
+		}
 		table.userbase-account-plans-table  {
 			border-width: 2px;
 			border-spacing: 0px;
@@ -75,6 +78,15 @@
 		.userbase-account-schedule-details {
 			color: gray;
 		}
+		.userbase-account-until-label, .userbase-account-starting-label {
+			font-weight: bold;
+			color: white;
+			background-color: gray;
+			padding: 0 0.2em;
+			border-radius: 5px;
+			-moz-border-radius: 5px;
+			-webkit-border-radius: 5px;
+		}
 		{/literal}
 	</style>
 
@@ -86,6 +98,13 @@
 		{if $plan.chosen}
 			{$next_chosen = true}
 		{/if}
+		{foreach from=$plan.schedules item=schedule}
+			{if $schedule.chosen}
+				{$next_chosen = true}
+			{/if}
+		{/foreach}
+	{/foreach}
+	{foreach from=$plans item=plan}
 		{if !empty($current_plan_col)}
 			{break}
 		{/if}
@@ -93,11 +112,6 @@
 			{$current_plan_col = $col}
 			{break}
 		{/if}
-		{foreach from=$plan.schedules item=schedule}
-			{if $schedule.chosen}
-				{$next_chosen = true}
-			{/if}
-		{/foreach}
 		{$col = $col + 1}
 	{/foreach}
 	<table class="userbase-account-plans-table">
@@ -139,12 +153,20 @@
 					id="plan-radio-{$col}-{$n}"
 					value="{$plan.slug}.{$schedule.slug}"
 					{if !$schedule.available}disabled{/if}
-					{if $schedule.chosen}checked{/if}
 					{if $next_chosen}{if $schedule.chosen}checked{/if}{else}{if $schedule.current}checked{/if}{/if}
 				/></td>
-				<td><label for="plan-radio-{$col}-{$n}"{if $schedule.current} class="userbase-account-current-schedule"{/if}>
-					<span class="userbase-account-schedule-name">{$schedule.name}</span><br/>
-					<span class="userbase-account-schedule-details">{$schedule.description}</span></div>
+				<td><label for="plan-radio-{$col}-{$n}"
+					{if $schedule.current} class="userbase-account-current-schedule"{/if}
+				>
+				<span class="userbase-account-schedule-name">{$schedule.name}</span>
+				{if $schedule.current && $next_chosen}
+					<span class="userbase-account-until-label">until {$next_charge}</span>
+				{/if}
+				{if $schedule.chosen}
+					<span class="userbase-account-starting-label">starting {$next_charge}</span>
+				{/if}
+				<br/>
+				<span class="userbase-account-schedule-details">{$schedule.description}</span>
 				</label>
 				</td>
 				</tr>
@@ -154,9 +176,20 @@
 		{else}
 			<input type="radio" name="plan" value="{$plan.slug}"
 				id="plan-radio-{$col}"
-				{if $next_chosen}{if $plan.chosen}checked{/if}{else}{if $plan.curent}checked{/if}{/if}
+				{if $next_chosen}
+					{if $plan.chosen}checked{/if}
+				{else}
+					{if $plan.current}checked{/if}
+				{/if}
 			/>
-			<label for="plan-radio-{$col}">free</label>
+			<label for="plan-radio-{$col}"{if $plan.current} class="userbase-account-current-plan"{/if}><span class="userbase-account-plan-name">free</span>
+			{if $next_chosen && $plan.current}
+				<span class="userbase-account-until-label">until {$next_charge}</span>
+			{/if}
+			{if $plan.chosen}
+				<span class="userbase-account-starting-label">starting {$next_charge}</span>
+			{/if}
+			</label>
 		{/if}
 		</td>
 		{$col = $col + 1}
