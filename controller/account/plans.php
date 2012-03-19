@@ -1,5 +1,4 @@
 <?php
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(dirname(dirname(__FILE__))).'/User.php');
 
 $user = User::require_login();
@@ -24,11 +23,15 @@ try {
 }
 
 // Check balance
-if ($schedule && $schedule->charge_amount > $account->getBalance()) {
+if (!is_null($schedule) && $schedule->charge_amount > $account->getBalance()) {
 
   $_SESSION['message'][] = "Not enough funds to activate plan/schedule";
 
-} elseif ($account->getPlanSlug() != $data[0]) {
+} 
+elseif ($account->getPlanSlug() != $data[0] || 
+  (!is_null($account->getNextPlan()) && $account->getNextPlan()->slug != $data[0])) 
+{
+ // Not changing plan if requested plan is same as current or next
 
   if ($account->planChangeRequest($data[0],$data[1])) {
     if ($account->getPlanSlug() != $data[0]) {
@@ -45,7 +48,11 @@ if ($schedule && $schedule->charge_amount > $account->getBalance()) {
     $_SESSION['message'][] = "Error activating plan";
   }
 
-} elseif (!is_null($data[1]) && $account->getScheduleSlug() != $data[1]) {
+} 
+elseif (!is_null($data[1]) && ($account->getScheduleSlug() != $data[1] || 
+  (!is_null($account->getNextSchedule()) && $account->getNextSchedule()->slug!= $data[1])))
+{
+  // Not changing schedule if requested schedule is same as current or next
 
   if ($account->scheduleChangeRequest($data[1])) {
     if ($account->getScheduleSlug() != $data[1]) {

@@ -45,7 +45,7 @@
     	To: <input type="text" name="to" id="to" value="{$to}" /><!--<span class="calendarButton" id="toButton" >..</span>-->
     <input type="submit" value="Show" /></p>
     </form>
-    <table border="1">
+    <table cellpaddng="5" cellspacing="0" border="1">
     <tr><th>Date and time</th><th>Transaction Amount</th><th>Transaction Details</th><th>Via</th></tr>
 		<tr><td colspan="4">
 		{if count($log) == $perpage}

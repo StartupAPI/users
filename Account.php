@@ -870,12 +870,12 @@ class Account
 	  if (is_null($this->charges)) {
 	    return 0;
     }
-	  
+
 	  $balance = 0;
 	  foreach($this->charges as $c) {
-	    $balance += $c['amount'];
+	    $balance += floatval($c['amount']);
     }
-    
+
     return $balance;
   }
   
@@ -1031,5 +1031,32 @@ class Account
 	public function getLastTransactionID() 
 	{
 	  return $this->lastTransactionID;
+  }
+  
+  public function cancelChangeRequest() {
+  
+    // Cancel any pending request to change plan and/or schedule.
+    
+    $db = UserConfig::getDB();
+    
+    if (!($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.
+      'accounts SET next_plan_slug = NULL, next_schedule_slug = NULL '.
+      'WHERE id = ?')))
+    {
+      throw new Exception("Can't prepare statement: ".$db->error);
+    }
+    
+    if (!$stmt->bind_param('i', $this->id)) {
+      throw new Exception("Can't bind parameters: ".$stmt->error);
+    }
+    
+    if (!$stmt->execute()) {
+      throw new Exception("Can't execute statement: ".$stmt->error);
+    }
+    
+    $this->nextPlan = NULL;
+    $this->nextSchedule = NULL;
+    
+    return TRUE;
   }
 }

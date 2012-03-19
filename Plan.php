@@ -152,7 +152,9 @@ class Plan
   
 //    if (count(self::$Plans))
 //      throw new Exception("Already initialized");
-      
+
+    self::$Plans = array(); // Isn't it an init?
+    
     if (!is_array($a))
       throw new Exception("Parameter is not an array");
 

@@ -1,6 +1,5 @@
 <?php
 
-require_once(dirname(dirname(dirname(__FILE__))).'/users.php');
 require_once(dirname(dirname(dirname(__FILE__))).'/smarty/libs/Smarty.class.php');
 
 $user = User::require_login();
@@ -14,6 +13,18 @@ $schedule_data = array(
   
 $smarty = new Smarty();
 
+session_start();
+if(isset($_SESSION['message'])) {
+  $smarty->assign('message',$_SESSION['message']);
+  unset($_SESSION['message']);
+  $fatal = isset($_SESSION['fatal']) ? $_SESSION['fatal'] : 0;
+  unset($_SESSION['fatal']);
+  if($fatal) {
+    $smarty->assign('fatal',1);
+    return;
+  }
+}
+
 $smarty->assign('account_name',$account->getName());
 $smarty->assign('account_role',$account->getUserRole());
 $smarty->assign('account_isActive',$account->isActive());
@@ -21,26 +32,33 @@ $smarty->assign('account_engine', is_null($account->getPaymentEngine()) ? 'None'
 $smarty->assign('account_next_charge', preg_replace("/ .*/","",$account->getNextCharge()));
   
 $plan = $account->getPlan();
-foreach($plan_data as $d)
+foreach ($plan_data as $d)
   $smarty->assign('plan_'.$d, $plan->$d);
   
 $downgrade = Plan::getPlanBySlug($plan->downgrade_to);
-if($downgrade) $smarty->assign('plan_downgrade_to', $downgrade->name);
+if ($downgrade) $smarty->assign('plan_downgrade_to', $downgrade->name);
 
 $plan = $account->getNextPlan();
-if($plan)
-  foreach($plan_data as $d)
+
+if (!is_null($plan)) {
+  foreach($plan_data as $d) {
     $smarty->assign('next_plan_'.$d, $plan->$d);
+  }
+}
 
 $schedule = $account->getSchedule();
-if($schedule)
-  foreach($schedule_data as $d)
+if (!is_null($schedule)) {
+  foreach($schedule_data as $d) {
     $smarty->assign('schedule_'.$d, $schedule->$d);
+  }
+}
 
 $schedule = $account->getNextSchedule();
-if($schedule)
-  foreach($schedule_data as $d)
+if (!is_null($schedule)) {
+  foreach($schedule_data as $d) {
     $smarty->assign('next_schedule_'.$d, $schedule->$d);
+  }
+}
 
 $engine = $account->getPaymentEngine();
 $smarty->assign('payment_engine',empty($engine) ? NULL : $engine->getTitle());

@@ -1,3 +1,9 @@
+  {if !empty($message) }
+    {foreach from=$message item=msg}
+    <h2>{$msg}</h2>
+    {/foreach}
+  {/if}
+  {if empty($fatal) }
   <div>
     <p>Account Name: <b>{$account_name}</b></p>
     <p>Account Role: <b>{if $account_role == constant("Account::ROLE_ADMIN")}Account Administrator{else}User{/if}</b></p>
@@ -6,7 +12,7 @@
   </div>
 
   <div>
-    <p>Plan Name: <b>{$plan_name}</b> <a href="{$USERSROOTURL}/plans.php">(change)</a></p>
+    <p>Plan Name: <b>{$plan_name}</b> <a href="{$USERSROOTURL}/plans.php">[ change ]</a></p>
     <p>Plan Description: {$plan_description}</p>
     <p>Plan Details: <a href="{$plan_details_url}">{$plan_details_url}</a></p>
     {if $plan_downgrade_to}
@@ -47,16 +53,21 @@
     <p>Plan Name: <b>{$next_plan_name}</b></p>
     <p>Plan Description: {$next_plan_description}</p>
     <p>Plan Details: <a href="{$plan_details_url}">{$next_plan_details_url}</a></p>
+
   </div>
   {/if}
-  {if isset($next_schedule) && $next_plan_name == $plan_name}
+  {if isset($next_schedule_name) && $next_plan_name == $plan_name}
   	<p>After this date following schedule used:</p>
   {/if}
-  {if isset($next_schedule) }
+  {if isset($next_schedule_name) }
     <p>Payment Schedule: <b>{$next_schedule_name}</b></p>
     <p>Payment Schedule description: {$next_schedule_description}</p>
     <p>Charge Amount: <b>${$next_schedule_charge_amount}</b></p>
     <p>Charge Period: <b>{$next_schedule_charge_period}</b> days</p>
+  {/if}
+  {if isset($next_schedule_name) || isset($next_plan_name)}
+    <p>You can <a href="{$USERSROOTURL}/controller/account/cancel.php" 
+      onclick="return confirm('Sure to cancel request?')">[cancel]</a> switching to this plan/schedule</p>
   {/if}
   {if !empty($payment_engine)}
 	<div>
@@ -68,3 +79,4 @@
 	<div>
 		<a href="{$USERSROOTURL}/transaction_log.php" >View account transactions</a>
 	</div>
+  {/if}

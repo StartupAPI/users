@@ -1,6 +1,5 @@
 <?php
 
-require_once(dirname(dirname(dirname(__FILE__))).'/users.php');
 require_once(dirname(dirname(dirname(__FILE__))).'/smarty/libs/Smarty.class.php');
 
 $user = User::require_login();
@@ -38,6 +37,7 @@ $plans = array();
 $balance = $account->getBalance();
 $smarty->assign('balance',$balance);
 $plan_slugs = Plan::getPlanSlugs();  
+
 foreach($plan_slugs as $p) { # Iterate over all configured plans
 
   $this_plan = Plan::getPlanBySlug($p);
