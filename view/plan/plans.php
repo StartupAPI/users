@@ -55,7 +55,9 @@ foreach($plan_slugs as $p) { # Iterate over all configured plans
   $schedule = array();
   $schedule_slugs = $this_plan->getPaymentScheduleSlugs(); # Iterate over all schedules of this plan
   
-  if(empty($schedule_slugs) && $account->getNextPlan()->slug == $this_plan->slug) {
+  if(empty($schedule_slugs) && !is_null($account->getNextPlan()) && 
+    $account->getNextPlan()->slug == $this_plan->slug) 
+  {
     $plan['chosen'] = TRUE;
   }
   else {
@@ -78,7 +80,7 @@ foreach($plan_slugs as $p) { # Iterate over all configured plans
         $schedule['available'] = FALSE;
     }
     
-    if($account->getNextSchedule()->slug == $this_schedule->slug) {
+    if(!is_null($account->getNextSchedule()) && $account->getNextSchedule()->slug == $this_schedule->slug) {
       $schedule['chosen'] = TRUE;
     } 
     else {

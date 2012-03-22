@@ -917,6 +917,13 @@ class Account
     if (count($new_plan->getPaymentScheduleSlugs()) && is_null($new_schedule)) {
       return FALSE;
     }
+    
+    // If requested plan/schedule is same as current plan/schedule, cancel any pending request
+    if ($this->plan->slug == $plan_slug && ((!is_null($this->schedule) && 
+      $this->schedule->slug == $schedule_slug) || (is_null($this->schedule) && is_null($schedule_slug))))
+    {
+      return $this->cancelChangeRequest();
+    }
 
     // Update db
 		$db = UserConfig::getDB();
@@ -957,6 +964,12 @@ class Account
       }
 
       return $this->setPaymentSchedule($schedule_slug);
+    }
+
+    // If requested schedule is same as current schedule, cancel any pending request
+    if (!is_null($this->schedule) && $this->schedule->slug == $schedule_slug) 
+    {
+      return $this->cancelChangeRequest();
     }
 	  
     // Update db

@@ -98,11 +98,13 @@
 		{if $plan.chosen}
 			{$next_chosen = true}
 		{/if}
-		{foreach from=$plan.schedules item=schedule}
-			{if $schedule.chosen}
-				{$next_chosen = true}
-			{/if}
-		{/foreach}
+    {if isset($plan.schedules) }
+  		{foreach from=$plan.schedules item=schedule}
+	  		{if $schedule.chosen}
+		  		{$next_chosen = true}
+  			{/if}
+	  	{/foreach}
+    {/if}
 	{/foreach}
 	{foreach from=$plans item=plan}
 		{if !empty($current_plan_col)}
