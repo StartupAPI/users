@@ -599,3 +599,31 @@ $versions[1]['down'][] = "DROP TABLE `".UserConfig::$mysql_prefix."user_preferen
 $dbupgrade = new DBUpgrade(UserConfig::getDB(),	$versions, 'UserBase');
 
 require_once(dirname(__FILE__).'/dbupgrade/client.php');
+
+/* Now, if upgrading from plan numeric IDs to slugs (v.15 -> v.16), convert ID to slug using 
+   plan key in UserConfig::$PLANS as slug and position as slug
+*/
+
+if ($dbupgrade->get_db_version() == 16) {
+
+  $plan_slugs = array_keys(UserConfig::$PLANS);
+
+  $db = UserConfig::getDB();
+  foreach ($plan_slugs as $n => $s) {
+    
+    if (!($stmt = $db->prepare("UPDATE ".UserConfig::$mysql_prefix."accounts SET ".
+      "plan_slug = ? WHERE plan_slug = ?")))
+    {
+      throw new Exception("Can't prepare statement: ".$db->error);
+    }
+    
+    if (!$stmt->bind_param('ss', $s, $n)) {
+       throw new Exception("Can't bind parameter".$stmt->error);
+    }
+
+    if (!$stmt->execute()) {
+      throw new Exception("Can't execute statement: ".$stmt->error);
+    }
+  }
+                              
+}
