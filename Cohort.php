@@ -67,7 +67,7 @@ abstract class CohortProvider {
 	public abstract function getDimensionTitle();
 
 	/*
-	 * @param int $activityid Activity ID
+	 * @param int $activityid Activity ID (null for any activity)
 	 * @param int $actnum Number of days in activity period
 	 */
 	public function getActivityRate($activityid, $actnum)
@@ -86,8 +86,10 @@ abstract class CohortProvider {
 			COUNT(DISTINCT u.id) AS total
 			FROM `'.UserConfig::$mysql_prefix.'activity` AS a
 				INNER JOIN ('.$this->getCohortSQL().') AS u
-					ON a.user_id = u.id
-			WHERE `activity_id` = ?';
+					ON a.user_id = u.id';
+		if (!is_null($activityid)) {
+			$query .= '	WHERE `activity_id` = ?';
+		}
 
 		if (!is_null($siteadminsstring)) {
 			$query .= "\nAND u.id NOT IN ($siteadminsstring)";
@@ -99,9 +101,16 @@ abstract class CohortProvider {
 
 		if ($stmt = $db->prepare($query))
 		{
-			if (!$stmt->bind_param('ii', $actnum, $activityid))
-			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+			if (!is_null($activityid)) {
+				if (!$stmt->bind_param('ii', $actnum, $activityid))
+				{
+					 throw new Exception("Can't bind parameter".$stmt->error);
+				}
+			} else {
+				if (!$stmt->bind_param('i', $actnum))
+				{
+					 throw new Exception("Can't bind parameter".$stmt->error);
+				}
 			}
 			if (!$stmt->execute())
 			{
