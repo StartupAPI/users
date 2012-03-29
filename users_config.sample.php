@@ -64,14 +64,6 @@ new UsernamePasswordAuthenticationModule();
 #new StatusNetAuthenticationModule('...identi.ca.api.key.goes.here...', '...identi.ca.api.secret.goes.here...');
 
 /**
- * Google Friend Connect configuration
- * Register your app here: http://www.google.com/friendconnect/admin/site/setup
- * And then uncomment two lines below and copy the site ID from the URL
- */
-#UserConfig::loadModule('google');
-#new GoogleAuthenticationModule('...site.id.goes.here...');
-
-/**
  * Google OAuth Authentication configuration
  * Register your app here: https://www.google.com/accounts/ManageDomains
  * Add URL for your site, verify it using one of the methods provided
