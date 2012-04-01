@@ -236,7 +236,11 @@ EOD;
 	}
 
 	public static function loadModule($modulename) {
-		require_once(dirname(__FILE__).'/modules/'.$modulename.'/index.php');
+		if (is_dir(dirname(__FILE__).'/modules/'.$modulename)) {
+			require_once(dirname(__FILE__).'/modules/'.$modulename.'/index.php');
+		} else {
+			throw new Exception('Module '.$modulename.' does not exist in '.dirname(__FILE__).'/modules/ folder');
+		}
 	}
 
 	/**

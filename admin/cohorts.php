@@ -8,6 +8,7 @@ require_once(dirname(__FILE__).'/header.php');
 <div>
 Pick activity:
 <select name="activityid" onchange="document.activities.submit();">
+<option value="any">-- any activity --</option>
 <?php
 
 // sorting by point-value of activities
@@ -31,15 +32,9 @@ if (array_key_exists('activityid', $_REQUEST) && is_numeric($_REQUEST['activityi
 	$selectedactivityid = $_REQUEST['activityid'];
 }
 
-$firstactivityid = null; // most popular one, first on the list
-
 foreach (UserConfig::$activities as $id => $activity) {
 	if (!array_key_exists($id, $stats)) {
 		continue;
-	}
-
-	if (is_null($firstactivityid)) {
-		$firstactivityid = $id;
 	}
 ?>
 	<option value="<?php echo $id ?>"<?php echo $selectedactivityid == $id ? ' selected="yes"' : '' ?>><?php echo $activity[0] ?> (<?php echo $activity[1] ?> points)</option>
@@ -120,14 +115,6 @@ $cohorts = $cohort_provider->getCohorts();
 foreach ($cohorts as $cohort) {
 	$cohort_lookup[$cohort->getID()] = $cohort;
 }
-
-$aggregates = null;
-
-if (is_null($selectedactivityid)) {
-	$selectedactivityid = $firstactivityid;
-}
-
-$selectedactivity = UserConfig::$activities[$selectedactivityid];
 
 $aggregates = $cohort_provider->getActivityRate($selectedactivityid, $actperiodlength);
 

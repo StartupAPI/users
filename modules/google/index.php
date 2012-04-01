@@ -2,6 +2,9 @@
 /**
  * @package StartupAPI
  * @subpackage Authentication
+ *
+ * !!! ATTENTION !!!
+ * This login method is discontinued by Google, use /google_oauth/ module instead
  */
 class GoogleAuthenticationModule extends AuthenticationModule
 {
