@@ -7,10 +7,10 @@
       $db = UserConfig::getDB();
       
       if (!($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.
-        'transaction_log (date_time, account_id, engine_slug, amount, message) VALUES (?, ?, ?, ?, ?)')))
+        'transaction_log (date_time, account_id, engine_slug, amount, message) VALUES (NOW(), ?, ?, ?, ?)')))
           throw new Exception("Can't prepare statement: ".$db->error);
 
-      if (!$stmt->bind_param('sisds',date('Y-m-d H:i:s'),$account_id,$engine_slug,$amount,$message))
+      if (!$stmt->bind_param('isds',$account_id,$engine_slug,$amount,$message))
         throw new Exception("Can't bind parameter".$stmt->error);
         
       if (!$stmt->execute())
