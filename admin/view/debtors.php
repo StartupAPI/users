@@ -21,7 +21,7 @@ if (!$stmt->bind_result($id,$name,$plan,$schedule,$debt))
   
 $debtors = array();
 while($stmt->fetch() === TRUE)
-  $debtors[] = array('id' => $id, 'name' => $name, 'plan' => $plan, 'schedule' => $schedule, 'debt' => sprintf("%.2f",abs($debt));
+  $debtors[] = array('id' => $id, 'name' => $name, 'plan' => $plan, 'schedule' => $schedule, 'debt' => sprintf("%.2f",abs($debt)));
 
 $stmt->close();
 
