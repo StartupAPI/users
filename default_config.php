@@ -168,6 +168,7 @@ class UserConfig
         // subscription plans list, MUST have free plan index
         public static $PLANS = array(
             'PLAN_FREE' => array(
+                'id' => 0,
                 'name' => 'Free account',
                 'description' => 'Free access with basic functionality'
             )

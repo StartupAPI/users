@@ -26,8 +26,8 @@ $versions[_]['down'][]	= "";
  * Adding transaciton details table for PaymentEngine_Manual
 */
 $versions[18]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."transaction_details_PaymentEngine_Manual` (
-  `transaction_id` int(11) NOT NULL,
-  `operator_id` int(11) NOT NULL,
+  `transaction_id` int(10) UNSIGNED NOT NULL,
+  `operator_id` int(10) UNSIGNED NOT NULL,
   `funds_source` varchar(256) DEFAULT NULL,
   `comment` varchar(256) DEFAULT NULL,
   CONSTRAINT `transaction_id_fk1` FOREIGN KEY (`transaction_id`) REFERENCES `".
@@ -46,27 +46,6 @@ $versions[17]['down'][] = "ALTER TABLE  `".UserConfig::$mysql_prefix."users` DRO
  * VERSION 16
  * Payment Plans and Engines
 */
-$versions[16]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."transaction_log (
-  `transaction_id` int(11) NOT NULL AUTO_INCREMENT,
-  `date_time` datetime NOT NULL,
-  `account_id` int(11) NOT NULL,
-  `engine_slug` varchar(256) DEFAULT NULL,
-  `amount` float DEFAULT NULL,
-  `message` text,
-  PRIMARY KEY (`transaction_id`),
-  KEY `acctid_dt` (`account_id`,`date_time`),
-  CONSTRAINT `transaction_acct_id` FOREIGN KEY `account_id` REFERENCES `".
-  UserConfig::$mysql_prefix."accounts` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
-) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-$versions[16]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."account_charge (
-  account_id int(11) NOT NULL,
-  date_time datetime NOT NULL,
-  amount float DEFAULT NULL,
-  UNIQUE KEY acct_id_datetime (account_id,date_time),
-  KEY account_idx (account_id),
-  CONSTRAINT `charge_acct_id` FOREIGN KEY `account_id` REFERENCES `".
-  UserConfig::$mysql_prefix."accounts` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
-) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 $versions[16]['up'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
   CHANGE COLUMN plan plan_slug varchar(256) DEFAULT NULL,
   ADD COLUMN next_plan_slug varchar(256) DEFAULT NULL,
@@ -75,6 +54,46 @@ $versions[16]['up'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
   ADD COLUMN engine_slug varchar(256) DEFAULT NULL,
   ADD COLUMN active tinyint(1) DEFAULT '1',
   ADD COLUMN next_charge datetime DEFAULT NULL";
+/*
+ * Now, if upgrading from plan numeric IDs to slugs, convert ID to slug using
+ * 'id' attribute to plan key in UserConfig::$PLANS as slug
+*/
+$plan_slugs = array_keys(UserConfig::$PLANS);
+foreach ($plan_slugs as $slug) {
+	$versions[16]['up'][] = sprintf('UPDATE '.UserConfig::$mysql_prefix."accounts SET plan_slug = '%s'".
+			" WHERE plan_slug = '%d'", $slug, UserConfig::$PLANS[$slug]['id']);
+}
+$versions[16]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."transaction_log (
+  `transaction_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `date_time` datetime NOT NULL,
+  `account_id` int(10) UNSIGNED NOT NULL,
+  `engine_slug` varchar(256) DEFAULT NULL,
+  `amount` float DEFAULT NULL,
+  `message` text,
+  PRIMARY KEY (`transaction_id`),
+  KEY `acctid_dt` (`account_id`,`date_time`),
+  CONSTRAINT `transaction_acct_id` FOREIGN KEY (`account_id`) REFERENCES `".
+  UserConfig::$mysql_prefix."accounts` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+$versions[16]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."account_charge (
+  account_id int(10) UNSIGNED NOT NULL,
+  date_time datetime NOT NULL,
+  amount float DEFAULT NULL,
+  UNIQUE KEY acct_id_datetime (account_id,date_time),
+  KEY account_idx (account_id),
+  CONSTRAINT `charge_acct_id` FOREIGN KEY (`account_id`) REFERENCES `".
+  UserConfig::$mysql_prefix."accounts` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+
+/*
+ * Now, if upgrading from plan numeric IDs to slugs, convert ID to slug using
+ * 'id' attribute to plan key in UserConfig::$PLANS as slug
+*/
+$plan_slugs = array_keys(UserConfig::$PLANS);
+foreach ($plan_slugs as $slug) {
+	$versions[16]['down'][] = sprintf('UPDATE '.UserConfig::$mysql_prefix."accounts SET plan_slug = '%d'".
+			" WHERE plan_slug = '%s'", UserConfig::$PLANS[$slug]['id'], $slug);
+}
 $versions[16]['down'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
   CHANGE COLUMN plan_slug plan tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'Payment plan ID',
   DROP COLUMN next_plan_slug, DROP COLUMN schedule_slug, DROP COLUMN next_schedule_slug, 
@@ -599,31 +618,3 @@ $versions[1]['down'][] = "DROP TABLE `".UserConfig::$mysql_prefix."user_preferen
 $dbupgrade = new DBUpgrade(UserConfig::getDB(),	$versions, 'UserBase');
 
 require_once(dirname(__FILE__).'/dbupgrade/client.php');
-
-/* Now, if upgrading from plan numeric IDs to slugs (v.15 -> v.16), convert ID to slug using 
-   plan key in UserConfig::$PLANS as slug and position as slug
-*/
-
-if ($dbupgrade->get_db_version() == 16) {
-
-  $plan_slugs = array_keys(UserConfig::$PLANS);
-
-  $db = UserConfig::getDB();
-  foreach ($plan_slugs as $n => $s) {
-    
-    if (!($stmt = $db->prepare("UPDATE ".UserConfig::$mysql_prefix."accounts SET ".
-      "plan_slug = ? WHERE plan_slug = ?")))
-    {
-      throw new Exception("Can't prepare statement: ".$db->error);
-    }
-    
-    if (!$stmt->bind_param('ss', $s, $n)) {
-       throw new Exception("Can't bind parameter".$stmt->error);
-    }
-
-    if (!$stmt->execute()) {
-      throw new Exception("Can't execute statement: ".$stmt->error);
-    }
-  }
-                              
-}
