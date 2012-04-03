@@ -225,8 +225,11 @@ Logging out from Facebook...
 		<?php UserTools::renderCSRFNonce(); ?>
 		</form>
 		<a class="userbase-fb-connect" href="#" onclick="UserBaseFBConnectButtonClicked(); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); <?php echo $buttonspritestyle ?> display: block; cursor: hand;" title="<?php echo $buttontitle ?>"></span></a>
+		<fb:facepile></fb:facepile>
 
 		<script>
+		var UserBaseFBFormType = <?php echo json_encode($form) ?>;
+
 		var UserBaseFBConnectButtonClicked = function() {
 			// FB is not loaded yet
 		};
@@ -266,7 +269,9 @@ Logging out from Facebook...
 				});
 			};
 			FB.Event.subscribe('auth.login', function() {
-				document.facebookconnectform.submit();
+				if (UserBaseFBFormType === "login" ) {
+					document.facebookconnectform.submit();
+				}
 			});
 
 			(function() {
@@ -358,15 +363,15 @@ Logging out from Facebook...
 		else
 		{
 			try {
-				$me = $this->sdk->api('/'.$fb_id);
+				$me = $this->sdk->api('/'.$fb_id.'?fields=id,name,email,link');
 			} catch (FacebookApiException $e) {
 				UserTools::debug("Can't get /me API data");
 				return null;
 			}
 			?>
 			<table><tr>
-			<td rowspan="2"><a href="<?php echo $me['link'] ?>" target="_blank"><img src="http://graph.facebook.com/<?php echo $fb_id ?>/picture" style="border: 0; max-width: 100px; max-height: 100px" title="<?php echo UserTools::escape($me['name']) ?>"></a></td>
-			<td><a href="<?php echo UserTools::escape($me['link']) ?>" target="_blank"><?php echo $me['name'] ?></a></td>
+			<td rowspan="2"><a href="<?php echo UserTools::escape($me['link']) ?>" target="_blank"><img src="http://graph.facebook.com/<?php echo $fb_id ?>/picture" style="border: 0; max-width: 100px; max-height: 100px" title="<?php echo UserTools::escape($me['name']) ?>"></a></td>
+			<td><a href="<?php echo UserTools::escape($me['link']) ?>" target="_blank"><?php echo UserTools::escape($me['name']) ?></a></td>
 			</tr><tr>
 			<td>
 			<form action="<?php echo $action?>" method="POST" name="facebookusereditform">
@@ -395,6 +400,7 @@ Logging out from Facebook...
 
 	public function processLogin($post_data, &$remember, $auto = false)
 	{
+		UserTools::debug('processLogin start');
 		$remember = $this->remember;
 
 		try {
@@ -442,6 +448,7 @@ Logging out from Facebook...
 
 	public function processRegistration($post_data, &$remember)
 	{
+		UserTools::debug('processRegistration start');
 		$remember = $this->remember;
 
 		try {
@@ -461,12 +468,13 @@ Logging out from Facebook...
 		$existing_user = User::getUserByFacebookID($fbuser);
 		if (!is_null($existing_user))
 		{
+			UserTools::debug('processRegistration - existing user: '.$existing_user->getID());
 			$existing_user->recordActivity(USERBASE_ACTIVITY_LOGIN_FB);
 			return $existing_user;
 		}
 
 		try {
-			$me = $this->sdk->api('/me');
+			$me = $this->sdk->api('/me?fields=id,name,email,link');
 		} catch (FacebookApiException $e) {
 			UserTools::debug("Can't get /me API data");
 			return null;
@@ -543,7 +551,7 @@ Logging out from Facebook...
 		// if user doesn't have email address and we required it for Facebook connection, let's save it
 		if (!$user->getEmail()) {
 			try {
-				$me = $this->sdk->api('/me');
+				$me = $this->sdk->api('/me?fields=email');
 			} catch (FacebookApiException $e) {
 				UserTools::debug("Can't get /me API data");
 				return null;
