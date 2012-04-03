@@ -221,7 +221,7 @@ Logging out from Facebook...
 		?><div id="fb-root"></div>
 
 		<?php if ($form == 'register') { ?>
-		<fb:facepile></fb:facepile>
+		<fb:facepile width="450" size="large" max-rows="1"></fb:facepile>
 		<?php } ?>
 		<form action="<?php echo $action?>" method="POST" name="facebookconnectform">
 		<input type="hidden" name="<?php echo $formsubmit ?>" value="Connect &gt;&gt;&gt;"/>
