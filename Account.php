@@ -316,8 +316,8 @@ class Account
 		
 		$account = new self($id, $name, $plan_slug, $role, NULL, $engine_slug);
 		$account->activatePlan($plan_slug, $schedule_slug);
-		$this->lastTransactionID = 
-		  TransactionLogger::Log($id,is_null($engine_slug) ? NULL : $account->paymentEngine->getSlug(),0,'Account created');
+ 	  TransactionLogger::Log($id,is_null($engine_slug) ? NULL : $account->paymentEngine->getSlug(),0,'Account created');
+      
 		return $account;
 	}
 
@@ -991,7 +991,7 @@ class Account
 
     $this->lastTransactionID =
       TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
-        0,'Request to change schedule to "'.$schedule->name.'" stored.');      
+        0,'Request to change schedule to "'.$schedule->name.'" stored.');
     return TRUE;
 	}
 
@@ -1037,7 +1037,7 @@ class Account
     if (!$stmt->execute()) {
       throw new Exception("Can't execute statement: ".$stmt->error);
     }
-      
+
     return TRUE;
 	}
 	
@@ -1069,7 +1069,11 @@ class Account
     
     $this->nextPlan = NULL;
     $this->nextSchedule = NULL;
-    
+
+    $this->lastTransactionID =
+      TransactionLogger::Log($this->id,is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(),
+        0,'Plan/schedule change request cancelled.');
+
     return TRUE;
   }
 }
