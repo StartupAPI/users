@@ -2,7 +2,7 @@
 
 class Account
 {
-	private $slug;
+	private $id;
 	private $name;
 	private $role;
 	private $plan;
@@ -960,7 +960,7 @@ class Account
       $this->getBalance() >= $schedule->charge_amount) 
     {
       if (!is_null($this->paymentEngine)) {
-        $this->paymentEngine->changeSubscription($this->plan,$schedule);
+        $this->paymentEngine->changeSubscription($this->id,$this->plan,$schedule);
       }
 
       return $this->setPaymentSchedule($schedule_slug);
