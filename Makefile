@@ -81,7 +81,8 @@ endif
 
 docs:	documentation
 documentation:
-	phpdoc -o HTML:frames:default -d . -t docs -i "*/oauth-php/*,*/modules/facebook/php-sdk/*,*/dbupgrade/*,*/admin/swfobject/*,*/docs/*,*/smarty/*,*/phptidy/*"
+	# Using PHPDocumentator 2.x that works with phpdoc.dist.xml file for configuration
+	phpdoc
 
 code:
 	php phptidy/phptidy.php replace
