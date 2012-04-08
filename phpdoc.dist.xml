@@ -1,19 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <phpdoc>
+	<title>StartupAPI</title>
 	<parser>
 		<target>docs</target>
 	</parser>
 	<transformer>
 		<target>docs</target>
 	</transformer>
+	<transformations>
+		<template name="responsive" />
+	</transformations>
 	<files>
 		<directory>.</directory>
+		<ignore>CookieStorage.php</ignore>
 		<ignore>oauth-php/*</ignore>
 		<ignore>modules/facebook/php-sdk/*</ignore>
 		<ignore>dbupgrade/*</ignore>
 		<ignore>admin/swfobject/*</ignore>
 		<ignore>docs/*</ignore>
 		<ignore>smarty/*</ignore>
+		<ignore>cache/*</ignore>
 		<ignore>phptidy/*</ignore>
 	</files>
 </phpdoc>
