@@ -1,10 +1,11 @@
 <?php
 /**
+ * Google Friend Connect Authentication Module
+ *
  * @package StartupAPI
  * @subpackage Authentication
  *
- * !!! ATTENTION !!!
- * This login method is discontinued by Google, use /google_oauth/ module instead
+ * @deprecated !!! ATTENTION !!! This login method is discontinued by Google, use /google_oauth/ module instead
  */
 class GoogleAuthenticationModule extends AuthenticationModule
 {
