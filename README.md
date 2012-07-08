@@ -15,64 +15,85 @@ Another important goal for the project are simple installation and upgrades. Let
 Follow these steps:
 
 1. Get the code from GitHub into the root of your site under users folder:
-
-		git clone git://github.com/StartupAPI/users.git users
+```
+	git clone git://github.com/StartupAPI/users.git users
+```
 
 2. If you don't have it yet, create MySQL database and get user credentials for it
 
 3. Copy sample configuration file to the same folder where you created users folder in step 1:
+```
+	cp users/users_config.sample.php users_config.php
+```
+4. Fill out `users_config.php` - as minimum, seed the secret for cookie encryption and set DB credentials
+```php
+	<?php
+	/**
+	 * You must fill it in with some random string
+	 * this protects some of your user's data when sent over the network
+	 * and must be different from other sites
+	 */
+	UserConfig::$SESSION_SECRET= '...type.some.random.characters.here...';
+	
+	/**
+	 * Database connectivity
+	 */
+	UserConfig::$mysql_db = '...database...';
+	UserConfig::$mysql_user = '...username...';
+	UserConfig::$mysql_password = '...password...';
+	#UserConfig::$mysql_host = 'localhost';
+	#UserConfig::$mysql_port = 3306;
+```
+5. Run make to generate database tables and other submodules and files required by the different parts of Startup API.
+```
+	make
+```
+6. Uncomment and configure API keys for more authentication modules for Facebook, Twitter, Google and etc.
 
-		cp users/users_config.sample.php users_config.php
+7. In your code, add include users.php file above any other output
+```php
+	<?php
+	require_once(dirname(__FILE__).'/users/users.php');
+```
+	then use either `User::get()` function to get a user object
+```php
+	<?php
+	/**
+	 * Get User object or null if user is not logged in
+	 */
+	$current_user = User::get();
+```
+	or if you want to protect the page from anonymous users, use `User::require_login()` function
+```php
+	<?php
+	/**
+	 * Get User object or redirect to login page if user is not logged in
+	 */
+	$current_user = User::require_login();
+```
+	you can get user's ID to connect it to your dataset using `getID()` method
+```php
+	<?php
+	/**
+	 * Get user's unique ID
+	 */
+	$user_id = $current_user->getID();
+```
+8. You will most likely want to show a login menu in the top-right corner of your page. You can do it by simply including navbox.php file like so:
+```php
+	<div style="float: right"><?php include(dirname(__FILE__).'/users/navbox.php'); ?></div>
+```
 
-3. Fill out users_config.php - as minimum, set DB credentials and seed the secret for cookie encryption
-
-		UserConfig::$SESSION_SECRET= '...some.random.characters.go.here...';
-
-		UserConfig::$mysql_host = 'localhost';
-		UserConfig::$mysql_db = '...database...';
-		UserConfig::$mysql_user = '...username...';
-		UserConfig::$mysql_password = '...password...';
-
-4. Run make to generate database tables and other submodules and files required by the different parts of Startup API.
-
-		make
-
-5. Uncomment and configure API keys for more authentication modules for Facebook, Twitter, Google and etc.
-
-6. In your code, add include users.php file above any other output
-
-		require_once(dirname(__FILE__).'/users/users.php');
-
-	then use either User::get() function to get a user object
-
-		/**
-		 * Get User object or null if user is not logged in
-		 */
-		$current_user = User::get();
-	or if you want to protect the page from anonymous users, use User::require_login() function
-
-		/**
-		 * Get User object or redirect to login page if user is not logged in
-		 */
-		$current_user = User::require_login();
-
-	you can get user ID to connect it to your dataset using getID() method
-
-		/**
-		 * Get user's unique ID
-		 */
-		$user_id = $current_user->getID();
-
-7. <s>Sit back and relax</s> Go implement the business logic now. You can call getID(), getName() and other methods on the user object to utilize it in your code.
+9. <s>Sit back and relax</s> Go implement the business logic now. You can call `getID()`, `getName()` and other methods on the user object to utilize it in your code.
 
 ## Upgrading
 
 As usual, make a backup of the database to avoid loosing data in case of disasters.
 
 Then just run make - it should grab the latest code and run database update scripts to bring schema up to date with the code.
-
-	make
-
+```
+make
+```
 ## Additional features
 
 When you're comfortable with basic features and want to explore more, go check the documentation (TODO [write the documentation](https://github.com/StartupAPI/users/issues/46)) for more advanced features like embedding registration / login forms on your pages, activity tracking, feature management and so on.
