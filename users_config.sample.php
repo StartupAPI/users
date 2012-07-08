@@ -4,16 +4,16 @@
  * this protects some of your user's data when sent over the network
  * and must be different from other sites
  */
-UserConfig::$SESSION_SECRET= '...some.random.characters.go.here...';
+UserConfig::$SESSION_SECRET= '...type.some.random.characters.here...';
 
 /**
  * Database connectivity 
  */
-UserConfig::$mysql_host = 'localhost';
 UserConfig::$mysql_db = '...database...';
 UserConfig::$mysql_user = '...username...';
 UserConfig::$mysql_password = '...password...';
-UserConfig::$mysql_port = '...port...';
+#UserConfig::$mysql_host = 'localhost';
+#UserConfig::$mysql_port = 3306;
 
 /**
  * User IDs of admins for this instance (to be able to access dashboard at /users/admin/)
