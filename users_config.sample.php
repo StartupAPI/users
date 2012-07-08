@@ -18,7 +18,9 @@ UserConfig::$mysql_password = '...password...';
 /**
  * User IDs of admins for this instance (to be able to access dashboard at /users/admin/)
  */
-UserConfig::$admins = array(  ); // usually first user has ID of 1
+UserConfig::$admins = array(
+#	1, // usually first user has ID of 1
+);
 
 /**
  * Set these to point at your header and footer or leave them commented out to use default ones
