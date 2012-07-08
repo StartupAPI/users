@@ -41,10 +41,10 @@ release: releasetag packages
 
 releasetag:
 ifndef v
-	# Must specify version as 'v' param
 	#
 	#   make rel v=1.1.1
 	#
+	$(error You must specify version number in 'v' parameter: make release v=1.1.1)
 else
 	#
 	# Tagging it with release tag
@@ -55,10 +55,10 @@ endif
 
 packages:
 ifndef v
-	# Must specify version as 'v' param
 	#
-	#   make rel v=1.1.1
+	#   make packages v=1.1.1
 	#
+	$(error You must specify version number in 'v' parameter: make packages v=1.1.1)
 else
 	mkdir StartupAPI_${v}
 
