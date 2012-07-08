@@ -18,6 +18,7 @@ Follow these steps:
 ```
 	git clone git://github.com/StartupAPI/users.git users
 ```
+	or you can just download [latest package](https://github.com/StartupAPI/users/downloads) from downloads section
 
 2. If you don't have it yet, create MySQL database and get user credentials for it
 
