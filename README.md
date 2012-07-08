@@ -50,12 +50,12 @@ Follow these steps:
 ```
 6. Uncomment and configure API keys for more authentication modules for Facebook, Twitter, Google and etc.
 
-7. In your code, add include users.php file above any other output
+7. Start building your app by copying code from [`sample.php`](https://github.com/StartupAPI/users/blob/master/sample.php). Basically, you'll need to include `users.php` above any other output
 ```php
 	<?php
 	require_once(dirname(__FILE__).'/users/users.php');
 ```
-	then use either `User::get()` function to get a user object
+	and then use either `User::get()` static method to get a user object
 ```php
 	<?php
 	/**
@@ -63,7 +63,7 @@ Follow these steps:
 	 */
 	$current_user = User::get();
 ```
-	or if you want to protect the page from anonymous users, use `User::require_login()` function
+	or if you want to protect the page from anonymous users, use `User::require_login()` instead - this will automatically redirect to a login form and back to yout page after user successfully logged in or registered.
 ```php
 	<?php
 	/**
@@ -71,7 +71,7 @@ Follow these steps:
 	 */
 	$current_user = User::require_login();
 ```
-	you can get user's ID to connect it to your dataset using `getID()` method
+	you can get numeric user ID to use in your data model by calling `getID()` method
 ```php
 	<?php
 	/**
@@ -79,12 +79,12 @@ Follow these steps:
 	 */
 	$user_id = $current_user->getID();
 ```
-8. You will most likely want to show a login menu in the top-right corner of your page. You can do it by simply including navbox.php file like so:
+	You will most likely want to show a login menu in the top-right corner of your page. You can do it by simply including navbox.php file like so:
 ```php
 	<div style="float: right"><?php include(dirname(__FILE__).'/users/navbox.php'); ?></div>
 ```
 
-9. <s>Sit back and relax</s> Go implement the business logic now. You can call `getID()`, `getName()` and other methods on the user object to utilize it in your code.
+8. <del>Sit back and relax</del> Go implement your business logic now. You can call `getID()`, `getName()` and other methods on the user object to utilize it in your code.
 
 ## Upgrading
 
