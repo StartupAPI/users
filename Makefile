@@ -32,7 +32,14 @@ ifneq "$(wildcard .git )" ""
 	git submodule update
 endif
 
-updatedb:
+checkconfig:
+ifeq ($(wildcard ../users_config.php),)
+	$(error "Can't find ../users_config.php in parent folder. Create it first by copying users_config.sample.php and edit it")
+else
+	@echo Found configuration file ../users_config.php
+endif
+
+updatedb: checkconfig
 	php dbupgrade.php
 	php aggregatepoints.php
 
