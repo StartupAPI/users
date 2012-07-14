@@ -550,7 +550,7 @@ Logging out from Facebook...
 
 		$user->setFacebookID($fbuser);
 
-		// if user doesn't have email address and we required it for Facebook connection, let's save it
+		// if user has email address and we required it for Facebook connection, let's save it
 		if (!$user->getEmail()) {
 			try {
 				$me = $this->sdk->api('/me?fields=email');
