@@ -91,6 +91,6 @@
 <div id="userbase_navbox">
 <?php include(dirname(__FILE__).'/navbox.php') ?>
 </div>
-<img src="<?php echo UserConfig::$USERSROOTURL ?>/images/header_icon.png" id="userbase_header_icon" title="Powered by Startup API"/>
+<a href="<?php echo UserConfig::$SITEROOTURL ?>"><img src="<?php echo UserConfig::$USERSROOTURL ?>/images/header_icon.png" id="userbase_header_icon" title="Powered by Startup API"/></a>
 </div>
 <div id="userbase_main">
