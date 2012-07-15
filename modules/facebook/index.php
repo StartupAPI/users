@@ -7,7 +7,7 @@ require_once(dirname(__FILE__).'/facebook.php');
 
 class FacebookAuthenticationModule extends AuthenticationModule
 {
-	private $sdk;
+	public $sdk;
 
 	private $appID;
 	private $secret;
