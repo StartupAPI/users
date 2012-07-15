@@ -22,6 +22,11 @@ UserConfig::$admins = array(
 #	1, // usually first user has ID of 1
 );
 
+/*
+ * Uncomment next line to enable debug messages in error_log
+ */
+#UserConfig::$DEBUG = true;
+
 /**
  * Set these to point at your header and footer or leave them commented out to use default ones
  */
