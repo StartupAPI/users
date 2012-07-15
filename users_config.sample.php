@@ -42,8 +42,8 @@ new UsernamePasswordAuthenticationModule();
 
 /**
  * Facebook Connect configuration
- * Register your app here: http://www.facebook.com/developers/createapp.php
- * Click "Edit settings" -> "Web Site" and enter your site's URL
+ * Register your app here: https://developers.facebook.com/apps
+ * Click "Edit settings" -> "Website with Facebook Login" and enter your site's URL
  * And then uncomment two lines below and copy API Key and App Secret
  */
 #UserConfig::loadModule('facebook');
