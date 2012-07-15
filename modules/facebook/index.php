@@ -13,6 +13,7 @@ class FacebookAuthenticationModule extends AuthenticationModule
 	private $secret;
 	private $permissions;
 	private $remember;
+	private $show_facepile = true;
 
 	private $headersLoaded = false;
 
@@ -23,7 +24,7 @@ class FacebookAuthenticationModule extends AuthenticationModule
 	 * @param array $permissions Array of additional permissions (e.g. email)
 	 * 	full list can be found here: http://developers.facebook.com/docs/authentication/permissions/
 	 */
-	public function __construct($appID, $secret, $permissions = array(), $remember = true)
+	public function __construct($appID, $secret, $permissions = array(), $remember = true, $options = null)
 	{
 		parent::__construct();
 
@@ -34,6 +35,12 @@ class FacebookAuthenticationModule extends AuthenticationModule
 		// TODO Replace it with immediate FB Connect call:
 		// http://code.google.com/p/userbase/issues/detail?id=16
 		$this->remember = $remember;
+
+		if (is_array($options)) {
+			if (array_key_exists('facepile', $options)) {
+				$this->show_facepile = $options['facepile'] ? true : false;
+			}
+		}
 
 		$config = array(
 			'appId'  => $this->appID,
@@ -220,7 +227,7 @@ Logging out from Facebook...
 
 		?><div id="fb-root"></div>
 
-		<?php if ($form == 'register') { ?>
+		<?php if ($this->show_facepile && $form == 'register') { ?>
 		<fb:facepile width="450" size="large" max-rows="1"></fb:facepile>
 		<?php } ?>
 		<form action="<?php echo $action?>" method="POST" name="facebookconnectform">
@@ -250,79 +257,47 @@ Logging out from Facebook...
 				channelURL : '<?php echo UserConfig::$USERSROOTFULLURL; ?>/modules/facebook/channel.php' // channel file
 			});
 
-			// when button is clicked, auto-login or popu-up a dialog
-			UserBaseFBConnectButtonClicked = function() {
-				FB.getLoginStatus(function(r) {
-					// TODO Also check if all permissions are set or we need more
-					if(r.status === 'connected') {
-						// alert('already logged in');
+			// Auto-login if user is connected already
+/*
+			FB.getLoginStatus(function(r) {
+				if(r.status === 'connected') {
+					// if permissions are nor required, submit the form now
+					if (required_perms.length === 0) {
 						document.facebookconnectform.submit();
-					} else {
-						// here perms is just a comma-separated string
-						FB.login(function(response) {
-							if (response.session &&
-								(required_perms == '' || response.perms == required_perms)
-							) {
-								document.facebookconnectform.submit();
-								return;
-							}
-						}, {scope: required_perms_string});
+						return;
 					}
-				});
-			};
-			FB.Event.subscribe('auth.login', function() {
-				if (UserBaseFBFormType === "login" ) {
-					document.facebookconnectform.submit();
+
+					FB.api('/me/permissions', function(response) {
+						if (response && response.data && response.data.length > 0) {
+							var perms = response.data[0];
+
+							var i = required_perms.length;
+							while (i--) {
+								// do not submit form if at least one
+								// required permission is not found
+								if (perms[required_perms[i]] !== 1) {
+									return;
+								}
+							}
+
+							document.facebookconnectform.submit();
+							return;
+						}
+					});
+
 				}
 			});
-
-			(function() {
-				FB.getLoginStatus(function(response) {
-					// getLoginStatus returns an array with 'extended' key or null
-					if (response.session) {
-						if (required_perms.length > 0) {
-							// bug in API - it returns a serialized array
-							if (typeof(response.perms) == 'string') {
-								response.perms = JSON.parse(response.perms);
-							}
-
-							if (typeof(response.perms) == 'object'
-								&& typeof(response.perms.extended) == 'object'
-								&& (response.perms.extended instanceof Array)
-							) {
-								var i = required_perms.length;
-								while (i--) {
-									var ex = response.perms.extended;
-
-									var j = ex.length;
-									var found = false;
-									while (j--) {
-										if (required_perms[i] == ex[j]) {
-											found = true;
-											break;
-										}
-									}
-
-									if (!found) {
-										return;
-									}
-								}
-							} else {
-								return; // no permissions passed
-							}
-						}
-
-						// looks like we have enough permissions
-						// override login button to use simple form submit
-						UserBaseFBConnectButtonClicked = function() {
-							document.facebookconnectform.submit();
-						}
-						return;
-					} else {
+*/
+			// when button is clicked popu-up a dialog
+			UserBaseFBConnectButtonClicked = function() {
+				// it will only have 'connected' status if permissions match
+				FB.login(function(response) {
+					if (response.status === 'connected') {
+						document.facebookconnectform.submit();
 						return;
 					}
-				}, {perms: required_perms_string});
-			})(); // returning a function to run on login button click
+				}, {scope: required_perms_string});
+			};
 		};
 
 		(function() {
