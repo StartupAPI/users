@@ -497,6 +497,8 @@ Logging out from Facebook...
 
 			$user->recordActivity(USERBASE_ACTIVITY_REMOVED_FB);
 
+			$this->sdk->api('/me/permissions','DELETE');
+
 			return true;
 		}
 
