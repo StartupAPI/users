@@ -7,7 +7,7 @@ require_once(dirname(__FILE__).'/facebook.php');
 
 class FacebookAuthenticationModule extends AuthenticationModule
 {
-	public $sdk;
+	private $sdk;
 
 	private $appID;
 	private $secret;
@@ -339,7 +339,7 @@ Logging out from Facebook...
 		else
 		{
 			try {
-				$me = $this->sdk->api('/'.$fb_id.'?fields=id,name,email,link');
+				$me = $this->api('/'.$fb_id.'?fields=id,name,email,link');
 			} catch (FacebookApiException $e) {
 				UserTools::debug("Can't get /me API data");
 				return null;
@@ -398,7 +398,7 @@ Logging out from Facebook...
 			throw new InputValidationException('No facebook user id', 0, $errors);
 		}
 
-		$permissions = $this->sdk->api('/me/permissions');
+		$permissions = $this->api('/me/permissions');
 		UserTools::debug('User permissions: '.var_export($permissions, true));
 		foreach ($this->permissions as $perm) {
 			if (!array_key_exists($perm, $permissions['data'][0]) || $permissions['data'][0][$perm] !== 1) {
@@ -450,7 +450,7 @@ Logging out from Facebook...
 		}
 
 		try {
-			$me = $this->sdk->api('/me?fields=id,name,email,link');
+			$me = $this->api('/me?fields=id,name,email,link');
 		} catch (FacebookApiException $e) {
 			UserTools::debug("Can't get /me API data");
 			return null;
@@ -529,7 +529,7 @@ Logging out from Facebook...
 		// if user has email address and we required it for Facebook connection, let's save it
 		if (!$user->getEmail()) {
 			try {
-				$me = $this->sdk->api('/me?fields=email');
+				$me = $this->api('/me?fields=email');
 			} catch (FacebookApiException $e) {
 				UserTools::debug("Can't get /me API data");
 				return null;
@@ -546,6 +546,36 @@ Logging out from Facebook...
 		$user->recordActivity(USERBASE_ACTIVITY_ADDED_FB);
 
 		return true;
+	}
+
+	/**
+	 * Wrapper to native SDK api call that will recover in case of expired tokens
+	 */
+	public function api(/* polymorphic */) {
+		$args = func_get_args();
+
+		$result = null;
+
+		try {
+			$result = call_user_func_array(array($this->sdk, 'api'), $args);
+		} catch (FacebookApiException $fb_ex) {
+			$message = $fb_ex->getMessage();
+
+			if (strpos($message, 'An active access token must be used') !== false) {
+				UserTools::debug('Facebook access token has expired, redirecting to login');
+
+				// looks like we have a problem with token, let's redirect to login
+				$url = $this->getLoginUrl(array(
+					'scope' => $this->permissions
+				));
+				header('Location: '.$url);
+				exit;
+			}
+
+			throw $fb_ex;
+		}
+
+		return $result;
 	}
 }
 
