@@ -258,7 +258,6 @@ Logging out from Facebook...
 			});
 
 			// Auto-login if user is connected already
-/*
 			FB.getLoginStatus(function(r) {
 				if(r.status === 'connected') {
 					// if permissions are nor required, submit the form now
@@ -287,7 +286,7 @@ Logging out from Facebook...
 
 				}
 			});
-*/
+
 			// when button is clicked popu-up a dialog
 			UserBaseFBConnectButtonClicked = function() {
 				// it will only have 'connected' status if permissions match
