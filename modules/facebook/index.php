@@ -561,11 +561,13 @@ Logging out from Facebook...
 		} catch (FacebookApiException $fb_ex) {
 			$message = $fb_ex->getMessage();
 
-			if (strpos($message, 'An active access token must be used') !== false) {
+			if (strpos($message, 'An active access token must be used') !== false ||
+				strpos($message, 'Session has expired at unix time') !== false
+			) {
 				UserTools::debug('Facebook access token has expired, redirecting to login');
 
 				// looks like we have a problem with token, let's redirect to login
-				$url = $this->getLoginUrl(array(
+				$url = $this->sdk->getLoginUrl(array(
 					'scope' => $this->permissions
 				));
 				header('Location: '.$url);
