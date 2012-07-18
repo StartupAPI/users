@@ -1,4 +1,4 @@
-<?php require_once(dirname(__FILE__).'/users.php');
+<?php
 
 function _USERBASE_render_navbox()
 {
