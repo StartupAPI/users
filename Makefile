@@ -1,4 +1,7 @@
-all:	updatecode updatedb
+all:	updatecode depcheck updatedb
+
+depcheck:
+	php depcheck.php
 
 updatecode:
 ifneq "$(wildcard .svn )" ""
