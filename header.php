@@ -52,6 +52,7 @@
 #userbase_footerpad {
 	height: 1em;
 	background-color: white;
+	clear: both;
 }
 
 #userbase_poweredby {
