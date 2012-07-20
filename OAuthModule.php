@@ -355,10 +355,11 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		?>
 		<p>Sign in using your existing account with <b><?php echo UserTools::escape($this->serviceName)?></b>.</p>
 		<form action="<?php echo $action?>" method="POST">
+		<input type="hidden" name="login" value="login"/>
 		<?php if (is_null($this->logInButtonURL)) { ?>
-		<input type="submit" name="login" value="Log in using <?php echo UserTools::escape($this->serviceName)?> &gt;&gt;&gt;"/>
+		<input type="submit" value="Log in using <?php echo UserTools::escape($this->serviceName)?> &gt;&gt;&gt;"/>
 		<?php } else { ?>
-		<input type="image" name="login" src="<?php echo UserTools::escape($this->logInButtonURL) ?>" value="login"/>
+		<input type="image" src="<?php echo UserTools::escape($this->logInButtonURL) ?>" value="login"/>
 		<?php } ?>
 		</form>
 		<?php
@@ -379,10 +380,11 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		}
 		?>
 		<form action="<?php echo $action?>" method="POST">
+		<input type="hidden" name="register" value="register"/>
 		<?php if (is_null($this->signUpButtonURL)) { ?>
-		<input type="submit" name="register" value="Register using <?php echo UserTools::escape($this->serviceName)?>&gt;&gt;&gt;"/>
+		<input type="submit" value="Register using <?php echo UserTools::escape($this->serviceName)?>&gt;&gt;&gt;"/>
 		<?php } else { ?>
-		<input type="image" name="register" src="<?php echo UserTools::escape($this->signUpButtonURL) ?>" value="register"/>
+		<input type="image" src="<?php echo UserTools::escape($this->signUpButtonURL) ?>"/>
 		<?php } ?>
 		</form>
 		<?php
@@ -475,10 +477,11 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		<?php
 		if (is_null($oauth_user_id)) {
 			if (is_null($this->connectButtonURL)) {
-				?><input type="submit" name="add" value="Connect existing <?php echo $this->getTitle() ?> account &gt;&gt;&gt;"/><?php
+				?><input type="submit" value="Connect existing <?php echo $this->getTitle() ?> account &gt;&gt;&gt;"/><?php
 			} else {
-				?><input type="image" name="add" src="<?php echo UserTools::escape($this->connectButtonURL) ?>" value="add"/><?php
+				?><input type="image" src="<?php echo UserTools::escape($this->connectButtonURL) ?>"/><?php
 			}
+			?><input type="hidden" name="add" value="add"/><?php
 		} else {
 			?>
 			<div><?php $this->renderUserInfo($serialized_userinfo) ?></div>
