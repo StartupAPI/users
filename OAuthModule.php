@@ -161,13 +161,22 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 				$params
 			);
 
+			$authorize_url = $this->getAuthorizeURL($tokenResultParams);
+
 			//  redirect to the authorization page, they will redirect back
-			header("Location: " . $this->oAuthAuthorizeURL . "?oauth_token=" . $tokenResultParams['token']);
+			header("Location: " . $authorize_url . "?oauth_token=" . $tokenResultParams['token']);
 			exit;
 		} catch(OAuthException2 $e) {
 			error_log(var_export($e, true));
 			return null;
 		}
+	}
+
+	/*
+	 * Override this function in subclass to get authorization URL from token parameters passed back
+	 */
+	protected function getAuthorizeURL($tokenResultParams) {
+		return $this->oAuthAuthorizeURL;
 	}
 
 	/**
@@ -356,7 +365,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		<p>Sign in using your existing account with <b><?php echo UserTools::escape($this->serviceName)?></b>.</p>
 		<form action="<?php echo $action?>" method="POST">
 		<?php if (is_null($this->logInButtonURL)) { ?>
-		<input type="submit" name="login" value="Log in using <?php echo UserTools::escape($this->serviceName)?> &gt;&gt;&gt;"/>
+		<input type="submit" name="login" value="Log in using <?php echo UserTools::escape($this->serviceName)?>"/>
 		<?php } else { ?>
 		<input type="image" name="login" src="<?php echo UserTools::escape($this->logInButtonURL) ?>" value="login"/>
 		<?php } ?>
@@ -380,7 +389,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		?>
 		<form action="<?php echo $action?>" method="POST">
 		<?php if (is_null($this->signUpButtonURL)) { ?>
-		<input type="submit" name="register" value="Register using <?php echo UserTools::escape($this->serviceName)?>&gt;&gt;&gt;"/>
+		<input type="submit" name="register" value="Register using <?php echo UserTools::escape($this->serviceName)?>"/>
 		<?php } else { ?>
 		<input type="image" name="register" src="<?php echo UserTools::escape($this->signUpButtonURL) ?>" value="register"/>
 		<?php } ?>
@@ -475,7 +484,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		<?php
 		if (is_null($oauth_user_id)) {
 			if (is_null($this->connectButtonURL)) {
-				?><input type="submit" name="add" value="Connect existing <?php echo $this->getTitle() ?> account &gt;&gt;&gt;"/><?php
+				?><input type="submit" name="add" value="Connect existing <?php echo $this->getTitle() ?> account"/><?php
 			} else {
 				?><input type="image" name="add" src="<?php echo UserTools::escape($this->connectButtonURL) ?>" value="add"/><?php
 			}
@@ -487,7 +496,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 			<?php
 		}
 		?>
-		<input type="hidden" name="save" value="Save &gt;&gt;&gt;"/>
+		<input type="hidden" name="save" value="Save"/>
 		<?php UserTools::renderCSRFNonce(); ?>
 		</form>
 		<?php
