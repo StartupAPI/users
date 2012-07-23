@@ -148,5 +148,6 @@ foreach (UserConfig::$authentication_modules as $module)
 </div>
 
 </div>
+<div style="clear: both"></div>
 <?php
 require_once(UserConfig::$footer);

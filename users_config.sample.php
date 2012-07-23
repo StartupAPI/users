@@ -4,21 +4,28 @@
  * this protects some of your user's data when sent over the network
  * and must be different from other sites
  */
-UserConfig::$SESSION_SECRET= '...some.random.characters.go.here...';
+UserConfig::$SESSION_SECRET= '...type.some.random.characters.here...';
 
 /**
  * Database connectivity 
  */
-UserConfig::$mysql_host = 'localhost';
 UserConfig::$mysql_db = '...database...';
 UserConfig::$mysql_user = '...username...';
 UserConfig::$mysql_password = '...password...';
-UserConfig::$mysql_port = '...port...';
+#UserConfig::$mysql_host = 'localhost';
+#UserConfig::$mysql_port = 3306;
 
 /**
  * User IDs of admins for this instance (to be able to access dashboard at /users/admin/)
  */
-UserConfig::$admins = array(  ); // usually first user has ID of 1
+UserConfig::$admins = array(
+#	1, // usually first user has ID of 1
+);
+
+/*
+ * Uncomment next line to enable debug messages in error_log
+ */
+#UserConfig::$DEBUG = true;
 
 /**
  * Set these to point at your header and footer or leave them commented out to use default ones
@@ -35,8 +42,8 @@ new UsernamePasswordAuthenticationModule();
 
 /**
  * Facebook Connect configuration
- * Register your app here: http://www.facebook.com/developers/createapp.php
- * Click "Edit settings" -> "Web Site" and enter your site's URL
+ * Register your app here: https://developers.facebook.com/apps
+ * Click "Edit settings" -> "Website with Facebook Login" and enter your site's URL
  * And then uncomment two lines below and copy API Key and App Secret
  */
 #UserConfig::loadModule('facebook');

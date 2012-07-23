@@ -249,7 +249,7 @@ EOD;
 		UserConfig::$SITEROOTFULLURL = 'http://'.$host.UserConfig::$SITEROOTURL;
 		UserConfig::$USERSROOTFULLURL = 'http://'.$host.substr(UserConfig::$ROOTPATH, $docrootlength);
 
-		UserConfig::$supportEmailXMailer = 'UserBase (PHP/'.phpversion();
+		UserConfig::$supportEmailXMailer = 'UserBase (PHP/'.phpversion().')';
 
 		UserConfig::$header = dirname(__FILE__).'/header.php';
 		UserConfig::$footer = dirname(__FILE__).'/footer.php';

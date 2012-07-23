@@ -1,4 +1,7 @@
-all:	updatecode updatedb
+all:	updatecode depcheck updatedb
+
+depcheck:
+	php depcheck.php
 
 updatecode:
 ifneq "$(wildcard .svn )" ""
@@ -32,7 +35,14 @@ ifneq "$(wildcard .git )" ""
 	git submodule update
 endif
 
-updatedb:
+checkconfig:
+ifeq ($(wildcard ../users_config.php),)
+	$(error "Can't find ../users_config.php in parent folder. Create it first by copying users_config.sample.php and edit it")
+else
+	@echo Found configuration file ../users_config.php
+endif
+
+updatedb: checkconfig
 	php dbupgrade.php
 	php aggregatepoints.php
 
@@ -41,10 +51,10 @@ release: releasetag packages
 
 releasetag:
 ifndef v
-	# Must specify version as 'v' param
 	#
 	#   make rel v=1.1.1
 	#
+	$(error You must specify version number in 'v' parameter: make release v=1.1.1)
 else
 	#
 	# Tagging it with release tag
@@ -55,10 +65,10 @@ endif
 
 packages:
 ifndef v
-	# Must specify version as 'v' param
 	#
-	#   make rel v=1.1.1
+	#   make packages v=1.1.1
 	#
+	$(error You must specify version number in 'v' parameter: make packages v=1.1.1)
 else
 	mkdir StartupAPI_${v}
 
@@ -75,7 +85,8 @@ endif
 
 docs:	documentation
 documentation:
-	phpdoc -o HTML:frames:default -d . -t docs -i "*/oauth-php/*,*/modules/facebook/php-sdk/*,*/dbupgrade/*,*/admin/swfobject/*,*/docs/*"
+	# Using PHPDocumentator 2.x that works with phpdoc.dist.xml file for configuration
+	phpdoc
 
 code:
 	php phptidy/phptidy.php replace

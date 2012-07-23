@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdoc>
+	<parser>
+		<target>docs</target>
+	</parser>
+	<transformer>
+		<target>docs</target>
+	</transformer>
+	<files>
+		<directory>.</directory>
+		<ignore>oauth-php/*</ignore>
+		<ignore>modules/facebook/php-sdk/*</ignore>
+		<ignore>dbupgrade/*</ignore>
+		<ignore>admin/swfobject/*</ignore>
+		<ignore>docs/*</ignore>
+		<ignore>smarty/*</ignore>
+		<ignore>phptidy/*</ignore>
+	</files>
+</phpdoc>

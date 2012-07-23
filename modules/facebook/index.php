@@ -13,6 +13,7 @@ class FacebookAuthenticationModule extends AuthenticationModule
 	private $secret;
 	private $permissions;
 	private $remember;
+	private $show_facepile = true;
 
 	private $headersLoaded = false;
 
@@ -23,7 +24,7 @@ class FacebookAuthenticationModule extends AuthenticationModule
 	 * @param array $permissions Array of additional permissions (e.g. email)
 	 * 	full list can be found here: http://developers.facebook.com/docs/authentication/permissions/
 	 */
-	public function __construct($appID, $secret, $permissions = array(), $remember = true)
+	public function __construct($appID, $secret, $permissions = array(), $remember = true, $options = null)
 	{
 		parent::__construct();
 
@@ -34,6 +35,12 @@ class FacebookAuthenticationModule extends AuthenticationModule
 		// TODO Replace it with immediate FB Connect call:
 		// http://code.google.com/p/userbase/issues/detail?id=16
 		$this->remember = $remember;
+
+		if (is_array($options)) {
+			if (array_key_exists('facepile', $options)) {
+				$this->show_facepile = $options['facepile'] ? true : false;
+			}
+		}
 
 		$config = array(
 			'appId'  => $this->appID,
@@ -220,13 +227,18 @@ Logging out from Facebook...
 
 		?><div id="fb-root"></div>
 
+		<?php if ($this->show_facepile && $form == 'register') { ?>
+		<fb:facepile width="450" size="large" max-rows="1"></fb:facepile>
+		<?php } ?>
 		<form action="<?php echo $action?>" method="POST" name="facebookconnectform">
 		<input type="hidden" name="<?php echo $formsubmit ?>" value="Connect &gt;&gt;&gt;"/>
 		<?php UserTools::renderCSRFNonce(); ?>
 		</form>
-		<a class="userbase-fb-connect" href="#" onclick="UserBaseFBConnectButtonClicked(); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); <?php echo $buttonspritestyle ?> display: block; cursor: hand;" title="<?php echo $buttontitle ?>"></span></a>
+		<a class="userbase-fb-connect" href="#" onclick="UserBaseFBConnectButtonClicked(); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); <?php echo $buttonspritestyle ?> display: block; cursor: hand; margin-top: 0.3em" title="<?php echo $buttontitle ?>"></span></a>
 
 		<script>
+		var UserBaseFBFormType = <?php echo json_encode($form) ?>;
+
 		var UserBaseFBConnectButtonClicked = function() {
 			// FB is not loaded yet
 		};
@@ -245,77 +257,46 @@ Logging out from Facebook...
 				channelURL : '<?php echo UserConfig::$USERSROOTFULLURL; ?>/modules/facebook/channel.php' // channel file
 			});
 
-			// when button is clicked, auto-login or popu-up a dialog
-			UserBaseFBConnectButtonClicked = function() {
-				FB.getLoginStatus(function(r) {
-					// TODO Also check if all permissions are set or we need more
-					if(r.status === 'connected') {
-						// alert('already logged in');
+			// Auto-login if user is connected already
+			FB.getLoginStatus(function(r) {
+				if(r.status === 'connected') {
+					// if permissions are nor required, submit the form now
+					if (required_perms.length === 0) {
 						document.facebookconnectform.submit();
-					} else {
-						// here perms is just a comma-separated string
-						FB.login(function(response) {
-							if (response.session &&
-								(required_perms == '' || response.perms == required_perms)
-							) {
-								document.facebookconnectform.submit();
-								return;
-							}
-						}, {scope: required_perms_string});
+						return;
 					}
-				});
-			};
-			FB.Event.subscribe('auth.login', function() {
-				document.facebookconnectform.submit();
+
+					FB.api('/me/permissions', function(response) {
+						if (response && response.data && response.data.length > 0) {
+							var perms = response.data[0];
+
+							var i = required_perms.length;
+							while (i--) {
+								// do not submit form if at least one
+								// required permission is not found
+								if (perms[required_perms[i]] !== 1) {
+									return;
+								}
+							}
+
+							document.facebookconnectform.submit();
+							return;
+						}
+					});
+
+				}
 			});
 
-			(function() {
-				FB.getLoginStatus(function(response) {
-					// getLoginStatus returns an array with 'extended' key or null
-					if (response.session) {
-						if (required_perms.length > 0) {
-							// bug in API - it returns a serialized array
-							if (typeof(response.perms) == 'string') {
-								response.perms = JSON.parse(response.perms);
-							}
-
-							if (typeof(response.perms) == 'object'
-								&& typeof(response.perms.extended) == 'object'
-								&& (response.perms.extended instanceof Array)
-							) {
-								var i = required_perms.length;
-								while (i--) {
-									var ex = response.perms.extended;
-
-									var j = ex.length;
-									var found = false;
-									while (j--) {
-										if (required_perms[i] == ex[j]) {
-											found = true;
-											break;
-										}
-									}
-
-									if (!found) {
-										return;
-									}
-								}
-							} else {
-								return; // no permissions passed
-							}
-						}
-
-						// looks like we have enough permissions
-						// override login button to use simple form submit
-						UserBaseFBConnectButtonClicked = function() {
-							document.facebookconnectform.submit();
-						}
-						return;
-					} else {
+			// when button is clicked popu-up a dialog
+			UserBaseFBConnectButtonClicked = function() {
+				// it will only have 'connected' status if permissions match
+				FB.login(function(response) {
+					if (response.status === 'connected') {
+						document.facebookconnectform.submit();
 						return;
 					}
-				}, {perms: required_perms_string});
-			})(); // returning a function to run on login button click
+				}, {scope: required_perms_string});
+			};
 		};
 
 		(function() {
@@ -358,15 +339,15 @@ Logging out from Facebook...
 		else
 		{
 			try {
-				$me = $this->sdk->api('/'.$fb_id);
+				$me = $this->api('/'.$fb_id.'?fields=id,name,email,link');
 			} catch (FacebookApiException $e) {
 				UserTools::debug("Can't get /me API data");
 				return null;
 			}
 			?>
 			<table><tr>
-			<td rowspan="2"><a href="<?php echo $me['link'] ?>" target="_blank"><img src="http://graph.facebook.com/<?php echo $fb_id ?>/picture" style="border: 0; max-width: 100px; max-height: 100px" title="<?php echo UserTools::escape($me['name']) ?>"></a></td>
-			<td><a href="<?php echo UserTools::escape($me['link']) ?>" target="_blank"><?php echo $me['name'] ?></a></td>
+			<td rowspan="2"><a href="<?php echo UserTools::escape($me['link']) ?>" target="_blank"><img src="http://graph.facebook.com/<?php echo $fb_id ?>/picture" style="border: 0; max-width: 100px; max-height: 100px" title="<?php echo UserTools::escape($me['name']) ?>"></a></td>
+			<td><a href="<?php echo UserTools::escape($me['link']) ?>" target="_blank"><?php echo UserTools::escape($me['name']) ?></a></td>
 			</tr><tr>
 			<td>
 			<form action="<?php echo $action?>" method="POST" name="facebookusereditform">
@@ -395,6 +376,7 @@ Logging out from Facebook...
 
 	public function processLogin($post_data, &$remember, $auto = false)
 	{
+		UserTools::debug('processLogin start');
 		$remember = $this->remember;
 
 		try {
@@ -416,7 +398,7 @@ Logging out from Facebook...
 			throw new InputValidationException('No facebook user id', 0, $errors);
 		}
 
-		$permissions = $this->sdk->api('/me/permissions');
+		$permissions = $this->api('/me/permissions');
 		UserTools::debug('User permissions: '.var_export($permissions, true));
 		foreach ($this->permissions as $perm) {
 			if (!array_key_exists($perm, $permissions['data'][0]) || $permissions['data'][0][$perm] !== 1) {
@@ -442,6 +424,7 @@ Logging out from Facebook...
 
 	public function processRegistration($post_data, &$remember)
 	{
+		UserTools::debug('processRegistration start');
 		$remember = $this->remember;
 
 		try {
@@ -461,12 +444,13 @@ Logging out from Facebook...
 		$existing_user = User::getUserByFacebookID($fbuser);
 		if (!is_null($existing_user))
 		{
+			UserTools::debug('processRegistration - existing user: '.$existing_user->getID());
 			$existing_user->recordActivity(USERBASE_ACTIVITY_LOGIN_FB);
 			return $existing_user;
 		}
 
 		try {
-			$me = $this->sdk->api('/me');
+			$me = $this->api('/me?fields=id,name,email,link');
 		} catch (FacebookApiException $e) {
 			UserTools::debug("Can't get /me API data");
 			return null;
@@ -512,6 +496,8 @@ Logging out from Facebook...
 
 			$user->recordActivity(USERBASE_ACTIVITY_REMOVED_FB);
 
+			$this->sdk->api('/me/permissions','DELETE');
+
 			return true;
 		}
 
@@ -540,10 +526,10 @@ Logging out from Facebook...
 
 		$user->setFacebookID($fbuser);
 
-		// if user doesn't have email address and we required it for Facebook connection, let's save it
+		// if user has email address and we required it for Facebook connection, let's save it
 		if (!$user->getEmail()) {
 			try {
-				$me = $this->sdk->api('/me');
+				$me = $this->api('/me?fields=email');
 			} catch (FacebookApiException $e) {
 				UserTools::debug("Can't get /me API data");
 				return null;
@@ -560,6 +546,38 @@ Logging out from Facebook...
 		$user->recordActivity(USERBASE_ACTIVITY_ADDED_FB);
 
 		return true;
+	}
+
+	/**
+	 * Wrapper to native SDK api call that will recover in case of expired tokens
+	 */
+	public function api(/* polymorphic */) {
+		$args = func_get_args();
+
+		$result = null;
+
+		try {
+			$result = call_user_func_array(array($this->sdk, 'api'), $args);
+		} catch (FacebookApiException $fb_ex) {
+			$message = $fb_ex->getMessage();
+
+			if (strpos($message, 'An active access token must be used') !== false ||
+				strpos($message, 'Session has expired at unix time') !== false
+			) {
+				UserTools::debug('Facebook access token has expired, redirecting to login');
+
+				// looks like we have a problem with token, let's redirect to login
+				$url = $this->sdk->getLoginUrl(array(
+					'scope' => $this->permissions
+				));
+				header('Location: '.$url);
+				exit;
+			}
+
+			throw $fb_ex;
+		}
+
+		return $result;
 	}
 }
 
