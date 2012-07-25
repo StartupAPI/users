@@ -164,7 +164,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 			$authorize_url = $this->getAuthorizeURL($tokenResultParams);
 
 			//  redirect to the authorization page, they will redirect back
-			header("Location: " . $authorize_url . "?oauth_token=" . $tokenResultParams['token']);
+			header("Location: " . $authorize_url . "?oauth_token=" . rawurlencode($tokenResultParams['token']));
 			exit;
 		} catch(OAuthException2 $e) {
 			error_log(var_export($e, true));
