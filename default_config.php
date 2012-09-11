@@ -44,6 +44,7 @@ class UserConfig
 
 	public static $mysql_host = 'localhost';
 	public static $mysql_port = 3306;
+	public static $mysql_socket;
 	public static $mysql_db;
 	public static $mysql_user;
 	public static $mysql_password;
@@ -157,7 +158,7 @@ class UserConfig
 	{
 		if (is_null(self::$db))
 		{
-			self::$db = new mysqli(self::$mysql_host, self::$mysql_user, self::$mysql_password, self::$mysql_db, self::$mysql_port);
+			self::$db = new mysqli(self::$mysql_host, self::$mysql_user, self::$mysql_password, self::$mysql_db, self::$mysql_port, self::$mysql_socket);
 			if (!self::$db->set_charset('utf8')) {
 				error_log("[UserBase] Warning: Can't set utf8 charset for DB connection");
 			}
