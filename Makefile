@@ -42,6 +42,7 @@ else
 	@echo Found configuration file ../users_config.php
 endif
 
+db:	updatedb
 updatedb: checkconfig
 	php dbupgrade.php
 	php aggregatepoints.php
