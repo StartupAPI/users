@@ -1,4 +1,10 @@
 <?php
+/**
+ * Email authentication module
+ *
+ * This module is used for authenticating users using just an email address.
+ * IT is useful for signing up people for future newsletter notifications of for an early beta program.
+ */
 class EmailAuthenticationModule extends AuthenticationModule
 {
 	public function getID()
@@ -169,7 +175,7 @@ class EmailAuthenticationModule extends AuthenticationModule
 		<fieldset>
 		<legend>Enter your email address to re-send login link</legend>
 		<ul>
-		<li><label for="userbase-email-login-email">Email</label><input id="userbase-email-login-email" name="email" type="text" size="40"/><?php echo array_key_exists('email', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</abbr>' : ''?></li>
+		<li><label for="userbase-email-login-email">Email</label><input id="userbase-email-login-email" name="email" type="email" size="40"/><?php echo array_key_exists('email', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</abbr>' : ''?></li>
 		<li><button id="userbase-email-login-button" type="submit" name="login">Re-send login link</button><?php if (UserConfig::$enableRegistration) {?> <a href="<?php echo UserConfig::$USERSROOTURL?>/register.php">or register</a><?php } ?></li>
 		</ul>
 		</fieldset>
@@ -402,10 +408,10 @@ class EmailAuthenticationModule extends AuthenticationModule
 	{
 		$user = User::getUserByUsernameOrEmail($data['email']);
 
-		header('Location: '.UserConfig::$USERSROOTURL.'/modules/email/login.php?email='.urlencode($data['email']));
+		header('Location: '.UserConfig::$USERSROOTURL.'/modules/email/login.php?module=email&message=linksent');
 		exit;
 
-		return null; // kind-of pointless, but indicates that you can' just login using email
+		return null; // kind-of pointless after redirect, but indicates that you can' just login using email
 	}
 
 	public function processLoginLink($email, $code)
@@ -697,7 +703,7 @@ class EmailAuthenticationModule extends AuthenticationModule
 	public static $IGNORE_PASSWORD_RESET = false;
 }
 
-class UsernamePassUserCredentials extends UserCredentials {
+class EmailUserCredentials extends UserCredentials {
 	private $username;
 
 	public function __construct($username) {
