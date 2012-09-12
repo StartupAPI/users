@@ -20,7 +20,7 @@ class StartupAPI {
 	 * styles, scripts and potentially meta-tags into the head of the pages on the site
 	*/
 	static function head() {
-		?><link rel="style/css" href="<?php echo UserConfig::$USERSROOTURL ?>/startupapi.css"><?php
+		?><link rel="stylesheet" type="text/css" href="<?php echo UserConfig::$USERSROOTURL ?>/themes/classic/startupapi.css"><?php
 	}
 
 	/**
