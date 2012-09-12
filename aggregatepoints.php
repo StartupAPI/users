@@ -1,6 +1,6 @@
 <?php
 // This script 
-require_once(dirname(__FILE__).'/config.php');
+require_once(dirname(__FILE__).'/global.php');
 
 function aggregatePoints() {
 	$db = UserConfig::getDB();

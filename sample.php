@@ -17,7 +17,7 @@ if (!is_null($user)) {
 <html>
 <head><title>Sample page</title></head>
 <body>
-<div style="float: right"><?php include(dirname(__FILE__).'/users/navbox.php'); ?></div>
+<div style="float: right"><?php StartupAPI::power_strip() ?></div>
 <?php
 
 if (!is_null($user)) {

@@ -17,7 +17,7 @@
 
 require_once dirname(__FILE__)."/php-sdk/src/base_facebook.php";
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/global.php');
 
 /**
  * Extends the BaseFacebook class with the intent of using

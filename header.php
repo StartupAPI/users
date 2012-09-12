@@ -3,6 +3,7 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>Users</title>
+<?php StartupAPI::head() ?>
 <style>
 #userbase_body {
 	color: #666666;
@@ -90,7 +91,7 @@
 <body id="userbase_body">
 <div id="userbase_header">
 <div id="userbase_navbox">
-<?php include(dirname(__FILE__).'/navbox.php') ?>
+<?php StartupAPI::power_strip() ?>
 </div>
 <a href="<?php echo UserConfig::$SITEROOTURL ?>"><img src="<?php echo UserConfig::$USERSROOTURL ?>/images/header_icon.png" id="userbase_header_icon" title="Powered by Startup API"/></a>
 </div>

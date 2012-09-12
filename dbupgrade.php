@@ -6,7 +6,7 @@
  * Note: this script should be versioned in your code repository so it always reflects current code's
  *       requirements for the database structure.
 */
-require_once(dirname(__FILE__).'/config.php');
+require_once(dirname(__FILE__).'/global.php');
 require_once(dirname(__FILE__).'/dbupgrade/lib.php');
 
 $versions = array();

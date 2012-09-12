@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__FILE__)).'/config.php');
+require_once(dirname(dirname(__FILE__)).'/global.php');
 require_once(dirname(dirname(__FILE__)).'/User.php');
 
 $current_user = User::require_login(false);
