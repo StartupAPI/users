@@ -68,39 +68,6 @@ if (array_key_exists('login', $_POST))
 require_once(UserConfig::$header);
 
 ?>
-<style>
-.userbase-errorbox {
-	background: #f7dfb9;
-	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-	padding: 0.4em 1em;
-	margin: 1em 0;
-	width: 475px;
-	border: 4px solid #f77;
-	border-radius: 7px;
-	-moz-border-radius: 7px;
-	-webkit-border-radius: 7px;
-	font-size: 1.2em;
-	color: #500;
-	font-weight: bold;
-}
-
-#userbase-authlist {
-	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-	padding: 0 1em;
-	margin: 0 auto;
-	width: 480px;
-}
-
-#userbase-authlist h2 {
-	font-weight: bold;
-	font-size: 2.5em;
-}
-#userbase-authlist h3 {
-	font-weight: bold;
-	font-size: 1.5em;
-}
-</style>
-
 <div id="userbase-authlist">
 <h2>Log in</h2>
 <?php
