@@ -62,8 +62,8 @@ if (count($errors) > 0)
 <fieldset>
 <legend>Enter confirmation code to login</legend>
 <ul>
-<li><label>Email</label><input name="email" type="text" size="40"<?php if (array_key_exists('email', $_GET)) {?> value="<?php echo UserTools::escape($_GET['email'])?>"<?php }?>/><?php echo array_key_exists('email', $errors) ? ' <span style="color:red" title="'.UserTools::escape($errors['email']).'">*</span>' : ''?></li>
-<li><label>Code</label><input name="code" type="text" size="40" autocomplete="off"/><?php echo array_key_exists('code', $errors) ? ' <span style="color:red" title="'.UserTools::escape(implode('; ', $errors['code'])).'">*</span>' : ''?></li>
+<li><label>Email</label><input name="email" type="text" size="40"<?php if (array_key_exists('email', $_GET)) {?> value="<?php echo UserTools::escape($_GET['email'])?>"<?php }?>/><?php echo array_key_exists('email', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape($errors['email']).'">*</span>' : ''?></li>
+<li><label>Code</label><input name="code" type="text" size="40" autocomplete="off"/><?php echo array_key_exists('code', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode('; ', $errors['code'])).'">*</span>' : ''?></li>
 <li><button id="userbase-loginlink-button" type="submit" name="login">Login</button></li>
 </ul>
 </fieldset>

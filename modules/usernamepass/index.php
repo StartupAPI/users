@@ -179,22 +179,22 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 
 		if (is_null($username)) {
 		?>
-		<li><label>Username</label><input name="username" type="text" size="25" maxlength="25" value="<?php echo array_key_exists('username', $data) ? UserTools::escape($data['username']) : ''?>"/><?php echo array_key_exists('username', $errors) ? ' <span style="color:red" title="'.UserTools::escape(implode("\n", $errors['username'])).'">*</span>' : ''?></li>
+		<li><label>Username</label><input name="username" type="text" size="25" maxlength="25" value="<?php echo array_key_exists('username', $data) ? UserTools::escape($data['username']) : ''?>"/><?php echo array_key_exists('username', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['username'])).'">*</span>' : ''?></li>
 		<?php }
 		else
 		{?>
 		<li><label>Username</label><b title="Sorry, you can't change your username">&nbsp;<?php echo UserTools::escape($username)?></b></li>
 		<?php }?>
 		<li class="userbase-usernamepass-edit-section">Name and email</li>
-		<li><label>Name</label><input name="name" type="test" size="40" value="<?php echo UserTools::escape(array_key_exists('name', $data) ? $data['name'] : $user->getName())?>"/><?php echo array_key_exists('name', $errors) ? ' <span style="color:red" title="'.UserTools::escape(implode("\n", $errors['name'])).'">*</span>' : ''?></li>
-		<li><label>E-mail</label><input name="email" type="email" size="40" value="<?php echo UserTools::escape(array_key_exists('email', $data) ? $data['email'] : $user->getEmail())?>"/><?php echo array_key_exists('email', $errors) ? ' <span style="color:red" title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</span>' : ''?></li>
+		<li><label>Name</label><input name="name" type="test" size="40" value="<?php echo UserTools::escape(array_key_exists('name', $data) ? $data['name'] : $user->getName())?>"/><?php echo array_key_exists('name', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['name'])).'">*</span>' : ''?></li>
+		<li><label>E-mail</label><input name="email" type="email" size="40" value="<?php echo UserTools::escape(array_key_exists('email', $data) ? $data['email'] : $user->getEmail())?>"/><?php echo array_key_exists('email', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</span>' : ''?></li>
 
 		<li class="userbase-usernamepass-edit-section">Change password</li>
 		<?php if (!is_null($user->getUsername())) {?>
-		<li><label>Current password</label><input name="currentpass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('currentpass', $errors) ? ' <span style="color:red" title="'.UserTools::escape(implode("\n", $errors['currentpass'])).'">*</span>' : ''?></li>
+		<li><label>Current password</label><input name="currentpass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('currentpass', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['currentpass'])).'">*</span>' : ''?></li>
 		<?php } ?>
-		<li><label><?php if (is_null($user->getUsername())) {?>Set a<?php } else {?>New<?php } ?> password</label><input name="pass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('pass', $errors) ? ' <span style="color:red" title="'.UserTools::escape(implode("\n", $errors['pass'])).'">*</span>' : ''?></li>
-		<li><label>Repeat new password</label><input name="repeatpass" type="password" size="25" autocomplete="off"/><?php array_key_exists('repeatpass', $errors) ? ' <span style="color:red" title="'.UserTools::escape(implode("\n", $errors['repeatpass'])).'">*</span>' : ''?></li>
+		<li><label><?php if (is_null($user->getUsername())) {?>Set a<?php } else {?>New<?php } ?> password</label><input name="pass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('pass', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['pass'])).'">*</span>' : ''?></li>
+		<li><label>Repeat new password</label><input name="repeatpass" type="password" size="25" autocomplete="off"/><?php array_key_exists('repeatpass', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['repeatpass'])).'">*</span>' : ''?></li>
 		<li><button id="userbase-usernamepass-edit-button" type="submit" name="save">Save</button></li>
 		</ul>
 		</fieldset>

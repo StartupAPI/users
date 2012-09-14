@@ -136,8 +136,8 @@ class EmailAuthenticationModule extends AuthenticationModule
 		<legend>Update your name and email</legend>
 		<ul>
 		<li class="userbase-email-edit-section">Name and email</li>
-		<li><label>Name</label><input name="name" type="test" size="40" value="<?php echo UserTools::escape(array_key_exists('name', $data) ? $data['name'] : $user->getName())?>"/><?php echo array_key_exists('name', $errors) ? ' <span style="color:red" title="'.UserTools::escape(implode("\n", $errors['name'])).'">*</span>' : ''?></li>
-		<li><label>E-mail</label><input name="email" type="text" size="40" value="<?php echo UserTools::escape(array_key_exists('email', $data) ? $data['email'] : $user->getEmail())?>"/><?php echo array_key_exists('email', $errors) ? ' <span style="color:red" title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</span>' : ''?></li>
+		<li><label>Name</label><input name="name" type="test" size="40" value="<?php echo UserTools::escape(array_key_exists('name', $data) ? $data['name'] : $user->getName())?>"/><?php echo array_key_exists('name', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['name'])).'">*</span>' : ''?></li>
+		<li><label>E-mail</label><input name="email" type="text" size="40" value="<?php echo UserTools::escape(array_key_exists('email', $data) ? $data['email'] : $user->getEmail())?>"/><?php echo array_key_exists('email', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</span>' : ''?></li>
 		</ul>
 		</fieldset>
 		<?php UserTools::renderCSRFNonce(); ?>

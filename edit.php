@@ -57,7 +57,7 @@ require_once(UserConfig::$header);
 <div id="userbase-edit-info">
 <h2>Edit Your Information</h2>
 
-<div style="float: right; width: 400px">
+<div id="startupapi-edit-account">
 <div>
 <?php if (UserConfig::$useAccounts) { ?>
 <h2>Accounts:</h2>
