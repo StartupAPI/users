@@ -270,7 +270,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 	}
 
 	/**
-	 * Get UserBase user by server identity and reset user_id -> oauth_user_id if necessary
+	 * Get StartupAPI user by server identity and reset user_id -> oauth_user_id if necessary
 	 */
 	public function getUserByOAuthIdentity($identity, $oauth_user_id) {
 		$db = UserConfig::getDB();
@@ -357,7 +357,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 	}
 
 ###########################################################################################
-# Methods related to UserBase mechanics
+# Methods related to Startup API mechanics
 ###########################################################################################
 	public function renderLoginForm($action)
 	{

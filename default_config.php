@@ -160,7 +160,7 @@ class UserConfig
 		{
 			self::$db = new mysqli(self::$mysql_host, self::$mysql_user, self::$mysql_password, self::$mysql_db, self::$mysql_port, self::$mysql_socket);
 			if (!self::$db->set_charset('utf8')) {
-				error_log("[UserBase] Warning: Can't set utf8 charset for DB connection");
+				error_log("[Startup API] Warning: Can't set utf8 charset for DB connection");
 			}
 		}
 
@@ -242,7 +242,7 @@ EOD;
 		{
 			$host = php_uname('n');
 			if (php_sapi_name() !== 'cli') {
-				error_log("[UserBase config] Warning: Can't determine site's host name, using $host");
+				error_log("[Startup API config] Warning: Can't determine site's host name, using $host");
 			}
  
 		}
@@ -250,7 +250,7 @@ EOD;
 		UserConfig::$SITEROOTFULLURL = 'http://'.$host.UserConfig::$SITEROOTURL;
 		UserConfig::$USERSROOTFULLURL = 'http://'.$host.substr(UserConfig::$ROOTPATH, $docrootlength);
 
-		UserConfig::$supportEmailXMailer = 'UserBase (PHP/'.phpversion().')';
+		UserConfig::$supportEmailXMailer = 'Startup API (PHP/'.phpversion().')';
 
 		UserConfig::$header = dirname(__FILE__).'/header.php';
 		UserConfig::$footer = dirname(__FILE__).'/footer.php';

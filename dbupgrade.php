@@ -242,13 +242,13 @@ $versions[10]['down'][]	= "ALTER TABLE `".UserConfig::$mysql_prefix."user_oauth_
 */
 $versions[9]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."user_oauth_identity` (
 	oauth_user_id INT(11) NOT NULL AUTO_INCREMENT COMMENT 'oauth-php user id',
-	user_id INT(10) UNSIGNED DEFAULT NULL COMMENT  'UserBase user id',
+	user_id INT(10) UNSIGNED DEFAULT NULL COMMENT  'Startup API user id',
 	identity TEXT DEFAULT NULL COMMENT 'String uniquely identifying user on the oauth server',
 	PRIMARY KEY (oauth_user_id),
 	CONSTRAINT oauth_identity_user_id FOREIGN KEY (user_id)
 		REFERENCES `".UserConfig::$mysql_prefix."users` (id)
 		ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = INNODB COMMENT =  'Table that links UserBase users and oauth-php users and their consumer tokens';
+) ENGINE = INNODB COMMENT =  'Table that links Startup API users and oauth-php users and their consumer tokens';
 ";
 $versions[9]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."oauth_log (
 	olg_id                  INT(11) NOT NULL AUTO_INCREMENT,

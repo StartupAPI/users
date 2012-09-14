@@ -1,6 +1,6 @@
 <?php
 /*
- * Various tools used within UserBase
+ * Various tools used within Startup API
  */
 class UserTools
 {
