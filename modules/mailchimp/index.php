@@ -17,7 +17,7 @@ class MailChimpModule extends EmailModule
 	}
 
 	public function __construct($apiKey, $listID) {
-		// handles module registration in UserBase
+		// handles module registration in Startup API
 		parent::__construct();
 
 		$this->apiKey = $apiKey;
