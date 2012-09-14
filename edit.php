@@ -54,7 +54,7 @@ if (array_key_exists('save', $_POST))
 require_once(UserConfig::$header);
 
 ?>
-<div id="userbase-edit-info">
+<div id="startupapi-edit-info">
 <h2>Edit Your Information</h2>
 
 <div id="startupapi-edit-account">
@@ -83,7 +83,7 @@ require_once(UserConfig::$header);
 <?php
 }
 ?></div>
-<div id="userbase-authlist">
+<div id="startupapi-authlist">
 <?php
 
 foreach (UserConfig::$authentication_modules as $module)
@@ -95,7 +95,7 @@ foreach (UserConfig::$authentication_modules as $module)
 <?php
 	if (array_key_exists($id, $errors) && is_array($errors[$id]) && count($errors[$id]) > 0)
 	{
-		?><div class="userbase-errorbox"><ul><?php
+		?><div class="startupapi-errorbox"><ul><?php
 		foreach ($errors[$id] as $field => $errorset)
 		{
 			foreach ($errorset as $error)

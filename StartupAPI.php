@@ -7,7 +7,7 @@ require_once(dirname(__FILE__).'/User.php');
 class StartupAPI {
 	// just a proxy to static methods in User class
 	static function getUser() {
-		return User::get();		
+		return User::get();
 	}
 
 	// just a proxy to static methods in User class
@@ -38,15 +38,15 @@ class StartupAPI {
 			$current_account = Account::getCurrentAccount($current_user);
 		}
 		?>
-	<div id="userbase-navbox">
+	<div id="startupapi-navbox">
 		<?php if (!is_null($current_user))
 		{
 			if ($current_user->isImpersonated()) {
-				?><b id="userbase-navbox-impersonating"><a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/stopimpersonation.php" title="Impersonated by <?php echo UserTools::escape($current_user->getImpersonator()->getName())?>">Stop Impersonation</a></b> | <?php 
+				?><b id="startupapi-navbox-impersonating"><a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/stopimpersonation.php" title="Impersonated by <?php echo UserTools::escape($current_user->getImpersonator()->getName())?>">Stop Impersonation</a></b> | <?php
 			}
 
 			if ($current_user->isAdmin()) {
-				?><b id="userbase-navbox-admin"><a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/">Admin</a></b> | <?php 
+				?><b id="startupapi-navbox-admin"><a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/">Admin</a></b> | <?php
 			}
 
 			if (count($accounts) > 1)
@@ -56,7 +56,7 @@ class StartupAPI {
 					$destination = UserConfig::$accountSwitchDestination;
 				}
 
-				?><select id="userbase-navbox-account-picker" name="account" onchange="document.location.href='<?php echo UserConfig::$USERSROOTURL ?>/change_account.php?return=<?php echo $destination ?>&account='+this.value"><?php
+				?><select id="startupapi-navbox-account-picker" name="account" onchange="document.location.href='<?php echo UserConfig::$USERSROOTURL ?>/change_account.php?return=<?php echo $destination ?>&account='+this.value"><?php
 
 				foreach ($accounts as $account)
 				{
@@ -89,15 +89,15 @@ class StartupAPI {
 			}
 			?>
 
-			<span id="userbase-navbox-username"><a href="<?php echo UserConfig::$USERSROOTURL ?>/edit.php" title="<?php echo UserTools::escape($current_user->getName())?>'s user information"><?php echo UserTools::escape($current_user->getName()) ?></a></span> |
-			<span id="userbase-navbox-logout"><a href="<?php echo UserConfig::$USERSROOTURL ?>/logout.php">logout</a></span>
+			<span id="startupapi-navbox-username"><a href="<?php echo UserConfig::$USERSROOTURL ?>/edit.php" title="<?php echo UserTools::escape($current_user->getName())?>'s user information"><?php echo UserTools::escape($current_user->getName()) ?></a></span> |
+			<span id="startupapi-navbox-logout"><a href="<?php echo UserConfig::$USERSROOTURL ?>/logout.php">logout</a></span>
 			<?php
 		}
 		else
 		{
 		?>
-			<span id="userbase-navbox-signup"><a href="<?php echo UserConfig::$USERSROOTURL ?>/register.php">Sign Up Now!</a></span> |
-			<span id="userbase-navbox-login"><a href="<?php echo UserConfig::$USERSROOTURL ?>/login.php">log in</a></span>
+			<span id="startupapi-navbox-signup"><a href="<?php echo UserConfig::$USERSROOTURL ?>/register.php">Sign Up Now!</a></span> |
+			<span id="startupapi-navbox-login"><a href="<?php echo UserConfig::$USERSROOTURL ?>/login.php">log in</a></span>
 		<?php
 		}
 		?>

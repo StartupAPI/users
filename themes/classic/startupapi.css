@@ -8,89 +8,89 @@
 }
 
 /* from header.php */
-#userbase_body {
+#startupapi_body {
 	color: #666666;
 	font-family: georgia, garamond, serif;
 	margin: 0;
 	background-color: #DCDCDC;
 }
 
-#userbase_header {
+#startupapi_header {
 	padding: 0.5em;
 	font-size: small;
 	border-bottom: 1px solid #c6c6c6;
 }
 
-#userbase_header_icon {
+#startupapi_header_icon {
 	border: 0;
 	vertical-align: bottom;
 	margin: 0.4em 0.3em 0.2em 0.3em;
 }
 
-#userbase_navbox {
+#startupapi_navbox {
 	color: #c6c6c6;
 	float: right;
 	margin-right: 0.5em;
 }
 
-#userbase_navbox a {
+#startupapi_navbox a {
 	color: #666666;
 	text-shadow: #EEE 0px 1px 0px;
 	text-decoration: none;
 }
 
-#userbase_navbox a:hover {
+#startupapi_navbox a:hover {
 	color: #69818d;
 }
 
-#userbase_main {
+#startupapi_main {
 	padding: 0.2em 0.5em;
 	background-color: white;
 }
 
-#userbase_footer {
+#startupapi_footer {
 	height: 1em;
 	border-top: 1px solid #c6c6c6;
 }
 
-#userbase_footerpad {
+#startupapi_footerpad {
 	height: 1em;
 	background-color: white;
 	clear: both;
 }
 
-#userbase_poweredby {
+#startupapi_poweredby {
 	color: #666;
 	float: right;
 	font-size: small;
 	padding: 2em;
 }
 
-#userbase_poweredby a {
+#startupapi_poweredby a {
 	color: #efe8e8;
 }
 
-#userbase_poweredby a:hover {
+#startupapi_poweredby a:hover {
 	color: white;
 }
 
-#userbase_adminmenu {
+#startupapi_adminmenu {
 	padding: 1em;
 	color: black;
 	font-size: larger;
 }
 
-#userbase_adminmenu a {
+#startupapi_adminmenu a {
 	color: #888;
 	text-decoration: none;
 }
 
-#userbase_adminmenu a:hover {
+#startupapi_adminmenu a:hover {
 	color: #69818d;
 }
 
 /* from login.php */
-.userbase-errorbox {
+.startupapi-errorbox {
 	background: #f7dfb9;
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0.4em 1em;
@@ -105,24 +105,24 @@
 	font-weight: bold;
 }
 
-#userbase-authlist {
+#startupapi-authlist {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0 1em;
 	margin: 0 auto;
 	width: 480px;
 }
 
-#userbase-authlist h2 {
+#startupapi-authlist h2 {
 	font-weight: bold;
 	font-size: 2.5em;
 }
-#userbase-authlist h3 {
+#startupapi-authlist h3 {
 	font-weight: bold;
 	font-size: 1.5em;
 }
 
 /* from register.php */
-.userbase-errorbox {
+.startupapi-errorbox {
 	background: #f7dfb9;
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0.4em 1em;
@@ -137,29 +137,29 @@
 	font-weight: bold;
 }
 
-.userbase-errorbox ul {
+.startupapi-errorbox ul {
 	margin: 0;
 	padding-left: 1em;
 }
 
-#userbase-authlist {
+#startupapi-authlist {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0 1em;
 	margin: 0 auto;
 	width: 480px;
 }
 
-#userbase-authlist h2 {
+#startupapi-authlist h2 {
 	font-weight: bold;
 	font-size: 2.5em;
 }
-#userbase-authlist h3 {
+#startupapi-authlist h3 {
 	font-weight: bold;
 	font-size: 1.5em;
 }
 
 /* from register.php - inivitation form */
-#userbase-invitation-form {
+#startupapi-invitation-form {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0.4em 1em;
 	margin: 0;
@@ -170,7 +170,7 @@
 	-webkit-border-radius: 7px;
 }
 
-#userbase-invitation-form p {
+#startupapi-invitation-form p {
 	font-size: 1.2em;
 	line-height: 1.5;
 
@@ -179,13 +179,13 @@
 	padding: 0;
 }
 
-#userbase-invitation-form fieldset {
+#startupapi-invitation-form fieldset {
 	border: 0;
 	padding: 0;
 	margin: 0;
 }
 
-#userbase-invitation-form legend {
+#startupapi-invitation-form legend {
 	border: 0;
 	padding: 0;
 	margin: 0;
@@ -194,12 +194,12 @@
 	padding-bottom: .6em;
 }
 
-#userbase-invitation-button {
+#startupapi-invitation-button {
 	padding: 0.3em 25px;
 	cursor: pointer;
 }
 
-#userbase-invitation-form input {
+#startupapi-invitation-form input {
 	background: #f6f6f6;
 	border: 2px solid #888;
 	border-radius: 2px;
@@ -208,11 +208,11 @@
 	padding: 4px;
 }
 
-#userbase-invitation-form input:focus {
+#startupapi-invitation-form input:focus {
 	background: #fff;
 }
 
-#userbase-invitation-form abbr {
+#startupapi-invitation-form abbr {
 	cursor: help;
 	font-style: normal;
 	border: 0;
@@ -221,29 +221,29 @@
 	font-weight: bold;
 }
 
-#userbase-invite-code {
+#startupapi-invite-code {
 	width: 290px;
 }
 
 /* from edit.php */
-#userbase-edit-info {
+#startupapi-edit-info {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	background: white;
 	padding: 0 1em;
 	margin: 0;
 }
 
-#userbase-edit-info h2 {
+#startupapi-edit-info h2 {
 	font-weight: bold;
 	font-size: 2.5em;
 }
 
-#userbase-edit-info h3 {
+#startupapi-edit-info h3 {
 	font-weight: bold;
 	font-size: 1.5em;
 }
 
-.userbase-errorbox {
+.startupapi-errorbox {
 	background: #f7dfb9;
 	padding: 0.4em 1em;
 	margin: 1em 0;
@@ -258,24 +258,24 @@
 }
 
 /* from modules/usernamepass/forgotpassword.php */
-#userbase-forgotpassword {
+#startupapi-forgotpassword {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0 1em;
 	margin: 0 auto;
 	width: 400px;
 }
 
-#userbase-forgotpassword h2 {
+#startupapi-forgotpassword h2 {
 	font-weight: bold;
 	font-size: 2.5em;
 }
 
-#userbase-forgotpassword h3 {
+#startupapi-forgotpassword h3 {
 	font-weight: bold;
 	font-size: 1.5em;
 }
 
-#userbase-passwordsent {
+#startupapi-passwordsent {
 	padding: 0 1em;
 	margin: 2em 0;
 	width: 350px;
@@ -285,7 +285,7 @@
 	-webkit-border-radius: 7px;
 }
 
-#userbase-forgotpassword-form {
+#startupapi-forgotpassword-form {
 	padding: 0.4em 1em;
 	margin: 0;
 	width: 350px;
@@ -295,7 +295,7 @@
 	-webkit-border-radius: 7px;
 }
 
-#userbase-forgotpassword-form input {
+#startupapi-forgotpassword-form input {
 	background: #f6f6f6;
 	border: 2px solid #888;
 	border-radius: 2px;
@@ -303,17 +303,17 @@
 	-webkit-border-radius: 2px;
 	padding: 4px;
 }
-#userbase-forgotpassword-button {
+#startupapi-forgotpassword-button {
 	padding: 0.3em 10px;
 	cursor: pointer;
 }
-#userbase-forgotpassword fieldset {
+#startupapi-forgotpassword fieldset {
 	border: 0;
 	padding: 0;
 	margin: 0;
 }
 
-#userbase-forgotpassword legend {
+#startupapi-forgotpassword legend {
 	border: 0;
 	padding: 0;
 	margin: 0;
@@ -323,7 +323,7 @@
 }
 
 /* from modules/usernamepass/index.php login form */
-#userbase-usernamepass-login-form {
+#startupapi-usernamepass-login-form {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0.4em 1em;
 	margin: 0;
@@ -334,7 +334,7 @@
 	-webkit-border-radius: 7px;
 }
 
-#userbase-usernamepass-login-form li {
+#startupapi-usernamepass-login-form li {
 	font-size: 1.2em;
 	line-height: 1.5;
 
@@ -343,13 +343,13 @@
 	padding: 0;
 }
 
-#userbase-usernamepass-login-form fieldset {
+#startupapi-usernamepass-login-form fieldset {
 	border: 0;
 	padding: 0;
 	margin: 0;
 }
 
-#userbase-usernamepass-login-form legend {
+#startupapi-usernamepass-login-form legend {
 	border: 0;
 	padding: 0;
 	margin: 0;
@@ -358,13 +358,13 @@
 	padding-bottom: .6em;
 }
 
-#userbase-usernamepass-login-form ul {
+#startupapi-usernamepass-login-form ul {
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
 
-#userbase-usernamepass-login-form label {
+#startupapi-usernamepass-login-form label {
 	display: block;
 	float: left;
 	line-height: 1.6;
@@ -374,24 +374,24 @@
 	padding: 3px 0;
 }
 
-#userbase-usernamepass-login-form label:after {
+#startupapi-usernamepass-login-form label:after {
 	content: ':';
 }
 
-#userbase-usernamepass-login-button {
+#startupapi-usernamepass-login-button {
 	margin-left: 125px;
 	padding: 0.3em 25px;
 	cursor: pointer;
 }
 
-#userbase-usernamepass-login-forgotpass {
+#startupapi-usernamepass-login-forgotpass {
 	margin-left: 130px;
 	cursor: pointer;
 	font-size: 0.6em;
 	display: block;
 }
 
-#userbase-usernamepass-login-form input {
+#startupapi-usernamepass-login-form input {
 	background: #f6f6f6;
 	border: 2px solid #888;
 	border-radius: 2px;
@@ -400,11 +400,11 @@
 	padding: 4px;
 }
 
-#userbase-usernamepass-login-form input:focus {
+#startupapi-usernamepass-login-form input:focus {
 	background: #fff;
 }
 
-#userbase-usernamepass-login-form .remember label {
+#startupapi-usernamepass-login-form .remember label {
 	display: block;
 	float: none;
 	margin-left: 127px;
@@ -412,21 +412,21 @@
 	width: 270px;
 }
 
-#userbase-usernamepass-login-form .remember input {
+#startupapi-usernamepass-login-form .remember input {
 	border: 0;
 	background: #fff;
 }
 
-#userbase-usernamepass-login-form .remember {
+#startupapi-usernamepass-login-form .remember {
 	margin-bottom: 0;
 }
 
-#userbase-usernamepass-login-form .remember label:after {
+#startupapi-usernamepass-login-form .remember label:after {
 	content: ''
 }
 
 /* from modules/usernamepass/index.php registration form */
-#userbase-usernamepass-register-form {
+#startupapi-usernamepass-register-form {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0.4em 1em;
 	margin: 0;
@@ -437,7 +437,7 @@
 	-webkit-border-radius: 7px;
 }
 
-#userbase-usernamepass-register-form li {
+#startupapi-usernamepass-register-form li {
 	font-size: 1.2em;
 	line-height: 1.5;
 
@@ -446,13 +446,13 @@
 	padding: 0;
 }
 
-#userbase-usernamepass-register-form fieldset {
+#startupapi-usernamepass-register-form fieldset {
 	border: 0;
 	padding: 0;
 	margin: 0;
 }
 
-#userbase-usernamepass-register-form legend {
+#startupapi-usernamepass-register-form legend {
 	border: 0;
 	padding: 0;
 	margin: 0;
@@ -461,13 +461,13 @@
 	padding-bottom: .6em;
 }
 
-#userbase-usernamepass-register-form ul {
+#startupapi-usernamepass-register-form ul {
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
 
-#userbase-usernamepass-register-form label {
+#startupapi-usernamepass-register-form label {
 	display: block;
 	float: left;
 	line-height: 1.6;
@@ -477,24 +477,24 @@
 	padding: 3px 0;
 }
 
-#userbase-usernamepass-register-form label:after {
+#startupapi-usernamepass-register-form label:after {
 	content: ':';
 }
 
-#userbase-usernamepass-register-button {
+#startupapi-usernamepass-register-button {
 	margin-left: 155px;
 	padding: 0.3em 25px;
 	cursor: pointer;
 }
 
-#userbase-usernamepass-register-forgotpass {
+#startupapi-usernamepass-register-forgotpass {
 	margin-left: 130px;
 	cursor: pointer;
 	font-size: 0.6em;
 	display: block;
 }
 
-#userbase-usernamepass-register-form input {
+#startupapi-usernamepass-register-form input {
 	background: #f6f6f6;
 	border: 2px solid #888;
 	border-radius: 2px;
@@ -503,11 +503,11 @@
 	padding: 4px;
 }
 
-#userbase-usernamepass-register-form input:focus {
+#startupapi-usernamepass-register-form input:focus {
 	background: #fff;
 }
 
-#userbase-usernamepass-register-form abbr {
+#startupapi-usernamepass-register-form abbr {
 	cursor: help;
 	font-style: normal;
 	border: 0;
@@ -517,7 +517,7 @@
 }
 
 /* from modules/usernamepass/index.php information editing form */
-#userbase-usernamepass-edit-form {
+#startupapi-usernamepass-edit-form {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0.4em 1em;
 	margin: 0;
@@ -528,7 +528,7 @@
 	-webkit-border-radius: 7px;
 }
 
-#userbase-usernamepass-edit-form li {
+#startupapi-usernamepass-edit-form li {
 	font-size: 1.2em;
 	line-height: 1.5;
 
@@ -537,13 +537,13 @@
 	padding: 0;
 }
 
-#userbase-usernamepass-edit-form fieldset {
+#startupapi-usernamepass-edit-form fieldset {
 	border: 0;
 	padding: 0;
 	margin: 0;
 }
 
-#userbase-usernamepass-edit-form legend {
+#startupapi-usernamepass-edit-form legend {
 	border: 0;
 	padding: 0;
 	margin: 0;
@@ -552,13 +552,13 @@
 	padding-bottom: .6em;
 }
 
-#userbase-usernamepass-edit-form ul {
+#startupapi-usernamepass-edit-form ul {
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
 
-#userbase-usernamepass-edit-form label {
+#startupapi-usernamepass-edit-form label {
 	display: block;
 	float: left;
 	line-height: 1.6;
@@ -568,24 +568,24 @@
 	padding: 3px 0;
 }
 
-#userbase-usernamepass-edit-form label:after {
+#startupapi-usernamepass-edit-form label:after {
 	content: ':';
 }
 
-#userbase-usernamepass-edit-button {
+#startupapi-usernamepass-edit-button {
 	margin-left: 180px;
 	padding: 0.3em 25px;
 	cursor: pointer;
 }
 
-#userbase-usernamepass-edit-forgotpass {
+#startupapi-usernamepass-edit-forgotpass {
 	margin-left: 130px;
 	cursor: pointer;
 	font-size: 0.6em;
 	display: block;
 }
 
-#userbase-usernamepass-edit-form input {
+#startupapi-usernamepass-edit-form input {
 	background: #f6f6f6;
 	border: 2px solid #888;
 	border-radius: 2px;
@@ -594,11 +594,11 @@
 	padding: 4px;
 }
 
-#userbase-usernamepass-edit-form input:focus {
+#startupapi-usernamepass-edit-form input:focus {
 	background: #fff;
 }
 
-#userbase-usernamepass-edit-form abbr {
+#startupapi-usernamepass-edit-form abbr {
 	cursor: help;
 	font-style: normal;
 	border: 0;
@@ -607,31 +607,31 @@
 	font-weight: bold;
 }
 
-#userbase-usernamepass-edit-form .userbase-usernamepass-edit-section {
+#startupapi-usernamepass-edit-form .startupapi-usernamepass-edit-section {
 	font-size: 1.5em;
 	font-weight: bold;
 	margin-top: 1em;
 }
 
 /* from modules/usernamepass/passwordreset.php */
-#userbase-passwordreset {
+#startupapi-passwordreset {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0 1em;
 	margin: 0 auto;
 	width: 400px;
 }
 
-#userbase-passwordreset h2 {
+#startupapi-passwordreset h2 {
 	font-weight: bold;
 	font-size: 2.5em;
 }
 
-#userbase-passwordreset h3 {
+#startupapi-passwordreset h3 {
 	font-weight: bold;
 	font-size: 1.5em;
 }
 
-#userbase-passwordreset-form {
+#startupapi-passwordreset-form {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0.4em 1em;
 	margin: 0;
@@ -642,7 +642,7 @@
 	-webkit-border-radius: 7px;
 }
 
-#userbase-passwordreset-form li {
+#startupapi-passwordreset-form li {
 	font-size: 1.2em;
 	line-height: 1.5;
 
@@ -651,13 +651,13 @@
 	padding: 0;
 }
 
-#userbase-passwordreset-form fieldset {
+#startupapi-passwordreset-form fieldset {
 	border: 0;
 	padding: 0;
 	margin: 0;
 }
 
-#userbase-passwordreset-form legend {
+#startupapi-passwordreset-form legend {
 	border: 0;
 	padding: 0;
 	margin: 0;
@@ -666,13 +666,13 @@
 	padding-bottom: .6em;
 }
 
-#userbase-passwordreset-form ul {
+#startupapi-passwordreset-form ul {
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
 
-#userbase-passwordreset-form label {
+#startupapi-passwordreset-form label {
 	display: block;
 	float: left;
 	line-height: 1.6;
@@ -682,17 +682,17 @@
 	padding: 3px 0;
 }
 
-#userbase-passwordreset-form label:after {
+#startupapi-passwordreset-form label:after {
 	content: ':';
 }
 
-#userbase-passwordreset-button {
+#startupapi-passwordreset-button {
 	margin-left: 170px;
 	padding: 0.3em 25px;
 	cursor: pointer;
 }
 
-#userbase-passwordreset-form input {
+#startupapi-passwordreset-form input {
 	background: #f6f6f6;
 	border: 2px solid #888;
 	border-radius: 2px;
@@ -701,12 +701,12 @@
 	padding: 4px;
 }
 
-#userbase-passwordreset-form input:focus {
+#startupapi-passwordreset-form input:focus {
 	background: #fff;
 }
 
 /* from modules/email/index.php login form */
-#userbase-email-login-form {
+#startupapi-email-login-form {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0.4em 1em;
 	margin: 0;
@@ -717,7 +717,7 @@
 	-webkit-border-radius: 7px;
 }
 
-#userbase-email-login-form li {
+#startupapi-email-login-form li {
 	font-size: 1.2em;
 	line-height: 1.5;
 
@@ -726,13 +726,13 @@
 	padding: 0;
 }
 
-#userbase-email-login-form fieldset {
+#startupapi-email-login-form fieldset {
 	border: 0;
 	padding: 0;
 	margin: 0;
 }
 
-#userbase-email-login-form legend {
+#startupapi-email-login-form legend {
 	border: 0;
 	padding: 0;
 	margin: 0;
@@ -741,13 +741,13 @@
 	padding-bottom: .6em;
 }
 
-#userbase-email-login-form ul {
+#startupapi-email-login-form ul {
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
 
-#userbase-email-login-form label {
+#startupapi-email-login-form label {
 	display: block;
 	float: left;
 	line-height: 1.6;
@@ -757,17 +757,17 @@
 	padding: 3px 0;
 }
 
-#userbase-email-login-form label:after {
+#startupapi-email-login-form label:after {
 	content: ':';
 }
 
-#userbase-email-login-button {
+#startupapi-email-login-button {
 	margin-left: 125px;
 	padding: 0.3em 25px;
 	cursor: pointer;
 }
 
-#userbase-email-login-form input {
+#startupapi-email-login-form input {
 	background: #f6f6f6;
 	border: 2px solid #888;
 	border-radius: 2px;
@@ -776,18 +776,18 @@
 	padding: 4px;
 }
 
-#userbase-email-login-form input:focus {
+#startupapi-email-login-form input:focus {
 	background: #fff;
 }
 
-#userbase-email-login-form abbr {
+#startupapi-email-login-form abbr {
 	color: #f74d3d;
 	font-weight: bold;
 	cursor: help;
 }
 
 /* from modules/email/index.php registration form */
-#userbase-email-signup-form {
+#startupapi-email-signup-form {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0.4em 1em;
 	margin: 0;
@@ -798,7 +798,7 @@
 	-webkit-border-radius: 7px;
 }
 
-#userbase-email-signup-form li {
+#startupapi-email-signup-form li {
 	font-size: 1.2em;
 	line-height: 1.5;
 
@@ -807,13 +807,13 @@
 	padding: 0;
 }
 
-#userbase-email-signup-form fieldset {
+#startupapi-email-signup-form fieldset {
 	border: 0;
 	padding: 0;
 	margin: 0;
 }
 
-#userbase-email-signup-form legend {
+#startupapi-email-signup-form legend {
 	border: 0;
 	padding: 0;
 	margin: 0;
@@ -822,13 +822,13 @@
 	padding-bottom: .6em;
 }
 
-#userbase-email-signup-form ul {
+#startupapi-email-signup-form ul {
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
 
-#userbase-email-signup-form label {
+#startupapi-email-signup-form label {
 	display: block;
 	float: left;
 	line-height: 1.6;
@@ -838,17 +838,17 @@
 	padding: 3px 0;
 }
 
-#userbase-email-signup-form label:after {
+#startupapi-email-signup-form label:after {
 	content: ':';
 }
 
-#userbase-email-signup-button {
+#startupapi-email-signup-button {
 	margin-left: 125px;
 	padding: 0.3em 25px;
 	cursor: pointer;
 }
 
-#userbase-email-signup-form input {
+#startupapi-email-signup-form input {
 	background: #f6f6f6;
 	border: 2px solid #888;
 	border-radius: 2px;
@@ -857,18 +857,18 @@
 	padding: 4px;
 }
 
-#userbase-email-signup-form input:focus {
+#startupapi-email-signup-form input:focus {
 	background: #fff;
 }
 
-#userbase-email-signup-form abbr {
+#startupapi-email-signup-form abbr {
 	color: #f74d3d;
 	font-weight: bold;
 	cursor: help;
 }
 
 /* from modules/email/index.php edit info form */
-#userbase-email-edit-form {
+#startupapi-email-edit-form {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0.4em 1em;
 	margin: 0;
@@ -879,7 +879,7 @@
 	-webkit-border-radius: 7px;
 }
 
-#userbase-email-edit-form li {
+#startupapi-email-edit-form li {
 	font-size: 1.2em;
 	line-height: 1.5;
 
@@ -888,13 +888,13 @@
 	padding: 0;
 }
 
-#userbase-email-edit-form fieldset {
+#startupapi-email-edit-form fieldset {
 	border: 0;
 	padding: 0;
 	margin: 0;
 }
 
-#userbase-email-edit-form legend {
+#startupapi-email-edit-form legend {
 	border: 0;
 	padding: 0;
 	margin: 0;
@@ -903,13 +903,13 @@
 	padding-bottom: .6em;
 }
 
-#userbase-email-edit-form ul {
+#startupapi-email-edit-form ul {
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
 
-#userbase-email-edit-form label {
+#startupapi-email-edit-form label {
 	display: block;
 	float: left;
 	line-height: 1.6;
@@ -919,24 +919,24 @@
 	padding: 3px 0;
 }
 
-#userbase-email-edit-form label:after {
+#startupapi-email-edit-form label:after {
 	content: ':';
 }
 
-#userbase-email-edit-button {
+#startupapi-email-edit-button {
 	margin-left: 180px;
 	padding: 0.3em 25px;
 	cursor: pointer;
 }
 
-#userbase-email-edit-forgotpass {
+#startupapi-email-edit-forgotpass {
 	margin-left: 130px;
 	cursor: pointer;
 	font-size: 0.6em;
 	display: block;
 }
 
-#userbase-email-edit-form input {
+#startupapi-email-edit-form input {
 	background: #f6f6f6;
 	border: 2px solid #888;
 	border-radius: 2px;
@@ -945,11 +945,11 @@
 	padding: 4px;
 }
 
-#userbase-email-edit-form input:focus {
+#startupapi-email-edit-form input:focus {
 	background: #fff;
 }
 
-#userbase-email-edit-form abbr {
+#startupapi-email-edit-form abbr {
 	cursor: help;
 	font-style: normal;
 	border: 0;
@@ -958,14 +958,14 @@
 	font-weight: bold;
 }
 
-#userbase-email-edit-form .userbase-email-edit-section {
+#startupapi-email-edit-form .startupapi-email-edit-section {
 	font-size: 1.5em;
 	font-weight: bold;
 	margin-top: 1em;
 }
 
 /* from modules/email/login.php */
-.userbase-errorbox {
+.startupapi-errorbox {
 	background: #f7dfb9;
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0.4em 1em;
@@ -980,28 +980,28 @@
 	font-weight: bold;
 }
 
-.userbase-errorbox ul {
+.startupapi-errorbox ul {
 	margin: 0;
 	padding-left: 1em;
 }
-#userbase-loginlink {
+#startupapi-loginlink {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0 1em;
 	margin: 0 auto;
 	width: 450px;
 }
 
-#userbase-loginlink h2 {
+#startupapi-loginlink h2 {
 	font-weight: bold;
 	font-size: 2.5em;
 }
 
-#userbase-loginlink h3 {
+#startupapi-loginlink h3 {
 	font-weight: bold;
 	font-size: 1.5em;
 }
 
-#userbase-loginlink-form {
+#startupapi-loginlink-form {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0.4em 1em;
 	margin: 0;
@@ -1012,7 +1012,7 @@
 	-webkit-border-radius: 7px;
 }
 
-#userbase-loginlink-form li {
+#startupapi-loginlink-form li {
 	font-size: 1.2em;
 	line-height: 1.5;
 
@@ -1021,13 +1021,13 @@
 	padding: 0;
 }
 
-#userbase-loginlink-form fieldset {
+#startupapi-loginlink-form fieldset {
 	border: 0;
 	padding: 0;
 	margin: 0;
 }
 
-#userbase-loginlink-form legend {
+#startupapi-loginlink-form legend {
 	border: 0;
 	padding: 0;
 	margin: 0;
@@ -1036,13 +1036,13 @@
 	padding-bottom: .6em;
 }
 
-#userbase-loginlink-form ul {
+#startupapi-loginlink-form ul {
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
 
-#userbase-loginlink-form label {
+#startupapi-loginlink-form label {
 	display: block;
 	float: left;
 	line-height: 1.6;
@@ -1052,17 +1052,17 @@
 	padding: 3px 0;
 }
 
-#userbase-loginlink-form label:after {
+#startupapi-loginlink-form label:after {
 	content: ':';
 }
 
-#userbase-loginlink-button {
+#startupapi-loginlink-button {
 	margin-left: 70px;
 	padding: 0.3em 25px;
 	cursor: pointer;
 }
 
-#userbase-loginlink-form input {
+#startupapi-loginlink-form input {
 	background: #f6f6f6;
 	border: 2px solid #888;
 	border-radius: 2px;
@@ -1071,6 +1071,6 @@
 	padding: 4px;
 }
 
-#userbase-loginlink-form input:focus {
+#startupapi-loginlink-form input:focus {
 	background: #fff;
 }

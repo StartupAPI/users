@@ -47,12 +47,12 @@ if (array_key_exists('recover', $_POST))
 
 require_once(UserConfig::$header);
 ?>
-<div id="userbase-forgotpassword">
+<div id="startupapi-forgotpassword">
 <?php
 if (array_key_exists('status', $_GET) && $_GET['status'] == 'sent')
 {
 ?>
-	<div id="userbase-passwordsent">
+	<div id="startupapi-passwordsent">
 	<fieldset>
 	<legend>Temporary password is sent</legend>
 	<p>We generated temporary password and sent it to email address on file with your account.</p>
@@ -65,12 +65,12 @@ if (array_key_exists('status', $_GET) && $_GET['status'] == 'sent')
 else
 {
 	?><h2>Forgot password?</h2>
-	<div id="userbase-forgotpassword-form">
+	<div id="startupapi-forgotpassword-form">
 	<form action="" method="POST">
 	<fieldset>
 	<legend>Please enter your email or username</legend>
 	<input type="text" name="emailorusername" value="" size="40"/>
-	<button id="userbase-forgotpassword-button" type="submit" name="recover">Send</button>
+	<button id="startupapi-forgotpassword-button" type="submit" name="recover">Send</button>
 
 	<p>Email with temporary password will be sent to email address associated with your user account.</p>
 	</fieldset>

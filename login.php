@@ -68,7 +68,7 @@ if (array_key_exists('login', $_POST))
 require_once(UserConfig::$header);
 
 ?>
-<div id="userbase-authlist">
+<div id="startupapi-authlist">
 <h2>Log in</h2>
 <?php
 
@@ -82,7 +82,7 @@ foreach (UserConfig::$authentication_modules as $module)
 <?php
 	if (array_key_exists('module', $_GET) && $id == $_GET['module'] && array_key_exists('error', $_GET))
 	{
-		?><div class="userbase-errorbox">Login failed</div><?php
+		?><div class="startupapi-errorbox">Login failed</div><?php
 	}
 
 	$module->renderLoginForm("?module=$id");

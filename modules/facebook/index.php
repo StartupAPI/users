@@ -234,7 +234,7 @@ Logging out from Facebook...
 		<input type="hidden" name="<?php echo $formsubmit ?>" value="Connect &gt;&gt;&gt;"/>
 		<?php UserTools::renderCSRFNonce(); ?>
 		</form>
-		<a class="userbase-fb-connect" href="#" onclick="UserBaseFBConnectButtonClicked(); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); <?php echo $buttonspritestyle ?> display: block; cursor: hand; margin-top: 0.3em" title="<?php echo $buttontitle ?>"></span></a>
+		<a class="startupapi-fb-connect" href="#" onclick="UserBaseFBConnectButtonClicked(); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); <?php echo $buttonspritestyle ?> display: block; cursor: hand; margin-top: 0.3em" title="<?php echo $buttontitle ?>"></span></a>
 
 		<script>
 		var UserBaseFBFormType = <?php echo json_encode($form) ?>;

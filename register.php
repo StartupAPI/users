@@ -80,7 +80,7 @@ if (UserConfig::$enableRegistration && array_key_exists('register', $_POST))
 require_once(UserConfig::$header);
 
 ?>
-<div id="userbase-authlist">
+<div id="startupapi-authlist">
 <h2>Sign up</h2>
 <?php
 
@@ -113,12 +113,12 @@ if (UserConfig::$enableRegistration)
 
 		if (!$show_registration_form) {
 			?>
-			<form id="userbase-invitation-form" action="" method="GET">
+			<form id="startupapi-invitation-form" action="" method="GET">
 			<fieldset>
 			<legend><?php echo $message?></legend>
 			<p>
-			<input id="userbase-invite-code" name="invite" size="30" value="<?php echo UserTools::escape(array_key_exists('invite', $_GET) ? $_GET['invite'] : '')?>"/>
-			<button id="userbase-invitation-button" type="submit">&gt;&gt;</button>
+			<input id="startupapi-invite-code" name="invite" size="30" value="<?php echo UserTools::escape(array_key_exists('invite', $_GET) ? $_GET['invite'] : '')?>"/>
+			<button id="startupapi-invitation-button" type="submit">&gt;&gt;</button>
 			</p>
 			</fieldset>
 			</form>
@@ -138,7 +138,7 @@ if (UserConfig::$enableRegistration)
 		<?php
 			if (array_key_exists($id, $errors) && is_array($errors[$id]) && count($errors[$id]) > 0)
 			{
-				?><div class="userbase-errorbox"><ul><?php
+				?><div class="startupapi-errorbox"><ul><?php
 				foreach ($errors[$id] as $field => $errorset)
 				{
 					foreach ($errorset as $error)

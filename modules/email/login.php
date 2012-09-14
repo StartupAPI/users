@@ -42,12 +42,12 @@ if (array_key_exists('code', $_GET) && array_key_exists('email', $_GET))
 require_once(UserConfig::$header);
 
 ?>
-<div id="userbase-loginlink">
+<div id="startupapi-loginlink">
 <p>Confirmation code was sent to <?php echo array_key_exists('email', $_GET) ? UserTools::escape($_GET['email']) : 'your email address' ?> please enter it below and click login button.</p>
 <?php
 if (count($errors) > 0)
 {
-	?><div class="userbase-errorbox"><ul><?php
+	?><div class="startupapi-errorbox"><ul><?php
 	foreach ($errors as $field => $errorset)
 	{
 		foreach ($errorset as $error)
@@ -58,13 +58,13 @@ if (count($errors) > 0)
 	?></ul></div><?php
 }
 ?>
-<form id="userbase-loginlink-form" action="" method="GET">
+<form id="startupapi-loginlink-form" action="" method="GET">
 <fieldset>
 <legend>Enter confirmation code to login</legend>
 <ul>
 <li><label>Email</label><input name="email" type="text" size="40"<?php if (array_key_exists('email', $_GET)) {?> value="<?php echo UserTools::escape($_GET['email'])?>"<?php }?>/><?php echo array_key_exists('email', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape($errors['email']).'">*</span>' : ''?></li>
 <li><label>Code</label><input name="code" type="text" size="40" autocomplete="off"/><?php echo array_key_exists('code', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode('; ', $errors['code'])).'">*</span>' : ''?></li>
-<li><button id="userbase-loginlink-button" type="submit" name="login">Login</button></li>
+<li><button id="startupapi-loginlink-button" type="submit" name="login">Login</button></li>
 </ul>
 </fieldset>
 </form>

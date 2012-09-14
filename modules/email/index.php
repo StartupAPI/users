@@ -90,12 +90,12 @@ class EmailAuthenticationModule extends AuthenticationModule
 	public function renderLoginForm($action)
 	{
 		?>
-		<form id="userbase-email-login-form" action="<?php echo $action?>" method="POST">
+		<form id="startupapi-email-login-form" action="<?php echo $action?>" method="POST">
 		<fieldset>
 		<legend>Enter your email address to re-send login link</legend>
 		<ul>
-		<li><label for="userbase-email-login-email">Email</label><input id="userbase-email-login-email" name="email" type="email" size="40"/><?php echo array_key_exists('email', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</abbr>' : ''?></li>
-		<li><button id="userbase-email-login-button" type="submit" name="login">Re-send login link</button><?php if (UserConfig::$enableRegistration) {?> <a href="<?php echo UserConfig::$USERSROOTURL?>/register.php">or register</a><?php } ?></li>
+		<li><label for="startupapi-email-login-email">Email</label><input id="startupapi-email-login-email" name="email" type="email" size="40"/><?php echo array_key_exists('email', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</abbr>' : ''?></li>
+		<li><button id="startupapi-email-login-button" type="submit" name="login">Re-send login link</button><?php if (UserConfig::$enableRegistration) {?> <a href="<?php echo UserConfig::$USERSROOTURL?>/register.php">or register</a><?php } ?></li>
 		</ul>
 		</fieldset>
 		</form>
@@ -106,13 +106,13 @@ class EmailAuthenticationModule extends AuthenticationModule
 	public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null)
 	{
 		?>
-		<form id="userbase-email-signup-form" action="<?php echo $action?>" method="POST">
+		<form id="startupapi-email-signup-form" action="<?php echo $action?>" method="POST">
 		<fieldset>
 		<legend>Enter your name and email address to sign up</legend>
 		<ul>
-		<li><label for="userbase-email-register-name">Name</label><input id="userbase-email-register-name" name="name" type="test" size="40" value="<?php echo array_key_exists('name', $data) ? UserTools::escape($data['name']) : ''?>"/><?php echo array_key_exists('name', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['name'])).'">*</abbr>' : ''?></li>
-		<li><label for="userbase-email-signup-email">Email</label><input id="userbase-email-signup-email" name="email" type="text" size="40"/><?php echo array_key_exists('email', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</abbr>' : ''?></li>
-		<li><button id="userbase-email-signup-button" type="submit" name="register">Sign up</button> <a href="<?php echo UserConfig::$USERSROOTURL?>/login.php">or re-send login link</a></li>
+		<li><label for="startupapi-email-register-name">Name</label><input id="startupapi-email-register-name" name="name" type="test" size="40" value="<?php echo array_key_exists('name', $data) ? UserTools::escape($data['name']) : ''?>"/><?php echo array_key_exists('name', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['name'])).'">*</abbr>' : ''?></li>
+		<li><label for="startupapi-email-signup-email">Email</label><input id="startupapi-email-signup-email" name="email" type="text" size="40"/><?php echo array_key_exists('email', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</abbr>' : ''?></li>
+		<li><button id="startupapi-email-signup-button" type="submit" name="register">Sign up</button> <a href="<?php echo UserConfig::$USERSROOTURL?>/login.php">or re-send login link</a></li>
 		</ul>
 		</fieldset>
 		</form>
@@ -131,11 +131,11 @@ class EmailAuthenticationModule extends AuthenticationModule
 	public function renderEditUserForm($action, $errors, $user, $data)
 	{
 		?>
-		<form id="userbase-email-edit-form" action="<?php echo $action?>" method="POST">
+		<form id="startupapi-email-edit-form" action="<?php echo $action?>" method="POST">
 		<fieldset>
 		<legend>Update your name and email</legend>
 		<ul>
-		<li class="userbase-email-edit-section">Name and email</li>
+		<li class="startupapi-email-edit-section">Name and email</li>
 		<li><label>Name</label><input name="name" type="test" size="40" value="<?php echo UserTools::escape(array_key_exists('name', $data) ? $data['name'] : $user->getName())?>"/><?php echo array_key_exists('name', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['name'])).'">*</span>' : ''?></li>
 		<li><label>E-mail</label><input name="email" type="text" size="40" value="<?php echo UserTools::escape(array_key_exists('email', $data) ? $data['email'] : $user->getEmail())?>"/><?php echo array_key_exists('email', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</span>' : ''?></li>
 		</ul>

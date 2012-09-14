@@ -40,16 +40,16 @@ if (array_key_exists('save', $_POST))
 require_once(UserConfig::$header);
 
 ?>
-<div id="userbase-passwordreset">
+<div id="startupapi-passwordreset">
 <h2>Password reset</h2>
 
-<form id="userbase-passwordreset-form" action="" method="POST">
+<form id="startupapi-passwordreset-form" action="" method="POST">
 <fieldset>
 <legend>Please enter new password</legend>
 <ul>
 <li><label>New password</label><input name="pass" type="password" size="25" autocomplete="off"/><?php echo array_key_eXists('pass', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape($errors['pass']).'">*</span>' : ''?></li>
 <li><label>Repeat new password</label><input name="repeatpass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('repeatpass', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape($errors['repeatpass']).'">*</span>' : ''?></li>
-<li><button id="userbase-passwordreset-button" type="submit" name="save">Save changes</button></li>
+<li><button id="startupapi-passwordreset-button" type="submit" name="save">Save changes</button></li>
 </ul>
 </fieldset>
 </form>

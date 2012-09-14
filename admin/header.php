@@ -37,7 +37,7 @@ if (UserConfig::$enableInvitations) {
 	?><h2>Users | <a href="invitations.php">Invitations</a></h2><?php
 }
 ?>
-<div id="userbase_adminmenu">
+<div id="startupapi_adminmenu">
 <?php if ($ADMIN_SECTION != 'dashboard') {
 	?><a href="./">Dashboard</a><?php
 } else {
