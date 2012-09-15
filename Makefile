@@ -86,12 +86,9 @@ endif
 
 docs:	documentation
 documentation:
-	# Using PHPDocumentator 2.x that works with phpdoc.dist.xml file for configuration
-	phpdoc
+	# Using ApiGen which works with apigen.neon file for configuration
+	apigen
 
 code:
 	php phptidy/phptidy.php replace
 	find . -name '*.phptidybak~' | xargs -n10 rm
-
-
-                              

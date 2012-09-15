@@ -1,0 +1,16 @@
+source: .
+
+destination: docs
+
+exclude:
+	- */oauth-php/*
+	- */modules/facebook/php-sdk/*
+	- */dbupgrade/*
+	- */admin/swfobject/*
+	- */docs/*
+	- */smarty/*
+	- */phptidy/*
+	- */apigen-docs/*
+	- */CookieStorage.php
+
+debug: yes
