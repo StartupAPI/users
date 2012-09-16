@@ -13,4 +13,4 @@ exclude:
 	- */apigen-docs/*
 	- */CookieStorage.php
 
-debug: yes
+php: no
