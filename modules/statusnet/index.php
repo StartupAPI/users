@@ -1,10 +1,10 @@
 <?php
-/**
- * @package StartupAPI
- * @subpackage Authentication
- */
 require_once(dirname(dirname(dirname(__FILE__))).'/OAuthModule.php');
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication\StatusNet
+ */
 class StatusNetAuthenticationModule extends OAuthAuthenticationModule
 {
 	private $title;
@@ -116,6 +116,10 @@ class StatusNetAuthenticationModule extends OAuthAuthenticationModule
 	}
 }
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication\StatusNet
+ */
 class StatusNetUserCredentials extends OAuthUserCredentials {
 	public function getHTML() {
 		return '@<a href="'.$this->rootURL . UserTools::escape($this->userinfo['screen_name']).'" target="_blank">'.$this->userinfo['screen_name'].'</a>';

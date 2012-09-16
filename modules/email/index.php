@@ -1,7 +1,7 @@
 <?php
 /**
  * @package StartupAPI
- * @subpackage Authentication
+ * @subpackage Authentication\Email
  *
  * Email authentication module
  *
@@ -447,6 +447,10 @@ class EmailAuthenticationModule extends AuthenticationModule
 	public static $IGNORE_PASSWORD_RESET = false;
 }
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication\Email
+ */
 class EmailUserCredentials extends UserCredentials {
 	private $username;
 

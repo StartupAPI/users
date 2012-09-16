@@ -1,7 +1,7 @@
 <?php
 /**
  * @package StartupAPI
- * @subpackage Email
+ * @subpackage Email\MailChimp
  */
 class MailChimpModule extends EmailModule
 {
@@ -98,6 +98,6 @@ class MailChimpModule extends EmailModule
 
 /**
  * @package StartupAPI
- * @subpackage Email
+ * @subpackage Email\MailChimp
  */
 class MailChimpException extends Exception { }

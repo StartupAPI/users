@@ -1,10 +1,10 @@
 <?php
-/**
- * @package StartupAPI
- * @subpackage Authentication
- */
 require_once(dirname(__FILE__).'/facebook.php');
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication\Facebook
+ */
 class FacebookAuthenticationModule extends AuthenticationModule
 {
 	private $sdk;
@@ -581,6 +581,10 @@ Logging out from Facebook...
 	}
 }
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication\Facebook
+ */
 class FacebookUserCredentials extends UserCredentials {
 	// Facebook user id
 	private $fb_id;

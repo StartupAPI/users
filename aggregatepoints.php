@@ -1,7 +1,7 @@
 <?php
 /**
  * @package StartupAPI
- * @subpackage Email
+ * @subpackage Analytics
  */
 require_once(dirname(__FILE__).'/global.php');
 

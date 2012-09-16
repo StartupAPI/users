@@ -1,10 +1,10 @@
 <?php
-/**
- * @package StartupAPI
- * @subpackage Authentication
- */
 require_once(dirname(dirname(dirname(__FILE__))).'/OAuthModule.php');
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication\Twitter
+ */
 class TwitterAuthenticationModule extends OAuthAuthenticationModule
 {
 	protected $userCredentialsClass = 'TwitterUserCredentials';
@@ -92,6 +92,10 @@ class TwitterAuthenticationModule extends OAuthAuthenticationModule
 	}
 }
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication\Twitter
+ */
 class TwitterUserCredentials extends OAuthUserCredentials {
 	public function getHTML() {
 		return '<a href="http://twitter.com/'.UserTools::escape($this->userinfo['screen_name']).'" target="_blank">@'.$this->userinfo['screen_name'].'</a>';

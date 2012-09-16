@@ -1,6 +1,10 @@
 <?php
 require_once(dirname(dirname(dirname(__FILE__))).'/OAuthModule.php');
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication\Linkedin
+ */
 class LinkedInAuthenticationModule extends OAuthAuthenticationModule
 {
 	protected $userCredentialsClass = 'LinkedInUserCredentials';
@@ -63,6 +67,10 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule
 	}
 }
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication\Linkedin
+ */
 class LinkedInUserCredentials extends OAuthUserCredentials {
 	public function getHTML() {
 		return '<a href="'.UserTools::escape($this->userinfo['publicProfileUrl']).'" target="_blank">'.$this->userinfo['name'].'</a>';

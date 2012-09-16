@@ -1,9 +1,9 @@
 <?php
 /**
- * Google Friend Connect Authentication Module
- *
  * @package StartupAPI
- * @subpackage Authentication
+ * @subpackage Authentication\Google
+ *
+ * Google Friend Connect Authentication Module
  *
  * @deprecated !!! ATTENTION !!! This login method is discontinued by Google, use /google_oauth/ module instead
  */
@@ -455,7 +455,12 @@ google.setOnLoadCallback(function() {
 		return $html;
 	}
 }
-
+/**
+ * @package StartupAPI
+ * @subpackage Authentication\Google
+ *
+ * @deprecated !!! ATTENTION !!! This login method is discontinued by Google, use /google_oauth/ module instead
+ */
 class GoogleFriendConnectUserCredentials extends UserCredentials {
 	// A list of Google Friend Connect IDs
 	private $google_ids;

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package StartupAPI
- * @subpackage Authentication
+ * @subpackage Authentication\Facebook
  *
  * Copyright 2011 Facebook, Inc.
  *

@@ -1,7 +1,6 @@
 <?php
 /**
  * @package StartupAPI
- * @subpackage Email
  *
  * Various tools used within Startup API
  */

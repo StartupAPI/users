@@ -1,10 +1,10 @@
 <?php
-/**
- * @package StartupAPI
- * @subpackage Authentication
- */
 require_once(dirname(dirname(dirname(__FILE__))).'/OAuthModule.php');
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication\Etsy
+ */
 class EtsyAuthenticationModule extends OAuthAuthenticationModule
 {
 	protected $userCredentialsClass = 'EtsyUserCredentials';
@@ -97,6 +97,10 @@ class EtsyAuthenticationModule extends OAuthAuthenticationModule
 	}
 }
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication\Etsy
+ */
 class EtsyUserCredentials extends OAuthUserCredentials {
 	public function getHTML() {
 		return '<a href="http://'.UserTools::escape($this->userinfo['name']).'.etsy.com/" target="_blank">'.UserTools::escape($this->userinfo['name']).'</a>';

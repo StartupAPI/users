@@ -1,10 +1,10 @@
 <?php
-/**
- * @package StartupAPI
- * @subpackage Authentication
- */
 require_once(dirname(dirname(dirname(__FILE__))).'/OAuthModule.php');
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication\Google
+ */
 class GoogleOAuthAuthenticationModule extends OAuthAuthenticationModule
 {
 	protected $userCredentialsClass = 'GoogleOAuthUserCredentials';
@@ -87,5 +87,9 @@ class GoogleOAuthAuthenticationModule extends OAuthAuthenticationModule
 	}
 }
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication\Google
+ */
 class GoogleOAuthUserCredentials extends OAuthUserCredentials {
 }

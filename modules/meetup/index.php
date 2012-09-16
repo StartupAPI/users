@@ -1,10 +1,10 @@
 <?php
-/**
- * @package StartupAPI
- * @subpackage Authentication
- */
 require_once(dirname(dirname(dirname(__FILE__))).'/OAuthModule.php');
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication\Meetup
+ */
 class MeetupAuthenticationModule extends OAuthAuthenticationModule
 {
 	protected $userCredentialsClass = 'MeetupUserCredentials';
@@ -74,6 +74,10 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 	}
 }
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication\Meetup
+ */
 class MeetupUserCredentials extends OAuthUserCredentials {
 	public function getHTML() {
 		return '<a href="'.UserTools::escape($this->userinfo['link']).'" target="_blank">'.$this->userinfo['name'].'</a>';

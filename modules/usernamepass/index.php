@@ -1,7 +1,7 @@
 <?php
 /**
  * @package StartupAPI
- * @subpackage Authentication
+ * @subpackage Authentication\UsernamePassword
  */
 class UsernamePasswordAuthenticationModule extends AuthenticationModule
 {
@@ -521,6 +521,10 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 	public static $IGNORE_PASSWORD_RESET = false;
 }
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication\UsernamePassword
+ */
 class UsernamePassUserCredentials extends UserCredentials {
 	private $username;
 

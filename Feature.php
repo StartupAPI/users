@@ -1,7 +1,6 @@
 <?php
 /**
  * @package StartupAPI
- * @subpackage Email
  */
 class Feature {
 	private $id;

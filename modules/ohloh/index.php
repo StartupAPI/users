@@ -1,10 +1,10 @@
 <?php
-/**
- * @package StartupAPI
- * @subpackage Authentication
- */
 require_once(dirname(dirname(dirname(__FILE__))).'/OAuthModule.php');
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication\Ohloh
+ */
 class OhlohAuthenticationModule extends OAuthAuthenticationModule
 {
 	protected $userCredentialsClass = 'OhlohUserCredentials';
@@ -77,6 +77,10 @@ class OhlohAuthenticationModule extends OAuthAuthenticationModule
 	}
 }
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication\Ohloh
+ */
 class OhlohUserCredentials extends OAuthUserCredentials {
 	public function getHTML() {
 		return '<a href="http://www.ohloh.net/accounts/'.UserTools::escape($user_info['id']).'" target="_blank">@'.$this->userinfo['name'].'</a>';
