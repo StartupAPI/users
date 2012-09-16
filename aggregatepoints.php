@@ -1,5 +1,8 @@
 <?php
-// This script 
+/**
+ * @package StartupAPI
+ * @subpackage Email
+ */
 require_once(dirname(__FILE__).'/global.php');
 
 function aggregatePoints() {

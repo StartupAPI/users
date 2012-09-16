@@ -1,7 +1,10 @@
 <?php
-/*
+/**
+ * @package StartupAPI
+ * @subpackage Email
+ *
  * Invitation class
-*/
+ */
 require_once(dirname(__FILE__).'/global.php');
 require_once(dirname(__FILE__).'/User.php');
 

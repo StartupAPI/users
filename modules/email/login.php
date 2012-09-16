@@ -7,7 +7,7 @@ $errors = array();
 
 if (array_key_exists('code', $_GET) && array_key_exists('email', $_GET))
 {
-	$module = UserBaseModule::get('email');
+	$module = StartupAPIModule::get('email');
 
 	try
 	{

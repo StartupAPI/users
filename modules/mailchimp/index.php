@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package StartupAPI
+ * @subpackage Email
+ */
 class MailChimpModule extends EmailModule
 {
 	private $apiKey;
@@ -92,4 +96,8 @@ class MailChimpModule extends EmailModule
 	}
 }
 
+/**
+ * @package StartupAPI
+ * @subpackage Email
+ */
 class MailChimpException extends Exception { }

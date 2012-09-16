@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package StartupAPI
+ * @subpackage Subscriptions
+ */
 class Plan {
 	private static $FREE;
 

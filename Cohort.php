@@ -1,5 +1,8 @@
-<?php 
-
+<?php
+/**
+ * @package StartupAPI
+ * @subpackage Analytics
+ */
 class Cohort {
 	private $id;
 	private $title;
@@ -24,6 +27,10 @@ class Cohort {
 	}
 }
 
+/**
+ * @package StartupAPI
+ * @subpackage Analytics
+ */
 abstract class CohortProvider {
 	private $title;
 	private $id;
@@ -139,6 +146,9 @@ abstract class CohortProvider {
 }
 
 /**
+ * @package StartupAPI
+ * @subpackage Analytics
+ *
  * This class allows dropping users into cohorts by registration date
  */
 class GenerationCohorts extends CohortProvider {
@@ -293,6 +303,9 @@ class GenerationCohorts extends CohortProvider {
 }
 
 /**
+ * @package StartupAPI
+ * @subpackage Analytics
+ *
  * This class allows dropping users into cohorts by registration method / module
  */
 class RegMethodCohorts extends CohortProvider {

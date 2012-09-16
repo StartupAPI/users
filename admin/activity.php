@@ -138,7 +138,7 @@ Filter activities:
 <option value="withpoints"<?php echo $showactivities == 'withpoints' ? ' selected="yes"' : '' ?>>-- all activities with points (default) --</option>
 <option value="all"<?php echo $showactivities == 'all' ? ' selected="yes"' : '' ?>>-- all activities --</option>
 <?php
-function mostpoints($a, $b) {
+uksort(UserConfig::$activities, function($a, $b) {
 	if (UserConfig::$activities[$a][1] > UserConfig::$activities[$b][1]) {
 		return -1;
 	} else if (UserConfig::$activities[$a][1] < UserConfig::$activities[$b][1]) {
@@ -146,9 +146,7 @@ function mostpoints($a, $b) {
 	}
 
 	return strcmp(UserConfig::$activities[$a][0], UserConfig::$activities[$b][0]);
-}
-
-uksort(UserConfig::$activities, 'mostpoints');
+});
 
 $stats = User::getActivityStatistics();
 

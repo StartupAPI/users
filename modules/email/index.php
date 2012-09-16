@@ -1,5 +1,8 @@
 <?php
 /**
+ * @package StartupAPI
+ * @subpackage Authentication
+ *
  * Email authentication module
  *
  * This module is used for authenticating users using just an email address.

@@ -4,7 +4,7 @@
  */
 require_once(dirname(__FILE__).'/global.php');
 
-interface IUserBaseModule
+interface IStartupAPIModule
 {
 	/**
 	 * Returns module ID
@@ -14,7 +14,7 @@ interface IUserBaseModule
 	public function getTitle();
 }
 
-abstract class UserBaseModule implements IUserBaseModule {
+abstract class StartupAPIModule implements IStartupAPIModule {
 	public function __construct() {
 		UserConfig::$all_modules[] = $this;
 	}

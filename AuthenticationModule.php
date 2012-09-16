@@ -3,7 +3,7 @@
  * @package StartupAPI
  * @subpackage Authentication
  */
-interface IAuthenticationModule extends IUserBaseModule
+interface IAuthenticationModule extends IStartupAPIModule
 {
 	public function renderLoginForm($action);
 	public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null);
@@ -29,7 +29,11 @@ interface IAuthenticationModule extends IUserBaseModule
 	public function getTotalConnectedUsers();
 }
 
-abstract class AuthenticationModule extends UserBaseModule implements IAuthenticationModule {
+/**
+ * @package StartupAPI
+ * @subpackage Authentication
+ */
+abstract class AuthenticationModule extends StartupAPIModule implements IAuthenticationModule {
 	public function __construct() {
 		parent::__construct();
 		UserConfig::$authentication_modules[] = $this;
@@ -109,6 +113,11 @@ abstract class AuthenticationModule extends UserBaseModule implements IAuthentic
 	}
 }
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication
+ */
+
 class InputValidationException extends Exception {
 	private $errors;
 
@@ -123,6 +132,11 @@ class InputValidationException extends Exception {
 		return $this->errors;
 	}
 }
+
+/**
+ * @package StartupAPI
+ * @subpackage Authentication
+ */
 
 class ExistingUserException extends Exception {
 	private $errors;
@@ -139,6 +153,11 @@ class ExistingUserException extends Exception {
 	}
 }
 
+/**
+ * @package StartupAPI
+ * @subpackage Authentication
+ */
+
 class UserCreationException extends Exception {
 	private $field;
 
@@ -154,7 +173,10 @@ class UserCreationException extends Exception {
 	}
 }
 
-/*
+/**
+ * @package StartupAPI
+ * @subpackage Authentication
+ *
  * Class representing user credentials for particular module
  * Must be subclassed and implemented by module
  */

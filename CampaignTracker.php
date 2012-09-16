@@ -1,10 +1,11 @@
 <?php
-require_once(dirname(__FILE__).'/CookieStorage.php');
-
-/*
+/**
+ * @package StartupAPI
+ * @subpackage Analytics
+ *
  * This file should be included on all pages if referer tracking is required
  */
-
+require_once(dirname(__FILE__).'/CookieStorage.php');
 class CampaignTracker
 {
 	private static $referer = null;

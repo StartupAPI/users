@@ -1,5 +1,9 @@
 <?php
-interface IEmailModule extends IUserBaseModule
+/**
+ * @package StartupAPI
+ * @subpackage Email
+ */
+interface IEmailModule extends IStartupAPIModule
 {
 	/**
 	 * This function should be called when new user is created
@@ -32,7 +36,11 @@ interface IEmailModule extends IUserBaseModule
 	public function hasUserInfoChanged($old_user, $new_user);
 }
 
-abstract class EmailModule extends UserBaseModule implements IEmailModule {
+/**
+ * @package StartupAPI
+ * @subpackage Email
+ */
+abstract class EmailModule extends StartupAPIModule implements IEmailModule {
 	public function __construct() {
 		parent::__construct();
 
@@ -66,10 +74,27 @@ abstract class EmailModule extends UserBaseModule implements IEmailModule {
 	}
 }
 
+/**
+ * @package StartupAPI
+ * @subpackage Email
+ */
+
 class EmailModuleException extends Exception {}
 
+/**
+ * @package StartupAPI
+ * @subpackage Email
+ */
 class EmailSubscriptionException extends EmailModuleException { }
 
+/**
+ * @package StartupAPI
+ * @subpackage Email
+ */
 class EmailSubscriberUpdateException extends EmailModuleException { }
 
+/**
+ * @package StartupAPI
+ * @subpackage Email
+ */
 class EmailUnSubscriptionException extends EmailModuleException { }
