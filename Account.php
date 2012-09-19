@@ -26,12 +26,23 @@ class Account
 	private $role;
 	private $plan;
 
+	/**
+	 * @var int Constant defining user role
+	 */
 	const ROLE_USER = 0;
+
+	/**
+	 * @var int Constant defining administrator role
+	 */
 	const ROLE_ADMIN = 1;
 
 	/**
-	* Gets Account by ID
-	*/
+	 * Gets Account by ID
+	 *
+	 * @param int $id Account id
+	 * @return Account Account associated with specified ID
+	 * @trows Exception
+	 */
 	public static function getByID($id)
 	{
 		$db = UserConfig::getDB();
@@ -67,7 +78,14 @@ class Account
 		return $account;
 	}
 
-	public static function getUserAccounts($user)
+	/**
+	 * Gets all accounts associated with the user
+	 *
+	 * @param User $user User we need accounts for
+	 * @return array Array of user accounts
+	 * @throws Exception
+	 */
+	public static function getUserAccounts(User $user)
 	{
 		$db = UserConfig::getDB();
 		$accounts = array();
