@@ -14,3 +14,8 @@ exclude:
 	- */CookieStorage.php
 
 php: no
+
+report: docs/report.xml
+
+todo: yes
+
