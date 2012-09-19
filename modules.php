@@ -1,29 +1,35 @@
 <?php
 /**
  * @package StartupAPI
+ * @subpackage Extensions
  */
 require_once(dirname(__FILE__).'/global.php');
 
-interface IStartupAPIModule
-{
-	/**
-	 * Returns module ID
-	 * Each module must implement this method and use unique ID
-	 */
-	public function getID();
-	public function getTitle();
-}
-
-abstract class StartupAPIModule implements IStartupAPIModule {
+abstract class StartupAPIModule {
 	public function __construct() {
 		UserConfig::$all_modules[] = $this;
 	}
 
 	/**
+	 * Returns module ID string
+	 * Each module must implement this method and use unique ID
+	 *
+	 * @return string Descriptionunique module ID
+	 */
+	abstract public function getID();
+
+	/**
+	 * Returns human readable module name
+	 *
+	 * @return string Module name
+	 */
+	abstract public function getTitle();
+
+	/**
 	 * Returns module by ID
 	 * @param string $id ID of the module
 	 */
-	public static function get($id) {
+	public static function get(string $id) {
 		foreach (UserConfig::$all_modules as $module)
 		{
 			if ($module->getID() == $id) {

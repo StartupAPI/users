@@ -3,44 +3,7 @@
  * @package StartupAPI
  * @subpackage Email
  */
-interface IEmailModule extends IStartupAPIModule
-{
-	/**
-	 * This function should be called when new user is created
-	 * or email is recorded for the user for the first time
-	 */
-	public function registerSubscriber($user);
-
-	/**
-	 * This function should be called when user information has changed
-	 * e.g. email address or additional information passed to provider like name or gender and etc.
-	 */
-	public function updateSubscriber($old_user, $new_user);
-
-	/**
-	 * This function should be called when user chose to unsubscribe from the mailing list
-	 */
-	public function removeSubscriber($user);
-
-	/**
-	 * This method will be called if some user info is changed
-	 */
-	public function userChanged($old_user, $new_user);
-
-	/**
-	 * This method should be called by userChanged to decide if updateSubscriber needs to be called
-	 * It's up to implementing class to decide if email provider needs to be updated
-	 *
-	 * @return boolean Returns true if user's information has changed and needs to be synced
-	 */
-	public function hasUserInfoChanged($old_user, $new_user);
-}
-
-/**
- * @package StartupAPI
- * @subpackage Email
- */
-abstract class EmailModule extends StartupAPIModule implements IEmailModule {
+abstract class EmailModule extends StartupAPIModule {
 	public function __construct() {
 		parent::__construct();
 
@@ -51,6 +14,34 @@ abstract class EmailModule extends StartupAPIModule implements IEmailModule {
 		UserConfig::$email_module = $this;
 	}
 
+	/**
+	 * This function should be called when new user is created
+	 * or email is recorded for the user for the first time
+	 */
+	abstract public function registerSubscriber($user);
+
+	/**
+	 * This function should be called when user information has changed
+	 * e.g. email address or additional information passed to provider like name or gender and etc.
+	 */
+	abstract public function updateSubscriber($old_user, $new_user);
+
+	/**
+	 * This function should be called when user chose to unsubscribe from the mailing list
+	 */
+	abstract public function removeSubscriber($user);
+
+	/**
+	 * This method should be called by userChanged to decide if updateSubscriber needs to be called
+	 * It's up to implementing class to decide if email provider needs to be updated
+	 *
+	 * @return boolean Returns true if user's information has changed and needs to be synced
+	 */
+	abstract public function hasUserInfoChanged($old_user, $new_user);
+
+	/**
+	 * This method will be called if some user info is changed
+	 */
 	public function userChanged($old_user, $new_user) {
 		// submodule to decide if it needs to sync the user info
 		$userInfoChanged = $this->hasUserInfoChanged($old_user, $new_user);

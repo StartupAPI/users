@@ -150,7 +150,7 @@ class EmailAuthenticationModule extends AuthenticationModule
 
 	public function processLogin($data, &$remember)
 	{
-		$user = User::getUserByUsernameOrEmail($data['email']);
+		$user = User::getUsersByEmailOrUsername($data['email']);
 
 		header('Location: '.UserConfig::$USERSROOTURL.'/modules/email/login.php?module=email&message=linksent');
 		exit;

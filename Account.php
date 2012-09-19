@@ -3,6 +3,22 @@
  * @package StartupAPI
  */
 require_once(dirname(__FILE__).'/Plan.php');
+
+/**
+ * Account class represents accounts in the system.
+ *
+ * Each account can have multiple users and usually it's a good idea to assign application items to accounts and not users.
+ * Navigation bar will show account picker when user has multiple accounts assugned to them,
+ *
+ * Usage:
+ * <code>
+ * // Getting currently logged in user
+ * $user = StartupAPI::requireLogin();
+ *
+ * // Getting currently selected account
+ * $account = $user->getCurrentAccount();
+ * </code>
+ */
 class Account
 {
 	private $id;
@@ -243,7 +259,7 @@ class Account
 				throw new Exception("Can't prepare statement: ".$db->error);
 			}
 		}
-		
+
 		return new self($id, $name, $plan, $role);
 	}
 
@@ -271,7 +287,7 @@ class Account
 			}
 			$stmt->fetch();
 			$stmt->close();
-			
+
 			if ($id)
 			{
 				return new self($id, $name, Plan::getByID($plan_id), $role);

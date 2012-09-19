@@ -1,11 +1,13 @@
 <?php
-/**
- * @package StartupAPI
- * @subpackage Authentication
- */
 include_once(dirname(__FILE__).'/oauth-php/library/OAuthStore.php');
 include_once(dirname(__FILE__).'/oauth-php/library/OAuthRequester.php');
 
+/**
+ * Abstract class, implements OAuth flow and data storage for specific modules to subclass
+ *
+ * @package StartupAPI
+ * @subpackage Authentication
+ */
 abstract class OAuthAuthenticationModule extends AuthenticationModule
 {
 	protected $serviceName;
@@ -616,11 +618,18 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 	}
 }
 
+/**
+ * Abstract class representing user credentials for making OAuth API calls
+ */
 abstract class OAuthUserCredentials extends UserCredentials {
-	// OAuth user id
+	/**
+	 * @var int OAuth user id
+	 */
 	protected $oauth_user_id;
 
-	// User info object specific to a subclass
+	/**
+	 * @var array User info object specific to a subclass
+	 */
 	protected $userinfo;
 
 	public function __construct($oauth_user_id, $userinfo) {
@@ -633,6 +642,8 @@ abstract class OAuthUserCredentials extends UserCredentials {
 	}
 
 	/**
+	 * Returns an array of user information key-value pairs
+	 *
 	 * @return array Array of user-specific information
 	 */
 	public function getUserInfo() {
@@ -640,7 +651,10 @@ abstract class OAuthUserCredentials extends UserCredentials {
 	}
 
 	/**
-	 * This method will most likely be implemented by a subclass using $this->userinfo object
+	 * Returns a chunk of HTML to display user's credentials
+	 *
+	 * This method will most likely be implemented by a subclass using $this->userinfo object.
+	 * For some providers it can be returning a code to include a JavaScript widget.
 	 *
 	 * @return string
 	 */
