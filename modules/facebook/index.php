@@ -75,15 +75,15 @@ class FacebookAuthenticationModule extends AuthenticationModule
 		{
 			if (!$stmt->bind_param('i', $userid))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($fb_id))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -96,7 +96,7 @@ class FacebookAuthenticationModule extends AuthenticationModule
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return null;
@@ -112,11 +112,11 @@ class FacebookAuthenticationModule extends AuthenticationModule
 		{
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($conns))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -124,7 +124,7 @@ class FacebookAuthenticationModule extends AuthenticationModule
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $conns;
@@ -143,11 +143,11 @@ class FacebookAuthenticationModule extends AuthenticationModule
 		{
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($regdate, $regs))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -159,7 +159,7 @@ class FacebookAuthenticationModule extends AuthenticationModule
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $dailyregs;

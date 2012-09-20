@@ -35,7 +35,7 @@ class CampaignTracker
 		));
 
 		if (!$storage->store(UserConfig::$entry_cmp_key, serialize($campaign))) {
-			throw new Exception(implode("\n", $storage->errors));
+			throw new StartupAPIException(implode("\n", $storage->errors));
 		}
 	}
 
@@ -57,8 +57,8 @@ class CampaignTracker
 				'httponly' => true
 			));
 
-			if (!$storage->store(UserConfig::$entry_referer_key, $referer)) { 
-				throw new Exception(implode("\n", $storage->errors));
+			if (!$storage->store(UserConfig::$entry_referer_key, $referer)) {
+				throw new StartupAPIException(implode("\n", $storage->errors));
 			}
 
 			self::$referer = $referer;
@@ -107,17 +107,17 @@ class CampaignTracker
 		{
 			if (!$stmt->bind_param('s', $source))
 			{
-				throw new Exception("Can't bind parameter");
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't insert compaign source");
+				throw new DBExecuteStmtException($db, $stmt, "Can't insert compaign source");
 			}
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't insert compaign source");
+			throw new DBExecuteStmtException($db, $stmt, "Can't insert compaign source");
 		}
 
 		if ($stmt = $db->prepare('SELECT id FROM '.UserConfig::$mysql_prefix.'cmp_source
@@ -125,15 +125,15 @@ class CampaignTracker
 		{
 			if (!$stmt->bind_param('s', $source))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($cmp_source_id))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -141,7 +141,7 @@ class CampaignTracker
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $cmp_source_id;
@@ -157,17 +157,17 @@ class CampaignTracker
 		{
 			if (!$stmt->bind_param('s', $medium))
 			{
-				throw new Exception("Can't bind parameter");
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't insert compaign medium");
+				throw new DBExecuteStmtException($db, $stmt, "Can't insert compaign medium");
 			}
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't insert compaign medium");
+			throw new DBPrepareStmtException($db, "Can't insert compaign medium");
 		}
 
 		if ($stmt = $db->prepare('SELECT id FROM '.UserConfig::$mysql_prefix.'cmp_medium
@@ -175,15 +175,15 @@ class CampaignTracker
 		{
 			if (!$stmt->bind_param('s', $medium))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($cmp_medium_id))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -191,7 +191,7 @@ class CampaignTracker
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $cmp_medium_id;
@@ -207,17 +207,17 @@ class CampaignTracker
 		{
 			if (!$stmt->bind_param('s', $keywords))
 			{
-				throw new Exception("Can't bind parameter");
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't insert compaign keywords");
+				throw new DBExecuteStmtException($db, $stmt, "Can't insert compaign keywords");
 			}
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't insert compaign keywords");
+			throw new DBPrepareStmtException($db, "Can't insert compaign keywords");
 		}
 
 		if ($stmt = $db->prepare('SELECT id FROM '.UserConfig::$mysql_prefix.'cmp_keywords
@@ -225,15 +225,15 @@ class CampaignTracker
 		{
 			if (!$stmt->bind_param('s', $keywords))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($cmp_keywords_id))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -241,7 +241,7 @@ class CampaignTracker
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $cmp_keywords_id;
@@ -257,17 +257,17 @@ class CampaignTracker
 		{
 			if (!$stmt->bind_param('s', $content))
 			{
-				throw new Exception("Can't bind parameter");
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't insert compaign content");
+				throw new DBExecuteStmtException($db, $stmt, "Can't insert compaign content");
 			}
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't insert compaign content");
+			throw new DBPrepareStmtException($db, "Can't insert compaign content");
 		}
 
 		if ($stmt = $db->prepare('SELECT id FROM '.UserConfig::$mysql_prefix.'cmp_content
@@ -275,15 +275,15 @@ class CampaignTracker
 		{
 			if (!$stmt->bind_param('s', $content))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($cmp_content_id))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -291,7 +291,7 @@ class CampaignTracker
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $cmp_content_id;
@@ -307,17 +307,17 @@ class CampaignTracker
 		{
 			if (!$stmt->bind_param('s', $name))
 			{
-				throw new Exception("Can't bind parameter");
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't insert compaign name");
+				throw new DBExecuteStmtException($db, $stmt, "Can't insert compaign name");
 			}
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't insert compaign name");
+			throw new DBPrepareStmtException($db, "Can't insert compaign name");
 		}
 
 		if ($stmt = $db->prepare('SELECT id FROM '.UserConfig::$mysql_prefix.'cmp
@@ -325,15 +325,15 @@ class CampaignTracker
 		{
 			if (!$stmt->bind_param('s', $name))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($cmp_name_id))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -341,7 +341,7 @@ class CampaignTracker
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $cmp_name_id;

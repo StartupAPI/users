@@ -9,11 +9,11 @@ $oauth_user_id = null;
 try
 {
 	if (!array_key_exists('module', $_GET)) {
-		throw new Exception('module not specified');
+		throw new StartupAPIException('module not specified');
 	}
 
 	if (!array_key_exists('oauth_token', $_GET) || !array_key_exists('oauth_verifier', $_GET)) {
-		throw new Exception('oauth_token & oauth_varifier required');
+		throw new StartupAPIException('oauth_token & oauth_varifier required');
 	}
 
 	$module = AuthenticationModule::get($_GET['module']);
@@ -29,7 +29,7 @@ try
 	$storage->delete(UserConfig::$oauth_user_id_key);
 
 	if (is_null($oauth_user_id)) {
-		throw new Exception("can't determine OAuth User ID");
+		throw new StartupAPIException("can't determine OAuth User ID");
 	}
 
 	try
@@ -38,7 +38,7 @@ try
 	}
 	catch (OAuthException2 $e)
 	{
-		throw new Exception('problem getting access token: '.$e->getMessage());
+		throw new StartupAPIException('problem getting access token: '.$e->getMessage());
 	}
 
 	try
@@ -47,11 +47,11 @@ try
 	}
 	catch (OAuthException2 $e)
 	{
-		throw new Exception('problem getting user identity: '.$e->getMessage());
+		throw new StartupAPIException('problem getting user identity: '.$e->getMessage());
 	}
 
 	if (is_null($identity)) {
-		throw new Exception('no identity returned');
+		throw new StartupAPIException('no identity returned');
 	}
 
 	#error_log(
@@ -83,7 +83,7 @@ try
 	} else {
 		// otherwise, we're adding their credential to an existing user
 		if (!is_null($user)) {
-			throw new Exception('another user is already connected with this account');
+			throw new StartupAPIException('another user is already connected with this account');
 		}
 
 		$module->addUserOAuthIdentity($current_user, $identity, $oauth_user_id);

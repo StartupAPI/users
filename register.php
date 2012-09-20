@@ -14,7 +14,7 @@ if (UserConfig::$enableRegistration && array_key_exists('register', $_POST))
 
 	if (is_null($module))
 	{
-		throw new Exception('Wrong module specified');
+		throw new StartupAPIException('Wrong module specified');
 	}
 
 	$invitation = null;
@@ -23,14 +23,14 @@ if (UserConfig::$enableRegistration && array_key_exists('register', $_POST))
 	{
 		if (!array_key_exists('invite', $_GET))
 		{
-			throw new Exception('Invitation code is not submitted');
+			throw new StartupAPIException('Invitation code is not submitted');
 		}
 
 		$invitation = Invitation::getByCode($_GET['invite']);
 
 		if (is_null($invitation) || $invitation->getStatus())
 		{
-			throw new Exception('Invitation code is invalid');
+			throw new StartupAPIException('Invitation code is invalid');
 		}
 	}
 

@@ -115,3 +115,61 @@ class StartupAPI {
 		//currently empty
 	}
 }
+/**
+ * Exception superclass used for all exceptions in StartupAPI
+ *
+ * @package StartupAPI
+ */
+class StartupAPIException extends Exception {
+	function __construct($message, $code, $previous) {
+		parent::__construct('[StartupAPI] ' . $message, $code, $previous);
+	}
+}
+
+/**
+ * Exception for database-related problems
+ *
+ * @package StartupAPI
+ */
+class DBException extends StartupAPIException {
+	function __construct(mysqli $db = null, $stmt = null, $message = null, $code = null, $previous = null) {
+		$exception_message = $message;
+
+		if (is_null($db)) {
+			$exception_message = "[DB] Can't connect to database, \$db object is null";
+		} else if ($db->connect_error) {
+			$exception_message = "[DB] Can't connect to database: (" . $db->connect_errno . ") " . $db->connect_error;
+		} else if (!$stmt) {
+			$exception_message = '[DB]' .
+				' $db->error: ' . $db->error .
+				' with message: ' . $message;
+		} else {
+			$exception_message = '[DB]' .
+				' $stmt->error: ' . $stmt->error .
+				' with message: ' . $message;
+
+		}
+
+		parent::__construct($exception_message, $code, $previous);
+	}
+}
+
+/**
+ * Paremeter Binding Exception
+ */
+class DBBindParamException extends DBException {}
+
+/**
+ * Result binding Exception
+ */
+class DBBindResultException extends DBException {}
+
+/**
+ * Statement Execution Exception
+ */
+class DBExecuteStmtException extends DBException {}
+
+/**
+ * Statement preparation Exception
+ */
+class DBPrepareStmtException extends DBException {}

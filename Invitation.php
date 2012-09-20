@@ -25,11 +25,11 @@ class Invitation
 		{
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($code, $time_created, $issuedby))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -41,7 +41,7 @@ class Invitation
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $invitations;
@@ -57,11 +57,11 @@ class Invitation
 		{
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($code, $time_created, $issuedby, $sentto))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -73,7 +73,7 @@ class Invitation
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $invitations;
@@ -89,11 +89,11 @@ class Invitation
 		{
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($code, $time_created, $issuedby, $sentto, $userid))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -105,7 +105,7 @@ class Invitation
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $invitations;
@@ -121,15 +121,15 @@ class Invitation
 		{
 			if (!$stmt->bind_param('s', $code))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($code, $time_created, $issuedby, $sentto, $userid))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE)
@@ -141,7 +141,7 @@ class Invitation
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $invitation;
@@ -166,11 +166,11 @@ class Invitation
 			{
 				if (!$stmt->bind_param('s', self::generateCode()))
 				{
-					 throw new Exception("Can't bind parameter".$stmt->error);
+					throw new DBBindParamException($db, $stmt);
 				}
 				if (!$stmt->execute())
 				{
-					throw new Exception("Can't execute statement: ".$stmt->error);
+					throw new DBExecuteStmtException($db, $stmt);
 				}
 			}
 
@@ -178,7 +178,7 @@ class Invitation
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 	}
 
@@ -244,18 +244,18 @@ class Invitation
 		{
 			if (!$stmt->bind_param('sis', $comment, $this->user, $this->code))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return;

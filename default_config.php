@@ -156,12 +156,16 @@ class UserConfig
 	public static $onCreate = null;
 	// create extra links on login strip
 	public static $onLoginStripLinks = null;
-			
+
 	public static function getDB()
 	{
 		if (is_null(self::$db))
 		{
 			self::$db = new mysqli(self::$mysql_host, self::$mysql_user, self::$mysql_password, self::$mysql_db, self::$mysql_port, self::$mysql_socket);
+			if (is_null(self::$db) || self::$db->connect_error) {
+				throw new DBException(self::$db, null, "Couldn't connect to database");
+			}
+
 			if (!self::$db->set_charset('utf8')) {
 				error_log("[Startup API] Warning: Can't set utf8 charset for DB connection");
 			}
@@ -213,7 +217,7 @@ EOD;
 		if (is_dir(dirname(__FILE__).'/modules/'.$modulename)) {
 			require_once(dirname(__FILE__).'/modules/'.$modulename.'/index.php');
 		} else {
-			throw new Exception('Module '.$modulename.' does not exist in '.dirname(__FILE__).'/modules/ folder');
+			throw new StartupAPIException('Module '.$modulename.' does not exist in '.dirname(__FILE__).'/modules/ folder');
 		}
 	}
 
@@ -247,7 +251,7 @@ EOD;
 			if (php_sapi_name() !== 'cli') {
 				error_log("[Startup API config] Warning: Can't determine site's host name, using $host");
 			}
- 
+
 		}
 
 		UserConfig::$SITEROOTFULLURL = 'http://'.$host.UserConfig::$SITEROOTURL;
@@ -261,7 +265,7 @@ EOD;
 		UserConfig::$admin_header = dirname(__FILE__).'/header.php';
 		UserConfig::$admin_footer = dirname(__FILE__).'/footer.php';
 
-		// Built in activities 
+		// Built in activities
 		define('USERBASE_ACTIVITY_LOGIN_UPASS',		1000);
 		define('USERBASE_ACTIVITY_LOGIN_FB',		1001);
 		define('USERBASE_ACTIVITY_LOGIN_GFC',		1002);

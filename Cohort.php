@@ -111,21 +111,21 @@ abstract class CohortProvider {
 			if (!is_null($activityid)) {
 				if (!$stmt->bind_param('ii', $actnum, $activityid))
 				{
-					 throw new Exception("Can't bind parameter".$stmt->error);
+					throw new DBBindParamException($db, $stmt);
 				}
 			} else {
 				if (!$stmt->bind_param('i', $actnum))
 				{
-					 throw new Exception("Can't bind parameter".$stmt->error);
+					throw new DBBindParamException($db, $stmt);
 				}
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($cohort_id, $actperiod, $activeusers))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -137,7 +137,7 @@ abstract class CohortProvider {
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $aggregates;
@@ -180,7 +180,7 @@ class GenerationCohorts extends CohortProvider {
 				$id .= "week";
 				break;
 			default:
-				throw new Exception('Wrong generation period');
+				throw new StartupAPIException('Wrong generation period');
 		}
 
 		parent::__construct($id, $title);
@@ -243,7 +243,7 @@ class GenerationCohorts extends CohortProvider {
 					FROM ".UserConfig::$mysql_prefix.'users';
 				break;
 			default:
-				throw new Exception('Wrong generation period');
+				throw new StartupAPIException('Wrong generation period');
 		}
 
 		if (!is_null($siteadminsstring)) {
@@ -256,11 +256,11 @@ class GenerationCohorts extends CohortProvider {
 		{
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($cohort_id, $title, $total))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -271,7 +271,7 @@ class GenerationCohorts extends CohortProvider {
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $cohorts;
@@ -295,7 +295,7 @@ class GenerationCohorts extends CohortProvider {
 					FROM '.UserConfig::$mysql_prefix.'users';
 				break;
 			default:
-				throw new Exception('Wrong generation period');
+				throw new StartupAPIException('Wrong generation period');
 		}
 
 		return $query;
@@ -354,11 +354,11 @@ class RegMethodCohorts extends CohortProvider {
 		{
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($cohort_id, $total))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -369,7 +369,7 @@ class RegMethodCohorts extends CohortProvider {
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $cohorts;

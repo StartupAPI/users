@@ -97,7 +97,7 @@ class User
 
 		$last = $storage->fetch(UserConfig::$last_login_key);
 		if (!$storage->store(UserConfig::$last_login_key, time())) { 
-			throw new Exception(implode('; ', $storage->errors));
+			throw new StartupAPIException(implode('; ', $storage->errors));
 		}
 
 		$user = self::get();
@@ -127,18 +127,18 @@ class User
 		{
 			if (!$stmt->bind_param('si', $referer, $this->userid))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 	}
 
@@ -151,15 +151,15 @@ class User
 		{
 			if (!$stmt->bind_param('i', $this->userid))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->bind_result($referer))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -167,7 +167,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $referer;
@@ -223,18 +223,18 @@ class User
 				$cmp_name_id,
 				$this->userid))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 	}
 
@@ -249,17 +249,17 @@ class User
 			{
 				if (!$stmt->bind_param('i', $userid))
 				{
-					throw new Exception("Can't bind parameter");
+					throw new DBBindParamException($db, $stmt);
 				}
 				if (!$stmt->execute())
 				{
-					throw new Exception("Can't update user preferences (set current account)");
+					throw new DBExecuteStmtException($db, $stmt, "Can't update user preferences (set current account)");
 				}
 				$stmt->close();
 			}
 			else
 			{
-				throw new Exception("Can't update user preferences (set current account)");
+				throw new DBPrepareStmtException($db, "Can't update user preferences (set current account)");
 			}
 
 			$personal = Account::createAccount('FREE ('.$this->getName().')',
@@ -292,11 +292,11 @@ class User
 		{
 			if (!$stmt->bind_param('s', $name))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			$id = $stmt->insert_id;
 
@@ -304,25 +304,25 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'googlefriendconnect (user_id, google_id, userpic) VALUES (?, ?, ?)'))
 		{
 			if (!$stmt->bind_param('iss', $id, $googleid, $userpic))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		$user = self::getUser($id);
@@ -352,11 +352,11 @@ class User
 		{
 			if (!$stmt->bind_param('ssi', $name, $email, $fb_id))
 			{
-				throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			$id = $stmt->insert_id;
 
@@ -365,7 +365,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		$user = self::getUser($id);
@@ -396,11 +396,11 @@ class User
 		{
 			if (!$stmt->bind_param('ss', $name, $email))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			$id = $stmt->insert_id;
 
@@ -408,7 +408,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		$user = self::getUser($id);
@@ -438,11 +438,11 @@ class User
 		{
 			if (!$stmt->bind_param('sssss', $name, $username, $email, $pass, $salt))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			$id = $stmt->insert_id;
 
@@ -450,7 +450,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		$user = self::getUser($id);
@@ -474,11 +474,11 @@ class User
 		{
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($total))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -486,7 +486,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $total;
@@ -551,17 +551,17 @@ class User
 			if (!is_null($date)) {
 				if (!$stmt->bind_param('ss', $date, $date))
 				{
-					 throw new Exception("Can't bind parameter".$stmt->error);
+					throw new DBBindParamException($db, $stmt);
 				}
 			}
 
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($total))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -569,7 +569,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $total;
@@ -601,11 +601,11 @@ class User
 		{
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($start_date, $start_day, $start_month, $start_year))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -613,7 +613,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		// no activities recorded yet
@@ -629,11 +629,11 @@ class User
 		{
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($date, $active_users))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -645,7 +645,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		$timestamp = mktime(0, 0, 1, $start_month, $start_day, $start_year);
@@ -687,14 +687,14 @@ class User
 			{
 				if (!$stmt->execute())
 				{
-					throw new Exception("Can't execute statement: ".$stmt->error);
+					throw new DBExecuteStmtException($db, $stmt);
 				}
 
 				$stmt->close();
 			}
 			else
 			{
-				throw new Exception("Can't prepare statement: ".$db->error);
+				throw new DBPrepareStmtException($db);
 			}
 		}
 
@@ -713,15 +713,15 @@ class User
 		{
 			if (!$stmt->bind_param('i', $activityid))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($date, $cnt))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -733,7 +733,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $daily_activity;
@@ -758,11 +758,11 @@ class User
 		{
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($date, $id, $total))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -774,7 +774,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $daily_activity;
@@ -792,11 +792,11 @@ class User
 		{
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($regdate, $regs))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -808,7 +808,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $dailyregs;
@@ -827,11 +827,11 @@ class User
 		{
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($date, $module, $regs))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch()) {
@@ -842,7 +842,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $dailyregs;
@@ -861,11 +861,11 @@ class User
 		{
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($module, $reg))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch()) {
@@ -876,7 +876,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $regs;
@@ -922,15 +922,15 @@ class User
 		{
 			if (!$stmt->bind_param('ii', $first, $perpage))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -942,7 +942,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $users;
@@ -963,15 +963,15 @@ class User
 		{
 			if (!$stmt->bind_param('sssii', $search, $search, $search, $first, $perpage))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -983,7 +983,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $users;
@@ -1026,15 +1026,15 @@ class User
 		{
 			if (!$stmt->bind_param('ii', $first, $perpage))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($time, $user_id, $activity_id))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -1046,7 +1046,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $activities;
@@ -1074,15 +1074,15 @@ class User
 		{
 			if (!$stmt->bind_param('iii', $activityid, $first, $perpage))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($time, $user_id))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -1094,7 +1094,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $activities;
@@ -1112,15 +1112,15 @@ class User
 		{
 			if (!$stmt->bind_param('ss', $nameoremail, $nameoremail))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE)
@@ -1132,7 +1132,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $users;
@@ -1158,11 +1158,11 @@ class User
 		{
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($activity_id, $cnt))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -1174,7 +1174,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $stats;
@@ -1213,15 +1213,15 @@ class User
 		{
 			if (!$stmt->bind_param('iii', $this->userid, $first, $perpage))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($time, $user_id, $activity_id))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -1233,7 +1233,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $activities;
@@ -1252,18 +1252,18 @@ class User
 		{
 			if (!$stmt->bind_param('si', $temppass, $this->userid))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $temppass;
@@ -1280,18 +1280,18 @@ class User
 		{
 			if (!$stmt->bind_param('s', $this->userid))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 	}
 
@@ -1308,18 +1308,18 @@ class User
 		{
 			if (!$stmt->bind_param('si', $module_id, $this->userid))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 	}
 
@@ -1345,11 +1345,11 @@ class User
 		{
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE)
@@ -1361,7 +1361,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $users;
@@ -1375,18 +1375,18 @@ class User
 		{
 			if (!$stmt->bind_param('is', $this->userid, $google_id))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 		$this->recordActivity(USERBASE_ACTIVITY_REMOVED_GFC);
 	}
@@ -1398,18 +1398,18 @@ class User
 		{
 			if (!$stmt->bind_param('iss', $this->userid, $google_id, $userpic))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		$this->recordActivity(USERBASE_ACTIVITY_ADDED_GFC);
@@ -1425,15 +1425,15 @@ class User
 		{
 			if (!$stmt->bind_param('i', $this->userid))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($google_id, $userpic))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE)
@@ -1445,7 +1445,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $associations;
@@ -1464,15 +1464,15 @@ class User
 		{
 			if (!$stmt->bind_param('s', $entered_username))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($id, $status, $name, $username, $email, $pass, $salt, $temppass, $requirespassreset, $fb_id))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE)
@@ -1499,7 +1499,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if (is_null($user))
@@ -1508,15 +1508,15 @@ class User
 			{
 				if (!$stmt->bind_param('ss', $entered_username, $entered_password))
 				{
-					 throw new Exception("Can't bind parameter".$stmt->error);
+					throw new DBBindParamException($db, $stmt);
 				}
 				if (!$stmt->execute())
 				{
-					throw new Exception("Can't execute statement: ".$stmt->error);
+					throw new DBExecuteStmtException($db, $stmt);
 				}
 				if (!$stmt->bind_result($id, $status, $name, $username, $email, $fb_id))
 				{
-					throw new Exception("Can't bind result: ".$stmt->error);
+					throw new DBBindResultException($db, $stmt);
 				}
 
 				if ($stmt->fetch() === TRUE)
@@ -1534,7 +1534,7 @@ class User
 			}
 			else
 			{
-				throw new Exception("Can't prepare statement: ".$db->error);
+				throw new DBPrepareStmtException($db);
 			}
 		}
 		else
@@ -1562,15 +1562,15 @@ class User
 		{
 			if (!$stmt->bind_param('s', $googleid))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE)
@@ -1582,7 +1582,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $user;
@@ -1600,15 +1600,15 @@ class User
 		{
 			if (!$stmt->bind_param('i', $fb_id))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $regtime, $points))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE)
@@ -1620,7 +1620,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $user;
@@ -1640,15 +1640,15 @@ class User
 		{
 			if (!$stmt->bind_param('i', $userid))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE)
@@ -1660,7 +1660,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $user;
@@ -1676,7 +1676,7 @@ class User
 		));
 
 		if (!$storage->store(UserConfig::$session_return_key, $return)) {
-			throw new Exception(implode('; ', $storage->errors));
+			throw new StartupAPIException(implode('; ', $storage->errors));
 		}
 	}
 
@@ -1781,7 +1781,7 @@ class User
 		{
 			$this->username = $username;
 		} else {
-			throw new Exception('This user already has username set.');
+			throw new StartupAPIException('This user already has username set.');
 		}
 	}
 	public function getEmail()
@@ -1828,15 +1828,15 @@ class User
 		{
 			if (!$stmt->bind_param('i', $this->userid))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($pass, $salt))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE)
@@ -1848,7 +1848,7 @@ class User
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return false;
@@ -1865,18 +1865,18 @@ class User
 		{
 			if (!$stmt->bind_param('ssi', $pass, $salt, $this->userid))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return;
@@ -1910,18 +1910,18 @@ class User
 		{
 			if (!$stmt->bind_param('isssiii', $status, $username, $name, $email, $passresetnum, $this->fbid, $this->userid))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if (!is_null(UserConfig::$email_module)) {
@@ -1944,7 +1944,7 @@ class User
 		));
 
 		if (!$storage->store(UserConfig::$session_userid_key, $this->userid)) {
-			throw new Exception(implode('; ', $storage->errors));
+			throw new StartupAPIException(implode('; ', $storage->errors));
 		}
 	}
 
@@ -1978,11 +1978,11 @@ class User
 		));
 
 		if (!$this->isAdmin()) {
-			throw new Exception('Not admin (userid: '.$this->userid.') is trying to impersonate another user (userid: '.$user->userid.')');
+			throw new StartupAPIException('Not admin (userid: '.$this->userid.') is trying to impersonate another user (userid: '.$user->userid.')');
 		}
 
 		if (!$storage->store(UserConfig::$impersonation_userid_key, $user->userid)) {
-			throw new Exception(implode('; ', $storage->errors));
+			throw new StartupAPIException(implode('; ', $storage->errors));
 		}
 
 		$user->impersonator = $this;
@@ -2016,36 +2016,36 @@ class User
 		{
 			if (!$stmt->bind_param('ii', $this->userid, $activity_id))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET points = points + ? WHERE id = ?'))
 		{
 			if (!$stmt->bind_param('ii', UserConfig::$activities[$activity_id][1], $this->userid))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 	}
 

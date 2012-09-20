@@ -34,24 +34,24 @@ function aggregatePoints() {
 				{
 					if (!$stmt->execute())
 					{
-						throw new Exception("Can't execute statement: ".$stmt->error);
+						throw new DBExecuteStmtException($db, $stmt);
 					}
 
 					$stmt->close();
 				} else {
-					throw new Exception("Can't prepare statement: ".$db->error);
+					throw new DBException($db);
 				}
 
 			} else {
-				throw new Exception("Can't prepare statement: ".$db->error);
+				throw new DBException($db);
 			}
 		} else {
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBException($db);
 		}
 	}
 	else
 	{
-		throw new Exception("Can't prepare statement: ".$db->error);
+		throw new DBException($db);
 	}
 }
 

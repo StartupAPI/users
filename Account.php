@@ -41,7 +41,7 @@ class Account
 	 *
 	 * @param int $id Account id
 	 * @return Account Account associated with specified ID
-	 * @trows Exception
+	 * @throws DBException
 	 */
 	public static function getByID($id)
 	{
@@ -52,15 +52,15 @@ class Account
 		{
 			if (!$stmt->bind_param('i', $id))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($name, $plan_id))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE)
@@ -72,7 +72,7 @@ class Account
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $account;
@@ -83,7 +83,7 @@ class Account
 	 *
 	 * @param User $user User we need accounts for
 	 * @return array Array of user accounts
-	 * @throws Exception
+	 * @throws DBException, StartupAPIException
 	 */
 	public static function getUserAccounts(User $user)
 	{
@@ -95,15 +95,15 @@ class Account
 		{
 			if (!$stmt->bind_param('i', $userid))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($id, $name, $plan_id, $role))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -115,13 +115,13 @@ class Account
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if (count($accounts) == 0)
 		{
 			// there must be at least one personal account for each user
-			throw new Exception("No accounts are set for the user");
+			throw new StartupAPIException("No accounts are set for the user");
 		}
 
 		return $accounts;
@@ -140,11 +140,11 @@ class Account
 		{
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($total))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -152,7 +152,7 @@ class Account
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $total;
@@ -193,15 +193,15 @@ class Account
 		{
 			if (!$stmt->bind_param('i', $this->id))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($userid))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -213,7 +213,7 @@ class Account
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		$users = User::getUsersByIDs($userids);
@@ -240,11 +240,11 @@ class Account
 		{
 			if (!$stmt->bind_param('si', $name, $plan_id))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			$id = $stmt->insert_id;
 
@@ -252,7 +252,7 @@ class Account
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if ($user !== null)
@@ -263,18 +263,18 @@ class Account
 			{
 				if (!$stmt->bind_param('iii', $id, $userid, $role))
 				{
-					 throw new Exception("Can't bind parameter".$stmt->error);
+					throw new DBBindParamException($db, $stmt);
 				}
 				if (!$stmt->execute())
 				{
-					throw new Exception("Can't execute statement: ".$stmt->error);
+					throw new DBExecuteStmtException($db, $stmt);
 				}
 
 				$stmt->close();
 			}
 			else
 			{
-				throw new Exception("Can't prepare statement: ".$db->error);
+				throw new DBPrepareStmtException($db);
 			}
 		}
 
@@ -293,15 +293,15 @@ class Account
 
 			if (!$stmt->bind_param('ii', $userid, $userid))
 			{
-				throw new Exception("Can't bind parameter: ".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($id, $name, $plan_id, $role))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 			$stmt->fetch();
 			$stmt->close();
@@ -321,11 +321,11 @@ class Account
 				}
 			}
 
-			throw new Exception("No accounts are set for the user");
+			throw new StartupAPIException("No accounts are set for the user");
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $current_account;
@@ -358,17 +358,17 @@ class Account
 
 			if (!$stmt->bind_param('ii', $this->id, $userid))
 			{
-				throw new Exception("Can't bind parameter");
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't update user preferences (set current account)");
+				throw new DBExecuteStmtException($db, $stmt, "Can't update user preferences (set current account)");
 			}
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't update user preferences (set current account)");
+			throw new DBPrepareStmtException($db, "Can't update user preferences (set current account)");
 		}
 	}
 

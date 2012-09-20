@@ -134,7 +134,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		));
 
 		if (!$storage->store(UserConfig::$oauth_user_id_key, $oauth_user_id)) {
-			throw new Exception(implode('; ', $storage->errors));
+			throw new StartupAPIException(implode('; ', $storage->errors));
 		}
 
 		try
@@ -197,11 +197,11 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		{
 			if (!$stmt->bind_param('s', $module))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			$oauth_user_id = $stmt->insert_id;
 
@@ -209,7 +209,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $oauth_user_id;
@@ -234,18 +234,18 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		{
 			if (!$stmt->bind_param('issis', $user_id, $server_unique_id, $serialized_userinfo, $oauth_user_id, $module))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 	}
 
@@ -256,18 +256,18 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		{
 			if (!$stmt->bind_param('i', $oauth_user_id))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 	}
 
@@ -288,15 +288,15 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		{
 			if (!$stmt->bind_param('ss', $module, $server_unique_id))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($old_oauth_user_id, $user_id))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -304,7 +304,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		// nobody registered with this identity yet
@@ -324,18 +324,18 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 			{
 				if (!$stmt->bind_param('issi', $user_id, $server_unique_id, $serialized_userinfo, $oauth_user_id))
 				{
-					 throw new Exception("Can't bind parameter".$stmt->error);
+					throw new DBBindParamException($db, $stmt);
 				}
 				if (!$stmt->execute())
 				{
-					throw new Exception("Can't execute statement: ".$stmt->error);
+					throw new DBExecuteStmtException($db, $stmt);
 				}
 
 				$stmt->close();
 			}
 			else
 			{
-				throw new Exception("Can't prepare statement: ".$db->error);
+				throw new DBPrepareStmtException($db);
 			}
 		}
 
@@ -415,15 +415,15 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		{
 			if (!$stmt->bind_param('is', $user_id, $module))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($oauth_user_id, $serialized_userinfo))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -431,7 +431,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if (is_null($serialized_userinfo)) {
@@ -464,15 +464,15 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		{
 			if (!$stmt->bind_param('is', $user_id, $module))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($oauth_user_id, $serialized_userinfo))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -480,7 +480,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		?>
@@ -541,18 +541,18 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 			{
 				if (!$stmt->bind_param('ii', $oauth_user_id, $user_id))
 				{
-					 throw new Exception("Can't bind parameter".$stmt->error);
+					throw new DBBindParamException($db, $stmt);
 				}
 				if (!$stmt->execute())
 				{
-					throw new Exception("Can't execute statement: ".$stmt->error);
+					throw new DBExecuteStmtException($db, $stmt);
 				}
 
 				$stmt->close();
 			}
 			else
 			{
-				throw new Exception("Can't prepare statement: ".$db->error);
+				throw new DBPrepareStmtException($db);
 			}
 
 			if (!is_null($this->USERBASE_ACTIVITY_OAUTH_MODULE_REMOVED)) {
@@ -595,15 +595,15 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		{
 			if (!$stmt->bind_param('s', $module_id))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($conns))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -611,7 +611,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $conns;

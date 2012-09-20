@@ -22,7 +22,7 @@ if (array_key_exists('module', $_GET))
 
 if (is_null($module))
 {
-	throw new Exception('Wrong module specified');
+	throw new StartupAPIException('Wrong module specified');
 }
 
 if (array_key_exists('save', $_POST))
