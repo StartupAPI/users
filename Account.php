@@ -21,9 +21,24 @@ require_once(dirname(__FILE__).'/Plan.php');
  */
 class Account
 {
+	/**
+	 * @var int Account ID
+	 */
 	private $id;
+
+	/**
+	 * @var string Account name
+	 */
 	private $name;
+
+	/**
+	 * @var int Current user's role
+	 */
 	private $role;
+
+	/**
+	 * @var Plan Subscription plan
+	 */
 	private $plan;
 
 	/**
@@ -82,8 +97,11 @@ class Account
 	 * Gets all accounts associated with the user
 	 *
 	 * @param User $user User we need accounts for
+	 *
 	 * @return array Array of user accounts
-	 * @throws DBException, StartupAPIException
+	 *
+	 * @throws DBException
+	 * @throws StartupAPIException
 	 */
 	public static function getUserAccounts(User $user)
 	{
@@ -127,8 +145,12 @@ class Account
 		return $accounts;
 	}
 
-	/*
+	/**
 	 * Returns total number of accounts in the system
+	 *
+	 * @return int Total number of accounts in the system
+	 *
+	 * @throws DBException
 	 */
 	public static function getTotalAccounts()
 	{
@@ -158,9 +180,15 @@ class Account
 		return $total;
 	}
 
-
-
-	private function __construct($id, $name, $plan, $role)
+	/**
+	 * Creates new Account object
+	 *
+	 * @param int $id
+	 * @param string $name
+	 * @param Plan $plan
+	 * @param int $role
+	 */
+	private function __construct($id, $name, Plan $plan, $role)
 	{
 		$this->id = $id;
 		$this->name = $name;
@@ -168,10 +196,21 @@ class Account
 		$this->role = $role;
 	}
 
+	/**
+	 * Returns account ID
+	 *
+	 * @return int Account ID
+	 */
 	public function getID()
 	{
 		return $this->id;
 	}
+
+	/**
+	 * Returns Accoutn name
+	 *
+	 * @return string Account Name
+	 */
 	public function getName()
 	{
 		if ($this->plan->isIndividual())
@@ -184,6 +223,14 @@ class Account
 			return $this->name;
 		}
 	}
+
+	/**
+	 * Returns a list of account users
+	 *
+	 * @return array Array of User objects
+	 *
+	 * @throws DBException
+	 */
 	public function getUsers()
 	{
 		$db = UserConfig::getDB();
@@ -220,16 +267,40 @@ class Account
 
 		return $users;
 	}
+
+	/**
+	 * Returns account's subscription plan
+	 *
+	 * @return Plan Subscription Plan
+	 */
 	public function getPlan()
 	{
 		return $this->plan;
 	}
+
+	/**
+	 * Return current user's role in the account
+	 *
+	 * @return int User's role (either Account::ROLE_USER or Account::ROLE_ADMIN)
+	 */
 	public function getUserRole()
 	{
 		return $this->role;
 	}
 
-	public static function createAccount($name, $plan, $user = null, $role = Account::ROLE_USER)
+	/**
+	 * Creates new account and optionally adds a user to it
+	 *
+	 * @param string $name Account Name
+	 * @param Plan $plan Subscription Plan
+	 * @param User $user User to add to account
+	 * @param integer $role User's role in the account (either Account::ROLE_USER or Account::ROLE_ADMIN)
+	 *
+	 * @return Account Newly created account
+	 *
+	 * @throws DBException
+	 */
+	public static function createAccount($name, $plan, $user = NULL, $role = Account::ROLE_USER)
 	{
 		$name = mb_convert_encoding($name, 'UTF-8');
 
@@ -281,6 +352,16 @@ class Account
 		return new self($id, $name, $plan, $role);
 	}
 
+	/**
+	 * Returns user's current account
+	 *
+	 * @param User $user
+	 *
+	 * @return Account
+	 *
+	 * @throws DBException
+	 * @throws StartupAPIException
+	 */
 	public static function getCurrentAccount($user)
 	{
 		$db = UserConfig::getDB();
@@ -331,6 +412,14 @@ class Account
 		return $current_account;
 	}
 
+	/**
+	 * Setts this account as current for the user
+	 *
+	 * @param User $user
+	 *
+	 * @throws DBException
+	 */
+
 	public function setAsCurrent($user)
 	{
 		$db = UserConfig::getDB();
@@ -372,6 +461,13 @@ class Account
 		}
 	}
 
+	/**
+	 * Compares two account objects
+	 *
+	 * @param Account $account
+	 *
+	 * @return boolean True if two account objects refer to the same account
+	 */
 	public function isTheSameAs($account)
 	{
 		if (is_null($account)) {
@@ -381,8 +477,12 @@ class Account
 		return $this->getID() == $account->getID();
 	}
 
-	/*
+	/**
 	 * Returns true if account has requested feature enabled
+	 *
+	 * @param Feature feature Feature object representing on of the features that can be enabled for the account
+	 *
+	 * @return boolean True if account has requested feature enabled
 	 */
 	public function hasFeature($feature) {
 		// checking if we got feature ID instead of object for backwards compatibility
