@@ -1,22 +1,62 @@
 <?php
-/**
- * @package StartupAPI
- *
- * User class
- */
 require_once(dirname(__FILE__).'/global.php');
 require_once(dirname(__FILE__).'/Account.php');
 require_once(dirname(__FILE__).'/CookieStorage.php');
 require_once(dirname(__FILE__).'/CampaignTracker.php');
 
+/**
+ * This class represents a registerd user in the system
+ *
+ * Usage:
+ * <code>
+ * // Getting currently logged in user
+ * // Returns User object, same as User::require_login()
+ * $user = StartupAPI::requireLogin();
+ * echo 'Welcome, ' . $user->getName() . '!';
+ * </code>
+ *
+ * Note that unless you are absolutely sure that data in your application is only
+ * specific to one individual, you might want to use Accounts to connect your data
+ * instead of Users - this way you will be able to add multi-user accounts in the
+ * future when you're ready.
+ *
+ * <code>
+ * // Getting currently selected account
+ * $account = $user->getCurrentAccount();
+ * </code>
+ *
+ * Each user gets a personal account created for them out of the box to make it
+ * easier for you to transition to accounts in the future.
+ *
+ * @see Account
+ *
+ * @package StartupAPI
+ */
 class User
 {
-	/*
+	/**
 	 * Checks if user is logged in and returns use object or redirects to login page
+	 *
+	 * This is the easiest way to protect a page from public viewing
+	 *
+	 * Usage:
+	 * <code>
+	 * // Getting currently logged in user
+	 * $user = StartupAPI::requireLogin();
+	 * </code>
+	 *
+	 * Although preferred method is to call a method on StartupAPI object
+	 * <code>
+	 * $user = StartupAPI::requireLogin();
+	 * </code>
+	 *
+	 * @param boolean $allow_impersonation Set to false if you do not want to allow impersonation
+	 *
+	 * @return User Current user
 	 */
-	public static function require_login($impersonate = true)
+	public static function require_login($allow_impersonation = true)
 	{
-		$user = self::get($impersonate);
+		$user = self::get($allow_impersonation);
 
 		if (!is_null($user))
 		{
@@ -28,11 +68,30 @@ class User
 		}
 	}
 
-	/*
+	/**
 	 * Checks if user is logged in and returns use object or null if user is not logged in
-	 * Disabled users are not allowed to login unless they are being impersonated
+	 * Disabled users are not allowed to login unless they are being impersonated.
+	 *
+	 * Usage:
+	 * <code>
+	 * // Getting currently logged in user
+	 * $user = User::get();
+	 *
+	 * if (!is_null($user)) {
+	 *		echo 'Welcome, ' . $user->getName() . '!';
+	 * }
+	 * </code>
+	 *
+	 * Although preferred method is to call a method on StartupAPI object
+	 * <code>
+	 * $user = StartupAPI::getUser();
+	 * </code>
+	 *
+	 * @param boolean $allow_impersonation Set to false if you do not want to allow impersonation
+	 *
+	 * @return User|null Current user or null if user is not logged in
 	 */
-	public static function get($impersonate = true)
+	public static function get($allow_impersonation = true)
 	{
 		$storage = new MrClay_CookieStorage(array(
 			'secret' => UserConfig::$SESSION_SECRET,
@@ -58,7 +117,7 @@ class User
 			}
 
 			// don't even try impersonating if not admin
-			if (!$impersonate || !$user->isAdmin()) {
+			if (!$allow_impersonation || !$user->isAdmin()) {
 				if ($user->isDisabled()) {
 					return null;
 				}
@@ -87,6 +146,13 @@ class User
 		}
 	}
 
+	/**
+	 * Updates user activity when user returns to the site more then a day after last access
+	 *
+	 * @throws StartupAPIException
+	 *
+	 * @internal
+	 */
 	public static function updateReturnActivity() {
 		$storage = new MrClay_CookieStorage(array(
 			'secret' => UserConfig::$SESSION_SECRET,
@@ -96,7 +162,7 @@ class User
 		));
 
 		$last = $storage->fetch(UserConfig::$last_login_key);
-		if (!$storage->store(UserConfig::$last_login_key, time())) { 
+		if (!$storage->store(UserConfig::$last_login_key, time())) {
 			throw new StartupAPIException(implode('; ', $storage->errors));
 		}
 
@@ -115,6 +181,13 @@ class User
 		}
 	}
 
+	/**
+	 * Sets user's referrer based on CampaignTracker's information
+	 *
+	 * @throws DBException
+	 *
+	 * @internal Should not be used other then by login methods
+	 */
 	private function setReferer() {
 		$referer = CampaignTracker::getReferer();
 		if (is_null($referer)) {
@@ -142,6 +215,13 @@ class User
 		}
 	}
 
+	/**
+	 * Return the URL this user came from when registered on the site.
+	 *
+	 * @return string Referer URL
+	 *
+	 * @throws DBException
+	 */
 	public function getReferer() {
 		$db = UserConfig::getDB();
 
@@ -173,6 +253,13 @@ class User
 		return $referer;
 	}
 
+	/**
+	 * Sets user's campaign they came from
+	 *
+	 * @throws DBException
+	 *
+	 * @internal Used by login/registration scripts to record user's campaign
+	 */
 	private function setRegCampaign() {
 		$campaign = CampaignTracker::getCampaign();
 		if (is_null($campaign) || !$campaign) {
@@ -238,6 +325,11 @@ class User
 		}
 	}
 
+	/**
+	 * This method is called when new user is created
+	 *
+	 * @throws DBException
+	 */
 	private function init()
 	{
 		$db = UserConfig::getDB();
@@ -277,8 +369,11 @@ class User
 			UserConfig::$email_module->registerSubscriber($this);
 		}
 	}
-	/*
-	 * create new user based on Google Friend Connect info
+
+	/**
+	 * Create new user based on Google Friend Connect info
+	 *
+	 * @deprecated
 	 */
 	public static function createNewGoogleFriendConnectUser($name, $googleid, $userpic)
 	{
@@ -332,8 +427,19 @@ class User
 
 		return $user;
 	}
-	/*
-	 * create new user based on facebook info
+
+	/**
+	 * Create new user based on facebook info
+	 *
+	 * Used by FacebookAuthenticationModule
+	 *
+	 * @param string $name User's display name
+	 * @param int $fb_id Facebook user ID
+	 * @param array $me Extra user info key/value pairs from /me Graph API call
+	 *
+	 * @return User Newly created user object
+	 *
+	 * @throws DBException
 	 */
 	public static function createNewFacebookUser($name, $fb_id, $me = null)
 	{
@@ -377,10 +483,25 @@ class User
 	}
 
 	/*
-	 * create new user without credentials
 	 */
-	public static function createNewWithoutCredentials($name, $email = null)
+
+	/**
+	 * Create new user without credentials
+	 *
+	 * Used primarily by modules that will store credentials separately from user table
+	 *
+	 * @param StartupAPIModule $module Registratin module used when registering the user
+	 * @param string $name User's display name
+	 * @param string $email User's emaol or null if no email is known
+	 *
+	 * @return User Newly created user object
+	 *
+	 * @throws DBException
+	 */
+	public static function createNewWithoutCredentials($module, $name, $email = null)
 	{
+		$module_id = $module->getID();
+
 		$name = mb_convert_encoding($name, 'UTF-8');
 
 		$db = UserConfig::getDB();
@@ -392,9 +513,9 @@ class User
 			$email = null;
 		}
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name, email) VALUES (?, ?)'))
+		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name, email, regmodule) VALUES (?, ?, ?)'))
 		{
-			if (!$stmt->bind_param('ss', $name, $email))
+			if (!$stmt->bind_param('sss', $name, $email, $module_id))
 			{
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -419,8 +540,19 @@ class User
 		return $user;
 	}
 
-	/*
-	 * create new user
+	/**
+	 * Create new user with username and password
+	 *
+	 * Used by UsernamePasswordAuthenticationModule
+	 *
+	 * @param string $name User's display name
+	 * @param string $username User's login name/username
+	 * @param string $email User's email
+	 * @param string $password User's password
+	 *
+	 * @return User Newly created user object
+	 *
+	 * @throws DBException
 	 */
 	public static function createNew($name, $username, $email, $password)
 	{
@@ -461,8 +593,12 @@ class User
 		return $user;
 	}
 
-	/*
+	/**
 	 * Returns total number of users in the system
+	 *
+	 * @return int Total number of users (including disabled users)
+	 *
+	 * @throws DBException
 	 */
 	public static function getTotalUsers()
 	{
@@ -490,11 +626,20 @@ class User
 		}
 
 		return $total;
-		
+
 	}
 
-	/*
+	/**
 	 * Returns a number of active users (with activity after one day from registration)
+	 *
+	 * If date is passed, will calculate active users as of particular day (used for charts).
+	 * Relatively data-intensive task, try to cache this data when produced (it would not change for the past dates)
+	 *
+	 * @param string $date MySQL-formatted date to get the statistics for
+	 *
+	 * @return int Number of active users
+	 *
+	 * @throws DBException
 	 */
 	public static function getActiveUsers($date = null)
 	{
@@ -575,8 +720,14 @@ class User
 		return $total;
 	}
 
-	/*
-	 * retrieves daily active users based on algorythm defined in getActiveUsers($date)
+	/**
+	 * Retrieves daily active users based on algorythm defined in getActiveUsers($date)
+	 *
+	 * @param int $lastndays Number of days to look back for
+	 *
+	 * @return array Array of active users numbers for the requested period
+	 *
+	 * @throws DBException
 	 */
 	public static function getDailyActiveUsers($lastndays = null)
 	{
@@ -700,8 +851,17 @@ class User
 
 		return $daily_activity;
 	}
-	/*
-	 * retrieves daily active users by activity
+
+	/**
+	 * Retrieves daily active users for activity
+	 *
+	 * @param int $activityid Activity ID
+	 *
+	 * @return array Array of activity counters for all dates when activity was recorded
+	 *
+	 * @throws DBException
+	 *
+	 * @internal Used in admin dashboard
 	 */
 	public static function getDailyPointsByActivity($activityid)
 	{
@@ -738,10 +898,21 @@ class User
 
 		return $daily_activity;
 	}
-	/*
-	 * retrieves aggregated activity points 
+
+	/**
+	 * Retrieves daily activity counters all or one user
+	 *
+	 * If $user parameter is passed, return activities only for that user, otherwise return for all users.
+	 *
+	 * @param User $user User object
+	 *
+	 * @return array Array of arrays (data, activity, total) for all dates when activities were recorded
+	 *
+	 * @throws DBException
+	 *
+	 * @internal Used in admin dashboard
 	 */
-	public static function getDailyActivityPoints($user)
+	public static function getDailyActivityPoints($user = null)
 	{
 		$db = UserConfig::getDB();
 
@@ -779,8 +950,15 @@ class User
 
 		return $daily_activity;
 	}
-	/*
-	 * retrieves aggregated registrations numbers 
+
+	/**
+	 * Returns a number of users registered for each date
+	 *
+	 * @return array Array of registration numbers for each date
+	 *
+	 * @throws DBException
+	 *
+	 * @internal Used in admin dashboard
 	 */
 	public static function getDailyRegistrations()
 	{
@@ -814,8 +992,14 @@ class User
 		return $dailyregs;
 	}
 
-	/*
-	 * retrieves aggregated registrations numbers by module
+	/**
+	 * Returns a number of users registered using each moduled for each date
+	 *
+	 * @return array Array of arrays of registration numbers for each module for each date
+	 *
+	 * @throws DBException
+	 *
+	 * @internal Used in admin dashboard
 	 */
 	public static function getDailyRegistrationsByModule()
 	{
@@ -851,6 +1035,19 @@ class User
 	/*
 	 * retrieves aggregated recent registrations numbers by module
 	 */
+
+	/**
+	 * Returns recent registrations by module
+	 *
+	 * Returns recent (last 30 days) registration numbers for each module,
+	 * used on admin dashboard to display registration by module breakdown
+	 *
+	 * @return array Array of recent registration counters for each authentication module
+	 *
+	 * @throws DBException
+	 *
+	 * @internal Used on admin dashboard
+	 */
 	public static function getRecentRegistrationsByModule()
 	{
 		$db = UserConfig::getDB();
@@ -882,8 +1079,23 @@ class User
 		return $regs;
 	}
 
-	/*
-	 * retrieves user credentials for all authentication modules
+	/**
+	 * Returns user credentials object
+	 *
+	 * If module ID is passed, return credentials only for that module, otherwise return an array of credential objects
+	 *
+	 * Example
+	 * <code>
+	 * $user = User::require_login();
+	 *
+	 * $creds = $user->getUserCredentials('twitter');
+	 *
+	 * $result = $creds->makeOAuthRequest('https://api.twitter.com/1/statuses/home_timeline.json', 'GET');
+	 * </code>
+	 *
+	 * @param string $requested_module_id Authentication module ID (e.g. 'facebook', 'twitter', 'google' and etc)
+	 *
+	 * @return UserCredentials|array User credentials object for the module or array of credentials for all modules
 	 */
 	public function getUserCredentials($requested_module_id = null)
 	{
@@ -904,6 +1116,20 @@ class User
 
 	/*
 	 * retrieves paged list of users
+	 */
+
+	/**
+	 * Returns paged list of basic user info
+	 *
+	 * @param int $pagenumber Page number
+	 * @param int $perpage Number of rows per page
+	 * @param string $sort String indicating the way to sort the list (either 'registration' or 'activity')
+	 *
+	 * @return array Array of user objects
+	 *
+	 * @throws DBException
+	 *
+	 * @internal Used in admin dashboard to show users
 	 */
 	public static function getUsers($pagenumber = 0, $perpage = 20, $sort = 'registration')
 	{
@@ -947,8 +1173,21 @@ class User
 
 		return $users;
 	}
-	/*
-	 * searches for users matching the query
+
+	/**
+	 * Returns a paged list of users based on search query
+	 *
+	 * Query is matched (substring) against user's display name, username or email address
+	 *
+	 * @param string $search Search query
+	 * @param int $pagenumber Page number
+	 * @param int $perpage Number of rows per page
+	 *
+	 * @return array Array of user objects
+	 *
+	 * @throws DBException
+	 *
+	 * @internal Used in admin dashboard
 	 */
 	public static function searchUsers($search, $pagenumber = 0, $perpage = 20)
 	{
@@ -988,8 +1227,23 @@ class User
 
 		return $users;
 	}
+
 	/*
-	 * retrieves a list of latest activities 
+	 * retrieves a list of latest activities
+	 */
+
+	/**
+ 	 * Returns a paged list of user's activities
+	 *
+	 * @param boolean $all Set to false if you want to return only acttivities with non-zero value
+	 * @param int $pagenumber Page number
+	 * @param int $perpage Number of rows per page
+	 *
+	 * @return array Array of (time, user_id, activity_id) records
+	 *
+	 * @throws DBException
+	 *
+	 * @internal Used in admin dashboard
 	 */
 	public static function getUsersActivity($all, $pagenumber = 0, $perpage = 20)
 	{
@@ -1052,8 +1306,18 @@ class User
 		return $activities;
 	}
 
-	/*
-	 * retrieves a list of users by activity
+	/**
+	 * Returns paged list users who performed particular activity
+	 *
+	 * @param int $activityid Activity ID
+	 * @param int $pagenumber Page number
+	 * @param int $perpage Number of rows per page
+	 *
+	 * @return array Array of (time, user_id) records
+	 *
+	 * @throws DBException
+	 *
+	 * @internal Used in admin dashboard
 	 */
 	public static function getUsersByActivity($activityid, $pagenumber = 0, $perpage = 20)
 	{
@@ -1100,6 +1364,17 @@ class User
 		return $activities;
 	}
 
+	/**
+	 * Return a list of users who match a username or email
+	 *
+	 * Used to retrieve user based on a login form, can return multiple objects
+	 *
+	 * @param string $nameoremail String with username or email address
+	 *
+	 * @return array Array of User objects
+	 *
+	 * @throws DBException
+	 */
 	public static function getUsersByEmailOrUsername($nameoremail)
 	{
 		$db = UserConfig::getDB();
@@ -1139,7 +1414,17 @@ class User
 	}
 
 	/*
-	 * retrieve activity statistics 
+	 * retrieve activity statistics
+	 */
+
+	/**
+	 * Returns total activity counts for all activities
+	 *
+	 * @return array Array of activity_id/count pairs
+	 *
+	 * @throws DBException
+	 *
+	 * @internal Used in admin dashboard
 	 */
 	public static function getActivityStatistics()
 	{
@@ -1180,8 +1465,18 @@ class User
 		return $stats;
 	}
 
-	/*
-	 * retrieves a list of latest activities 
+	/**
+	 * Returns a paged list of activities
+	 *
+	 * @param boolean $all Set to false if you want to return only acttivities with non-zero value
+	 * @param int $pagenumber Page number
+	 * @param int $perpage Number of rows per page
+	 *
+	 * @return array Array of (time, user_id, activity_id) records
+	 *
+	 * @throws DBException
+	 *
+	 * @internal Used in admin dashboard
 	 */
 	public function getActivity($all, $pagenumber = 0, $perpage = 20)
 	{
@@ -1239,8 +1534,16 @@ class User
 		return $activities;
 	}
 
-	/*
+	/**
 	 * Generates password recovery code and saves it to the database for later matching
+	 *
+	 * Temporary password is only valid for a short period of time and also reset upon successful entry of temporary or current password
+	 *
+	 * @see resetTemporaryPassword
+	 *
+	 * @return string
+	 *
+	 * @throws DBException
 	 */
 	public function generateTemporaryPassword()
 	{
@@ -1269,8 +1572,12 @@ class User
 		return $temppass;
 	}
 
-	/*
+	/**
 	 * Resets temporary password
+	 *
+	 * @see generateTemporaryPassword
+	 *
+	 * @throws DBException
 	 */
 	public function resetTemporaryPassword()
 	{
@@ -1295,8 +1602,16 @@ class User
 		}
 	}
 
-	/*
-	 * Records user registration module (should be used only once
+	/**
+	 * Records user registration module (should be used only once)
+	 *
+	 * Deprecated - module should be set right away upon user creation
+	 *
+	 * @param StartupAPIModule $module Startup API Module object
+	 *
+	 * @throws DBException
+	 *
+	 * @deprecated
 	 */
 	public function setRegistrationModule($module)
 	{
@@ -1324,7 +1639,19 @@ class User
 	}
 
 	/*
-	 * retrieves user information by array of IDs 
+	 * retrieves user information by array of IDs
+	 */
+
+	/**
+	 * Returns a list of users by a list of user IDs
+	 *
+	 * Use this method if you need to retrieve multiple users - it only makes on DB request
+	 *
+	 * @param array $userids Array of integers representing user IDs
+	 *
+	 * @return array Array of User objects
+	 *
+	 * @throws DBException
 	 */
 	public static function getUsersByIDs($userids)
 	{
@@ -1340,7 +1667,7 @@ class User
 		}
 
 		$idlist = join(', ', $ids);
-		
+
 		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users WHERE id IN ('.$idlist.')'))
 		{
 			if (!$stmt->execute())
@@ -1367,6 +1694,15 @@ class User
 		return $users;
 	}
 
+	/**
+	 * Removes association between the user and Google Friend Connect credential
+	 *
+	 * @param string $google_id Google Friend Connect user ID
+	 *
+	 * @throws DBException
+	 *
+	 * @deprecated
+	 */
 	public function removeGoogleFriendConnectAssociation($google_id)
 	{
 		$db = UserConfig::getDB();
@@ -1390,6 +1726,17 @@ class User
 		}
 		$this->recordActivity(USERBASE_ACTIVITY_REMOVED_GFC);
 	}
+
+	/**
+	 * Adds association between the user and Google Friend Connect credential
+	 *
+	 * @param string $google_id Google Friend Connect user ID
+	 * @param string $userpic User's userpic URL
+	 *
+	 * @throws DBException
+	 *
+	 * @deprecated
+	 */
 	public function addGoogleFriendConnectAssociation($google_id, $userpic)
 	{
 		$db = UserConfig::getDB();
@@ -1415,6 +1762,15 @@ class User
 		$this->recordActivity(USERBASE_ACTIVITY_ADDED_GFC);
 	}
 
+	/**
+	 * Returns all Google Friend Connect associations for the user
+	 *
+	 * @return array Array of (google_id, userpic) records
+	 *
+	 * @throws DBException
+	 *
+	 * @deprecated
+	 */
 	public function getGoogleFriendsConnectAssociations()
 	{
 		$db = UserConfig::getDB();
@@ -1451,8 +1807,18 @@ class User
 		return $associations;
 	}
 
-	/*
-	 * retrieves user information by username
+	/**
+	 * Returns a user by username and password
+	 *
+	 * Returns user object or null if username and password do not match.
+	 * It also resets temporary password if user remembered their old password.
+	 *
+	 * @param string $entered_username Username
+	 * @param string $entered_password Password
+	 *
+	 * @return User|null User object or null if username and password do not match
+	 *
+	 * @throws DBException
 	 */
 	public static function getUserByUsernamePassword($entered_username, $entered_password)
 	{
@@ -1542,6 +1908,7 @@ class User
 			$user->resetTemporaryPassword();
 		}
 
+		// do not let disabled users in
 		if (!is_null($user) && $user->isDisabled()) {
 			return null;
 		}
@@ -1549,8 +1916,16 @@ class User
 		return $user;
 	}
 
-	/*
-	 * retrieves user information by Google Friend Connect ID
+	/**
+	 * Returnes user by their Google Friend Connect ID
+	 *
+	 * @param string $googleid Google Friend Connect ID
+	 *
+	 * @return User User object
+	 *
+	 * @throws DBException
+	 *
+	 * @deprecated
 	 */
 	public static function getUserByGoogleFriendConnectID($googleid)
 	{
@@ -1588,7 +1963,17 @@ class User
 		return $user;
 	}
 	/*
-	 * retrieves user information by Facebook ID
+	 *
+	 */
+
+	/**
+	 * Retrieves user information by Facebook ID
+	 *
+	 * @param int $fb_id Facebook user ID
+	 *
+	 * @return User|null User object if user with such ID does not exist
+	 *
+	 * @throws DBException
 	 */
 	public static function getUserByFacebookID($fb_id)
 	{
@@ -1626,9 +2011,14 @@ class User
 		return $user;
 	}
 
-
-	/*
-	 * retrieves user information from database and constructs
+	/**
+	 * Returns user by ID or null if user with such ID does not exist
+	 *
+	 * @param int $userid User ID
+	 *
+	 * @return User|null User object
+	 *
+	 * @throws DBException
 	 */
 	public static function getUser($userid)
 	{
@@ -1666,6 +2056,13 @@ class User
 		return $user;
 	}
 
+	/**
+	 * Set's user's return cookie to track where to go upon login/registration
+	 *
+	 * @param string $return Return URL
+	 *
+	 * @throws StartupAPIException
+	 */
 	private static function setReturn($return)
 	{
 		$storage = new MrClay_CookieStorage(array(
@@ -1680,6 +2077,11 @@ class User
 		}
 	}
 
+	/**
+	 * Retrieve return URL
+	 *
+	 * @return string|null Return URL or null if no return URL was stored
+	 */
 	public static function getReturn()
 	{
 		$storage = new MrClay_CookieStorage(array(
@@ -1697,6 +2099,9 @@ class User
 		}
 	}
 
+	/**
+	 * Crears return URL
+	 */
 	public static function clearReturn()
 	{
 		$storage = new MrClay_CookieStorage(array(
@@ -1708,14 +2113,20 @@ class User
 		$storage->delete(UserConfig::$session_return_key);
 	}
 
+	/**
+	 * Sends user to login page (remembering current page to be returned to upon success)
+	 */
 	public static function redirectToLogin()
 	{
 		self::setReturn($_SERVER['REQUEST_URI']);
-		
+
 		header('Location: '.UserConfig::$USERSROOTURL.'/login.php');
 		exit;
 	}
 
+	/**
+	 * Sends user to password reset page (remembering current page to be returned to upon success)
+	 */
 	private static function redirectToPasswordReset()
 	{
 		self::setReturn($_SERVER['REQUEST_URI']);
@@ -1724,22 +2135,81 @@ class User
 		exit;
 	}
 
-	// statics are over - things below are for objects.
+	/**
+	 * Numeric user ID used to uniquely identify user in the database
+	 *
+	 * @var int User ID
+	 */
 	private $userid;
+
+	/**
+	 * User status: true for active / false for disabled, stored in the database as 1 or 0
+	 *
+	 * @var boolean
+	 */
 	private $status;
+
+	/**
+	 * @var string User's display name
+	 */
 	private $name;
+
+	/**
+	 * @var string Username for logging in
+	 */
 	private $username;
+
+	/**
+	 * @var string User's email address
+	 */
 	private $email;
+
+	/**
+	 * Whatever user is required to reset password on next login, stored in the database as 1 or 0
+	 *
+	 * @var boolean
+	 */
 	private $requirespassreset;
+
+	/**
+	 * @var int Facebook user ID
+	 */
 	private $fbid;
+
+	/**
+	 * @var int Unix timestamp indicating user's registration time
+	 */
 	private $regtime;
+
+	/**
+	 * @var int Total number of activity points user accumulated so far
+	 *
+	 * @see aggregatepoints.php
+	 */
 	private $points;
+
+	/**
+	 * @var User User currently impersonating this user or null if not being impersonated
+	 */
 	private $impersonator;
 
-	function __construct($userid, $status = 1, $name, $username = null, $email = null, $requirespassreset = false, $fbid = null, $regtime = null, $points = 0)
+	/**
+	 * Private constructor, creates new User object
+	 *
+	 * @param int $userid User ID
+	 * @param boolean $status
+	 * @param string $name
+	 * @param string $username
+	 * @param string $email
+	 * @param boolean $requirespassreset
+	 * @param int $fbid
+	 * @param int $regtime
+	 * @param int $points
+	 */
+	private function __construct($userid, $status = true, $name, $username = null, $email = null, $requirespassreset = false, $fbid = null, $regtime = null, $points = 0)
 	{
 		$this->userid = $userid;
-		$this->status = $status;
+		$this->status = $status ? true : false;
 		$this->name = $name;
 		$this->username = $username;
 		$this->email = $email;
@@ -1749,32 +2219,79 @@ class User
 		$this->points = $points;
 	}
 
+	/**
+	 * Returns true if this user is required to reset the password
+	 *
+	 * @return boolean
+	 */
 	public function requiresPasswordReset()
 	{
 		return $this->requirespassreset;
 	}
 
+	/**
+	 * Sets whatever user is required to reset their password
+	 *
+	 * You have to call save() method to persist to the database
+	 *
+	 * @param boolean $requires Set to true to require user to reset their password
+	 */
 	public function setRequiresPasswordReset($requires)
 	{
-		$this->requirespassreset = $requires;
+		$this->requirespassreset = $requires ? true : false;
 	}
 
+	/**
+	 * Returns numeric user ID
+	 *
+	 * @return int User ID
+	 */
 	public function getID()
 	{
 		return $this->userid;
 	}
+
+	/**
+	 * Returns user's display name
+	 *
+	 * @return string User's display name
+	 */
 	public function getName()
 	{
 		return $this->name;
 	}
+
+	/**
+	 * Sets user's display name
+	 *
+	 * You have to call save() method to persist to the database
+	 *
+	 * @param string $name User's display name
+	 */
 	public function setName($name)
 	{
 		$this->name = $name;
 	}
+
+	/**
+	 * Return user's login name or null if none is set for the user
+	 *
+	 * @return string|null User's login name
+	 */
 	public function getUsername()
 	{
 		return $this->username;
 	}
+
+	/**
+	 * Sets user's login name
+	 *
+	 * You have to call save() method to persist to the database
+	 *
+	 * @param string $username User's login name
+	 *
+	 * @throws StartupAPIException
+	 */
 	public function setUsername($username)
 	{
 		if (is_null($this->username))
@@ -1784,42 +2301,113 @@ class User
 			throw new StartupAPIException('This user already has username set.');
 		}
 	}
+
+	/**
+	 * Returns user's email address or null if none is set for the user
+	 *
+	 * @return string|null User's email address
+	 */
 	public function getEmail()
 	{
 		return $this->email;
 	}
+
+	/**
+	 * Sets user's email address
+	 *
+	 * You have to call save() method to persist to the database
+	 *
+	 * @param string $email User's email address
+	 */
 	public function setEmail($email)
 	{
 		$this->email = $email;
 	}
+
+	/**
+	 * Returns user's Facebook account ID or null if user doesn't have a facebook account associated
+	 *
+	 * @return int|null User's Facebook account ID
+	 */
 	public function getFacebookID()
 	{
 		return $this->fbid;
 	}
+
+	/**
+	 * Sets user's Facebook account ID
+	 *
+	 * You have to call save() method to persist to the database
+	 *
+	 * @param int $fbid User's Facebook account ID
+	 */
 	public function setFacebookID($fbid)
 	{
 		$this->fbid = $fbid;
 	}
+
+	/**
+	 * Sets user's status - true if active and false if disabled
+	 *
+	 * You have to call save() method to persist to the database
+	 *
+	 * @param boolean $status User's status
+	 */
 	public function setStatus($status) {
-		$this->status = $status ? 1 : 0;
+		$this->status = $status ? TRUE : FALSE;
 	}
+
+	/**
+	 * Returns Unix timestamp for the time when user registered in the system
+	 *
+	 * @return int Unix timestamp representing user's registration time
+	 */
 	public function getRegTime()
 	{
 		return $this->regtime;
 	}
+
+	/**
+	 * Returns aggregated user's activity points
+	 *
+	 * @return int Aggregated activity points
+	 */
 	public function getPoints()
 	{
 		return $this->points;
 	}
+
+	/**
+	 * Compares this user object to another user object
+	 *
+	 * @param Use $user User object to compare to
+	 *
+	 * @return boolean Returns whatever this is the same user or not
+	 */
 	public function isTheSameAs($user)
 	{
 		return $this->getID() == $user->getID();
 	}
+
+	/**
+	 * Returns true if user is disabled (not active)
+	 *
+	 * @return boolean True if user is disabled
+	 */
 	public function isDisabled()
 	{
-		return ($this->status == 0 ? true : false);
+		return (!$this->status ? true : false);
 	}
 
+	/**
+	 * Checks user's password
+	 *
+	 * @param string $password User's password
+	 *
+	 * @return boolean True if password matches
+	 *
+	 * @throws DBException
+	 */
 	public function checkPass($password)
 	{
 		$db = UserConfig::getDB();
@@ -1854,6 +2442,13 @@ class User
 		return false;
 	}
 
+	/**
+	 * Sets user's password
+	 *
+	 * @param string $password New password
+	 *
+	 * @throws DBException
+	 */
 	public function setPass($password)
 	{
 		$db = UserConfig::getDB();
@@ -1878,16 +2473,19 @@ class User
 		{
 			throw new DBPrepareStmtException($db);
 		}
-
-		return;
 	}
 
+	/**
+	 * Persists user's data into the database
+	 *
+	 * @throws DBException
+	 */
 	public function save()
 	{
 		$db = UserConfig::getDB();
 
 		$passresetnum = $this->requirespassreset ? 1 : 0;
-		$status = $this->status == 0 ? 0 : 1;
+		$status = $this->status ? 1 : 0;
 
 		if (!is_null(UserConfig::$email_module)) {
 			// !WARNING! it's not safe to do anything with this user except reading it's built-in
@@ -1928,10 +2526,15 @@ class User
 			// it's up to email module to decide what to do
 			UserConfig::$email_module->userChanged($old_user, $this);
 		}
-
-		return;
 	}
 
+	/**
+	 * Creates user session cookie
+	 *
+	 * @param boolean $remember Set to true to remember user beyond browser session (if globally enabled)
+	 *
+	 * @throws StartupAPIException
+	 */
 	public function setSession($remember)
 	{
 		$storage = new MrClay_CookieStorage(array(
@@ -1948,6 +2551,9 @@ class User
 		}
 	}
 
+	/**
+	 * Clears user session cookie
+	 */
 	public static function clearSession()
 	{
 		self::stopImpersonation();
@@ -1963,6 +2569,14 @@ class User
 
 	/**
 	 * This method turns on impersonation of particular user (instead of just becoming one)
+	 *
+	 * Should only be used for administrative purpuses.
+	 *
+	 * @param User $user User to impersonate
+	 *
+	 * @return User|null New user object with current user associated with it as impersonator
+	 *
+	 * @throws StartupAPIException
 	 */
 	public function impersonate($user)
 	{
@@ -2004,9 +2618,11 @@ class User
 		$storage->delete(UserConfig::$impersonation_userid_key);
 	}
 
-	/*
-	 * records user activity
-	 * @activity_id:	ID of activity performed by the user
+	/**
+	 * Records user activity
+	 * @param int $activity_id ID of activity performed by the user
+	 *
+	 * @throws DBException
 	 */
 	public function recordActivity($activity_id)
 	{
@@ -2049,24 +2665,32 @@ class User
 		}
 	}
 
-	/*
+	/**
 	 * Returns a list of user's accounts
+	 *
+	 * @return array Array of Account objects
 	 */
 	public function getAccounts()
 	{
 		return Account::getUserAccounts($this);
 	}
 
-	/*
+	/**
 	 * Returns user's current account
+	 *
+	 * @return Account Currently selected account
 	 */
 	public function getCurrentAccount()
 	{
 		return Account::getCurrentAccount($this);
 	}
 
-	/*
-	 * Returns true if user has requested feature enabled
+	/**
+	 * Returns true if user has the feature enabled
+	 *
+	 * @param Feature $feature Feature to check
+	 *
+	 * @return boolean True if feature is enabled for this user
 	 */
 	public function hasFeature($feature) {
 		// checking if we got feature ID instead of object for backwards compatibility
@@ -2077,6 +2701,11 @@ class User
 		return $feature->isEnabledForUser($this);
 	}
 
+	/**
+	 * Explicitly enable features on the list for the user and disable the rest of the features
+	 *
+	 * @param array $features Array of Feature objects)
+	 */
 	public function setFeatures($features) {
 		$all_features = Feature::getAll();
 
@@ -2092,13 +2721,17 @@ class User
 
 	/**
 	 * Returns true if user is the admin of the instance
+	 *
+	 * @return boolean True if user is system administrator for this installation
 	 */
 	public function isAdmin() {
 		return in_array($this->getID(), UserConfig::$admins);
 	}
 
 	/**
-	 * Returns true if user is being impersonated by another user
+	 * Returns true if user is being impersonated by administrator
+	 *
+	 * @return booluesn True if user is being impersonated by administrator
 	 */
 	public function isImpersonated() {
 		return !is_null($this->impersonator);
@@ -2106,9 +2739,11 @@ class User
 
 	/**
 	 * Returns impersonator object (not actual, but a copy to avoid fiddling with real object)
+	 *
+	 * @return User A copy of impersonator's User object
 	 */
 	public function getImpersonator() {
-		// do not return
+		// do not return actual user object
 		return clone($this->impersonator);
 	}
 }

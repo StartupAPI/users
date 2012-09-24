@@ -228,7 +228,7 @@ class EmailAuthenticationModule extends AuthenticationModule
 		}
 
 		// ok, let's create a user
-		$user = User::createNewWithoutCredentials($name, $email);
+		$user = User::createNewWithoutCredentials($this, $name, $email);
 		$user->recordActivity(USERBASE_ACTIVITY_REGISTER_EMAIL);
 //		$user->sendConfirmationEmail();
 		return $user;

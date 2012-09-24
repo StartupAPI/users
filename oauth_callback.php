@@ -66,13 +66,12 @@ try
 		if (is_null($user)) {
 			// This user doesn't exist yet, registering them
 			$new_user = User::createNewWithoutCredentials(
+				$module,
 				$identity['name'],
 				array_key_exists('email', $identity) ? $identity['email'] : null
 			);
 
 			$module->addUserOAuthIdentity($new_user, $identity, $oauth_user_id);
-
-			$new_user->setRegistrationModule($module);
 
 			$new_user->setSession(true);
 			$module->recordRegistrationActivity($new_user);
