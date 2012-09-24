@@ -620,6 +620,9 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 
 /**
  * Abstract class representing user credentials for making OAuth API calls
+ *
+ * @package StartupAPI
+ * @subpackage Authentication
  */
 abstract class OAuthUserCredentials extends UserCredentials {
 	/**

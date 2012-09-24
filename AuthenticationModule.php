@@ -181,6 +181,9 @@ abstract class AuthenticationModule extends StartupAPIModule {
  * Abstract authentication exception class for specific exceptions to subclass
  *
  * Comparing to regular exception, this one also stores a list of messages to be passed back to forms being rendered
+ *
+ * @package StartupAPI
+ * @subpackage Authentication
  */
 abstract class AuthenticationException extends Exception {
 	/**
