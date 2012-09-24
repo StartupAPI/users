@@ -19,3 +19,7 @@ report: docs/report.xml
 
 todo: yes
 
+accessLevels:
+	- public
+	- protected
+	- private
