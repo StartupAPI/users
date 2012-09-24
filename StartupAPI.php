@@ -6,7 +6,7 @@ require_once(dirname(__FILE__).'/User.php');
 
 /**
  * StartupAPI class contains some global static functions and entry points for API
-*/
+ */
 class StartupAPI {
 	// just a proxy to static methods in User class
 	static function getUser() {
