@@ -1,7 +1,7 @@
 <?php
 /**
  * @package StartupAPI
- * @subpackage Analytics
+ * @subpackage Analytics\CohortAnalysis
  */
 require_once(dirname(__FILE__).'/admin.php');
 
@@ -44,7 +44,7 @@ foreach (UserConfig::$activities as $id => $activity) {
 </select>
 
 
-<?php 
+<?php
 
 $boxes = !array_key_exists('boxes', $_REQUEST) || $_REQUEST['boxes'] !== 'set';
 $zoom = array_key_exists('zoom', $_REQUEST);
@@ -208,7 +208,7 @@ for ($period = $minactperiod; $period <= $maxactperiod; $period ++) {
 ?>
 </tr>
 
-<?php 
+<?php
 for ($cohort_number = 0; $cohort_number < count($cohorts); $cohort_number += 1) {
 	$cohort = $cohorts[$cohort_number];
 	$total_cohort_users = $cohort->getTotal();
