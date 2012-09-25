@@ -1,4 +1,5 @@
-.startupapi-edit-account {
+/* from edit.php */
+#startupapi-edit-account {
 	float: right;
 	width: 400px;
 }
@@ -105,22 +106,6 @@
 	font-weight: bold;
 }
 
-#startupapi-authlist {
-	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-	padding: 0 1em;
-	margin: 0 auto;
-	width: 480px;
-}
-
-#startupapi-authlist h2 {
-	font-weight: bold;
-	font-size: 2.5em;
-}
-#startupapi-authlist h3 {
-	font-weight: bold;
-	font-size: 1.5em;
-}
-
 /* from register.php */
 .startupapi-errorbox {
 	background: #f7dfb9;
@@ -145,7 +130,6 @@
 #startupapi-authlist {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0 1em;
-	margin: 0 auto;
 	width: 480px;
 }
 
