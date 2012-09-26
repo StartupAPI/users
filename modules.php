@@ -29,7 +29,7 @@ abstract class StartupAPIModule {
 	 * Returns module by ID
 	 * @param string $id ID of the module
 	 */
-	public static function get(string $id) {
+	public static function get($id) {
 		foreach (UserConfig::$all_modules as $module)
 		{
 			if ($module->getID() == $id) {
