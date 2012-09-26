@@ -1,91 +1,341 @@
 <?php
-/**
- * @package StartupAPI
- */
 require_once(dirname(__FILE__).'/Plan.php');
 require_once(dirname(__FILE__).'/Cohort.php');
 require_once(dirname(__FILE__).'/Feature.php');
 require_once(dirname(__FILE__).'/modules.php');
 require_once(dirname(__FILE__).'/tools.php');
 
+/**
+ * This class contains a bunch of static variables defining how Startup API instance
+ * would behave with reasonable defaults that can be overriden in users_config.php
+ *
+ * @package StartupAPI
+ *
+ * @todo Move read-only arrays into appropriate classes and make them private
+ */
 class UserConfig
 {
-	// list of all available modules
+
+	/**************************************************************************
+	 *
+	 * Modules and extensions
+	 *
+	 **************************************************************************/
+
+	/**
+	 * @var array List of all available modules (StartupAPIModule objects). Do not modify!
+	 */
 	public static $all_modules = array();
 
-	// multiple email modules can be assigned for the same instance
+	/**
+	 * List of authentication modules (AuthenticationModule objects). Do not modify!
+	 * Multiple authentication modules can be assigned for the same instance
+	 *
+	 * @var array
+	 */
 	public static $authentication_modules = array();
 
-	// Only one email module can exist
+	/**
+	 * Email module responsible for syncronization with newsletter service. Only one can be assigned. Do not modify!
+	 *
+	 * @var EmailModule
+	 */
 	public static $email_module;
 
-	// Debugger enabled/disabled
+
+	/**************************************************************************
+	 *
+	 * Debugging
+	 *
+	 **************************************************************************/
+
+	/**
+	 * @var boolean Enable / disable debug messages
+	 */
 	public static $DEBUG = false;
 
-	// paths
+
+	/**************************************************************************
+	 *
+	 * Paths and URLs
+	 *
+	 **************************************************************************/
+
+	/**
+	 * @var string Root path of the project on the file system
+	 */
 	public static $ROOTPATH;
+
+	/**
+	 * @var string Root URL of Startup API code (relative, e.g. /myapp/users/)
+	 */
 	public static $USERSROOTURL;
+
+	/**
+	 * @var string Root URL of Startup API code (full, e.g. http://example.com/myapp/users/)
+	 */
 	public static $USERSROOTFULLURL;
+
+	/**
+	 * @var string Root URL of the application using Startup API (relative, e.g. /myapp/)
+	 */
 	public static $SITEROOTURL;
+
+	/**
+	 * @var string Root URL of the application using Startup API (full, e.g. http://example.com/myapp/)
+	 */
 	public static $SITEROOTFULLURL;
+
+	/**
+	 * @var string Default location URL to return to upon login
+	 */
 	public static $DEFAULTLOGINRETURN;
+
+	/**
+	 * @var string Default location URL to return to upon logout
+	 */
 	public static $DEFAULTLOGOUTRETURN;
+
+	/**
+	 * @var string Default location URL to return to upon registration
+	 */
 	public static $DEFAULTREGISTERRETURN;
+
+	/**
+	 * @var string Default location URL to return to upon password reset (for username/password auth)
+	 */
 	public static $DEFAULTUPDATEPASSWORDRETURN;
 
-	// session secret - must be unique for each installation
+
+	/**************************************************************************
+	 *
+	 * Sessions and cookies
+	 *
+	 * All cookies are stored encrypted using a session secret
+	 *
+	 **************************************************************************/
+
+	/**
+	 * @var string Session secret - must be unique for each installation
+	 *
+	 * @todo Add some validation to ensure that this instance actually specified a unique secret
+	 */
 	public static $SESSION_SECRET;
+
+	/**
+	 * @var string Cookie name for csrf nonce storage
+	 */
 	public static $csrf_nonce_key = 'users-csrf-nonce';
 
-	// Administrator users
-	public static $admins = array();
-
-	// key used in session storage to store user's ID
+	/**
+	 * @var string Cookie name for User ID, indicates that user is logged in.
+	 */
 	public static $session_userid_key = 'users-userid';
+
+	/**
+	 * Cookie name for the URL to return to for redirect-based actions
+	 * like login, registration and etc.
+	 *
+	 * @var string
+	 */
 	public static $session_return_key = 'users-return-to';
+
+	/**
+	 * @var string Cookie name for User ID of the user being impersonated
+	 */
 	public static $impersonation_userid_key = 'users-userid-impr';
 
-	public static $mysql_host = 'localhost';
-	public static $mysql_port = 3306;
-	public static $mysql_socket;
-	public static $mysql_db;
-	public static $mysql_user;
-	public static $mysql_password;
-	public static $mysql_prefix= 'u_';
+	/**
+	 * @var string Facebook session storage cookie name prefix
+	 */
+	public static $facebook_storage_key_prefix = 'users-fb';
 
-	private static $db = null;
+	/**
+	 * @var string Cookie name for OAuth User ID during the OAuth workflow
+	 */
+	public static $oauth_user_id_key = 'users-oauth-user-id';
 
-	public static $header;
-	public static $footer;
-	public static $maillist;
-
-	public static $admin_header;
-	public static $admin_footer;
-
-	// a list of activities
-	public static $activities = array();
-
-	// a list of cohort providers for cohort analysis
-	public static $cohort_providers = array();
-
-	/* A list of features in the system.
-	   Key must be integer.
-	   Values of the array are:
-		- name of the feature (string)
-		- if it is enabled or disabled globally (boolean)
-		- if it is enabled for everybody, overriding account settings (boolean)
-	*/
-	public static $features = array();
-
-	// returning user activity configs
-	public static $last_login_key = 'users-last-login';
-	public static $last_login_session_length = 30; // 30 minutes away considered returning user
-
-	// tracking referrals
+	/**
+	 * @var string Cookie name for storing referrer between anonymous user's arrival and their registration
+	 */
 	public static $entry_referer_key = 'users-ref';
 
-	// campaign tracking variables with Google Analytics defaults
+	/**
+	 * @var string Cookie name for storing campaign object between anonymous user's arrival and their registration
+	 */
 	public static $entry_cmp_key = 'users-cmp';
+
+	/**
+	 * @var string Cookie name for last login cookie
+	 */
+	public static $last_login_key = 'users-last-login';
+
+	/**
+	 * @var boolean Allow remembering a user beyond their browser session, true by default
+	 */
+	public static $allowRememberMe = true;
+
+	/**
+	 * @var boolean Automatically remember user  beyond their browser session when they register, true by default
+	 */
+	public static $rememberUserOnRegistration = true;
+
+	/**
+	 * Time in seconds for long sessions - defaults to 10 years, can be set to relatively short, e.g. 2 weeks if needed
+	 *
+	 * @var int
+	 */
+	public static $rememberMeTime = 315360000;
+
+	/**
+	 * @var boolean Checks "remember me" box on registration and login forms (false by default)
+	 */
+	public static $rememberMeDefault = false;
+
+
+	/**************************************************************************
+	 *
+	 * Admin UI and access
+	 *
+	 **************************************************************************/
+
+	/**
+	 * Array of integer IDs for instance administrators (who have access to adin UI).
+	 *
+	 * Usually first user with ID of 1 is administrator, but defining it without
+	 * having this user in the system might be dangerous if IDs didnt generate
+	 * as you expected upon data re-import or something.
+	 *
+	 * @var array
+	 */
+	public static $admins = array();
+
+
+	/**************************************************************************
+	 *
+	 * DB cpnnectivity
+	 *
+	 **************************************************************************/
+
+	/**
+	 * @var string MySQL host
+	 */
+	public static $mysql_host = 'localhost';
+
+	/**
+	 * @var int MySQL port
+	 */
+	public static $mysql_port = 3306;
+
+	/**
+	 * MySQL socket path on file system. If specified, StartupAPI will not use TCP/IP,
+	 * but a socket connection instead.
+	 *
+	 * @var string
+	 */
+	public static $mysql_socket;
+
+	/**
+	 * @var string MySQL database name
+	 */
+	public static $mysql_db;
+
+	/**
+	 * @var string MySQL database user. See access permissions requirements at http://StartupAPI.org/StartupAPI/DB_privileges
+	 */
+	public static $mysql_user;
+
+	/**
+	 * @var string MySQL password
+	 */
+	public static $mysql_password;
+
+	/**
+	 * @var string MySQL table prefix for all StartupAPI tables ('u_' by default)
+	 */
+	public static $mysql_prefix= 'u_';
+
+	/**
+	 * @var mysqli Database connection singleton
+	 */
+	private static $db = null;
+
+
+	/**************************************************************************
+	 *
+	 * Headers, footers and look and feel
+	 *
+	 **************************************************************************/
+
+	/**
+	 * @var string File system path to header HTML file.
+	 */
+	public static $header;
+
+	/**
+	 * @var string File system path to header HTML file.
+	 */
+	public static $footer;
+
+	/**
+	 * File system path to maillist management widget file to be included on profile management page.
+	 *
+	 * @var string
+	 */
+	public static $maillist;
+
+	/**
+	 * @var string File system path to admin UI header HTML file.
+	 */
+	public static $admin_header;
+
+	/**
+	 * @var string File system path to admin UI footer HTML file.
+	 */
+	public static $admin_footer;
+
+
+	/**************************************************************************
+	 *
+	 * Activity tracking and analytics
+	 *
+	 **************************************************************************/
+
+	/**
+	 * @var array An array of activity entries
+	 */
+	public static $activities = array();
+
+	/**
+	 * @var boolean Only consider users active if they had activities with non-zero value points assigned
+	 */
+	public static $adminActiveOnlyWithPoints = false;
+
+	/**
+	 * @var array An array of cohort providers (CohortProvider objects) for cohort analysis
+	 */
+	public static $cohort_providers = array();
+
+	// returning user activity configs
+
+	/**
+	 * @var int Number of minutes for considering a user as returning user, 30 minutes by default
+	 */
+	public static $last_login_session_length = 30;
+
+	/**
+	 * Array of arrays of URL parameters to be used for campaign tracking.
+	 * Google Analytics (Urchin) defaults are pre-configured, you can append your keys.
+	 *
+	 * The following keys are used:
+	 * - cmp_source - campaign source ('utm_source' is tracked by default)
+	 * - cmp_medium - campaign medium ('utm_medium' is tracked by default)
+	 * - cmp_keywords - campaign keyworkds ('utm_term' is tracked by default)
+	 * - cmp_content - campaign content ('utm_content' is tracked by default)
+	 * - cmp_name - campaign name ('utm_campaign' is tracked by default)
+	 *
+	 * @var array
+	 */
 	public static $campaign_variables = array(
 		'cmp_source' => array('utm_source'),
 		'cmp_medium' => array('utm_medium'),
@@ -94,69 +344,184 @@ class UserConfig
 		'cmp_name' => array('utm_campaign')
 	);
 
-	// Facebook session storage key prefix
-	public static $facebook_storage_key_prefix = 'users-fb';
-
-	// don't display activity for some admin users
+	/**
+	 * An array of user IDs to exclude from activity listing in admin UI.
+	 * Try not to use it unless absolutely necessary - transparency is very important for operations.
+	 *
+	 * @var array
+	 */
 	public static $dont_display_activity_for = array();
 
-	// functionality switches
+
+	/**************************************************************************
+	 *
+	 * Systems features
+	 *
+	 **************************************************************************/
+
+	/**
+	 *
+	 * [DEPRECATED] A list of features in the system.
+	 *
+	 * This way of defining features is deprecated, use Feature class instead.
+	 *
+	 * Key must be a unique integer, usually defined as a constant
+	 *
+	 * Values of the array are arrays with following elements:
+	 * [0] name of the feature (string)
+	 * [1] if feature is enabled or disabled globally (boolean)
+	 * [2] if featurei s enabled for everybody, overriding account settings (boolean)
+	 *
+	 * @var array
+	 *
+	 * @deprecated
+	 */
+	public static $features = array();
+
+
+	/**************************************************************************
+	 *
+	 * Startup API functionality switches
+	 *
+	 **************************************************************************/
+
+	/**
+	 * @var boolean Set to false to disable registration of new users
+	 */
 	public static $enableRegistration = true;
+
+	/**
+	 * @var string Disabled registration message, e.g. "Registration is disabled." (default) or "Coming soon"
+	 */
 	public static $registrationDisabledMessage = 'Registration is disabled.';
 
+	/**
+	 * @var boolean Enables admin invitations
+	 */
 	public static $enableInvitations = false;
+
+	/**
+	 * @var string Message to be displayed on registration page if person came without an invitation
+	 */
 	public static $invitationRequiredMessage = 'Please enter your invitation code';
 
-	// Support emails configuration
+
+	/**************************************************************************
+	 *
+	 * System emails settings
+	 *
+	 **************************************************************************/
+
+	/**
+	 * @var string Name and email to send invitations from (e.g. 'User Support <support@example.com>')
+	 */
 	public static $supportEmailFrom = 'User Support <support@example.com>';
+
+	/**
+	 * @var string Reply-To email address for return emails
+	 */
 	public static $supportEmailReplyTo = 'support@example.com';
+
+	/**
+	 * @var string Email agent header (X-Mailer), 'Startup API (PHP/'.phpversion().')' by default.
+	 * '
+	 * @todo Figure out if there are best practices to be applied here,
+	 * e.g. administrator's email address or backlink to the site, etc.
+	 */
 	public static $supportEmailXMailer;
 
-	// Password recovery email configuration
+	/**
+	 * @var string Password recovery email subject line
+	 */
 	public static $passwordRecoveryEmailSubject = 'Your Password';
 
-	// TODO move all module-specific remember me configurations to module classes
-	// Allow remembering user for longer then a session
-	public static $allowRememberMe = true;
-	// Automatically remember user for longer then a session when they register
-	public static $rememberUserOnRegistration = true;
-	// Time for long sessions - defaults to 10 years
-	// can be set to relatively short, e.g. 2 weeks if needed
-	public static $rememberMeTime = 315360000;
-	// To check or not "remember me" box by default
-	public static $rememberMeDefault = false;
 
-	// use accounts or just users only
+	/**************************************************************************
+	 *
+	 * Accounts
+	 *
+	 **************************************************************************/
+
+	/**
+	 * Use accounts in addition to users, disable this only if youare not going to
+	 * charge subscription fees and 100% sure that you will never have multiple
+	 * users using same data in your system.
+	 *
+	 * @var boolean
+	 *
+	 * @deprecated
+	 */
 	public static $useAccounts = true;
 
-	// account switch destination (curret page will be used if null)
+	/**
+	 * @var string Destination URL used when account is switched (current page by default, if null)
+	 */
 	public static $accountSwitchDestination = null;
 
-	// OAuth application name (not sent if null)
+	/**************************************************************************
+	 *
+	 * OAuth client configuration
+	 *
+	 **************************************************************************/
+
+	/**
+	 * @var string OAuth application name, not sent if null (default) - apps use registered name most of the time anyway
+	 */
 	public static $OAuthAppName = null;
 
-	// key for storing OAuth User ID during the OAuth workflow
-	public static $oauth_user_id_key = 'users-oauth-user-id';
 
-	/*
-	 * Admin insterface settings
+	/**************************************************************************
+	 *
+	 * Hooks
+	 *
+	 **************************************************************************/
+
+	/**
+	 * @var callable Hook for rendering invitation action UI in admin interface
 	 */
-	public static $adminActiveOnlyWithPoints = false;
-
-	/*
-	 * hooks
-	 */
-
-	// Invitation page action renderers
 	public static $onRenderUserInvitationAction = 'UserConfig::renderUserInvitationAction';
+
+	/**
+	 * @var callable Hook for rendering invitation followup action UI in admin interface
+	 */
 	public static $onRenderUserInvitationFollowUpAction = 'UserConfig::renderUserInvitationFollowUpAction';
-	// formatter for password recovery email
+
+	/**
+	 * @var callable Formatter for password recovery email
+	 */
 	public static $onRenderTemporaryPasswordEmail = 'UserConfig::renderTemporaryPasswordEmail';
-	// handler to be called when new user is created
+
+	/**
+	 * @var callable Handler to be called when new user is created, newly created user object is passed in
+	 */
 	public static $onCreate = null;
-	// create extra links on login strip
+
+	/**
+	 * @var callable Hook for rendering extra links on power strip
+	 */
 	public static $onLoginStripLinks = null;
 
+
+	/**************************************************************************
+	 *
+	 * Some global functions and default hooks, as well as static initializer
+	 *
+	 **************************************************************************/
+
+	/**
+	 * Singleton call for getting database connection object
+	 *
+	 * Creates new connection if none made yet or uses existing connection aleady opened previously.
+	 *
+	 * Example:
+	 * <code>
+	 * $db = UserConfig::getDB();
+	 * </code>
+	 *
+	 * @return mysqli
+	 *
+	 * @throws DBException
+	 */
 	public static function getDB()
 	{
 		if (is_null(self::$db))
@@ -174,21 +539,58 @@ class UserConfig
 		return self::$db;
 	}
 
+	/**
+	 * Sets database connection object (mysqli)
+	 *
+	 * Can be used in users_config.php instead of defining connection parameters,
+	 * useful when your app is using same connection which is configured elsewhere
+	 *
+	 * @param mysqli $db
+	 */
 	public static function setDB($db)
 	{
 		self::$db = $db;
 	}
 
+	/**
+	 * Default handler for UserConfig::$onRenderUserInvitationAction hook
+	 *
+	 * @param string $code Invitation code
+	 */
 	public static function renderUserInvitationAction($code)
 	{
 		?><a href="mailto:?Subject=Invitation&Body=<?php echo UserConfig::$SITEROOTFULLURL?>users/register.php?invite=<?php echo urlencode($code)?>">Invite</a><?php
 	}
 
+	/**
+	 * Default handler for UserConfig::$onRenderUserInvitationFollowUpAction hook
+	 *
+	 * @param string $code Invitation code
+	 */
 	public static function renderUserInvitationFollowUpAction($code)
 	{
 		?><a href="mailto:?Subject=Re:%20Invitation&Body=<?php echo UserConfig::$SITEROOTFULLURL?>users/register.php?invite=<?php echo urlencode($code)?>">Follow Up</a><?php
 	}
 
+	/**
+	 * Default handler for UserConfig::$onrenderTemporaryPasswordEmail hook
+	 *
+	 * Create your own like this to override outgoing password recovery emails.
+	 *
+	 * The password sent is actually a password recovery token disguised as
+	 * temporary password to avoid user confusion with different form fields.
+	 *
+	 * This token has limited lifespan and gets reset on password update or upon
+	 * successful entry of previous (remembered) password.
+	 * It's probably the most secure thing you can do for sending
+	 * recovery tokens to the user by email.
+	 *
+	 * @param string $baseurl URL for login page
+	 * @param string $username User's login name
+	 * @param string $temppass One time password / password recovery token
+	 *
+	 * @return string Text email body
+	 */
 	public static function renderTemporaryPasswordEmail($baseurl, $username, $temppass )
 	{
 		$message = <<<EOD
@@ -213,6 +615,13 @@ EOD;
 		return $message;
 	}
 
+	/**
+	 * Loads Startup API module by ID/folder name.
+	 *
+	 * @param string $modulename Module ID / folder name.
+	 *
+	 * @throws StartupAPIException
+	 */
 	public static function loadModule($modulename) {
 		if (is_dir(dirname(__FILE__).'/modules/'.$modulename)) {
 			require_once(dirname(__FILE__).'/modules/'.$modulename.'/index.php');
@@ -221,6 +630,9 @@ EOD;
 		}
 	}
 
+	/**
+	 * Static initializer for various configuration parameters that require calculation on initialization
+	 */
 	public static function init()
 	{
 		UserConfig::$ROOTPATH = dirname(__FILE__);
