@@ -85,7 +85,13 @@ else
 endif
 
 docs:	documentation
-documentation:
+documentation: phpdoc apigen
+
+phpdoc:
+	# Using PHPDocumentor which wirks with phpdocx.dist.xml
+	phpdoc
+
+apigen:
 	# Using ApiGen which works with apigen.neon file for configuration
 	apigen
 

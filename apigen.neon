@@ -1,6 +1,6 @@
 source: .
 
-destination: docs
+destination: docs/apigen
 
 exclude:
 	- */oauth-php/*
@@ -15,7 +15,7 @@ exclude:
 
 php: no
 
-report: docs/report.xml
+report: docs/apigen/report.xml
 
 todo: yes
 
