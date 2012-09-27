@@ -139,6 +139,8 @@ abstract class AuthenticationModule extends StartupAPIModule {
 	 * Retrieves aggregated registration numbers
 	 *
 	 * @return array Array of date => count pairs for all dates that have users registered on that date
+	 *
+	 * @throws DBException
 	 */
 	public function getDailyRegistrations()
 	{
