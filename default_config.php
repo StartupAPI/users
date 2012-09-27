@@ -747,9 +747,17 @@ EOD;
 		UserConfig::$cohort_providers[] = new RegMethodCohorts();
 	}
 
-	// Couldn't reuse it, but keeping it here because it might be still populated in user configs
-	// Use UserConfig::$all_modules array instead of needed
-	/* !!! DEPRECATED !!! */ public static $modules = array();
+	/**
+	 * Old way of keeping track of modules.
+	 *
+	 * Couldn't reuse it, but keeping it here because it might be still populated in user configs
+	 * Use UserConfig::$all_modules array instead of needed
+	 *
+	 * @var array
+	 *
+	 * @deprecated
+	 */
+	public static $modules = array();
 }
 
 UserConfig::init();
