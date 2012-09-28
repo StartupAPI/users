@@ -1,13 +1,13 @@
 <?php
-/**
- * @package StartupAPI
- *
- * Invitation class
- */
 require_once(dirname(__FILE__).'/global.php');
 require_once(dirname(__FILE__).'/User.php');
 
-class Invitation 
+/**
+ * Invitation class
+ *
+ * @package StartupAPI
+ */
+class Invitation
 {
 	private $code;
 	private $time_created;
@@ -149,7 +149,7 @@ class Invitation
 
 	public function __construct($code, $time_created, $issuedby, $usagecomment = null, $user = null)
 	{
-		$this->code = $code;	
+		$this->code = $code;
 		$this->time_created = $time_created;
 		$this->issuedby = $issuedby;
 		$this->usagecomment = $usagecomment;

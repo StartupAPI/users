@@ -1,11 +1,10 @@
 <?php
-/**
- * @package StartupAPI
- */
 require_once(dirname(__FILE__).'/User.php');
 
 /**
  * StartupAPI class contains some global static functions and entry points for API
+ *
+ * @package StartupAPI
  */
 class StartupAPI {
 	// just a proxy to static methods in User class
@@ -158,20 +157,28 @@ class DBException extends StartupAPIException {
 
 /**
  * Paremeter Binding Exception
+ *
+ * @package StartupAPI
  */
 class DBBindParamException extends DBException {}
 
 /**
  * Result binding Exception
+ *
+ * @package StartupAPI
  */
 class DBBindResultException extends DBException {}
 
 /**
  * Statement Execution Exception
+ *
+ * @package StartupAPI
  */
 class DBExecuteStmtException extends DBException {}
 
 /**
  * Statement preparation Exception
+ *
+ * @package StartupAPI
  */
 class DBPrepareStmtException extends DBException {}

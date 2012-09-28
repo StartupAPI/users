@@ -1,8 +1,8 @@
 <?php
 /**
- * @package StartupAPI
- *
  * Various tools used within Startup API
+ *
+ * @package StartupAPI
  */
 class UserTools
 {

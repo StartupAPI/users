@@ -15,5 +15,6 @@
 		<ignore>docs/*</ignore>
 		<ignore>smarty/*</ignore>
 		<ignore>phptidy/*</ignore>
+		<ignore>CookieStorage.php</ignore>
 	</files>
 </phpdoc>

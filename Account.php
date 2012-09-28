@@ -1,7 +1,4 @@
 <?php
-/**
- * @package StartupAPI
- */
 require_once(dirname(__FILE__).'/Plan.php');
 
 /**
@@ -18,6 +15,8 @@ require_once(dirname(__FILE__).'/Plan.php');
  * // Getting currently selected account
  * $account = $user->getCurrentAccount();
  * </code>
+ *
+ * @package StartupAPI
  */
 class Account
 {

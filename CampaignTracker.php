@@ -5,6 +5,11 @@ require_once(dirname(__FILE__).'/CookieStorage.php');
  * Tracks sources of marketing campaigns using variables in the incoming URLs
  * as well as incoming links and preserves this information for registered users.
  *
+ * Configure it using UserConfig::$campaign_variables array, by default it uses
+ * Google Analytics (Urchin) campaign tracking URL parameters.
+ *
+ * @see UserConfig::$campaign_variables
+ *
  * @package StartupAPI
  * @subpackage Analytics
  */

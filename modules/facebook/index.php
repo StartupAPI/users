@@ -2,6 +2,8 @@
 require_once(dirname(__FILE__).'/facebook.php');
 
 /**
+ * Facebook Authentication Module
+ *
  * @package StartupAPI
  * @subpackage Authentication\Facebook
  */
@@ -131,7 +133,7 @@ class FacebookAuthenticationModule extends AuthenticationModule
 	}
 
 	/*
-	 * retrieves aggregated registrations numbers 
+	 * retrieves aggregated registrations numbers
 	 */
 	public function getDailyRegistrations()
 	{

@@ -1,10 +1,14 @@
 <?php
+require_once(dirname(__FILE__).'/global.php');
+
 /**
+ * StartupAPI module class
+ *
+ * Subclass it if you want to add a module/extension
+ *
  * @package StartupAPI
  * @subpackage Extensions
  */
-require_once(dirname(__FILE__).'/global.php');
-
 abstract class StartupAPIModule {
 	public function __construct() {
 		UserConfig::$all_modules[] = $this;

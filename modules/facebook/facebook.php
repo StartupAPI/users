@@ -1,8 +1,5 @@
 <?php
 /**
- * @package StartupAPI
- * @subpackage Authentication\Facebook
- *
  * Copyright 2011 Facebook, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -27,6 +24,9 @@ require_once(dirname(dirname(dirname(__FILE__))).'/global.php');
  * PHP sessions to store user ids and access tokens.
  *
  * Based on a class provided in Facebook PHP SDK
+ *
+ * @package StartupAPI
+ * @subpackage Authentication\Facebook
  */
 class Facebook extends BaseFacebook
 {

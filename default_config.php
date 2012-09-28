@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package StartupAPI
+ */
 require_once(dirname(__FILE__).'/Plan.php');
 require_once(dirname(__FILE__).'/Cohort.php');
 require_once(dirname(__FILE__).'/Feature.php');
@@ -678,33 +681,102 @@ EOD;
 		UserConfig::$admin_footer = dirname(__FILE__).'/footer.php';
 
 		// Built in activities
+
+		/**
+		 * Activity ID for login using username and password
+		 */
 		define('USERBASE_ACTIVITY_LOGIN_UPASS',		1000);
+		/**
+		 * Activity ID for login using Facebpok
+		 */
 		define('USERBASE_ACTIVITY_LOGIN_FB',		1001);
+		/**
+		 * Activity ID for login using Google Friend Connect (deprecated)
+		 *
+		 * @deprecated
+		 */
 		define('USERBASE_ACTIVITY_LOGIN_GFC',		1002);
 
+		/**
+		 * Activity ID for adding username and password in user settings
+		 */
 		define('USERBASE_ACTIVITY_ADDED_UPASS',		1003);
+		/**
+		 * Activity ID for adding Facebook account in user settings
+		 */
 		define('USERBASE_ACTIVITY_ADDED_FB',		1004);
+		/**
+		 * Activity ID for adding Google Friend Connect account in user settings (deprecated)
+		 *
+		 * @deprecated
+		 */
 		define('USERBASE_ACTIVITY_ADDED_GFC',		1005);
 
+		/**
+		 * Activity ID for removing Facebook account in user settings
+		 */
 		define('USERBASE_ACTIVITY_REMOVED_FB',		1006);
+		/**
+		 * Activity ID for removing Google Friend Connect account in user settings (deprecated)
+		 *
+		 * @deprecated
+		 */
 		define('USERBASE_ACTIVITY_REMOVED_GFC',		1007);
 
+		/**
+		 * Activity ID for logging out of the application
+		 */
 		define('USERBASE_ACTIVITY_LOGOUT',		1008);
 
+		/**
+		 * Activity ID for registering using username and password
+		 */
 		define('USERBASE_ACTIVITY_REGISTER_UPASS',	1009);
+		/**
+		 * Activity ID for registering using Facebook account
+		 */
 		define('USERBASE_ACTIVITY_REGISTER_FB',		1010);
+		/**
+		 * Activity ID for registering using Google Friend Connect account (deprecated)
+		 *
+		 * @deprecated
+		 */
 		define('USERBASE_ACTIVITY_REGISTER_GFC',	1011);
 
+		/**
+		 * Activity ID for updating user information in user settings
+		 */
 		define('USERBASE_ACTIVITY_UPDATEUSERINFO',	1012);
 
+		/**
+		 * Activity ID for changing password
+		 */
 		define('USERBASE_ACTIVITY_UPDATEPASS',		1013);
+		/**
+		 * Activity ID for resetting forgotten password
+		 */
 		define('USERBASE_ACTIVITY_RESETPASS',		1014);
 
+		/**
+		 * Activity ID for returning back within a day
+		 */
 		define('USERBASE_ACTIVITY_RETURN_DAILY',	1015);
+		/**
+		 * Activity ID for returning back within a week
+		 */
 		define('USERBASE_ACTIVITY_RETURN_WEEKLY',	1016);
+		/**
+		 * Activity ID for returning back within a month
+		 */
 		define('USERBASE_ACTIVITY_RETURN_MONTHLY',	1017);
 
+		/**
+		 * Activity ID for logging in using email address
+		 */
 		define('USERBASE_ACTIVITY_LOGIN_EMAIL',		1018);
+		/**
+		 * Activity ID for registering using email address
+		 */
 		define('USERBASE_ACTIVITY_REGISTER_EMAIL',	1019);
 
 		// Array of activities in the system.
