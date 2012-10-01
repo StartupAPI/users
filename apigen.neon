@@ -23,3 +23,5 @@ accessLevels:
 	- public
 	- protected
 	- private
+
+updateCheck: no
