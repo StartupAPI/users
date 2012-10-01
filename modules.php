@@ -10,6 +10,9 @@ require_once(dirname(__FILE__).'/global.php');
  * @subpackage Extensions
  */
 abstract class StartupAPIModule {
+	/**
+	 * Creates new module and registers it with the system
+	 */
 	public function __construct() {
 		UserConfig::$all_modules[] = $this;
 	}
@@ -31,7 +34,10 @@ abstract class StartupAPIModule {
 
 	/**
 	 * Returns module by ID
+	 *
 	 * @param string $id ID of the module
+	 *
+	 * @return StartupAPIModule StartupAPIModule object
 	 */
 	public static function get($id) {
 		foreach (UserConfig::$all_modules as $module)
