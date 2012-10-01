@@ -1,19 +1,63 @@
 <?php
 /**
+ * Represents application feature
+ *
+ * Usage:
+ *
+ * First define in your configuration file using a numeric ID
+ * <code>
+ * define('MY_FIRST_FEATURE_ID', 1);
+ * new Feature(MY_FIRST_FEATURE_ID, 'My first feature');
+ * </code>
+ *
+ * and then use it when implementing the feature in your code
+ * <code>
+ * if ($user->hasFeature(MY_FIRST_FEATURE_ID)) {
+ *		echo "Hey, you can use my first feature!";
+ * }
+ * </code>
+ *
  * @package StartupAPI
  */
 class Feature {
+	/**
+	 * @var int Numeric feature ID
+	 */
 	private $id;
+
+	/**
+	 * @var string Feature display name
+	 */
 	private $name;
+
+	/**
+	 * @var boolean Is feature enabled or not
+	 */
 	private $enabled;
+
+	/**
+	 * @var boolean Is feature is rolled out to all users or not
+	 */
 	private $rolled_out_to_all_users;
+
+	/**
+	 * @var int Shutdown priority, can be used to automate shutdown in case of system problems
+	 */
 	private $shutdown_priority;
+
+	/**
+	 * @var boolean Indicates that this feature was shut down due to system problems
+	 */
 	private $emergency_shutdown;
 
-	// moved feature array from users_config to here
+	/**
+	 * @var array An array of features registered in the system
+	 */
 	private static $features = array();
 
 	/**
+	 * Creates a new feature object and registers it in the system
+	 *
 	 * @param integer Unique numeric ID of the feature
 	 * @param string Human readable name of the feature
 	 * @param boolean Flag indicating that feature is currently active
@@ -53,34 +97,76 @@ class Feature {
 		self::$features[$id] = $this;
 	}
 
+	/**
+	 * Returns feature ID
+	 *
+	 * @return int Feature ID
+	 */
 	public function getID() {
 		return $this->id;
 	}
 
+	/**
+	 * Returns feature display name
+	 *
+	 * @return string Feature display name
+	 */
 	public function getName() {
 		return $this->name;
 	}
 
+	/**
+	 * Checks if feature is enabled or not
+	 *
+	 * @return boolean Enabled / disabled
+	 */
 	public function isEnabled() {
 		return $this->enabled ? true : false;
 	}
 
+	/**
+	 * Returns whatever this feature is rolled out to all users already
+	 *
+	 * @return boolean
+	 */
 	public function isRolledOutToAllUsers() {
-		return $this->rolled_out_to_all_users;
+		return $this->rolled_out_to_all_users ? true : false;
 	}
 
+	/**
+	 * Returns shutdown priority
+	 *
+	 * @return int Shutdown priority
+	 */
 	public function getShutdownPriority() {
 		return $this->shutdown_priority;
 	}
 
+	/**
+	 * Checks if system is shut down
+	 *
+	 * @return boolean Up / Down
+	 */
 	public function isShutDown() {
 		return $this->emergency_shutdown;
 	}
 
+	/**
+	 * Returns all features
+	 *
+	 * @return array Array of Feature objects configured in the system
+	 */
 	public static function getAll() {
 		return self::$features;
 	}
 
+	/**
+	 * Returns feature for ID provided, or null if no feature with this ID exists
+	 *
+	 * @param int $id Feature ID
+	 *
+	 * @return Feature|null
+	 */
 	public static function getByID($id) {
 		if (array_key_exists($id, self::$features)) {
 			return self::$features[$id];
@@ -89,13 +175,29 @@ class Feature {
 		return null;
 	}
 
-	// used for backwards compatibility
+	//
+	/**
+	 * Initializes features based on old configuration
+	 *
+	 * Used for backwards compatibility
+	 *
+	 * @deprecated
+	 */
 	public static function init() {
 		foreach (UserConfig::$features as $id => $details) {
 			new Feature($id, $details[0], $details[1], $details[2]);
 		}
 	}
 
+	/**
+	 * Checks if feature is enabled for particular account
+	 *
+	 * @param Account $account Account to check
+	 *
+	 * @return boolean Enabled / Disabled
+	 *
+	 * @throws DBException
+	 */
 	public function isEnabledForAccount($account){
 		if ($this->emergency_shutdown || !$this->enabled) {
 			return false;
@@ -137,8 +239,14 @@ class Feature {
 		}
 	}
 
-	/*
-	 * Returns true if user has requested feature enabled
+	/**
+	 * Checks if feature is enabled for particular user
+	 *
+	 * @param User $user User to check
+	 *
+	 * @return boolean Enabled / Disabled
+	 *
+	 * @throws DBException
 	 */
 	public function isEnabledForUser($user) {
 		if ($this->emergency_shutdown || !$this->enabled) {
@@ -188,8 +296,12 @@ class Feature {
 		return false;
 	}
 
-	/*
+	/**
 	 * Returns a number of users this feature is enabled for
+	 *
+	 * @return int Number of users this feature is enabled for
+	 *
+	 * @throws DBException
 	 */
 	public function getUserCount() {
 		$db = UserConfig::getDB();
@@ -222,8 +334,12 @@ class Feature {
 		return false;
 	}
 
-	/*
+	/**
 	 * Returns a number of accounts this feature is enabled for
+	 *
+	 * @return int Number of accounts this feature is enabled for
+	 *
+	 * @throws DBException
 	 */
 	public function getAccountCount() {
 		$db = UserConfig::getDB();
@@ -256,7 +372,13 @@ class Feature {
 		return false;
 	}
 
-
+	/**
+	 * Disables feature for particular user
+	 *
+	 * @param User $user User to disable this feature for
+	 *
+	 * @throws DBException
+	 */
 	public function disableForUser($user) {
 		// now, let's see if user has it enabled
 		$db = UserConfig::getDB();
@@ -281,6 +403,13 @@ class Feature {
 		}
 	}
 
+	/**
+	 * Enables feature for particular user
+	 *
+	 * @param User $user User to enables this feature for
+	 *
+	 * @throws DBException
+	 */
 	public function enableForUser($user) {
 		// now, let's see if user has it enabled
 		$db = UserConfig::getDB();
