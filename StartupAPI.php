@@ -7,12 +7,21 @@ require_once(dirname(__FILE__).'/User.php');
  * @package StartupAPI
  */
 class StartupAPI {
-	// just a proxy to static methods in User class
+	//
+	/**
+	 * Just a proxy to static User::get() method in User class
+	 *
+	 * @return User|null
+	 */
 	static function getUser() {
 		return User::get();
 	}
 
-	// just a proxy to static methods in User class
+	/**
+	 * Just a proxy to static User::require_login() method in User class
+	 *
+	 * @return User
+	 */
 	static function requireLogin() {
 		return User::requireLogin();
 	}
@@ -120,6 +129,13 @@ class StartupAPI {
  * @package StartupAPI
  */
 class StartupAPIException extends Exception {
+	/**
+	 * General Startup API Exception
+	 *
+	 * @param string $message Exception message
+	 * @param int $code Exception code
+	 * @param Exception $previous Previous exception in the chain
+	 */
 	function __construct($message, $code, $previous) {
 		parent::__construct('[StartupAPI] ' . $message, $code, $previous);
 	}
@@ -131,6 +147,15 @@ class StartupAPIException extends Exception {
  * @package StartupAPI
  */
 class DBException extends StartupAPIException {
+	/**
+	 * Creates a database-related exception
+	 *
+	 * @param mysqli $db MySQLi database object
+	 * @param mysqli_stmt $stmt MySQLi database statement
+	 * @param string $message Exception message
+	 * @param int $code Exception code
+	 * @param Exception $previous Previous exception in the chain
+	 */
 	function __construct(mysqli $db = null, $stmt = null, $message = null, $code = null, $previous = null) {
 		$exception_message = $message;
 

@@ -1,10 +1,25 @@
 <?php
 /**
- * @package StartupAPI
- * @subpackage Analytics
+ * Maintenance script to aggregate activity value points for all users.
+ *
+ * When activity is recorded, only an entry for activity is written into database,
+ * activity value points which are configured for the app are not recorded and
+ * have to be aggregated separately.
+ *
+ * Also if you change activity point values, totals must be recalculated,
+ * just run this script.
  */
 require_once(dirname(__FILE__).'/global.php');
 
+/**
+ * Aggregates activity points for users, can be ran as cron job
+ * on a daily basis or more often if needed.
+ *
+ * @package StartupAPI
+ * @subpackage Analytics
+ *
+ * @throws DBException
+ */
 function aggregatePoints() {
 	$db = UserConfig::getDB();
 
