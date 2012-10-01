@@ -5,16 +5,65 @@ require_once(dirname(__FILE__).'/User.php');
 /**
  * Invitation class
  *
+ * This class supports admin-initiated invitations only at the moment
+ *
+ * @todo Add ability for users to invite each other
+ * @todo Get rid of integers for user IDs and use user objects instead
+ *
  * @package StartupAPI
  */
 class Invitation
 {
+	/**
+	 * @var string Invitation code
+	 */
 	private $code;
+
+	/**
+	 * @var string Date/time when invitation code was created
+	 */
 	private $time_created;
+
+	/**
+	 * @var int User ID of the user who sent the invitation
+	 */
 	private $issuedby;
+
+	/**
+	 * @var string Invitation comment (reminder to issuer why it was sent)
+	 */
 	private $usagecomment;
+
+	/**
+	 * @var int ID of the User who got invited
+	 */
 	private $user;
 
+	/**
+	 * Creates new invitation object
+	 *
+	 * @param string $code Invitation code
+	 * @param string $time_created Date/time when invitation code was created
+	 * @param int $issuedby ID of the user who created an invitation
+	 * @param string $usagecomment Invitation comment (reminder to issuer why it was sent)
+	 * @param int $user ID of the User who got invited
+	 */
+	private function __construct($code, $time_created, $issuedby, $usagecomment = null, $user = null)
+	{
+		$this->code = $code;
+		$this->time_created = $time_created;
+		$this->issuedby = $issuedby;
+		$this->usagecomment = $usagecomment;
+		$this->user = $user;
+	}
+
+	/**
+	 * Returns invitations that were generated, but not sent yet
+	 *
+	 * @return array Array of Invitation objects
+	 *
+	 * @throws DBException
+	 */
 	public static function getUnsent()
 	{
 		$invitations = array();
@@ -47,6 +96,13 @@ class Invitation
 		return $invitations;
 	}
 
+	/**
+	 * Returns invitations that were sent, but not used for registration yet
+	 *
+	 * @return array Array of Invitation objects
+	 *
+	 * @throws DBException
+	 */
 	public static function getSent()
 	{
 		$invitations = array();
@@ -79,6 +135,13 @@ class Invitation
 		return $invitations;
 	}
 
+	/**
+	 * Returns invitations that were accepted
+	 *
+	 * @return array Array of Invitation objects
+	 *
+	 * @throws DBException
+	 */
 	public static function getAccepted()
 	{
 		$invitations = array();
@@ -111,6 +174,15 @@ class Invitation
 		return $invitations;
 	}
 
+	/**
+	 * Returns invitation by invitation code
+	 *
+	 * @param string $code Invitation code
+	 *
+	 * @return Invitation
+	 *
+	 * @throws DBException
+	 */
 	public static function getByCode($code)
 	{
 		$invitation = null;
@@ -147,15 +219,13 @@ class Invitation
 		return $invitation;
 	}
 
-	public function __construct($code, $time_created, $issuedby, $usagecomment = null, $user = null)
-	{
-		$this->code = $code;
-		$this->time_created = $time_created;
-		$this->issuedby = $issuedby;
-		$this->usagecomment = $usagecomment;
-		$this->user = $user;
-	}
-
+	/**
+	 * Creates new invitation codes to be used for inviting new users
+	 *
+	 * @param int $howmany How many codes to generate
+	 *
+	 * @throws DBException
+	 */
 	public static function generate($howmany)
 	{
 		$db = UserConfig::getDB();
@@ -182,7 +252,12 @@ class Invitation
 		}
 	}
 
-	public static function generateCode()
+	/**
+	 * Creates new invitation code string
+	 *
+	 * @return string Invitation code
+	 */
+	private static function generateCode()
 	{
 		// Length of invitation strings
 		$length = 10;
@@ -210,30 +285,61 @@ class Invitation
 		return $string;
 	}
 
+	/**
+	 * Returns invitation code
+	 *
+	 * @return string Invitation code
+	 */
 	public function getCode()
 	{
 		return $this->code;
 	}
 
+	/**
+	 * Returns date/time code was generated
+	 *
+	 * @return string Date/time when code was generated
+	 */
 	public function getTimeCreated()
 	{
 		return $this->time_created;
 	}
 
+	/**
+	 * Returns user ID of user who issued invitation
+	 *
+	 * @return int User ID of user who issued invitation
+	 */
 	public function getIssuer()
 	{
 		return $this->issuedby;
 	}
 
+	/**
+	 * Returns invitation comment
+	 *
+	 * @return string Invitation comments
+	 */
 	public function getComment()
 	{
 		return $this->usagecomment;
 	}
+
+	/**
+	 * Sets invitation comment
+	 *
+	 * @param string $comment Invitation comment
+	 */
 	public function setComment($comment)
 	{
 		$this->usagecomment = $comment;
 	}
 
+	/**
+	 * Persists invitation object in database
+	 *
+	 * @throws DBException
+	 */
 	public function save()
 	{
 		$db = UserConfig::getDB();
@@ -257,19 +363,33 @@ class Invitation
 		{
 			throw new DBPrepareStmtException($db);
 		}
-
-		return;
 	}
 
+	/**
+	 * Returns ID of invited user
+	 *
+	 * @return int User ID
+	 */
 	public function getUser()
 	{
 		return User::getUser($this->user);
 	}
+
+	/**
+	 * Sets user ID of invited user
+	 *
+	 * @param int $user User ID
+	 */
 	public function setUser($user)
 	{
 		$this->user = $user->getID();
 	}
 
+	/**
+	 * Returns true if invitation is already accepted
+	 *
+	 * @return boolean True if invitation is already accepted
+	 */
 	public function getStatus()
 	{
 		return !is_null($this->user);
