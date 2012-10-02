@@ -38,6 +38,18 @@ abstract class AuthenticationModule extends StartupAPIModule {
 	abstract public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null);
 
 	/**
+	 * Renders user editing form
+	 *
+	 * Implementations of this method must render login form
+	 *
+	 * @param string $action Form action URL to post back to
+	 * @param array $errors Array of error messages to display
+	 * @param User $user User object for current user that is being edited
+	 * @param array $data Data submitted to the form
+	 */
+	abstract public function renderEditUserForm($action, $errors, $user, $data);
+
+	/**
 	 * Processes login form data
 	 *
 	 * In some implementations this method can trigger automatic registration
