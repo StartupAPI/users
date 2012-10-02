@@ -306,6 +306,8 @@ class UserConfig
 
 	/**
 	 * @var array An array of activity entries
+	 *
+	 * @todo Create Activity class and rewrite everything to use the class instead of params array
 	 */
 	public static $activities = array();
 
