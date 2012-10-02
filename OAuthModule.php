@@ -10,34 +10,133 @@ include_once(dirname(__FILE__).'/oauth-php/library/OAuthRequester.php');
  */
 abstract class OAuthAuthenticationModule extends AuthenticationModule
 {
+	/**
+	 * @var string Service display name
+	 */
 	protected $serviceName;
 
+	/**
+	 * @var string Name of user credentials class for this module, created and overriden by subclass
+	 */
 	protected $userCredentialsClass;
 
-	// oauth parameters
-	protected $oAuthAPIRootURL;
-	protected $oAuthConsumerKey;
-	protected $oAuthConsumerSecret;
-	protected $oAuthAuthorizeURL;
-	protected $oAuthRequestTokenURL;
-	protected $oAuthAccessTokenURL;
-	protected $oAuthSignatureMethods = array();
-	protected $oAuthScope;
-
-	// OAuth store instance - using MySQLi store as the rest of the app uses MySQLi
+	/**
+	 * @var OAuthStoreMySQLi OAuth store instance - using MySQLi store as the rest of the app uses MySQLi
+	 */
 	protected $oAuthStore;
 
-	// Look and feel
+	/**************************************************************************
+	 *
+	 * OAuth parameters
+	 *
+	 **************************************************************************/
+
+	/**
+	 * @var string Root URL for all API calls using this provider
+	 */
+	protected $oAuthAPIRootURL;
+
+	/**
+	 * @var string OAuth consumer key
+	 */
+	protected $oAuthConsumerKey;
+
+	/**
+	 * @var string OAuth consumer secret
+	 */
+	protected $oAuthConsumerSecret;
+
+	/**
+	 * @var string URL of OAuth endpoint for getting request tokens
+	 */
+	protected $oAuthRequestTokenURL;
+
+	/**
+	 * @var string URL of OAuth endpoint for getting access tokens
+	 */
+	protected $oAuthAccessTokenURL;
+
+	/**
+	 * @var string Authorization/authentication dialog URL to redirect user to
+	 */
+	protected $oAuthAuthorizeURL;
+
+	/**
+	 * @var array Array of signature methods supported by the service, e.g. 'HMAC-SHA1'
+	 */
+	protected $oAuthSignatureMethods = array();
+
+	/**
+	 * @var string Requested permission scopes (zero or more scope URLs separated by spaces)
+	 */
+	protected $oAuthScope;
+
+
+	/**************************************************************************
+	 *
+	 * Look and feel
+	 *
+	 **************************************************************************/
+
+	/**
+	 * @var type Sign-up button image URL
+	 */
 	protected $signUpButtonURL;
+
+	/**
+	 * @var type Login button image URL
+	 */
 	protected $logInButtonURL;
+
+	/**
+	 * @var type Connect button image URL
+	 */
 	protected $connectButtonURL;
 
-	// Subclasses must assign unique integer IDs
+
+	/**************************************************************************
+	 *
+	 * Activities. Subclasses must assign unique integer IDs
+	 *
+	 **************************************************************************/
+
+	/**
+	 * @var array Login activity configuration array
+	 */
 	protected $USERBASE_ACTIVITY_OAUTH_MODULE_LOGIN;
+
+	/**
+	 * @var array Connection added activity configuration array
+	 */
 	protected $USERBASE_ACTIVITY_OAUTH_MODULE_ADDED;
+
+	/**
+	 * @var array Connection removed activity configuration array
+	 */
 	protected $USERBASE_ACTIVITY_OAUTH_MODULE_REMOVED;
+
+	/**
+	 * @var array Registration activity configuration array
+	 */
 	protected $USERBASE_ACTIVITY_OAUTH_MODULE_REGISTER;
 
+	/**
+	 * Instantiates a new OAuth-based module and registers it in the system
+	 *
+	 * @param string $serviceName Service display name
+	 * @param string $oAuthAPIRootURL Root URL for all API calls using this provider
+	 * @param string $oAuthConsumerKey OAuth consumer key
+	 * @param string $oAuthConsumerSecret OAuth consumer secret
+	 * @param string $oAuthRequestTokenURL URL of OAuth endpoint for getting request tokens
+	 * @param string $oAuthAccessTokenURL URL of OAuth endpoint for getting access tokens
+	 * @param string $oAuthAuthorizeURL Authorization/authentication dialog URL to redirect user to
+	 * @param array $oAuthSignatureMethods Array of signature methods supported by the service, e.g. 'HMAC-SHA1'
+	 * @param string $oAuthScope Requested permission scopes (zero or more scope URLs separated by spaces)
+	 * @param string $signUpButtonURL Sign-up button image URL
+	 * @param string $logInButtonURL Login button image URL
+	 * @param string $connectButtonURL Connect button image URL
+	 * @param array $activities Array of user activity configuration entries (see UserConfig::$activities)
+	 */
 	public function __construct($serviceName,
 		$oAuthAPIRootURL,
 		$oAuthConsumerKey, $oAuthConsumerSecret,
@@ -83,9 +182,11 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		));
 	}
 
-###########################################################################################
-# Methods related to OAuth handling
-###########################################################################################
+	/**************************************************************************
+	 *
+	 * Methods related to OAuth handling
+	 *
+	 **************************************************************************/
 
 	/**
 	 * Each module is supposed to implement this service to retrieve identity info from the server.
@@ -94,7 +195,8 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 	 * for the same user. Also, access_tokens can expire or be revoked eventually, but this doesn't
 	 * mean that the system user identity has changed.
 	 *
-	 * @param array $oauth_user_id OAuth user id to get identity for
+	 * @param int $oauth_user_id OAuth user id to get identity for
+	 *
 	 * @return array $identity Identity array that includes user info including 'id' column which
 	 *                         uniquely identifies the user on server and 'name' value that can be
 	 *                         used as user's name upon registration
@@ -122,6 +224,11 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		}
 	}
 
+	/**
+	 * Starts OAuth flow
+	 *
+	 * @throws StartupAPIException
+	 */
 	protected function startOAuthFlow() {
 		// generate new user id since we're logging in and have no idea who the user is
 		$oauth_user_id = $this->getNewOAuthUserID();
@@ -170,12 +277,16 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 			exit;
 		} catch(OAuthException2 $e) {
 			error_log(var_export($e, true));
-			return null;
 		}
 	}
 
-	/*
-	 * Override this function in subclass to get authorization URL from token parameters passed back
+	/**
+	 * By default returns pre-defined authorization URL, but subclasses can override
+	 * this function to get authorization URL from token parameters passed back.
+	 *
+	 * @param array $tokenResultParams array of OAuth token information passed in by provider
+	 *
+	 * @return string Returns OAuth Authorization URL
 	 */
 	protected function getAuthorizeURL($tokenResultParams) {
 		return $this->oAuthAuthorizeURL;
@@ -184,6 +295,10 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 	/**
 	 * When we don't know current user, we need to create a new OAuth User ID to use for new connection.
 	 * If we know the user when OAuth comes through, we'll replace current OAuth User ID with the new one.
+	 *
+	 * @return string New/temporary OAuth user ID
+	 *
+	 * @throws DBException
 	 */
 	protected function getNewOAuthUserID() {
 		// TODO add a way to skip this step if server was initialized
@@ -216,7 +331,13 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 	}
 
 	/**
+	 * Adds user identity to OAuth user
 	 *
+	 * @param User $user User who this OAuth credentials belong
+	 * @param array $identity Identity array provided for this OAuth user
+	 * @param int $oauth_user_id OAuth user id
+	 *
+	 * @throws DBException
 	 */
 	public function addUserOAuthIdentity($user, $identity, $oauth_user_id) {
 		$db = UserConfig::getDB();
@@ -249,6 +370,13 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		}
 	}
 
+	/**
+	 * Deletes OAuth user credentials
+	 *
+	 * @param int $oauth_user_id OAuth user ID
+	 *
+	 * @throws DBException
+	 */
 	public function deleteOAuthUser($oauth_user_id) {
 		$db = UserConfig::getDB();
 
@@ -272,7 +400,16 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 	}
 
 	/**
-	 * Get StartupAPI user by server identity and reset user_id -> oauth_user_id if necessary
+	 * Returns a user for OAuth credentials
+	 *
+	 * Gets StartupAPI user by server identity and resets user_id -> oauth_user_id if necessary
+	 *
+	 * @param array $identity Identity array provided for this OAuth user
+	 * @param int $oauth_user_id OAuth user id
+	 *
+	 * @return User|null User object or null if these credentials are not connected to any user
+	 *
+	 * @throws DBException
 	 */
 	public function getUserByOAuthIdentity($identity, $oauth_user_id) {
 		$db = UserConfig::getDB();
@@ -342,6 +479,11 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		return User::getUser($user_id);
 	}
 
+	/**
+	 * Retrieves OAuth access token from the service
+	 *
+	 * @param int $oauth_user_id OAuth user ID
+	 */
 	public function getAccessToken($oauth_user_id) {
 		//  STEP 2:  Get an access token
 		$oauthToken = $_GET["oauth_token"];
@@ -358,9 +500,20 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		);
 	}
 
-###########################################################################################
-# Methods related to Startup API mechanics
-###########################################################################################
+
+	/**************************************************************************
+	 *
+	 * Methods related to Startup API mechanics
+	 *
+	 **************************************************************************/
+
+	/**
+	 * Renders login form HTML with a single button
+	 *
+	 * Uses self::$loginButtonURL for a button image if supplied
+	 *
+	 * @param string $action Action URL the form should submit data to
+	 */
 	public function renderLoginForm($action)
 	{
 		?>
@@ -376,6 +529,16 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		<?php
 	}
 
+	/**
+	 * Renders registration form HTML with a single button
+	 *
+	 * Uses self::$signUpButtonURL for a button image if supplied
+	 *
+	 * @param boolean $full Whatever or not to display a short version of the form or full
+	 * @param string $action Action URL the form should submit data to
+	 * @param array $errors An array of error messages to be displayed to the user on error
+	 * @param array $data An array of data passed by a form on previous submission to display back to user
+	 */
 	public function renderRegistrationForm($full = false, $action = null, $errors = null , $data = null)
 	{
 		if (is_null($action))
@@ -401,54 +564,17 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		<?php
 	}
 
-	public function getUserCredentials($user)
-	{
-		$db = UserConfig::getDB();
-
-		$user_id = $user->getID();
-		$module = $this->getID();
-
-		$oauth_user_id = null;
-		$serialized_userinfo = null;
-
-		if ($stmt = $db->prepare('SELECT oauth_user_id, userinfo FROM '.UserConfig::$mysql_prefix.'user_oauth_identity WHERE user_id = ? AND module = ?'))
-		{
-			if (!$stmt->bind_param('is', $user_id, $module))
-			{
-				throw new DBBindParamException($db, $stmt);
-			}
-			if (!$stmt->execute())
-			{
-				throw new DBExecuteStmtException($db, $stmt);
-			}
-			if (!$stmt->bind_result($oauth_user_id, $serialized_userinfo))
-			{
-				throw new DBBindResultException($db, $stmt);
-			}
-
-			$stmt->fetch();
-			$stmt->close();
-		}
-		else
-		{
-			throw new DBPrepareStmtException($db);
-		}
-
-		if (is_null($serialized_userinfo)) {
-			return null;
-		}
-
-		return new $this->userCredentialsClass($oauth_user_id, unserialize($serialized_userinfo));
-	}
-
-	/*
+	/**
 	 * Renders user editing form
 	 *
-	 * Parameters:
-	 * $action - form action to post back to
-	 * $errors - error messages to display
-	 * $user - user object for current user that is being edited
-	 * $data - data submitted to the form
+	 * Uses self::$connectButtonURL for a button image if supplied
+	 *
+	 * @param string $action Form action URL to post back to
+	 * @param array $errors Array of error messages to display
+	 * @param User $user User object for current user that is being edited
+	 * @param array $data Data submitted to the form
+	 *
+	 * @throws DBException
 	 */
 	public function renderEditUserForm($action, $errors, $user, $data)
 	{
@@ -507,27 +633,117 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		<?php
 	}
 
+	/**
+	 * Returns user credentials
+	 *
+	 * Creates a new object of self::$userCredentialsClass class and returns it
+	 *
+	 * @param User $user User to get credentials for
+	 *
+	 * @return OAuthUserCredentials User credentials object specific to the module
+	 *
+	 * @throws DBException
+	 */
+	public function getUserCredentials($user)
+	{
+		$db = UserConfig::getDB();
+
+		$user_id = $user->getID();
+		$module = $this->getID();
+
+		$oauth_user_id = null;
+		$serialized_userinfo = null;
+
+		if ($stmt = $db->prepare('SELECT oauth_user_id, userinfo FROM '.UserConfig::$mysql_prefix.'user_oauth_identity WHERE user_id = ? AND module = ?'))
+		{
+			if (!$stmt->bind_param('is', $user_id, $module))
+			{
+				throw new DBBindParamException($db, $stmt);
+			}
+			if (!$stmt->execute())
+			{
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+			if (!$stmt->bind_result($oauth_user_id, $serialized_userinfo))
+			{
+				throw new DBBindResultException($db, $stmt);
+			}
+
+			$stmt->fetch();
+			$stmt->close();
+		}
+		else
+		{
+			throw new DBPrepareStmtException($db);
+		}
+
+		if (is_null($serialized_userinfo)) {
+			return null;
+		}
+
+		return new $this->userCredentialsClass($oauth_user_id, unserialize($serialized_userinfo));
+	}
+
+	/**
+	 * Renders user information as HTML
+	 *
+	 * Subclasses can override to add links to user profiles on destination sites, userpics and etc.
+	 *
+	 * @param array $serialized_userinfo Array of user info parameters from provider with "id" and "name" required
+	 */
 	protected function renderUserInfo($serialized_userinfo) {
 		$user_info = unserialize($serialized_userinfo);
 		echo $user_info['name'];
 	}
 
+	/**
+	 * Called when login form is submitted
+	 *
+	 * This method never returns user information, it redirects to OAuth flow
+	 * ending on oauth_callback.php which implements the logic instead of login.php
+	 *
+	 * @param array $data Form data
+	 * @param boolean $remember whatever or not to remember the user
+	 *
+	 * @return null This method never returns user information
+	 *
+	 * @todo Figure out if we need $remember parameter at all for these modules
+	 */
 	public function processLogin($data, &$remember)
 	{
 		$this->startOAuthFlow();
+
+		return null; // it never reaches this point
 	}
 
+	/**
+	 * Called when registration form is submitted
+	 *
+	 * This method never returns user information, it redirects to OAuth flow
+	 * ending on oauth_callback.php which implements the logic instead of register.php
+	 *
+	 * @param array $data Form data
+	 * @param boolean $remember whatever or not to remember the user
+	 *
+	 * @return null This method never returns user information
+	 *
+	 * @todo Figure out if we need $remember parameter at all for these modules
+	 */
 	public function processRegistration($data, &$remember)
 	{
 		$this->startOAuthFlow();
+		
+		return null; // it never reaches this point
 	}
 
-	/*
-	 * Updates user information
+	/**
+	 * Updates user connection information
 	 *
-	 * returns true if successful and false if unsuccessful
+	 * @param User $user User object
+	 * @param array $data Form data
 	 *
-	 * throws InputValidationException if there are problems with input data
+	 * @return boolean True if successful and false if unsuccessful
+	 * @throws DBException
 	 */
 	public function processEditUser($user, $data)
 	{
@@ -567,22 +783,46 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		}
 	}
 
+	/**
+	 * Records login activity for a user
+	 *
+	 * @param User $user User object
+	 */
 	public function recordLoginActivity($user) {
 		if (!is_null($this->USERBASE_ACTIVITY_OAUTH_MODULE_LOGIN)) {
 			$user->recordActivity($this->USERBASE_ACTIVITY_OAUTH_MODULE_LOGIN);
 		}
 	}
+
+	/**
+	 * Records registration activity for a user
+	 *
+	 * @param User $user User object
+	 */
 	public function recordRegistrationActivity($user) {
 		if (!is_null($this->USERBASE_ACTIVITY_OAUTH_MODULE_REGISTER)) {
 			$user->recordActivity($this->USERBASE_ACTIVITY_OAUTH_MODULE_REGISTER);
 		}
 	}
+
+	/**
+	 * Records connection added activity for a user
+	 *
+	 * @param User $user User object
+	 */
 	public function recordAddActivity($user) {
 		if (!is_null($this->USERBASE_ACTIVITY_OAUTH_MODULE_ADDED)) {
 			$user->recordActivity($this->USERBASE_ACTIVITY_OAUTH_MODULE_ADDED);
 		}
 	}
 
+	/**
+	 * Returns totsal number of users connected using the module
+	 *
+	 * @return int Number of users connected using the module
+	 *
+	 * @throws DBException
+	 */
 	public function getTotalConnectedUsers()
 	{
 		$db = UserConfig::getDB();
@@ -621,6 +861,9 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 /**
  * Abstract class representing user credentials for making OAuth API calls
  *
+ * Should be extended by subclasses to implement additional features and customize
+ * formatting for user information, e.g. add links to user profiles, userpics and so on.
+ *
  * @package StartupAPI
  * @subpackage Authentication
  */
@@ -635,11 +878,22 @@ abstract class OAuthUserCredentials extends UserCredentials {
 	 */
 	protected $userinfo;
 
+	/**
+	 * Creates new OAuth credentials
+	 *
+	 * @param int $oauth_user_id OAuth user ID
+	 * @param array $userinfo User info array as retrieved from provider
+	 */
 	public function __construct($oauth_user_id, $userinfo) {
 		$this->oauth_user_id = $oauth_user_id;
 		$this->userinfo = $userinfo;
 	}
 
+	/**
+	 * Returns OAuth user ID
+	 *
+	 * @return string OAuth user ID
+	 */
 	public function getOAuthUserID() {
 		return $this->oauth_user_id;
 	}
@@ -659,12 +913,26 @@ abstract class OAuthUserCredentials extends UserCredentials {
 	 * This method will most likely be implemented by a subclass using $this->userinfo object.
 	 * For some providers it can be returning a code to include a JavaScript widget.
 	 *
-	 * @return string
+	 * @return string HTML to display user information
 	 */
 	public function getHTML() {
 		return $this->userinfo['name'];
 	}
 
+	/**
+	 * Makes HTTP request with OAuth authentication
+	 *
+	 * This method allows requesting information on behalf of the user from a 3rd party provider.
+	 * Possibly the most important feature of the whole system.
+	 *
+	 * @param string $request Request URL
+	 * @param string $method HTTP method (e.g. GET, POST, PUT, etc)
+	 * @param array $params Request parameters key->value array
+	 * @param string $body Request body
+	 * @param array $files Array of file names (currently supports 1 max untilmultipart/form-data is supported)
+	 *
+	 * @return array Response data (code=>int, headers=>array(), body=>string)
+	 */
 	public function makeOAuthRequest($request, $method = null, $params = null, $body = null, $files = null) {
 		$request = new OAuthRequester($request, $method, $params, $body, $files);
 		return $request->doRequest($this->oauth_user_id);
