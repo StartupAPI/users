@@ -80,6 +80,16 @@ abstract class AuthenticationModule extends StartupAPIModule {
 	abstract public function processRegistration($data, &$remember);
 
 	/**
+	 * Process user connection form data
+	 *
+	 * @param User $user User who's information is being edited
+	 * @param array $data Form data
+	 *
+	 * @return boolean True if successful, false if unsuccessful
+	 */
+	abstract public function processEditUser($user, $data);
+
+	/**
 	 * Returns user credentials
 	 *
 	 * Implementations of this method must return an instance of UserCredention object or it's subclass
@@ -113,6 +123,15 @@ abstract class AuthenticationModule extends StartupAPIModule {
 			}
 		}
 	}
+
+	/**
+	 * Returns module color to be used in chart legends
+	 *
+	 * Submodules must implement this method returning a hex color value
+	 *
+	 * @return string Hex color string
+	 */
+	abstract public function getLegendColor();
 
 	/**
 	 * By default, do not auto-login, should be overriden by modules that support auto-login
