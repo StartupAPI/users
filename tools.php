@@ -6,17 +6,30 @@
  */
 class UserTools
 {
-	// CSRF prevention variables
+	/**
+	 * @var string CSRF nonce for this request
+	 */
 	public static $CSRF_NONCE;
 
-	/*
-	 * Escapes strings making it safe to include user data in HTML output
+	/**
+	 * Properly escapes strings making it safe to include user data in HTML output
+	 *
+	 * @param string $string Data to output
+	 *
+	 * @return string Escaped user data for output in HTML
 	 */
 	public static function escape($string)
 	{
 		return htmlentities($string, ENT_COMPAT, 'UTF-8');
 	}
 
+	/**
+	 * Prevents CSRF for all POST requests by comparing cookie and POST nonces.
+	 *
+	 * Keeps track of 3 recent nonces to avoid problems for double-submissions, but still prevent CSRF attacks
+	 *
+	 * @todo Check if tracking multiple nonces is actually safe - need professional opinion
+	 */
 	public static function preventCSRF() {
 		$storage = new MrClay_CookieStorage(array(
 			'secret' => UserConfig::$SESSION_SECRET,
@@ -70,6 +83,9 @@ class UserTools
 		$storage->store(UserConfig::$csrf_nonce_key, implode(' ', $unused_nonces));
 	}
 
+	/**
+	 * Outputs CSRF nonce form field to be included in all POST forms
+	 */
 	public static function renderCSRFNonce() {
 		?><input type="hidden" name="CSRF_NONCE" value="<?php echo self::escape(self::$CSRF_NONCE); ?>"/>
 <?php
@@ -78,7 +94,16 @@ class UserTools
 	/**
 	 * Debug wrapper for simplified debugging, call it like this:
 	 *
-	 *    UserTools::debug('... some message ...');
+	 * Logs debugging information into error log if UserConfig::$DEBUG variable is set to true
+	 *
+	 * Usage:
+	 * <code>
+	 * UserTools::debug('... some message ...');
+	 * </code>
+	 *
+	 * @param string $message Debug message
+	 *
+	 * @see UserConfig::$DEBUG
 	 */
 	public static function debug($message) {
 		if (UserConfig::$DEBUG) {
