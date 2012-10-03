@@ -67,7 +67,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 	protected $oAuthSignatureMethods = array();
 
 	/**
-	 * @var string Requested permission scopes (zero or more scope URLs separated by spaces)
+	 * @var string Requested permission scopes (zero or more scope strings, usually URLs, separated by spaces)
 	 */
 	protected $oAuthScope;
 
@@ -131,7 +131,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 	 * @param string $oAuthAccessTokenURL URL of OAuth endpoint for getting access tokens
 	 * @param string $oAuthAuthorizeURL Authorization/authentication dialog URL to redirect user to
 	 * @param array $oAuthSignatureMethods Array of signature methods supported by the service, e.g. 'HMAC-SHA1'
-	 * @param string $oAuthScope Requested permission scopes (zero or more scope URLs separated by spaces)
+	 * @param string $oAuthScope Requested permission scopes (zero or more scope strings, usually URLs, separated by spaces)
 	 * @param string $signUpButtonURL Sign-up button image URL
 	 * @param string $logInButtonURL Login button image URL
 	 * @param string $connectButtonURL Connect button image URL
@@ -732,7 +732,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 	public function processRegistration($data, &$remember)
 	{
 		$this->startOAuthFlow();
-		
+
 		return null; // it never reaches this point
 	}
 

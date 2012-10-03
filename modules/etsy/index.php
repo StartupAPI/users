@@ -2,18 +2,38 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/OAuthModule.php');
 
 /**
+ * Authenticates users using Etsy (etsy.com) and providers access to their API using OAuth
+ *
+ * Register your app here: https://www.etsy.com/developers/register to get OAuth key and secret
+ *
  * @package StartupAPI
  * @subpackage Authentication\Etsy
  */
 class EtsyAuthenticationModule extends OAuthAuthenticationModule
 {
 	protected $userCredentialsClass = 'EtsyUserCredentials';
+
+	/**
+	 * @var string Base URL for API calls (prod or sandbox), set based on sandbox flag
+	 */
 	private $base_url;
 
+	/**
+	 * Initializes EtsyAuthenticationModule and registers it in the system
+	 *
+	 * @param string $oAuthConsumerKey Etsy OAuth consumer key
+	 * @param string $oAuthConsumerSecret Etsy OAuth consumer secret
+	 * @param string $oAuthScope Etsy permissions scope (http://www.etsy.com/developers/documentation/getting_started/oauth#section_permission_scopes)
+	 * @param boolean $sandbox True for sandbox, false for production (default)
+	 *
+	 * @see https://www.etsy.com/developers/register
+	 * @see https://www.etsy.com/developers/your-apps
+	 * @see http://www.etsy.com/developers/documentation/getting_started/oauth#section_permission_scopes
+	 */
 	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret, $oAuthScope = 'email_r', $sandbox = false)
 	{
 		// !!! attention !!!
-		// clear <prefix>_oauth_consumer_registry entry for Etsy
+		// clear database entry in <prefix>_oauth_consumer_registry table for Etsy
 		// before switching between sandbox and production
 		if ($sandbox) {
 			$this->base_url = 'http://sandbox.openapi.etsy.com/v2';
@@ -43,25 +63,51 @@ class EtsyAuthenticationModule extends OAuthAuthenticationModule
 		);
 	}
 
+	/**
+	 * Returns module's ID string - "etsy"
+	 *
+	 * @return string Always returns "etsy"
+	 */
 	public function getID()
 	{
 		return "etsy";
 	}
 
+	/**
+	 * Returns legend color
+	 *
+	 * @return string Always returns Etsy-orange ("d55f15")
+	 */
 	public function getLegendColor()
 	{
 		return "d55f15";
 	}
 
+	/**
+	 * Returns mogue title
+	 *
+	 * @return string Always returns "Etsy"
+	 */
 	public function getTitle()
 	{
 		return "Etsy";
 	}
 
+	/**
+	 * We tried to use authorize_uri returned with the OAuth token, but it didn't work,
+	 * hardcoding https://www.etsy.com/oauth/signin instead
+	 */
 #	protected function getAuthorizeURL($tokenResultParameters) {
 #		return $tokenResultParameters['authorize_uri'];
 #	}
 
+	/**
+	 * Returns user identity, id, login name and primary_email in case of etsy
+	 *
+	 * @param int $oauth_user_id OAuth user ID
+	 *
+	 * @return array Identity info array
+	 */
 	public function getIdentity($oauth_user_id) {
 		// get etsy user id
 		$request = new OAuthRequester($this->base_url.'/private/users/__SELF__', 'GET');
@@ -90,6 +136,11 @@ class EtsyAuthenticationModule extends OAuthAuthenticationModule
 		return null;
 	}
 
+	/**
+	 * Displays user's login name with the link to their Etsy store
+	 *
+	 * @param string $serialized_userinfo Serialized user information array
+	 */
 	protected function renderUserInfo($serialized_userinfo) {
 		$user_info = unserialize($serialized_userinfo);
 		?><a href="http://<?php echo UserTools::escape($user_info['name']); ?>.etsy.com/" target="_blank">
@@ -98,6 +149,8 @@ class EtsyAuthenticationModule extends OAuthAuthenticationModule
 }
 
 /**
+ * Etsy user credentials
+ *
  * @package StartupAPI
  * @subpackage Authentication\Etsy
  */

@@ -19,9 +19,10 @@ abstract class StartupAPIModule {
 
 	/**
 	 * Returns module ID string
+	 *
 	 * Each module must implement this method and use unique ID
 	 *
-	 * @return string Descriptionunique module ID
+	 * @return string Unique module ID
 	 */
 	abstract public function getID();
 
