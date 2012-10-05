@@ -9,22 +9,44 @@ require_once(dirname(__FILE__).'/facebook.php');
  */
 class FacebookAuthenticationModule extends AuthenticationModule
 {
+	/**
+	 * @var type Stores Facebook SDK object
+	 */
 	private $sdk;
 
+	/**
+	 * @var string Facebook Application ID
+	 */
 	private $appID;
-	private $secret;
-	private $permissions;
-	private $remember;
-	private $show_facepile = true;
-
-	private $headersLoaded = false;
 
 	/**
-	 * Cretes Facebook authentication module
+	 * @var string Facebook application secret
+	 */
+	private $secret;
+
+	/**
+	 * @var array List of permissions required by application
+	 */
+	private $permissions;
+
+	/**
+	 * @var boolean Remember user between browser sessions
+	 */
+	private $remember;
+
+	/**
+	 * @var boolean Display Facepile social plugin on login/registration forms
+	 */
+	private $show_facepile = true;
+
+	/**
+	 * Instantiates Facebook authentication module and registers it with the system
+	 *
 	 * @param string $appID Facebook application ID
 	 * @param string $secret Facebook application secret (not key)
-	 * @param array $permissions Array of additional permissions (e.g. email)
-	 * 	full list can be found here: http://developers.facebook.com/docs/authentication/permissions/
+	 * @param array $permissions Array of additional permissions (e.g. email) full list can be found here: http://developers.facebook.com/docs/authentication/permissions/
+	 * @param boolean $remember Remember user between browser sessions?
+	 * @param array $options Options array, set "facepile" key to true to enable Facepile
 	 */
 	public function __construct($appID, $secret, $permissions = array(), $remember = true, $options = null)
 	{
@@ -67,6 +89,15 @@ class FacebookAuthenticationModule extends AuthenticationModule
 		return "Facebook";
 	}
 
+	/**
+	 * Returns FacebookUserCredentials object for the user
+	 *
+	 * @param User $user User object
+	 *
+	 * @return FacebookUserCredentials|null FacebookUserCredentials object or null if user is not connected to Facebook
+	 *
+	 * @throws DBException
+	 */
 	public function getUserCredentials($user)
 	{
 		$db = UserConfig::getDB();
@@ -132,9 +163,6 @@ class FacebookAuthenticationModule extends AuthenticationModule
 		return $conns;
 	}
 
-	/*
-	 * retrieves aggregated registrations numbers
-	 */
 	public function getDailyRegistrations()
 	{
 		$db = UserConfig::getDB();
@@ -211,6 +239,14 @@ Logging out from Facebook...
 <?php
 	}
 
+	/**
+	 * Renders Facebook connect/login/registration forms
+	 *
+	 * This method is called from renderLoginForm, renderRegistrationForm and renderEditUserForm
+	 *
+	 * @param string $action Submit URL to be used by the form
+	 * @param string $form ID strgin of the form to be rendered
+	 */
 	private function renderForm($action, $form)
 	{
 		if ($form == 'login') {
@@ -322,15 +358,6 @@ Logging out from Facebook...
 		$this->renderForm($action, 'register');
 	}
 
-	/*
-	 * Renders user editing form
-	 *
-	 * Parameters:
-	 * $action - form action to post back to
-	 * $errors - error messages to display
-	 * $user - user object for current user that is being edited
-	 * $data - data submitted to the form
-	 */
 	public function renderEditUserForm($action, $errors, $user, $data)
 	{
 		$fb_id = $user->getFacebookID();
@@ -344,7 +371,7 @@ Logging out from Facebook...
 				$me = $this->api('/'.$fb_id.'?fields=id,name,email,link');
 			} catch (FacebookApiException $e) {
 				UserTools::debug("Can't get /me API data");
-				return null;
+				return;
 			}
 			?>
 			<table><tr>
@@ -376,6 +403,19 @@ Logging out from Facebook...
 		return UserConfig::$USERSROOTFULLURL.'/modules/facebook/logout.php';
 	}
 
+	/**
+	 * Processes user login form submission
+	 *
+	 * Logs user in or registers them if no user with this Facebook connection exists
+	 *
+	 * @param array $post_data Form data array
+	 * @param boolean $remember Whatever or not to remember a user
+	 * @param boolean $auto Set to true if this is used in auto-login scenario
+	 *
+	 * @return User|null User object or null if login didn't succeed
+	 *
+	 * @throws InputValidationException
+	 */
 	public function processLogin($post_data, &$remember, $auto = false)
 	{
 		UserTools::debug('processLogin start');
@@ -483,13 +523,6 @@ Logging out from Facebook...
 		return $user;
 	}
 
-	/*
-	 * Updates user information
-	 *
-	 * returns true if successful and false if unsuccessful
-	 *
-	 * throws InputValidationException if there are problems with input data
-	 */
 	public function processEditUser($user, $data)
 	{
 		if (array_key_exists('remove', $data)) {
@@ -552,6 +585,10 @@ Logging out from Facebook...
 
 	/**
 	 * Wrapper to native SDK api call that will recover in case of expired tokens
+	 *
+	 * @return mixed API call results
+	 *
+	 * @throws FacebookApiException
 	 */
 	public function api(/* polymorphic */) {
 		$args = func_get_args();
@@ -584,17 +621,31 @@ Logging out from Facebook...
 }
 
 /**
+ * User credentials for Facebook users
+ *
  * @package StartupAPI
  * @subpackage Authentication\Facebook
  */
 class FacebookUserCredentials extends UserCredentials {
-	// Facebook user id
+	/**
+	 * @var int Facebook user id
+	 */
 	private $fb_id;
 
+	/**
+	 * Creates credemtials onject
+	 *
+	 * @param int $fb_id Facebook user ID
+	 */
 	public function __construct($fb_id) {
 		$this->fb_id = $fb_id;
 	}
 
+	/**
+	 * Returns Facebook user ID
+	 *
+	 * @return int Facebook user ID
+	 */
 	public function getFacebookID() {
 		return $this->fb_id;
 	}

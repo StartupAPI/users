@@ -46,14 +46,20 @@ class Facebook extends BaseFacebook
 		parent::__construct($config);
 	}
 
+	/**
+	 * @var array Keys supported by OAuth endpoint
+	 */
 	protected static $kSupportedKeys = array('state', 'code', 'access_token', 'user_id');
 
 	/**
-	* Provides the implementations of the inherited abstract
-	* methods.  The implementation uses PHP sessions to maintain
-	* a store for authorization codes, user ids, CSRF states, and
-	* access tokens.
-	*/
+	 * Provides the implementations of the inherited abstract
+	 * methods.  The implementation uses PHP sessions to maintain
+	 * a store for authorization codes, user ids, CSRF states, and
+	 * access tokens.
+	 *
+	 * @param string $key Key
+	 * @param mixed $value Value
+	 */
 	protected function setPersistentData($key, $value) {
 		if (!in_array($key, self::$kSupportedKeys)) {
 			self::errorLog('Unsupported key passed to setPersistentData.');
@@ -64,6 +70,14 @@ class Facebook extends BaseFacebook
 		$_SESSION[$session_var_name] = $value;
 	}
 
+	/**
+	 * Retrieves data between requests
+	 *
+	 * @param string $key
+	 * @param boolean $default
+	 *
+	 * @return mixed
+	 */
 	protected function getPersistentData($key, $default = false) {
 		if (!in_array($key, self::$kSupportedKeys)) {
 			self::errorLog('Unsupported key passed to getPersistentData.');
@@ -74,6 +88,11 @@ class Facebook extends BaseFacebook
 		return isset($_SESSION[$session_var_name]) ? $_SESSION[$session_var_name] : $default;
 	}
 
+	/**
+	 * Erases persisted data for the key
+	 *
+	 * @param string $key Key
+	 */
 	protected function clearPersistentData($key) {
 		if (!in_array($key, self::$kSupportedKeys)) {
 			self::errorLog('Unsupported key passed to clearPersistentData.');
@@ -84,12 +103,22 @@ class Facebook extends BaseFacebook
 		unset($_SESSION[$session_var_name]);
 	}
 
+	/**
+	 * Removes all persisted data
+	 */
 	protected function clearAllPersistentData() {
 		foreach (self::$kSupportedKeys as $key) {
 			$this->clearPersistentData($key);
 		}
 	}
 
+	/**
+	 * Creates storage key based on the key provided
+	 *
+	 * @param string $key Key
+	 *
+	 * @return string Storage variable name
+	 */
 	protected function constructSessionVariableName($key) {
 		return implode('_', array(UserConfig::$facebook_storage_key_prefix, $this->getAppId(), $key));
 	}
