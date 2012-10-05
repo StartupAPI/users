@@ -2,6 +2,11 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/OAuthModule.php');
 
 /**
+ * Twitter authentication module
+ *
+ * Provides authentication using Twitter accounts and API access using OAuth
+ * Register your app here https://dev.twitter.com/apps/new to get the key and secret
+ *
  * @package StartupAPI
  * @subpackage Authentication\Twitter
  */
@@ -9,6 +14,12 @@ class TwitterAuthenticationModule extends OAuthAuthenticationModule
 {
 	protected $userCredentialsClass = 'TwitterUserCredentials';
 
+	/**
+	 * Instantiates Twitter authentication module and registers it with the system
+	 *
+	 * @param string $oAuthConsumerKey OAuth Consumer Key
+	 * @param string $oAuthConsumerSecret OAuth Consumer Secret
+	 */
 	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret)
 	{
 		parent::__construct(
@@ -93,6 +104,8 @@ class TwitterAuthenticationModule extends OAuthAuthenticationModule
 }
 
 /**
+ * Twitter user credentials
+ *
  * @package StartupAPI
  * @subpackage Authentication\Twitter
  */
