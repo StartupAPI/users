@@ -1,5 +1,12 @@
 <?php
 /**
+ * Basic authentication module using username and password
+ *
+ * Registers users with their username, password, name and email address
+ *
+ * This is the module that is enabled by default in user_config.sample.php
+ * because it requires not configuration.
+ *
  * @package StartupAPI
  * @subpackage Authentication\UsernamePassword
  */
@@ -88,7 +95,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		return $conns;
 	}
 	/*
-	 * retrieves aggregated registrations numbers 
+	 * retrieves aggregated registrations numbers
 	 */
 	public function getDailyRegistrations()
 	{
@@ -471,12 +478,15 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		return true;
 	}
 
-	/*
+	/**
 	 * Updates user's password
 	 *
-	 * returns true if successful and false if unsuccessful
+	 * @param User $user User object
+	 * @param array $data Form data
 	 *
-	 * throws InputValidationException if there are problems with input data
+	 * @return boolean True if password update was successful, false otherwise
+	 *
+	 * @throws InputValidationException
 	 */
 	public function processUpdatePassword($user, $data)
 	{
@@ -516,22 +526,41 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		return true;
 	}
 
-	// THIS SHOULD ONLY BE SET ON PASSWORD RESET PAGE
-	// SETTING THIS ON OTHER PAGES CAN RESULT IN SECURITY BREACH
+	/**
+	 * THIS SHOULD ONLY BE SET ON PASSWORD RESET PAGE
+	 * SETTING THIS ON OTHER PAGES CAN RESULT IN SECURITY BREACH
+	 *
+	 * @var boolean
+	 */
 	public static $IGNORE_PASSWORD_RESET = false;
 }
 
 /**
+ * Username credentials
+ *
  * @package StartupAPI
  * @subpackage Authentication\UsernamePassword
  */
 class UsernamePassUserCredentials extends UserCredentials {
+	/**
+	 * @var string Username
+	 */
 	private $username;
 
+	/**
+	 * Creates Username credentials object
+	 *
+	 * @param type $username
+	 */
 	public function __construct($username) {
 		$this->username = $username;
 	}
 
+	/**
+	 * Returns user's username
+	 *
+	 * @return string Username
+	 */
 	public function getUsername() {
 		return $this->username;
 	}

@@ -101,6 +101,8 @@ abstract class AuthenticationModule extends StartupAPIModule {
 	 *
 	 * @param User $user User to get credentials for
 	 * @return UserCredentials User credentials object specific to the module
+	 *
+	 * @throws DBException
 	 */
 	abstract public function getUserCredentials($user);
 
