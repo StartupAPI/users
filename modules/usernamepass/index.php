@@ -527,10 +527,14 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 	}
 
 	/**
+	 * Bypasses required password reset flag if set to true
+	 *
 	 * THIS SHOULD ONLY BE SET ON PASSWORD RESET PAGE
 	 * SETTING THIS ON OTHER PAGES CAN RESULT IN SECURITY BREACH
 	 *
 	 * @var boolean
+	 *
+	 * @internal
 	 */
 	public static $IGNORE_PASSWORD_RESET = false;
 }
