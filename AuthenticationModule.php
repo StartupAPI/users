@@ -76,6 +76,9 @@ abstract class AuthenticationModule extends StartupAPIModule {
 	 * @param boolean $remember Remember flag to be updated if user is to be remembered longer then one session.
 	 *
 	 * @return User User object for a successfully registered user or null on failure
+	 *
+	 * @throws InputValidationException
+	 * @throws ExistingUserException
 	 */
 	abstract public function processRegistration($data, &$remember);
 
@@ -86,6 +89,8 @@ abstract class AuthenticationModule extends StartupAPIModule {
 	 * @param array $data Form data
 	 *
 	 * @return boolean True if successful, false if unsuccessful
+	 *
+	 * @throws InputValidationException If there are problems with input data
 	 */
 	abstract public function processEditUser($user, $data);
 
@@ -106,6 +111,8 @@ abstract class AuthenticationModule extends StartupAPIModule {
 	 *
 	 * @return int Number of users who have connections through this provider
 	 *	       Some modules might allow for multiple connections, but the user is only counted once
+	 *
+	 * @throws DBException
 	 */
 	abstract public function getTotalConnectedUsers();
 
