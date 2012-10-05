@@ -2,6 +2,11 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/OAuthModule.php');
 
 /**
+ * LinkedIn authorization modlue
+ *
+ * Provides LinkedIn authentication and API access using OAuth
+ * Register your app here: https://www.linkedin.com/secure/developer
+ *
  * @package StartupAPI
  * @subpackage Authentication\Linkedin
  */
@@ -9,6 +14,13 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule
 {
 	protected $userCredentialsClass = 'LinkedInUserCredentials';
 
+	/**
+	 * Instantiates LinkedIn authentication module and registers it with the system
+	 *
+	 * @param string $oAuthConsumerKey OAuth Consumer Key
+	 * @param string $oAuthConsumerSecret OAuth Consumer Secret
+	 * @param string $oAuthScope Requested permission scopes (zero or more scope strings, usually URLs, separated by spaces)
+	 */
 	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret, $oAuthScope = 'basic')
 	{
 		parent::__construct(
@@ -68,6 +80,8 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule
 }
 
 /**
+ * LinkedIn user credentials class
+ *
  * @package StartupAPI
  * @subpackage Authentication\Linkedin
  */

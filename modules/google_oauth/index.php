@@ -2,6 +2,14 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/OAuthModule.php');
 
 /**
+ * Google OAuth (v1) authentication module
+ *
+ * Provides authentication using Google accounts and API access using OAuth
+ *
+ * Note that Google deprecated OAuth v1 support for new APIs and will be converting
+ * all APIs to OAuth v2. Authentication and old APIs are still functional per
+ * Google's deprecation policy.
+ *
  * @package StartupAPI
  * @subpackage Authentication\Google
  */
@@ -88,6 +96,8 @@ class GoogleOAuthAuthenticationModule extends OAuthAuthenticationModule
 }
 
 /**
+ * Google user credentials, primarily storing OAuth tokens
+ *
  * @package StartupAPI
  * @subpackage Authentication\Google
  */
