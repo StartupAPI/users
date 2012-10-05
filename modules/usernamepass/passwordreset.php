@@ -47,7 +47,7 @@ require_once(UserConfig::$header);
 <fieldset>
 <legend>Please enter new password</legend>
 <ul>
-<li><label>New password</label><input name="pass" type="password" size="25" autocomplete="off"/><?php echo array_key_eXists('pass', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape($errors['pass']).'">*</span>' : ''?></li>
+<li><label>New password</label><input name="pass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('pass', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape($errors['pass']).'">*</span>' : ''?></li>
 <li><label>Repeat new password</label><input name="repeatpass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('repeatpass', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape($errors['repeatpass']).'">*</span>' : ''?></li>
 <li><button id="startupapi-passwordreset-button" type="submit" name="save">Save changes</button></li>
 </ul>
