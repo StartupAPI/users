@@ -1,13 +1,29 @@
 <?php
 /**
+ * MailChip mailing list integration module (UNFINISHED)
+ *
+ * Syncronizes user information with MailChimp mailing list
+ *
+ * @todo Finish the implementation
+ *
  * @package StartupAPI
  * @subpackage Email\MailChimp
  */
 class MailChimpModule extends EmailModule
 {
+	/**
+	 * @var string MailChimp API key
+	 */
 	private $apiKey;
+
+	/**
+	 * @var string Mail list ID to syncronize with
+	 */
 	private $listID;
 
+	/**
+	 * @var string API Endpoint URL (based on datacenter)
+	 */
 	private $endpoint;
 
 	public function getID()
@@ -20,6 +36,14 @@ class MailChimpModule extends EmailModule
 		return "MailChimp";
 	}
 
+	/**
+	 * Instantiates MailChimp module and registers it with the system
+	 *
+	 * @param string $apiKey MailChimp API key
+	 * @param string $listID Mail list ID
+	 *
+	 * @throws MailChimpException
+	 */
 	public function __construct($apiKey, $listID) {
 		// handles module registration in Startup API
 		parent::__construct();
@@ -39,8 +63,12 @@ class MailChimpModule extends EmailModule
 	}
 
 	/**
-	 * This function should be called when new user is created
-	 * or email is recorded for the user for the first time
+	 * Adds new subscriber to MailChimp mailing list
+	 *
+	 * @param User $user Subscriber's User object
+	 *
+	 * @throws MailChimpException
+	 * @throws EmailSubscriptionException
 	 */
 	public function registerSubscriber($user) {
 		error_log("Registering new MailChimp subscriber: ".$user->getName().' <'.$user->getEmail().'>');
@@ -52,12 +80,12 @@ class MailChimpModule extends EmailModule
 
 		error_log('URL: '.var_export($url, true));
 
-		$ch = curl_init(); 
+		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE); 
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($ch, CURLOPT_HEADER, TRUE);
 
-		$result = curl_exec($ch); 
+		$result = curl_exec($ch);
 
 		if (curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200) {
 			throw new MailChimpException("API call failed: ".curl_error($ch));
@@ -69,18 +97,11 @@ class MailChimpModule extends EmailModule
 		}
 	}
 
-	/**
-	 * This function should be called when user information has changed
-	 * e.g. email address or additional information passed to provider like name or gender and etc.
-	 */
 	public function updateSubscriber($old_user, $new_user) {
 		// TODO Implement subscriber info update
 		error_log("MailChimp::updateSubscriber method is not implemented yet");
 	}
 
-	/**
-	 * This function should be called when user chose to unsubscribe from the mailing list
-	 */
 	public function removeSubscriber($user) {
 		// TODO Implement subscriber removal
 		error_log("MailChimp::removeSubscriber method is not implemented yet");
@@ -88,7 +109,8 @@ class MailChimpModule extends EmailModule
 
 	/**
 	 * This method is called by userChanged (implemented in parent class)
-	 * @return boolean Returns true if user's information has changed and needs to be synced
+	 *
+	 * @return boolean Returns true if user's information has changed and needs to be sync'ed
 	 */
 	public function hasUserInfoChanged($old_user, $new_user) {
 		// we only track user name change so far
@@ -97,6 +119,8 @@ class MailChimpModule extends EmailModule
 }
 
 /**
+ * MailChimp integration exception
+ *
  * @package StartupAPI
  * @subpackage Email\MailChimp
  */
