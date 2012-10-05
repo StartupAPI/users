@@ -2,18 +2,47 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/OAuthModule.php');
 
 /**
+ * StatusNet authentication module
+ *
+ * Provides authentication using StatusNet open source microblogging platform
+ * that powers http://identi.ca and other public and private sites.
+ *
+ * Provides access to Twitter-based and other APIs using OAuth
+ *
  * @package StartupAPI
  * @subpackage Authentication\StatusNet
  */
 class StatusNetAuthenticationModule extends OAuthAuthenticationModule
 {
+	/**
+	 * @var string Provider name
+	 */
 	private $title;
+
+	/**
+	 * @var string Root URL of StatusNet installation
+	 */
 	private $rootURL;
+
+	/**
+	 * @var string Root URL of API endpoint
+	 */
 	private $APIRootURL;
 
 	protected $userCredentialsClass = 'StatusNetUserCredentials';
 
-	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret, $title = 'Status.Net', $rootURL = 'https://identi.ca/', $APIrootURL = null)
+	/**
+	 * Instantiates StatusNet authentication module and registers it with the system
+	 *
+	 * Defaults are for Identi.ca server, but it can be used with any StatusNet instance
+	 *
+	 * @param string $oAuthConsumerKey OAuth Consumer Key
+	 * @param string $oAuthConsumerSecret OAuth Consumer Secret
+	 * @param string $title Provider name
+	 * @param string $rootURL Root URL of StatusNet installation
+	 * @param string $APIrootURL Root URL of API endpoint
+	 */
+	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret, $title = 'Identi.ca', $rootURL = 'https://identi.ca/', $APIrootURL = null)
 	{
 		/** Support auth through multiple statusnet services in the same instance */
 
@@ -104,7 +133,15 @@ class StatusNetAuthenticationModule extends OAuthAuthenticationModule
 	}
 
 	/**
-	 * Call to Status.Net Twitter API using OAuth
+	 * Calls Status.Net Twitter API using OAuth
+	 *
+	 * @param string $path API method / URL path
+	 * @param string $method HTTP method, e.g. GET/POST/PUT and etc.
+	 * @param array $params Parameters to pass
+	 * @param string $body Request body, if any
+	 * @param array $files Array of file names to upload (if API supports it)
+	 *
+	 * @return mixed API response
 	 */
 	protected function api_call($path, $method = "GET", $params = null, $body = null, $files = null) {
 		return makeOAuthRequest(
@@ -117,6 +154,8 @@ class StatusNetAuthenticationModule extends OAuthAuthenticationModule
 }
 
 /**
+ * StatusNet credentials
+ *
  * @package StartupAPI
  * @subpackage Authentication\StatusNet
  */
