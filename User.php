@@ -2675,7 +2675,7 @@ class User
 		$email = is_null($this->email) || $this->email == '' ? null
 			: mb_convert_encoding($this->email, 'UTF-8');
 
-		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET status = ?, username = ?, name = ?, email = ?, email_verified = ? requirespassreset = ?, fb_id = ? WHERE id = ?'))
+		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET status = ?, username = ?, name = ?, email = ?, email_verified = ?, requirespassreset = ?, fb_id = ? WHERE id = ?'))
 		{
 			if (!$stmt->bind_param('isssiiii', $status, $username, $name, $email, $email_verifiednum, $passresetnum, $this->fbid, $this->userid))
 			{
