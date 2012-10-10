@@ -165,15 +165,6 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		<?php
 	}
 
-	/*
-	 * Renders user editing form
-	 *
-	 * Parameters:
-	 * $action - form action to post back to
-	 * $errors - error messages to display
-	 * $user - user object for current user that is being edited
-	 * $data - data submitted to the form
-	 */
 	public function renderEditUserForm($action, $errors, $user, $data)
 	{
 		?>
@@ -194,7 +185,9 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		<?php }?>
 		<li class="startupapi-usernamepass-edit-section">Name and email</li>
 		<li><label>Name</label><input name="name" type="test" size="40" value="<?php echo UserTools::escape(array_key_exists('name', $data) ? $data['name'] : $user->getName())?>"/><?php echo array_key_exists('name', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['name'])).'">*</span>' : ''?></li>
-		<li><label>E-mail</label><input name="email" type="email" size="40" value="<?php echo UserTools::escape(array_key_exists('email', $data) ? $data['email'] : $user->getEmail())?>"/><?php echo array_key_exists('email', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</span>' : ''?></li>
+		<li><label>E-mail</label><input name="email" type="email" size="40" value="<?php echo UserTools::escape(array_key_exists('email', $data) ? $data['email'] : $user->getEmail())?>"/><?php echo array_key_exists('email', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</span>' : ''?>
+			<?php if (!$user->isEmailVerified()) { ?><a id="startupapi-usernamepass-edit-verify-email" href="<?php echo UserConfig::$USERSROOTURL ?>/verify_email.php">Email address not verified yet, click here to verify</a><?php } ?>
+		</li>
 
 		<li class="startupapi-usernamepass-edit-section">Change password</li>
 		<?php if (!is_null($user->getUsername())) {?>

@@ -597,6 +597,12 @@
 	margin-top: 1em;
 }
 
+#startupapi-usernamepass-edit-verify-email {
+	font-size: small;
+	display: block;
+	margin-left: 5em;
+}
+
 /* from modules/usernamepass/passwordreset.php */
 #startupapi-passwordreset {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
@@ -1064,7 +1070,6 @@
 	font-weight: bold;
 }
 
-}
 #startupapi-verifyemail {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 0 1em;

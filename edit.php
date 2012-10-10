@@ -3,6 +3,8 @@ require_once(dirname(__FILE__).'/global.php');
 
 require_once(dirname(__FILE__).'/User.php');
 
+UserConfig::$IGNORE_REQUIRED_EMAIL_VERIFICATION = true;
+
 $user = User::require_login();
 
 UserTools::preventCSRF();
