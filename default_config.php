@@ -459,6 +459,11 @@ class UserConfig
 	public static $requireVerifiedEmail = false;
 
 	/**
+	 * @var int Amount of days email verification code is valid for
+	 */
+	public static $emailVerificationCodeExpiresInDays = 5;
+
+	/**
 	 * Bypasses required email verificatiob flag if set to true
 	 *
 	 * THIS SHOULD ONLY BE SET ON EMAIL VERIFICATION PAGE

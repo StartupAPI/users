@@ -407,22 +407,33 @@ class User
 		}
 
 		if (is_null($user)) {
-			$query = 'UPDATE '.UserConfig::$mysql_prefix.'users SET email_verified = 1, email_verification_code = null WHERE email_verification_code = ?';
+			$query = 'UPDATE '.UserConfig::$mysql_prefix.'users
+						SET email_verified = 1,
+							email_verification_code = null,
+							email_verification_code_time = null
+						WHERE email_verification_code = ?
+							AND email_verification_code_time > DATE_SUB(NOW(), INTERVAL ? DAY)';
 		} else {
-			$query = 'UPDATE '.UserConfig::$mysql_prefix.'users SET email_verified = 1, email_verification_code = null WHERE id = ? AND email_verification_code = ?';
+			$query = 'UPDATE '.UserConfig::$mysql_prefix.'users
+						SET email_verified = 1,
+							email_verification_code = null,
+							email_verification_code_time = null
+						WHERE id = ?
+							AND email_verification_code = ?
+							AND email_verification_code_time > DATE_SUB(NOW(), INTERVAL ? DAY)';
 		}
 
 		if ($stmt = $db->prepare($query))
 		{
 			if (is_null($user)) {
-				if (!$stmt->bind_param('s', $code))
+						if (!$stmt->bind_param('si', $code, UserConfig::$emailVerificationCodeExpiresInDays))
 				{
 					throw new DBBindParamException($db, $stmt);
 				}
 			} else {
 				$user_id = $user->getID();
 
-				if (!$stmt->bind_param('is', $user_id, $code))
+				if (!$stmt->bind_param('isi', $user_id, $code, UserConfig::$emailVerificationCodeExpiresInDays))
 				{
 					throw new DBBindParamException($db, $stmt);
 				}
@@ -463,7 +474,10 @@ class User
 
 		$code = uniqid();
 
-		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET email_verification_code = ? WHERE id = ?'))
+		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET
+										email_verification_code = ?,
+										email_verification_code_time = now()
+									WHERE id = ?'))
 		{
 			if (!$stmt->bind_param('si', $code, $this->userid))
 			{
