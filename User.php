@@ -472,7 +472,7 @@ class User
 
 		$db = UserConfig::getDB();
 
-		$code = uniqid();
+		$code = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 10);
 
 		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET
 										email_verification_code = ?,
