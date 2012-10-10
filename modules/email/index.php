@@ -221,6 +221,7 @@ class EmailAuthenticationModule extends AuthenticationModule
 			throw new InputValidationException('Validation failed', 0, $errors);
 		}
 
+		// TODO check if code is good and log the user in
 		return null;
 	}
 

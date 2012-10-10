@@ -64,7 +64,7 @@ class User
 		}
 		else
 		{
-			User::redirectToLogin();
+			self::redirectToLogin();
 		}
 	}
 
@@ -109,11 +109,16 @@ class User
 				return null;
 			}
 
+			// if email verification is required, force users to verify it
+			if (!$user->is_email_verified && UserConfig::$requireVerifiedEmail && !UserConfig::$IGNORE_REQUIRED_EMAIL_VERIFICATION) {
+				self::redirectToEmailVerification();
+			}
+
 			// only forsing password reset on non-impersonated users
 			if ($user->requiresPasswordReset() &&
 				!UsernamePasswordAuthenticationModule::$IGNORE_PASSWORD_RESET)
 			{
-				User::redirectToPasswordReset();
+				self::redirectToPasswordReset();
 			}
 
 			// don't even try impersonating if not admin
@@ -368,6 +373,126 @@ class User
 		if (!is_null(UserConfig::$email_module)) {
 			UserConfig::$email_module->registerSubscriber($this);
 		}
+	}
+
+	/**
+	 * Verifies email link code and marks user's email as verified.
+	 *
+	 * If optional User object is passed, will only verify code for this user,
+	 * otherwise will search among all users in the system.
+	 *
+	 * Will also reset the code if successful
+	 *
+	 * @param string $code Code to verify
+	 * @param User $user Optional user object if user is logged in
+	 *
+	 * @return boolean Is code associated with a user or not
+	 *
+	 * @todo Check if this can be an attack vector for brute forcing the code
+	 * verification for unauthorized users and if there are any ways to prevent
+	 * this from happening
+	 */
+	public static function verifyEmailLinkCode($code, $user = null) {
+		$db = UserConfig::getDB();
+
+		$verified = false;
+
+		$code = trim($code);
+
+		/*
+		 * If code is empty, fail silently
+		 */
+		if (strlen($code) == 0) {
+			return false;
+		}
+
+		if (is_null($user)) {
+			$query = 'UPDATE '.UserConfig::$mysql_prefix.'users SET email_verified = 1, email_verification_code = null WHERE email_verification_code = ?';
+		} else {
+			$query = 'UPDATE '.UserConfig::$mysql_prefix.'users SET email_verified = 1, email_verification_code = null WHERE id = ? AND email_verification_code = ?';
+		}
+
+		if ($stmt = $db->prepare($query))
+		{
+			if (is_null($user)) {
+				if (!$stmt->bind_param('s', $code))
+				{
+					throw new DBBindParamException($db, $stmt);
+				}
+			} else {
+				$user_id = $user->getID();
+
+				if (!$stmt->bind_param('is', $user_id, $code))
+				{
+					throw new DBBindParamException($db, $stmt);
+				}
+			}
+			if (!$stmt->execute())
+			{
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+
+			$verified = ($db->affected_rows == 1);
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new DBPrepareStmtException($db);
+		}
+
+		return $verified;
+	}
+
+	/**
+	 * Sends email verification emai to user's email address
+	 *
+	 * Generates a new verification code and sends it to the user's email address
+	 *
+	 * @throws DBException
+	 */
+	public function sendEmailVerificationCode() {
+		$email = $this->getEmail();
+
+		// Silently fail to avoid email discovery
+		if (is_null($email)) {
+			return;
+		}
+
+		$db = UserConfig::getDB();
+
+		$code = uniqid();
+
+		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET email_verification_code = ? WHERE id = ?'))
+		{
+			if (!$stmt->bind_param('si', $code, $this->userid))
+			{
+				throw new DBBindParamException($db, $stmt);
+			}
+			if (!$stmt->execute())
+			{
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new DBPrepareStmtException($db);
+		}
+
+		$verification_link = UserConfig::$USERSROOTFULLURL.'/verify_email.php?code='.urlencode($code);
+
+		$message = call_user_func_array(UserConfig::$onRenderVerificationCodeEmail,
+			array($verification_link, $code));
+
+		$subject = UserConfig::$emailVerificationSubject;
+
+		$headers = 'From: '.UserConfig::$supportEmailFrom."\r\n".
+			'Reply-To: '.UserConfig::$supportEmailReplyTo."\r\n".
+			'X-Mailer: '.UserConfig::$supportEmailXMailer;
+
+		mail($email, $subject, $message, $headers);
 	}
 
 	/**
@@ -1144,7 +1269,7 @@ class User
 			$orderby = 'points';
 		}
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users ORDER BY '.$orderby.' DESC LIMIT ?, ?'))
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users ORDER BY '.$orderby.' DESC LIMIT ?, ?'))
 		{
 			if (!$stmt->bind_param('ii', $first, $perpage))
 			{
@@ -1154,14 +1279,14 @@ class User
 			{
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified))
 			{
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
 			{
-				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
+				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
@@ -1198,7 +1323,7 @@ class User
 		$first = $perpage * $pagenumber;
 
 		// TODO Replace with real, fast and powerful full-text search
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime) FROM '.UserConfig::$mysql_prefix.'users WHERE INSTR(name, ?) > 0 OR INSTR(username, ?) > 0 OR INSTR(email, ?) > 0 ORDER BY regtime DESC LIMIT ?, ?'))
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE INSTR(name, ?) > 0 OR INSTR(username, ?) > 0 OR INSTR(email, ?) > 0 ORDER BY regtime DESC LIMIT ?, ?'))
 		{
 			if (!$stmt->bind_param('sssii', $search, $search, $search, $first, $perpage))
 			{
@@ -1208,14 +1333,14 @@ class User
 			{
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime))
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified))
 			{
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
 			{
-				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime);
+				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
@@ -1383,7 +1508,7 @@ class User
 
 		$users = array();
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users WHERE username = ? OR email = ?'))
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE username = ? OR email = ?'))
 		{
 			if (!$stmt->bind_param('ss', $nameoremail, $nameoremail))
 			{
@@ -1393,14 +1518,14 @@ class User
 			{
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified))
 			{
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE)
 			{
-				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
+				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
@@ -1668,20 +1793,20 @@ class User
 
 		$idlist = join(', ', $ids);
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users WHERE id IN ('.$idlist.')'))
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE id IN ('.$idlist.')'))
 		{
 			if (!$stmt->execute())
 			{
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified))
 			{
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE)
 			{
-				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
+				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
@@ -1826,7 +1951,7 @@ class User
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, pass, salt, temppass, requirespassreset, fb_id FROM '.UserConfig::$mysql_prefix.'users WHERE username = ?'))
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, pass, salt, temppass, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE username = ?'))
 		{
 			if (!$stmt->bind_param('s', $entered_username))
 			{
@@ -1836,7 +1961,7 @@ class User
 			{
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($id, $status, $name, $username, $email, $pass, $salt, $temppass, $requirespassreset, $fb_id))
+			if (!$stmt->bind_result($id, $status, $name, $username, $email, $pass, $salt, $temppass, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified))
 			{
 				throw new DBBindResultException($db, $stmt);
 			}
@@ -1845,7 +1970,7 @@ class User
 			{
 				if (sha1($salt.$entered_password) == $pass)
 				{
-					$user = new self($id, $status, $name, $username, $email, $requirespassreset, $fb_id);
+					$user = new self($id, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
 
 				}
 			}
@@ -1870,7 +1995,7 @@ class User
 
 		if (is_null($user))
 		{
-			if ($stmt = $db->prepare('SELECT id, status, name, username, email, fb_id FROM '.UserConfig::$mysql_prefix.'users WHERE username = ? AND temppass = ? AND temppasstime > DATE_SUB(NOW(), INTERVAL 1 DAY)'))
+			if ($stmt = $db->prepare('SELECT id, status, name, username, email, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE username = ? AND temppass = ? AND temppasstime > DATE_SUB(NOW(), INTERVAL 1 DAY)'))
 			{
 				if (!$stmt->bind_param('ss', $entered_username, $entered_password))
 				{
@@ -1880,14 +2005,14 @@ class User
 				{
 					throw new DBExecuteStmtException($db, $stmt);
 				}
-				if (!$stmt->bind_result($id, $status, $name, $username, $email, $fb_id))
+				if (!$stmt->bind_result($id, $status, $name, $username, $email, $fb_id, $regtime, $points, $is_email_verified))
 				{
 					throw new DBBindResultException($db, $stmt);
 				}
 
 				if ($stmt->fetch() === TRUE)
 				{
-					$user = new self($id, $status, $name, $username, $email, null, $fb_id);
+					$user = new self($id, $status, $name, $username, $email, null, $fb_id, $regtime, $points, $is_email_verified);
 				}
 
 				$stmt->close();
@@ -1933,7 +2058,7 @@ class User
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users u INNER JOIN '.UserConfig::$mysql_prefix.'googlefriendconnect g ON u.id = g.user_id WHERE g.google_id = ?'))
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users u INNER JOIN '.UserConfig::$mysql_prefix.'googlefriendconnect g ON u.id = g.user_id WHERE g.google_id = ?'))
 		{
 			if (!$stmt->bind_param('s', $googleid))
 			{
@@ -1943,14 +2068,14 @@ class User
 			{
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified))
 			{
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE)
 			{
-				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
+				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
@@ -1981,7 +2106,7 @@ class User
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users WHERE fb_id = ?'))
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE fb_id = ?'))
 		{
 			if (!$stmt->bind_param('i', $fb_id))
 			{
@@ -1991,14 +2116,14 @@ class User
 			{
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $regtime, $points))
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $regtime, $points, $is_email_verified))
 			{
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE)
 			{
-				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
+				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
@@ -2026,7 +2151,7 @@ class User
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points FROM '.UserConfig::$mysql_prefix.'users WHERE id = ?'))
+		if ($stmt = $db->prepare('SELECT status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE id = ?'))
 		{
 			if (!$stmt->bind_param('i', $userid))
 			{
@@ -2036,14 +2161,14 @@ class User
 			{
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points))
+			if (!$stmt->bind_result($status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified))
 			{
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE)
 			{
-				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points);
+				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
@@ -2136,6 +2261,16 @@ class User
 	}
 
 	/**
+	 * Sends user to email verification page (remembering current page to be returned to upon success)
+	 */
+	private static function redirectToEmailVerification() {
+		self::setReturn($_SERVER['REQUEST_URI']);
+
+		header('Location: '.UserConfig::$USERSROOTURL.'/verify_email.php');
+		exit;
+	}
+
+	/**
 	 * Numeric user ID used to uniquely identify user in the database
 	 *
 	 * @var int User ID
@@ -2163,6 +2298,11 @@ class User
 	 * @var string User's email address
 	 */
 	private $email;
+
+	/**
+	 * @var boolean Is user's email verified or not
+	 */
+	private $is_email_verified;
 
 	/**
 	 * Whatever user is required to reset password on next login, stored in the database as 1 or 0
@@ -2206,7 +2346,7 @@ class User
 	 * @param int $regtime
 	 * @param int $points
 	 */
-	private function __construct($userid, $status = true, $name, $username = null, $email = null, $requirespassreset = false, $fbid = null, $regtime = null, $points = 0)
+	private function __construct($userid, $status = true, $name, $username = null, $email = null, $requirespassreset = false, $fbid = null, $regtime = null, $points = 0, $is_email_verified)
 	{
 		$this->userid = $userid;
 		$this->status = $status ? true : false;
@@ -2217,6 +2357,7 @@ class User
 		$this->fbid = $fbid;
 		$this->regtime = $regtime;
 		$this->points = $points;
+		$this->is_email_verified = $is_email_verified ? true : false;
 	}
 
 	/**
@@ -2322,6 +2463,21 @@ class User
 	public function setEmail($email)
 	{
 		$this->email = $email;
+	}
+
+	/**
+	 * Sets email verification flag
+	 *
+	 * You have to call save() method to persist to the database
+	 *
+	 * @param boolean $verified True if email address is verified, false otherwise
+	 */
+	private function setEmailVerified($verified) {
+		$this->is_email_verified = $verified ? true : false;
+	}
+
+	public function isEmailVerified() {
+		return $this->is_email_verified;
 	}
 
 	/**
@@ -2486,6 +2642,7 @@ class User
 
 		$passresetnum = $this->requirespassreset ? 1 : 0;
 		$status = $this->status ? 1 : 0;
+		$email_verifiednum = $this->is_email_verified ? 1 : 0;
 
 		if (!is_null(UserConfig::$email_module)) {
 			// !WARNING! it's not safe to do anything with this user except reading it's built-in
@@ -2494,7 +2651,7 @@ class User
 			// just reading object properties.
 
 			// creating a copy of the user in case we need to update their email subscription
-			$old_user = User::getUser($this->getID());
+			$old_user = self::getUser($this->getID());
 		}
 
 		$username = is_null($this->username) || $this->username == '' ? null
@@ -2504,9 +2661,9 @@ class User
 		$email = is_null($this->email) || $this->email == '' ? null
 			: mb_convert_encoding($this->email, 'UTF-8');
 
-		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET status = ?, username = ?, name = ?, email = ?, requirespassreset = ?, fb_id = ? WHERE id = ?'))
+		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET status = ?, username = ?, name = ?, email = ?, email_verified = ? requirespassreset = ?, fb_id = ? WHERE id = ?'))
 		{
-			if (!$stmt->bind_param('isssiii', $status, $username, $name, $email, $passresetnum, $this->fbid, $this->userid))
+			if (!$stmt->bind_param('isssiiii', $status, $username, $name, $email, $email_verifiednum, $passresetnum, $this->fbid, $this->userid))
 			{
 				throw new DBBindParamException($db, $stmt);
 			}

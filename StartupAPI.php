@@ -7,7 +7,6 @@ require_once(dirname(__FILE__).'/User.php');
  * @package StartupAPI
  */
 class StartupAPI {
-	//
 	/**
 	 * Just a proxy to static User::get() method in User class
 	 *

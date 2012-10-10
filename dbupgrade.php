@@ -22,6 +22,18 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 17
+ * Adding email verification field
+*/
+$versions[17]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."users`
+		ADD email_verified TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'Is email address verified or not' AFTER email,
+		ADD email_verification_code VARCHAR(10) NULL DEFAULT NULL COMMENT 'One time code used to verify users email address' AFTER `email_verified`,
+		ADD email_verification_code_time timestamp NULL DEFAULT NULL COMMENT 'Email verification code generation time' AFTER email_verification_code
+";
+$versions[17]['down'][] = "ALTER TABLE  `".UserConfig::$mysql_prefix."users` DROP email_verified, DROP email_verification_code, DROP email_verification_code_time";
+
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 16
  * Adding login link code
 */

@@ -109,6 +109,11 @@ class UserConfig
 	 */
 	public static $DEFAULTUPDATEPASSWORDRETURN;
 
+	/**
+	 * @var string Default location URL to return to upon successful email verification
+	 */
+	public static $DEFAULT_EMAIL_VERIFIED_RETURN;
+
 
 	/**************************************************************************
 	 *
@@ -440,6 +445,31 @@ class UserConfig
 	 */
 	public static $passwordRecoveryEmailSubject = 'Your Password';
 
+	/**
+	 * @var string Email verification message subject line
+	 */
+	public static $emailVerificationSubject = 'Please verify your email';
+
+	/**
+	 * Set to true if you want to require users to verify their email addresses
+	 * before they can log in.
+	 *
+	 * @var boolean
+	 */
+	public static $requireVerifiedEmail = false;
+
+	/**
+	 * Bypasses required email verificatiob flag if set to true
+	 *
+	 * THIS SHOULD ONLY BE SET ON EMAIL VERIFICATION PAGE
+	 * SETTING THIS ON OTHER PAGES CAN RESULT IN SECURITY BREACH
+	 *
+	 * @var boolean
+	 *
+	 * @internal
+	 */
+	public static $IGNORE_REQUIRED_EMAIL_VERIFICATION = false;
+
 
 	/**************************************************************************
 	 *
@@ -495,6 +525,11 @@ class UserConfig
 	 * @var callable Formatter for password recovery email
 	 */
 	public static $onRenderTemporaryPasswordEmail = 'UserConfig::renderTemporaryPasswordEmail';
+
+	/**
+	 * @var callable Formatter for email verification message
+	 */
+	public static $onRenderVerificationCodeEmail = 'UserConfig::renderVerificationCodeEmail';
 
 	/**
 	 * @var callable Handler to be called when new user is created, newly created user object is passed in
@@ -621,6 +656,31 @@ EOD;
 	}
 
 	/**
+	 * Default handler for UserConfig::onRenderVerificationCodeEmail hook
+	 *
+	 * Create your own like this to override email verification message
+	 *
+	 * @param string $verification_link Verification link to be clicked be a user
+	 * @param string $code Verification code user can manually type in
+	 *
+	 * @return string Email messge to send
+	 */
+	public static function renderVerificationCodeEmail($verification_link, $code) {
+		$verify_email_url = UserConfig::$USERSROOTFULLURL.'/verify_email.php';
+
+		$message = <<<EOD
+Please verify your email address by clicking on this link:
+$verification_link
+
+Or just go to $verify_email_url and enter the code: $code
+
+--
+User Support
+EOD;
+		return $message;
+	}
+
+	/**
 	 * Loads Startup API module by ID/folder name.
 	 *
 	 * @param string $modulename Module ID / folder name.
@@ -657,6 +717,7 @@ EOD;
 		UserConfig::$DEFAULTLOGOUTRETURN = UserConfig::$SITEROOTURL;
 		UserConfig::$DEFAULTREGISTERRETURN = UserConfig::$SITEROOTURL;
 		UserConfig::$DEFAULTUPDATEPASSWORDRETURN = UserConfig::$SITEROOTURL;
+		UserConfig::$DEFAULT_EMAIL_VERIFIED_RETURN = UserConfig::$SITEROOTURL;
 
 		if (array_key_exists('HTTP_HOST', $_SERVER))
 		{
