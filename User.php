@@ -702,7 +702,7 @@ class User
 
 		$user = null;
 
-		$salt = uniqid();
+		$salt = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 13);;
 		$pass = sha1($salt.$password);
 
 		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix."users (regmodule, name, username, email, pass, salt) VALUES ('userpass', ?, ?, ?, ?, ?)"))
@@ -1688,7 +1688,7 @@ class User
 	{
 		$db = UserConfig::getDB();
 
-		$temppass = uniqid();
+		$temppass = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 13);;
 
 		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET temppass = ?, temppasstime = now() WHERE id = ?'))
 		{
@@ -2623,7 +2623,7 @@ class User
 	{
 		$db = UserConfig::getDB();
 
-		$salt = uniqid();
+		$salt = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 13);
 		$pass = sha1($salt.$password);
 
 		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET pass = ?, salt = ? WHERE id = ?'))
