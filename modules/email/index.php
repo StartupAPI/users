@@ -159,8 +159,9 @@ class EmailAuthenticationModule extends AuthenticationModule
 		<li class="startupapi-email-edit-section">Name and email</li>
 		<li><label>Name</label><input name="name" type="test" size="40" value="<?php echo UserTools::escape(array_key_exists('name', $data) ? $data['name'] : $user->getName())?>"/><?php echo array_key_exists('name', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['name'])).'">*</span>' : ''?></li>
 		<li><label>E-mail</label><input name="email" type="text" size="40" value="<?php echo UserTools::escape(array_key_exists('email', $data) ? $data['email'] : $user->getEmail())?>"/><?php echo array_key_exists('email', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</span>' : ''?>
-			<?php if (!$user->isEmailVerified()) { ?><a id="startupapi-usernamepass-edit-verify-email" href="<?php echo UserConfig::$USERSROOTURL ?>/verify_email.php">Email address not verified yet, click here to verify</a><?php } ?>
+			<?php if (!$user->isEmailVerified()) { ?><a id="startupapi-email-edit-verify-email" href="<?php echo UserConfig::$USERSROOTURL ?>/verify_email.php">Email address not verified yet, click here to verify</a><?php } ?>
 		</li>
+		<li><button id="startupapi-email-edit-button" type="submit" name="save">Save</button></li>
 		</ul>
 		</fieldset>
 		<?php UserTools::renderCSRFNonce(); ?>
