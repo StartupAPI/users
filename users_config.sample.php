@@ -7,7 +7,7 @@
 UserConfig::$SESSION_SECRET= '...type.some.random.characters.here...';
 
 /**
- * Database connectivity 
+ * Database connectivity
  */
 UserConfig::$mysql_db = '...database...';
 UserConfig::$mysql_user = '...username...';
@@ -21,6 +21,11 @@ UserConfig::$mysql_password = '...password...';
 UserConfig::$admins = array(
 #	1, // usually first user has ID of 1
 );
+
+/*
+ * Uncomment next line to require email address verification before users can access the site
+ */
+#UserConfig::$requireVerifiedEmail = true;
 
 /*
  * Uncomment next line to enable debug messages in error_log
