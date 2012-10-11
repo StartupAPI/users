@@ -857,6 +857,12 @@
 	cursor: help;
 }
 
+#startupapi-email-edit-verify-email {
+	font-size: small;
+	display: block;
+	margin-left: 5em;
+}
+
 /* from modules/email/index.php edit info form */
 #startupapi-email-edit-form {
 	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
