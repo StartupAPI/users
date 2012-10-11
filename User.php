@@ -2476,6 +2476,10 @@ class User
 	 */
 	public function setEmail($email)
 	{
+		if ($this->email != $email) {
+			$this->setEmailVerified(false);
+		}
+
 		$this->email = $email;
 	}
 
@@ -2658,15 +2662,13 @@ class User
 		$status = $this->status ? 1 : 0;
 		$email_verifiednum = $this->is_email_verified ? 1 : 0;
 
-		if (!is_null(UserConfig::$email_module)) {
-			// !WARNING! it's not safe to do anything with this user except reading it's built-in
-			// properties
-			// TODO implement some protection from reading or writing to DB based on this user's info,
-			// just reading object properties.
+		// !WARNING! it's not safe to do anything with this user except reading it's built-in
+		// properties
+		// TODO implement some protection from reading or writing to DB based on this user's info,
+		// just reading object properties.
 
-			// creating a copy of the user in case we need to update their email subscription
-			$old_user = self::getUser($this->getID());
-		}
+		// creating a copy of the user in case we need to update their email subscription
+		$old_user = self::getUser($this->getID());
 
 		$username = is_null($this->username) || $this->username == '' ? null
 			: mb_convert_encoding($this->username, 'UTF-8');
@@ -2691,6 +2693,13 @@ class User
 		else
 		{
 			throw new DBPrepareStmtException($db);
+		}
+
+		$old_email = $old_user->getEmail();
+		$new_email = $this->getEmail();
+
+		if ($old_email != $new_email) {
+			$this->sendEmailVerificationCode();
 		}
 
 		if (!is_null(UserConfig::$email_module)) {
