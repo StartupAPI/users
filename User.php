@@ -2844,6 +2844,67 @@ class User
 		{
 			throw new DBPrepareStmtException($db);
 		}
+
+		$this->triggerActivityBadge($activity_id);
+	}
+
+	/**
+	 * Gives user a badge based on activity
+	 *
+	 * @param int $activity_id Activity ID
+	 */
+	public function triggerActivityBadge($activity_id) {
+		Badge::triggerActivityBadge($this, $activity_id);
+	}
+
+	/**
+	 * Returns activity count for one or more activities
+	 *
+	 * @param int[] $activity_ids Array of activity IDs
+	 * @param int $period Number of days in activity window or null if all time
+	 *
+	 * @todo Actially implement activity window
+	 */
+	public function getActivitiesCount($activity_ids, $period = null) {
+		$db = UserConfig::getDB();
+
+		if (!is_array($activity_ids) || count($activity_ids) == 0) {
+			return 0;
+		}
+
+		$activity_count = 0;
+
+		$in = implode(', ', $activity_ids);
+
+		if ($stmt = $db->prepare('SELECT count(*) as count FROM '.UserConfig::$mysql_prefix.'activity
+									WHERE user_id = ? AND activity_id IN (' . $in . ')'))
+		{
+			if (!$stmt->bind_param('i', $this->userid))
+			{
+				throw new DBBindParamException($db, $stmt);
+			}
+			if (!$stmt->execute())
+			{
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+			if (!$stmt->bind_result($count))
+			{
+				throw new DBBindResultException($db, $stmt);
+			}
+
+			if($stmt->fetch() === TRUE)
+			{
+				$activity_count = $count;
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new DBPrepareStmtException($db);
+		}
+
+		return $activity_count;
 	}
 
 	/**

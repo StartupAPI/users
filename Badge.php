@@ -41,7 +41,7 @@ class Badge {
 	private $set;
 
 	/**
-	 * @var array A list of activity triggers
+	 * @var badgeActivityTrigger[] A list of activity triggers
 	 */
 	private static $activityTriggers = array();
 
@@ -206,17 +206,20 @@ class Badge {
 	 * If activity period is null, count activities for all time.
 	 *
 	 * @param int[] $activity_ids Array of numeric activity IDs that trigger the badge
-	 * @param int $count Number of activities to trigger the badge
-	 * @param int $period Number of days in activity window (null for all time)
+	 * @param int $activity_count Number of activities to trigger the badge
+	 * @param int $badge_level Level of the badge to trigger
+	 * @param int $activity_period Number of days in activity window (null for all time)
 	 */
-	public function registerActivityTrigger($activity_ids, $count, $period = null) {
+	public function registerActivityTrigger($activity_ids, $activity_count, $badge_level = 1, $activity_period = null) {
 		// in case only one activity ID is passed in, upgrade it to array
 		if (is_int($activity_ids)) {
 			$activity_ids = array($activity_ids);
 		}
 
 		foreach ($activity_ids as $activity_id) {
-			self::$activityTriggers[$activity_id] = array($activity_ids, $count, $period, $this);
+			self::$activityTriggers[$activity_id][] = new badgeActivityTrigger(
+							$this, $activity_ids, $activity_count, $badge_level, $activity_period
+			);
 		}
 	}
 
@@ -277,14 +280,18 @@ class Badge {
 	 * Register a badge for the user
 	 *
 	 * @param User $user User who got a badge
+	 * @param int $level Badge level
 	 *
 	 * @throws DBException
 	 */
-	public function registerForUser($user) {
+	public function registerForUser($user, $level) {
+		$db = UserConfig::getDB();
+
 		$user_id = $user->getID();
 
-		if ($stmt = $db->prepare('INSERT IGNORE INTO ' . UserConfig::$mysql_prefix . 'user_badges (user_id, badge_id) VALUES (?, ?)')) {
-			if (!$stmt->bind_param('ii', $user_id, $this->id)) {
+		if ($stmt = $db->prepare('INSERT IGNORE INTO ' . UserConfig::$mysql_prefix . 'user_badges
+									(user_id, badge_id, badge_level) VALUES (?, ?, ?)')) {
+			if (!$stmt->bind_param('iii', $user_id, $this->id, $level)) {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
@@ -296,6 +303,81 @@ class Badge {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Gives user a badge based on activity
+	 *
+	 * @param User $user User object
+	 * @param int $activity_id Activity ID
+	 */
+	public static function triggerActivityBadge($user, $activity_id) {
+		if (!array_key_exists($activity_id, self::$activityTriggers)) {
+			return;
+		}
+
+		$activityTriggers = self::$activityTriggers[$activity_id];
+
+		foreach ($activityTriggers as $activityTrigger) {
+			// TODO cache the counts between different badges or badge levels
+			// that trigger for the same set of actions
+			$count = $user->getActivitiesCount($activityTrigger->activity_ids, $activityTrigger->activity_period);
+
+			if ($count == $activityTrigger->activity_count) {
+				$activityTrigger->badge->registerForUser($user, $activityTrigger->badge_level);
+			}
+		}
+	}
+
+}
+
+/**
+ * Basic data structure to hold information about activity triggers
+ *
+ * @internal Used only for data management in Badge class
+ */
+class badgeActivityTrigger {
+
+	/**
+	 * @var Badge Badge to give if triggered
+	 */
+	public $badge;
+
+	/**
+	 * @var int[] Array of activity IDs that would activate the trigger
+	 */
+	public $activity_ids = array();
+
+	/**
+	 * @var int Number of activities to activate the trigger
+	 */
+	public $activity_count = 0;
+
+	/**
+	 * @var int Badge level to grant if triggered
+	 */
+	public $badge_level = 1;
+
+	/**
+	 * @var int Amount of days in activity window to cause the trigger
+	 */
+	public $activity_period = null;
+
+	/**
+	 * Creates a badge activity trigger
+	 *
+	 * @param Badge $badge Badge to give if triggered
+	 * @param int[] $activity_ids Array of activity IDs that would activate the trigger
+	 * @param int $activity_count Number of activities to activate the trigger
+	 * @param int $badge_level Badge level to grant if triggered
+	 * @param int $activity_period Amount of days in activity window to cause the trigger
+	 */
+	public function __construct($badge, $activity_ids, $activity_count, $badge_level, $activity_period = null) {
+		$this->badge = $badge;
+		$this->activity_ids = $activity_ids;
+		$this->activity_count = $activity_count;
+		$this->badge_level = $badge_level;
+		$this->activity_period = $activity_period;
 	}
 
 }
