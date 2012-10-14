@@ -1,2 +1,3 @@
 docs
 .phptidy-cache
+.DS_Store

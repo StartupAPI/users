@@ -22,6 +22,24 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 18
+ * Gamification badges
+*/
+$versions[18]['up'][] = "CREATE TABLE IF NOT EXISTS `".UserConfig::$mysql_prefix."user_badges` (
+	`user_id` INT(10) UNSIGNED NOT NULL,
+	`badge_id` INT(4) NOT NULL,
+	`badge_level` INT(4) NOT NULL DEFAULT 1,
+
+	PRIMARY KEY (user_id, badge_id, badge_level),
+
+	CONSTRAINT badge_user
+		FOREIGN KEY (user_id)
+		REFERENCES ".UserConfig::$mysql_prefix."users (id)
+		ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='User badges'";
+$versions[18]['down'][]	= "DROP TABLE `".UserConfig::$mysql_prefix."user_badges`";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 17
  * Adding email verification field
 */

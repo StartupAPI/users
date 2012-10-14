@@ -1,6 +1,7 @@
 <?php
 require_once(dirname(__FILE__).'/global.php');
 require_once(dirname(__FILE__).'/Account.php');
+require_once(dirname(__FILE__).'/Badge.php');
 require_once(dirname(__FILE__).'/CookieStorage.php');
 require_once(dirname(__FILE__).'/CampaignTracker.php');
 
@@ -2925,5 +2926,23 @@ class User
 	public function getImpersonator() {
 		// do not return actual user object
 		return clone($this->impersonator);
+	}
+
+	/**
+	 * Returns a list of badges user earned
+	 *
+	 * @return array Array of user badges with badge IDs as keys and arrays of Badge object and maximum level as value
+	 */
+	public function getBadges() {
+		return Badge::getUserBadges($this);
+	}
+
+	/**
+	 * Registers a badge for a user
+	 *
+	 * @param Badge $badge Badge to Register for a user
+	*/
+	public function registerBadge($badge) {
+		$badge->registerForUser();
 	}
 }

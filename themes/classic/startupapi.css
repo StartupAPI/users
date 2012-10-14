@@ -1,11 +1,25 @@
 /* from edit.php */
-#startupapi-edit-account {
+#startupapi-edit-rightcol {
 	float: right;
 	width: 400px;
 }
 
 .startupapi-error-message {
 	color: red;
+}
+
+.startupapi-badge {
+	margin: 0.4em;
+}
+
+/* from show_badge.php */
+.startupapi-badge-large {
+	float: left;
+	margin: 1em 1em;
+}
+
+.startupapi-badge-call-to-action {
+	font-style: italic;
 }
 
 /* from header.php */

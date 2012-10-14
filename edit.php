@@ -59,8 +59,8 @@ require_once(UserConfig::$header);
 <div id="startupapi-edit-info">
 <h2>Edit Your Information</h2>
 
+<div id="startupapi-edit-rightcol">
 <div id="startupapi-edit-account">
-<div>
 <?php if (UserConfig::$useAccounts) { ?>
 <h2>Accounts:</h2>
 <?php
@@ -74,6 +74,31 @@ require_once(UserConfig::$header);
 		}
 		?></div><?php
 	}
+}
+?>
+</div>
+
+<?php
+$available_badges = Badge::getAvailableBadges();
+
+if (count($available_badges) > 0 && UserConfig::$enableGamification) { ?>
+<div id="startupapi-edit-badges">
+<h2>Badges:</h2>
+<?php
+
+	$user_badges = $user->getBadges();
+
+	foreach($available_badges as $badge) {
+
+		if (array_key_exists($badge->getID(), $user_badges)) {
+			$badge_level = $user_badges[$badge->getID()][1];
+
+			?><a href="<?php echo UserConfig::$USERSROOTURL.'/show_badge.php?name='.$badge->getSlug() ?>"><img class="startupapi-badge" src="<?php echo $badge->getImageURL(UserConfig::$badgeListingSize, $badge_level) ?>" title="<?php echo $badge->getTitle() ?>" width="<?php echo UserConfig::$badgeListingSize ?>" height="<?php echo UserConfig::$badgeListingSize ?>"/></a><?php
+		} else {
+			?><img class="startupapi-badge" src="<?php echo $badge->getPlaceholderImageURL(UserConfig::$badgeListingSize) ?>" title="Hint: <?php echo $badge->getHint() ?>" width="<?php echo UserConfig::$badgeListingSize ?>" height="<?php echo UserConfig::$badgeListingSize ?>"/><?php
+		}
+	}
+?></div><?php
 }
 ?>
 </div>
