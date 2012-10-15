@@ -13,6 +13,3 @@
 [submodule "phptidy"]
 	path = phptidy
 	url = git://github.com/sergeychernyshev/phptidy.git
-[submodule "bootstrap"]
-	path = bootstrap
-	url = git://github.com/twitter/bootstrap.git
