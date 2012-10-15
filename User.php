@@ -389,6 +389,8 @@ class User
 	 *
 	 * @return boolean Is code associated with a user or not
 	 *
+	 * @throws DBException
+	 *
 	 * @todo Check if this can be an attack vector for brute forcing the code
 	 * verification for unauthorized users and if there are any ways to prevent
 	 * this from happening
@@ -2352,16 +2354,17 @@ class User
 	 * Private constructor, creates new User object
 	 *
 	 * @param int $userid User ID
-	 * @param boolean $status
-	 * @param string $name
-	 * @param string $username
-	 * @param string $email
-	 * @param boolean $requirespassreset
-	 * @param int $fbid
-	 * @param int $regtime
-	 * @param int $points
+	 * @param boolean $status Status (enabled/disabled)
+	 * @param string $name User's display name
+	 * @param string $username Username
+	 * @param string $email Email address
+	 * @param boolean $requirespassreset Is this user required to reset their password
+	 * @param int $fbid Facebook ID
+	 * @param int $regtime Registration time
+	 * @param int $points Total points user has
+	 * @param boolean $is_email_verified Is user's email verified or not
 	 */
-	private function __construct($userid, $status = true, $name, $username = null, $email = null, $requirespassreset = false, $fbid = null, $regtime = null, $points = 0, $is_email_verified)
+	private function __construct($userid, $status = true, $name, $username = null, $email = null, $requirespassreset = false, $fbid = null, $regtime = null, $points = 0, $is_email_verified = false)
 	{
 		$this->userid = $userid;
 		$this->status = $status ? true : false;
@@ -2495,6 +2498,11 @@ class User
 		$this->is_email_verified = $verified ? true : false;
 	}
 
+	/**
+	 * Returns true if user's email address is verified
+	 *
+	 * @return boolean True if user's email is verified
+	 */
 	public function isEmailVerified() {
 		return $this->is_email_verified;
 	}
@@ -2862,6 +2870,10 @@ class User
 	 *
 	 * @param int[] $activity_ids Array of activity IDs
 	 * @param int $period Number of days in activity window or null if all time
+	 *
+	 * @return int Number of times any of the activities requested have happened
+	 *
+	 * @throws DBException
 	 *
 	 * @todo Actially implement activity window
 	 */

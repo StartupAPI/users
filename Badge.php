@@ -59,10 +59,12 @@ class Badge {
 	 * Creates a badge and registers it in the system
 	 *
 	 * @param int $id Badge ID
+	 * @param string $set
 	 * @param string $slug Badge slug
 	 * @param string $title Badge title
-	 * @param int $level Badge level
-	 * @param string $set
+	 * @param string $description Badge description
+	 * @param string $hint Hint for unlocking this badge
+	 * @param string[] $calls_to_action Array of calls to action (one for each level)
 	 */
 	public function __construct($id, $set, $slug, $title, $description, $hint = null, $calls_to_action = null) {
 		$this->id = $id;
@@ -159,6 +161,7 @@ class Badge {
 	 * Set second parameter to true to return absolute URL (to use in emails and such)
 	 *
 	 * @param int $size Image size
+	 * @param int $level Badge level
 	 * @param boolean $full Set to true for an absolute URL
 	 *
 	 * @return string Badge image URL
@@ -243,6 +246,8 @@ class Badge {
 	 * @param User $user User object
 	 *
 	 * @return array Array of user badges with badge IDs as keys and arrays of Badge object and maximum level as value
+	 *
+	 * @throws DBException
 	 */
 	public function getUserBadges($user) {
 		// TODO implement a list of badges for the user
@@ -301,8 +306,6 @@ class Badge {
 		} else {
 			throw new DBPrepareStmtException($db, "Can't register a badge for a user");
 		}
-
-		return true;
 	}
 
 	/**
