@@ -276,6 +276,11 @@ class UserConfig
 	 **************************************************************************/
 
 	/**
+	 * @var string Application name
+	 */
+	public static $appName;
+
+	/**
 	 * @var string File system path to header HTML file.
 	 */
 	public static $header;

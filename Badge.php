@@ -2,6 +2,9 @@
 
 /**
  * This class represents gamification badges people can uses
+ *
+ * @package StartupAPI
+ * @subpackage Gamification
  */
 class Badge {
 
@@ -336,6 +339,9 @@ class Badge {
 
 /**
  * Basic data structure to hold information about activity triggers
+ *
+ * @package StartupAPI
+ * @subpackage Gamification
  *
  * @internal Used only for data management in Badge class
  */
