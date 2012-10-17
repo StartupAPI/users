@@ -692,6 +692,10 @@ Temporary passwords only work for one day and will become invalid once you set y
 --
 User Support
 EOD;
+		if (!is_null(UserConfig::$appName)) {
+			$message .= "\n".UserConfig::$appName;
+		}
+
 		return $message;
 	}
 
@@ -717,6 +721,10 @@ Or just go to $verify_email_url and enter the code: $code
 --
 User Support
 EOD;
+		if (!is_null(UserConfig::$appName)) {
+			$message .= "\n".UserConfig::$appName;
+		}
+
 		return $message;
 	}
 
@@ -776,6 +784,9 @@ EOD;
 		UserConfig::$USERSROOTFULLURL = 'http://'.$host.substr(UserConfig::$ROOTPATH, $docrootlength);
 
 		UserConfig::$supportEmailXMailer = 'Startup API (PHP/'.phpversion().')';
+		if (is_null(UserConfig::$appName)) {
+			UserConfig::$supportEmailXMailer = UserConfig::$appName . ' using ' . UserConfig::$appName;
+		}
 
 		UserConfig::$header = dirname(__FILE__).'/header.php';
 		UserConfig::$footer = dirname(__FILE__).'/footer.php';
