@@ -23,6 +23,11 @@ UserConfig::$admins = array(
 );
 
 /*
+ * Name of your application to be used in UI and emails to users
+ */
+#UserConfig::$appName = '';
+
+/*
  * Uncomment next line to require email address verification before users can access the site
  */
 #UserConfig::$requireVerifiedEmail = true;
