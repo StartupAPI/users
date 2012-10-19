@@ -77,7 +77,10 @@ google.setOnLoadCallback(function() {
 	}
 });
 </script>
+<div class="span9">
+
 <div id='chart_div' style='width: 100%; height: 240px; margin-bottom: 1em'></div>
 
+</div>
 <?php
 require_once(dirname(__FILE__).'/footer.php');

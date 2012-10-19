@@ -1,11 +1,12 @@
 <?php
-require_once(dirname(dirname(__FILE__)).'/global.php');
-require_once(dirname(dirname(__FILE__)).'/User.php');
+require_once(dirname(dirname(__FILE__)) . '/global.php');
+require_once(dirname(dirname(__FILE__)) . '/User.php');
+require_once(dirname(__FILE__) . '/adminMenus.php');
 
 $current_user = User::require_login(false);
 
 if (!$current_user->isAdmin()) {
-	require_once(dirname(__FILE__).'/admin_access_only.php');
+	require_once(dirname(__FILE__) . '/admin_access_only.php');
 	exit;
 }
 
@@ -15,57 +16,106 @@ if (array_key_exists('impersonate', $_POST)) {
 		exit;
 	}
 
-	$impersonated_user= $current_user->impersonate(User::getUser($_POST['impersonate']));
+	$impersonated_user = $current_user->impersonate(User::getUser($_POST['impersonate']));
 	if ($impersonated_user !== null) {
-		header('Location: '.UserConfig::$DEFAULTLOGINRETURN);
+		header('Location: ' . UserConfig::$DEFAULTLOGINRETURN);
 		exit;
-	}
-	else
-	{
+	} else {
 		header('Location: #msg=cantimpersonate');
 		exit;
 	}
 }
 
-require_once(UserConfig::$admin_header);
+$ADMIN_ROOT = UserConfig::$USERSROOTURL . '/admin';
 
-if (!isset($ADMIN_SECTION)) {
-	$ADMIN_SECTION = null;
-}
+$admin_menu = new adminMenu(array(
+			new menu('home', 'Home', $ADMIN_ROOT . '/', 'home'),
+	/*
+			new menuSection('dashboards', 'Dashboards', array(
+				new menu('basic', 'Basic Metrics', $ADMIN_ROOT . '/', 'signal')
+			)),
+	*/		new menuSection('users', 'Users', null, array(
+				new menu('activity', 'Activity', $ADMIN_ROOT . '/activity.php', 'signal'),
+				new menu('registrations', 'Registered Users', $ADMIN_ROOT . '/registrations.php', 'user'),
+				new menu('cohorts', 'Cohort Analysis', $ADMIN_ROOT . '/cohorts.php', 'th'),
+				new menu('bymodule', 'Registrations By Module', $ADMIN_ROOT . '/bymodule.php', 'th-large'),
+				new menu('invitations', 'Invitations', $ADMIN_ROOT . '/invitations.php', 'envelope', UserConfig::$enableInvitations, 'Invitations are disabled in configuration')
+			)),
+			new menuSection('settings', 'Settings', null, array(
+				new menu('features', 'Features', $ADMIN_ROOT . '/features.php', 'check'),
+				new menu('templates', 'Templates', $ADMIN_ROOT . '/templates.php', 'list-alt', false),
+			)),
+			new menuSection('promotion', 'Promotion', null, array(
+				new menu('sources', 'Sources', $ADMIN_ROOT . '/sources.php', 'random', FALSE),
+				new menu('campaigns', 'Campaign management', $ADMIN_ROOT . '/campaigns.php', 'comment', FALSE)
+			))
+		));
 
-if (UserConfig::$enableInvitations) {
-	?><h2>Users | <a href="invitations.php">Invitations</a></h2><?php
+if (isset($ADMIN_SECTION)) {
+	$admin_menu->setActive($ADMIN_SECTION);
 }
-?>
-<div id="startupapi_adminmenu">
-<?php if ($ADMIN_SECTION != 'dashboard') {
-	?><a href="./">Dashboard</a><?php
-} else {
-	?>Dashboard<?php
-} ?> |
-<?php if ($ADMIN_SECTION != 'cohorts') {
-	?><a href="cohorts.php">Cohort Analysis</a><?php
-} else {
-	?>Cohort Analysis<?php
-} ?> |
-<?php if ($ADMIN_SECTION != 'activity') {
-	?><a href="activity.php">Activity</a><?php
-} else {
-	?>Activity<?php
-} ?> |
-<?php if ($ADMIN_SECTION != 'registrations') {
-	?><a href="registrations.php">Registered Users</a><?php
-} else {
-	?>Registered Users<?php
-} ?> |
-<?php if ($ADMIN_SECTION != 'bymodule') {
-	?><a href="bymodule.php">Registrations By Module</a><?php
-} else {
-	?>Registrations By Module<?php
-} ?> |
-<?php if ($ADMIN_SECTION != 'features') {
-	?><a href="features.php">Features</a><?php
-} else {
-	?>Features<?php
-} ?>
-</div>
+?><!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/css/bootstrap.css" rel="stylesheet">
+		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+		<script src="http://code.jquery.com/jquery-latest.js"></script>
+		<script src="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/js/bootstrap.min.js"></script>
+		<style>
+			.startupapi-sidebar.affix {
+				top: 4em;
+			}
+
+			body {
+				padding-top: 40px;
+			}
+
+			.logo {
+				margin-right: 0.5em;
+			}
+
+			.footer {
+				padding: 70px 0;
+				margin-top: 70px;
+				border-top: 1px solid #E5E5E5;
+				background-color: whiteSmoke;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="navbar">
+			<div class="navbar-inner navbar-fixed-top">
+				<span class="brand"><a href="<?php echo UserConfig::$USERSROOTURL ?>"><img class="logo" src="<?php echo UserConfig::$USERSROOTURL ?>/images/header_icon.png"/><?php echo is_null(UserConfig::$appName) ? 'Startup API' : UserConfig::$appName; ?></a></span>
+
+				<?php $admin_menu->renderTopNav() ?>
+
+				<ul class="nav pull-right">
+					<li class="navbar-text"><?php echo $current_user->getName() ?></li>
+					<li><a href="<?php echo UserConfig::$USERSROOTURL ?>/logout.php">Logout</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="container-fluid">
+			<div class="row-fluid">
+				<div class="span3">
+					<div class="well sidebar-nav startupapi-sidebar">
+
+						<?php $admin_menu->render() ?>
+
+					</div>
+					<!--Sidebar content-->
+				</div>
+
+				<!-- admin header ends -->
+
+				<div class="span9">
+					<?php
+					if (!isset($BREADCRUMB_EXTRA)) {
+						$BREADCRUMB_EXTRA = null;
+					}
+
+					$admin_menu->renderBreadCrumbs($BREADCRUMB_EXTRA);
+					?>
+
+				</div>

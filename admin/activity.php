@@ -2,7 +2,6 @@
 require_once(dirname(__FILE__).'/admin.php');
 
 $ADMIN_SECTION = 'activity';
-require_once(dirname(__FILE__).'/header.php');
 
 $daily_active_users = User::getDailyActiveUsers();
 
@@ -28,6 +27,8 @@ if (array_key_exists('activityid', $_REQUEST) && is_numeric($_REQUEST['activityi
 } else {
 	if (array_key_exists('userid', $_REQUEST)) {
 		$activityuser = User::getUser($_REQUEST['userid']);
+
+		$BREADCRUMB_EXTRA = $activityuser->getName();
 	}
 	$daily_activity = User::getDailyActivityPoints($activityuser);
 
@@ -52,6 +53,8 @@ if (array_key_exists('activityid', $_REQUEST) && is_numeric($_REQUEST['activityi
 }
 
 $total = 0;
+
+require_once(dirname(__FILE__).'/header.php');
 ?>
 <script type='text/javascript' src='swfobject/swfobject/swfobject.js'></script>
 <script type='text/javascript' src='http://www.google.com/jsapi'></script>
@@ -129,6 +132,9 @@ google.setOnLoadCallback(function() {
 	}
 });
 </script>
+<div class="span9">
+
+
 <div id='chart_div' style='width: 100%; height: 240px; margin-bottom: 1em'></div>
 
 <form action="" name="activities">
@@ -280,5 +286,6 @@ else
 </td></tr>
 </table>
 
+</div>
 <?php
 require_once(dirname(__FILE__).'/footer.php');

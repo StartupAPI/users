@@ -33,6 +33,7 @@ table, td, th, tr {
 	border: 1px solid silver;
 }
 </style>
+<div class="span9">
 
 <?php if (count(Feature::getAll()) > 0) { ?>
 
@@ -77,4 +78,7 @@ foreach (Feature::getAll() as $feature) {
 	?><div style="text-align: center; padding: 2em">No <a href="http://startupapi.org/StartupAPI/FeatureManagement" target="_blank">features</a> defined in this application</div><?php
 }
 
+?>
+</div>
+<?php
 require_once(dirname(__FILE__).'/footer.php');

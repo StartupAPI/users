@@ -55,6 +55,8 @@ google.setOnLoadCallback(function() {
 	}
 });
 </script>
+<div class="span9">
+
 <div id='chart_div' style='width: 100%; height: 240px; margin-bottom: 1em'></div>
 
 <table cellpadding="5" cellspacing="0" border="1" width="100%">
@@ -127,7 +129,7 @@ foreach ($users as $user)
 
 	?><tr valign="top">
 	<td><a href="user.php?id=<?php $userid = $user->getID(); echo $userid; ?>"><?php echo $userid; ?></a></td>
-	<td align="right"><?php echo date('M j, h:iA', $regtime)?> (<?php if ($ago <= 5) {?><span style="color: #00<?php echo sprintf('%02s', dechex((4 - $ago) * 150 / 4 + 50))?>00; font-weight: bold"><?php }?><?php echo $ago?> day<?php echo $ago > 1 ? 's' : '' ?> ago<?php if ($ago <= 5) {?></span><?php }?>)</td>
+	<td align="right"><?php echo date('M j, h:iA', $regtime)?><br/>(<?php if ($ago <= 5) {?><span style="color: #00<?php echo sprintf('%02s', dechex((4 - $ago) * 150 / 4 + 50))?>00; font-weight: bold"><?php }?><?php echo $ago?> day<?php echo $ago > 1 ? 's' : '' ?> ago<?php if ($ago <= 5) {?></span><?php }?>)</td>
 	<td><?php
 	foreach (UserConfig::$authentication_modules as $module)
 	{
@@ -175,6 +177,6 @@ else
 
 </td></tr>
 </table>
-
+</div>
 <?php
 require_once(dirname(__FILE__).'/footer.php');

@@ -39,9 +39,12 @@ if (array_key_exists("deactivate", $_POST)) {
 	$user->save();
 }
 
-#$ADMIN_SECTION = 'registrations';
+$ADMIN_SECTION = 'registrations';
+$BREADCRUMB_EXTRA = $user->getName();
 require_once(dirname(__FILE__).'/header.php');
 ?>
+<div class="span9">
+
 <h2>User information: <?php echo UserTools::escape($user->getName()); ?></h2>
 
 <p><b>Email:</b>
@@ -152,5 +155,8 @@ if (count($features) > 0) {
 	</form>
 <?php
 }
+?>
 
+</div>
+<?php
 require_once(dirname(__FILE__).'/footer.php');

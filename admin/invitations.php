@@ -43,7 +43,7 @@ $_styles = array (
 	'http://yui.yahooapis.com/2.7.0/build/button/assets/skins/sam/button.css',
 	'http://yui.yahooapis.com/2.7.0/build/container/assets/skins/sam/container.css'
 );
-$_scripts = array ( 
+$_scripts = array (
 	'http://yui.yahooapis.com/2.7.0/build/yahoo-dom-event/yahoo-dom-event.js',
 	'http://yui.yahooapis.com/2.7.0/build/animation/animation-min.js',
 	'http://yui.yahooapis.com/2.7.0/build/connection/connection-min.js',
@@ -53,7 +53,7 @@ $_scripts = array (
 	'http://yui.yahooapis.com/2.7.0/build/container/container-min.js'
 );
 
-require_once(UserConfig::$header);
+require_once(dirname(__FILE__) . '/header.php');
 ?>
 <script>
 YAHOO.util.Event.onDOMReady(function() {
@@ -63,9 +63,9 @@ YAHOO.util.Event.onDOMReady(function() {
 	});
 });
 </script>
+<div class="span9">
 
-<h2><a href="./">Users</a> | Invitations</h2><div style="background: white; padding: 1em">
-<h2>Unsent Invitations</h2>
+	<h2>Unsent Invitations</h2>
 <?php
 $invitations = Invitation::getUnsent();
 
@@ -170,5 +170,9 @@ if (count($invitations) > 0)
 ?>
 </table>
 
-</div><?php
-require_once(UserConfig::$footer);
+</div>
+
+
+</div>
+<?php
+require_once(dirname(__FILE__) . '/footer.php');

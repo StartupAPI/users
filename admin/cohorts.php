@@ -5,9 +5,22 @@
  */
 require_once(dirname(__FILE__).'/admin.php');
 
+$selectedactivityid = null;
+
+if (array_key_exists('activityid', $_REQUEST) && is_numeric($_REQUEST['activityid'])) {
+	$selectedactivityid = $_REQUEST['activityid'];
+}
+
 $ADMIN_SECTION = 'cohorts';
+
+$BREADCRUMB_EXTRA = null;
+if (array_key_exists($selectedactivityid, UserConfig::$activities)) {
+	$BREADCRUMB_EXTRA = UserConfig::$activities[$selectedactivityid][0];
+}
 require_once(dirname(__FILE__).'/header.php');
 ?>
+<div class="span9">
+
 <form action="" name="activities" style="margin: 1em 0">
 <div>
 Pick activity:
@@ -28,11 +41,6 @@ uksort(UserConfig::$activities, function($a, $b) {
 
 $stats = User::getActivityStatistics();
 
-$selectedactivityid = null;
-
-if (array_key_exists('activityid', $_REQUEST) && is_numeric($_REQUEST['activityid'])) {
-	$selectedactivityid = $_REQUEST['activityid'];
-}
 
 foreach (UserConfig::$activities as $id => $activity) {
 	if (!array_key_exists($id, $stats)) {
@@ -280,5 +288,8 @@ for ($cohort_number = 0; $cohort_number < count($cohorts); $cohort_number += 1) 
 
 <?php
 }
+?>
 
+</div>
+<?php
 require_once(dirname(__FILE__).'/footer.php');

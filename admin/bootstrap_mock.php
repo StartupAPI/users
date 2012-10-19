@@ -94,6 +94,7 @@ require_once(dirname(__FILE__) . '/admin.php');
 					</ul>
 
 				</div>
+<!-- admin header ends -->
 
 				<div class="span5">
 
@@ -217,6 +218,9 @@ require_once(dirname(__FILE__) . '/admin.php');
 
 
 				</div> -->
+
+<!-- admin footer starts -->
+
 			</div>
 		</div>
 		<footer class="footer">
