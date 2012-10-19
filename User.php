@@ -1331,7 +1331,7 @@ class User
 	 *
 	 * @internal Used in admin dashboard
 	 */
-	public static function searchUsers($search, $pagenumber = 0, $perpage = 20)
+	public static function searchUsers($search, $pagenumber = 0, $perpage = 20, $sort = 'registration')
 	{
 		$db = UserConfig::getDB();
 
@@ -1339,8 +1339,13 @@ class User
 
 		$first = $perpage * $pagenumber;
 
+		$orderby = 'regtime';
+		if ($sort == 'activity') {
+			$orderby = 'points';
+		}
+
 		// TODO Replace with real, fast and powerful full-text search
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE INSTR(name, ?) > 0 OR INSTR(username, ?) > 0 OR INSTR(email, ?) > 0 ORDER BY regtime DESC LIMIT ?, ?'))
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE INSTR(name, ?) > 0 OR INSTR(username, ?) > 0 OR INSTR(email, ?) > 0 ORDER BY '.$orderby.' DESC LIMIT ?, ?'))
 		{
 			if (!$stmt->bind_param('sssii', $search, $search, $search, $first, $perpage))
 			{
