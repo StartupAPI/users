@@ -23,6 +23,8 @@ if (array_key_exists('activityid', $_REQUEST) && is_numeric($_REQUEST['activityi
 	$selectedactivityid = $_REQUEST['activityid'];
 	$selectedactivity = UserConfig::$activities[$selectedactivityid];
 
+	$BREADCRUMB_EXTRA = $selectedactivity[0];
+
 	$dates = User::getDailyPointsByActivity($selectedactivityid);
 } else {
 	if (array_key_exists('userid', $_REQUEST)) {
@@ -133,10 +135,6 @@ google.setOnLoadCallback(function() {
 });
 </script>
 <div class="span9">
-
-
-<div id='chart_div' style='width: 100%; height: 240px; margin-bottom: 1em'></div>
-
 <form action="" name="activities">
 <div>
 Filter activities:
@@ -165,17 +163,48 @@ foreach (UserConfig::$activities as $id => $activity) {
 <?php } ?>
 </select>
 
-Users:
-<?php if (is_null($activityuser)) {
-	?>all<?php
-} else {
-	?><a href="user.php?id=<?php echo $activityuser->getID()?>"><?php echo UserTools::escape($activityuser->getName())?></a> (<a href=".">reset</a>)<?php
+<?php if (!is_null($activityuser)) {
+	?> for
+	<a href="user.php?id=<?php echo $activityuser->getID()?>"><?php echo UserTools::escape($activityuser->getName())?></a>
+	<a href="activity.php" class="btn btn-mini">×</a>
+<?php
 }
+
+$perpage = 20;
+$pagenumber = 0;
+
+if (array_key_exists('page', $_GET)) {
+	$pagenumber = $_GET['page'];
+}
+
 ?>
 </form>
 </div>
 
-<table cellpadding="5" cellspacing="0" border="1" width="100%">
+<div id='chart_div' style='width: 100%; height: 240px; margin-bottom: 1em'></div>
+
+<ul class="pager">
+	<li class="previous <?php if ($pagenumber <= 0 ) {?> disabled<?php } ?>">
+		<?php if ($pagenumber > 0) {?>
+			<a href="?<?php echo array_key_exists('userid', $_REQUEST) ? 'userid='.urlencode($_REQUEST['userid']).'&' : ''; echo array_key_exists('activityid', $_REQUEST) ? 'activityid='.urlencode($_REQUEST['activityid']).'&' : '' ?>page=<?php echo $pagenumber-1?>">&larr; prev</a>
+		<?php } else {?>
+			<a>&larr; prev</a>
+		<?php } ?>
+	</li>
+
+	<li>Page <?php echo $pagenumber+1?></li>
+
+	<li class="next <?php if (count($activities) < $perpage ) {?> disabled<?php } ?>">
+		<?php if (count($activities) >= $perpage ) {?>
+		<a href="?<?php echo array_key_exists('userid', $_REQUEST) ? 'userid='.urlencode($_REQUEST['userid']).'&' : ''; echo array_key_exists('activityid', $_REQUEST) ? 'activityid='.urlencode($_REQUEST['activityid']).'&' : '' ?>page=<?php echo $pagenumber+1?>">next &gt;&gt;&gt;</a>
+		<?php } else {?>
+			<a>next &rarr;</a>
+		<?php } ?>
+	</li>
+</ul>
+
+<table class="table table-striped table-bordered" width="100%">
+<thead>
 <tr><th>Time</th>
 <?php
 if (is_null($selectedactivity)) {
@@ -191,12 +220,6 @@ if (is_null($activityuser)) {
 }?>
 </tr>
 <?php
-$perpage = 20;
-$pagenumber = 0;
-
-if (array_key_exists('page', $_GET)) {
-	$pagenumber = $_GET['page'];
-}
 
 // TODO get activities only for specific activity
 
@@ -210,26 +233,9 @@ else
 	$activities = $activityuser->getActivity($showactivities == 'all', $pagenumber, $perpage);
 }
 ?>
-<tr><td colspan="4">
-<?php
-if (count($activities) == $perpage) {
-	?><a style="float: right" href="?<?php echo array_key_exists('userid', $_REQUEST) ? 'userid='.urlencode($_REQUEST['userid']).'&' : ''; echo array_key_exists('activityid', $_REQUEST) ? 'activityid='.urlencode($_REQUEST['activityid']).'&' : '' ?>page=<?php echo $pagenumber+1?>">next &gt;&gt;&gt;</a><?php
-}
-else
-{
-	?><span style="color: silver; float: right">next &gt;&gt;&gt;</span><?php
-}
+</thead>
 
-if ($pagenumber > 0) {
-	?><a style="float: left" href="?<?php echo array_key_exists('userid', $_REQUEST) ? 'userid='.urlencode($_REQUEST['userid']).'&' : ''; echo array_key_exists('activityid', $_REQUEST) ? 'activityid='.urlencode($_REQUEST['activityid']).'&' : '' ?>page=<?php echo $pagenumber-1?>">&lt;&lt;&lt;prev</a><?php
-}
-else
-{
-	?><span style="color: silver; float: left">&lt;&lt;&lt;prev</span><?php
-}
-?>
-<span style="float: left; margin: 0 2em">Page <?php echo $pagenumber+1?></span>
-</td></tr>
+<tbody>
 <?php
 $now = time();
 
@@ -243,7 +249,7 @@ foreach ($activities as $activity)
 	$user = User::getUser($activity['user_id']);
 
 	?><tr valign="top">
-	<td align="right"><?php echo date('M j, h:iA', $time)?> (<?php if ($ago <= 5) {?><span style="color: #00<?php echo sprintf('%02s', dechex((4 - $ago) * 150 / 4 + 50))?>00; font-weight: bold"><?php }?><?php echo $ago?> day<?php echo $ago > 1 ? 's' : '' ?> ago<?php if ($ago <= 5) {?></span><?php }?>)</td>
+	<td align="right"><?php echo date('M j, h:iA', $time)?> <span class="pull-right" style="width: 8em"><span class="badge<?php if ($ago <= 5) {?> badge-success<?php }?>"><?php echo $ago?></span> day<?php echo $ago != 1 ? 's' : '' ?> ago</span></td>
 	<?php
 	if (is_null($selectedactivity)) {
 	?>
@@ -255,7 +261,9 @@ foreach ($activities as $activity)
 	if (is_null($activityuser)) {
 	?>
 		<td>
-		<a href="user.php?id=<?php echo $user->getID()?>"><?php echo UserTools::escape($user->getName());?></a> (<a href="activity.php?userid=<?php echo $user->getID()?>">user activity</a>)
+
+			<a href="activity.php?userid=<?php echo $user->getID()?>"><?php echo UserTools::escape($user->getName());?></a>
+			<a class="btn btn-mini pull-right" href="user.php?id=<?php echo $user->getID()?>"><i class="icon-user"></i> user profile</a>
 		</td>
 	<?php
 	}?>
@@ -263,28 +271,28 @@ foreach ($activities as $activity)
 }
 
 ?>
-<tr><td colspan="6">
-<?php
-if (count($activities) == $perpage) {
-	?><a style="float: right" href="?<?php echo array_key_exists('userid', $_REQUEST) ? 'userid='.urlencode($_REQUEST['userid']).'&' : ''; echo array_key_exists('activityid', $_REQUEST) ? 'activityid='.urlencode($_REQUEST['activityid']).'&' : '' ?>page=<?php echo $pagenumber+1?>">next &gt;&gt;&gt;</a><?php
-}
-else
-{
-	?><span style="color: silver; float: right">next &gt;&gt;&gt;</span><?php
-}
-
-if ($pagenumber > 0) {
-	?><a style="float: left" href="?<?php echo array_key_exists('userid', $_REQUEST) ? 'userid='.urlencode($_REQUEST['userid']).'&' : ''; echo array_key_exists('activityid', $_REQUEST) ? 'activityid='.urlencode($_REQUEST['activityid']).'&' : '' ?>page=<?php echo $pagenumber-1?>">&lt;&lt;&lt;prev</a><?php
-}
-else
-{
-	?><span style="color: silver; float: left">&lt;&lt;&lt;prev</span><?php
-}
-?>
-<span style="float: left; margin-left: 2em">Page <?php echo $pagenumber+1?></span>
-
-</td></tr>
+</tbody>
 </table>
+
+<ul class="pager">
+	<li class="previous <?php if ($pagenumber <= 0 ) {?> disabled<?php } ?>">
+		<?php if ($pagenumber > 0) {?>
+			<a href="?<?php echo array_key_exists('userid', $_REQUEST) ? 'userid='.urlencode($_REQUEST['userid']).'&' : ''; echo array_key_exists('activityid', $_REQUEST) ? 'activityid='.urlencode($_REQUEST['activityid']).'&' : '' ?>page=<?php echo $pagenumber-1?>">&larr; prev</a>
+		<?php } else {?>
+			<a>&larr; prev</a>
+		<?php } ?>
+	</li>
+
+	<li>Page <?php echo $pagenumber+1?></li>
+
+	<li class="next <?php if (count($activities) < $perpage ) {?> disabled<?php } ?>">
+		<?php if (count($activities) >= $perpage ) {?>
+		<a href="?<?php echo array_key_exists('userid', $_REQUEST) ? 'userid='.urlencode($_REQUEST['userid']).'&' : ''; echo array_key_exists('activityid', $_REQUEST) ? 'activityid='.urlencode($_REQUEST['activityid']).'&' : '' ?>page=<?php echo $pagenumber+1?>">next &gt;&gt;&gt;</a>
+		<?php } else {?>
+			<a>next &rarr;</a>
+		<?php } ?>
+	</li>
+</ul>
 
 </div>
 <?php
