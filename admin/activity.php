@@ -188,7 +188,7 @@ if (array_key_exists('page', $_GET)) {
 		<?php if ($pagenumber > 0) {?>
 			<a href="?<?php echo array_key_exists('userid', $_REQUEST) ? 'userid='.urlencode($_REQUEST['userid']).'&' : ''; echo array_key_exists('activityid', $_REQUEST) ? 'activityid='.urlencode($_REQUEST['activityid']).'&' : '' ?>page=<?php echo $pagenumber-1?>">&larr; prev</a>
 		<?php } else {?>
-			<a>&larr; prev</a>
+			<a href="#">&larr; prev</a>
 		<?php } ?>
 	</li>
 
@@ -198,7 +198,7 @@ if (array_key_exists('page', $_GET)) {
 		<?php if (count($activities) >= $perpage ) {?>
 		<a href="?<?php echo array_key_exists('userid', $_REQUEST) ? 'userid='.urlencode($_REQUEST['userid']).'&' : ''; echo array_key_exists('activityid', $_REQUEST) ? 'activityid='.urlencode($_REQUEST['activityid']).'&' : '' ?>page=<?php echo $pagenumber+1?>">next &gt;&gt;&gt;</a>
 		<?php } else {?>
-			<a>next &rarr;</a>
+			<a href="#">next &rarr;</a>
 		<?php } ?>
 	</li>
 </ul>
@@ -279,7 +279,7 @@ foreach ($activities as $activity)
 		<?php if ($pagenumber > 0) {?>
 			<a href="?<?php echo array_key_exists('userid', $_REQUEST) ? 'userid='.urlencode($_REQUEST['userid']).'&' : ''; echo array_key_exists('activityid', $_REQUEST) ? 'activityid='.urlencode($_REQUEST['activityid']).'&' : '' ?>page=<?php echo $pagenumber-1?>">&larr; prev</a>
 		<?php } else {?>
-			<a>&larr; prev</a>
+			<a href="#">&larr; prev</a>
 		<?php } ?>
 	</li>
 
@@ -289,7 +289,7 @@ foreach ($activities as $activity)
 		<?php if (count($activities) >= $perpage ) {?>
 		<a href="?<?php echo array_key_exists('userid', $_REQUEST) ? 'userid='.urlencode($_REQUEST['userid']).'&' : ''; echo array_key_exists('activityid', $_REQUEST) ? 'activityid='.urlencode($_REQUEST['activityid']).'&' : '' ?>page=<?php echo $pagenumber+1?>">next &gt;&gt;&gt;</a>
 		<?php } else {?>
-			<a>next &rarr;</a>
+			<a href="#">next &rarr;</a>
 		<?php } ?>
 	</li>
 </ul>
