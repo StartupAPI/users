@@ -25,7 +25,7 @@ require_once(dirname(__FILE__) . '/header.php');
 		<form class="form-horizontal" action="" name="activities" style="margin: 1em 0">
 			<div class="control-group">
 				<label class="control-label">
-					Pick activity:
+					Select activity
 				</label>
 				<div class="controls">
 					<select name="activityid" onchange="document.activities.submit();">
@@ -74,7 +74,7 @@ require_once(dirname(__FILE__) . '/header.php');
 			</div>
 			<div class="control-group">
 				<label class="control-label">
-					Drop users into cohorts:
+					Drop users into cohorts
 				</label>
 				<div class="controls">
 					<select name="cohorts" onchange="document.activities.submit();">
@@ -125,7 +125,7 @@ require_once(dirname(__FILE__) . '/header.php');
 			</div>
 			<div class="control-group">
 				<label class="control-label">
-					Aggregate:
+					Aggregate
 				</label>
 				<div class="controls">
 					<input type="radio" name="periodlength" value="monthly"<?php if ($actperiodlength == 30) { ?> checked="yes"<?php } ?> onchange="document.activities.submit();"/> Monthly
