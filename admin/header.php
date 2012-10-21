@@ -28,13 +28,15 @@ if (array_key_exists('impersonate', $_POST)) {
 
 $ADMIN_ROOT = UserConfig::$USERSROOTURL . '/admin';
 
+$features_num = count(Feature::getAll());
+
 $admin_menu = new adminMenu(array(
 			new menu('home', 'Home', $ADMIN_ROOT . '/', 'home'),
-	/*
-			new menuSection('dashboards', 'Dashboards', array(
-				new menu('basic', 'Basic Metrics', $ADMIN_ROOT . '/', 'signal')
-			)),
-	*/		new menuSection('users', 'Users', null, array(
+			/*
+			  new menuSection('dashboards', 'Dashboards', array(
+			  new menu('basic', 'Basic Metrics', $ADMIN_ROOT . '/', 'signal')
+			  )),
+			 */ new menuSection('users', 'Users', null, array(
 				new menu('activity', 'Activity', $ADMIN_ROOT . '/activity.php', 'signal'),
 				new menu('registrations', 'Registered Users', $ADMIN_ROOT . '/registrations.php', 'user'),
 				new menu('cohorts', 'Cohort Analysis', $ADMIN_ROOT . '/cohorts.php', 'th'),
@@ -42,7 +44,7 @@ $admin_menu = new adminMenu(array(
 				new menu('invitations', 'Invitations', $ADMIN_ROOT . '/invitations.php', 'envelope', UserConfig::$enableInvitations, 'Invitations are disabled in configuration')
 			)),
 			new menuSection('settings', 'Settings', null, array(
-				new menu('features', 'Features', $ADMIN_ROOT . '/features.php', 'check'),
+				new menu('features', 'Features', $ADMIN_ROOT . '/features.php', 'check', $features_num > 0, 'No features defined in this app'),
 				new menu('templates', 'Templates', $ADMIN_ROOT . '/templates.php', 'list-alt', false),
 			)),
 			new menuSection('promotion', 'Promotion', null, array(
@@ -86,7 +88,9 @@ if (isset($ADMIN_SECTION)) {
 	<body>
 		<div class="navbar">
 			<div class="navbar-inner navbar-fixed-top">
-				<span class="brand"><a href="<?php echo UserConfig::$USERSROOTURL ?>"><img class="logo" src="<?php echo UserConfig::$USERSROOTURL ?>/images/header_icon.png"/><?php echo is_null(UserConfig::$appName) ? 'Startup API' : UserConfig::$appName; ?></a></span>
+				<span class="brand"><a href="<?php echo UserConfig::$SITEROOTURL ?>"><img class="logo" src="<?php echo UserConfig::$USERSROOTURL ?>/images/header_icon.png"/><?php echo is_null(UserConfig::$appName) ? '' : UserConfig::$appName; ?></a></span>
+
+				<span></span>
 
 				<?php $admin_menu->renderTopNav() ?>
 

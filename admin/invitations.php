@@ -53,6 +53,9 @@ $_scripts = array (
 	'http://yui.yahooapis.com/2.7.0/build/container/container-min.js'
 );
 
+
+$ADMIN_SECTION = 'invitations';
+
 require_once(dirname(__FILE__) . '/header.php');
 ?>
 <script>

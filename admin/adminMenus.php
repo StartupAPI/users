@@ -207,7 +207,19 @@ class menuSection extends menuElement {
 	}
 
 	protected function renderTopNav() {
+		$enabled = false;
+		foreach ($this->sub_menus as $menu) {
+			if ($menu->enabled) {
+				$enabled = true;
+			}
+		}
+		$this->enabled = $enabled;
+
 		if (!$this->enabled) {
+			return;
+		}
+
+		if ($this->enabled) {
 			if (is_null($this->sub_menus)) {
 				$link = $this->link;
 			} else if (count($this->sub_menus) > 0) {
@@ -225,7 +237,7 @@ class menuSection extends menuElement {
 		} else {
 			?>
 			<li class="disabled">
-				<a href="#">
+				<a href="#" class="disabled">
 					<?php echo $this->title; ?>
 				</a>
 			</li>
@@ -263,6 +275,7 @@ class menuSection extends menuElement {
  * @subpackage Admin
  */
 class menu extends menuElement {
+
 	/**
 	 * Creates a leaf menu item
 	 *
@@ -297,6 +310,19 @@ class menu extends menuElement {
 			</li>
 			<?php
 		}
+	}
+
+	protected function renderTopNav() {
+		if (!$this->enabled) {
+			return;
+		}
+		?>
+		<li<?php if ($this->active) { ?> class="active"<?php } ?>>
+			<a href="<?php echo $this->link ?>">
+				<?php echo $this->title ?>
+			</a>
+		</li>
+		<?php
 	}
 
 	protected function renderBreadCrumbs($extra = null) {
