@@ -639,7 +639,7 @@ class UserConfig
 	 */
 	public static function renderUserInvitationAction($code)
 	{
-		?><a href="mailto:?Subject=Invitation&Body=<?php echo UserConfig::$SITEROOTFULLURL?>users/register.php?invite=<?php echo urlencode($code)?>">Invite</a><?php
+		?><a class="btn btn-info" href="mailto:?Subject=Invitation&Body=<?php echo UserConfig::$SITEROOTFULLURL?>users/register.php?invite=<?php echo urlencode($code)?>"><i class="icon-envelope icon-white"></i> Invite</a><?php
 	}
 
 	/**
@@ -649,7 +649,7 @@ class UserConfig
 	 */
 	public static function renderUserInvitationFollowUpAction($code)
 	{
-		?><a href="mailto:?Subject=Re:%20Invitation&Body=<?php echo UserConfig::$SITEROOTFULLURL?>users/register.php?invite=<?php echo urlencode($code)?>">Follow Up</a><?php
+		?><a class="btn btn-warning"href="mailto:?Subject=Re:%20Invitation&Body=<?php echo UserConfig::$SITEROOTFULLURL?>users/register.php?invite=<?php echo urlencode($code)?>"><i class="icon-envelope icon-white"></i> Follow Up</a><?php
 	}
 
 	/**
