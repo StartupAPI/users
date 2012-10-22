@@ -149,6 +149,7 @@ require_once(dirname(__FILE__) . '/header.php');
 
 	$features = Feature::getAll();
 	if (count($features) > 0) {
+		$has_features_to_save = false;
 		?><h3>Features</h3>
 		<form class="form" action="" method="POST">
 			<?php foreach ($features as $id => $feature) {
@@ -157,15 +158,25 @@ require_once(dirname(__FILE__) . '/header.php');
 						<input id="feature_<?php echo UserTools::escape($feature->getID()) ?>"
 							   type="checkbox"
 							   name="feature[<?php echo UserTools::escape($feature->getID()) ?>]"
-							   <?php echo $feature->isEnabledForUser($user) ? ' checked="true"' : '' ?>
-							   <?php echo!$feature->isEnabled() || $feature->isRolledOutToAllUsers() ? ' disabled="disabled"' : '' ?>
+							   <?php if ($feature->isEnabledForUser($user)) { ?> checked="true"<?php } ?>
+							   <?php if (!$feature->isEnabled() || $feature->isRolledOutToAllUsers()) { ?> disabled="disabled"<?php
+				   } else {
+					   $has_features_to_save = true;
+				   }
+							   ?>
 							   >
 							   <?php echo UserTools::escape($feature->getName()) ?>
 					</label>
-				</div><?php }
-						   ?>
-			<input class="btn btn-primary" type="submit" name="savefeatures" value="update features">
-			<?php UserTools::renderCSRFNonce(); ?>
+				</div>
+			<?php } ?>
+			<input class="btn btn-primary"
+				   type="submit"
+				   name="savefeatures"
+				   value="update features"
+				   <?php if (!$has_features_to_save) { ?> disabled="disabled"<?php } ?>
+				   >
+				   <?php UserTools::renderCSRFNonce();
+				   ?>
 		</form>
 		<?php
 	}

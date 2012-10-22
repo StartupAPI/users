@@ -1267,7 +1267,7 @@ class User
 	 * @param int $perpage Number of rows per page
 	 * @param string $sort String indicating the way to sort the list (either 'registration' or 'activity')
 	 *
-	 * @return array Array of user objects
+	 * @return User[] Array of user objects
 	 *
 	 * @throws DBException
 	 *
@@ -1325,7 +1325,7 @@ class User
 	 * @param int $pagenumber Page number
 	 * @param int $perpage Number of rows per page
 	 *
-	 * @return array Array of user objects
+	 * @return User[] Array of user objects
 	 *
 	 * @throws DBException
 	 *
