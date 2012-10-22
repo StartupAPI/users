@@ -136,6 +136,33 @@ class Invitation
 	}
 
 	/**
+	 * Cancels invitation code
+	 *
+	 * @param string $code Invitation code to cancel
+	 */
+	public static function cancel($code) {
+		$db = UserConfig::getDB();
+
+		if ($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.'invitation WHERE code = ?'))
+		{
+			if (!$stmt->bind_param('s', $code))
+			{
+				throw new DBBindParamException($db, $stmt);
+			}
+			if (!$stmt->execute())
+			{
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new DBPrepareStmtException($db);
+		}
+	}
+
+	/**
 	 * Returns invitations that were accepted
 	 *
 	 * @return array Array of Invitation objects
@@ -306,13 +333,22 @@ class Invitation
 	}
 
 	/**
-	 * Returns user ID of user who issued invitation
+	 * Returns User object for who issued invitation
 	 *
-	 * @return int User ID of user who issued invitation
+	 * @return User User who issued invitation
 	 */
 	public function getIssuer()
 	{
-		return $this->issuedby;
+		return User::getUser($this->issuedby);
+	}
+
+	/**
+	 * Sets invitation issuer
+	 *
+	 * @param User $user Issuer's User object
+	 */
+	public function setIssuer($user) {
+		$this->issuedby = $user->getID();
 	}
 
 	/**
@@ -346,9 +382,9 @@ class Invitation
 
 		$comment = mb_convert_encoding($this->usagecomment, 'UTF-8');
 
-		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'invitation SET sentto = ?, user = ? WHERE code = ?'))
+		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'invitation SET sentto = ?, issuedby = ?, user = ? WHERE code = ?'))
 		{
-			if (!$stmt->bind_param('sis', $comment, $this->user, $this->code))
+			if (!$stmt->bind_param('siis', $comment, $this->issuedby, $this->user, $this->code))
 			{
 				throw new DBBindParamException($db, $stmt);
 			}

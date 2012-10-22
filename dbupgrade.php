@@ -22,6 +22,15 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 19
+ * Invitation issuer is optional
+*/
+$versions[19]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."invitation`
+CHANGE `issuedby` `issuedby` bigint(10) unsigned DEFAULT NULL COMMENT 'User who issued the invitation'";
+$versions[19]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."invitation`
+CHANGE `issuedby` `issuedby` bigint(10) unsigned NOT NULL DEFAULT '1' COMMENT 'User who issued the invitation'";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 18
  * Gamification badges
 */
