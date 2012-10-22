@@ -2795,8 +2795,8 @@ class User
 
 		$user->impersonator = $this;
 
-		error_log('[Impersonation log] ' . $this->getName() . ' (ID: ' . $this->getID() .
-				') started impersonating ' . $user->getName() . ' (ID: ' . $user->getID() . ')');
+		error_log('[Impersonation log] ' . $this->getName() . ' (User ID: ' . $this->getID() .
+				') started impersonating ' . $user->getName() . ' (User ID: ' . $user->getID() . ')');
 
 		return $user;
 	}
@@ -2817,8 +2817,8 @@ class User
 		$storage->delete(UserConfig::$impersonation_userid_key);
 
 		if (!is_null($user)) {
-			error_log('[Impersonation log] ' . $user->impersonator->getName() . ' (ID: ' . $user->impersonator->getID() .
-					') stopped impersonating ' . $user->getName() . ' (ID: ' . $user->getID() . ')');
+			error_log('[Impersonation log] ' . $user->impersonator->getName() . ' (User ID: ' . $user->impersonator->getID() .
+					') stopped impersonating ' . $user->getName() . ' (User ID: ' . $user->getID() . ')');
 		}
 	}
 
@@ -2833,9 +2833,9 @@ class User
 		if ($this->isImpersonated())
 		{
 			// TODO Implement real impersonation logging instead of tracking activity for a user
-			error_log('[Impersonation log] Activity "' . UserConfig::$activities[$activity_id][1] .  '" by ' .
-					$this->impersonator->getName() . ' (ID: ' . $this->impersonator->getID() . ')
-						on behalf of ' . $this->getName() . ' (ID: ' . $this->getID() . ')');
+			error_log('[Impersonation log] Activity "' . UserConfig::$activities[$activity_id][0] .  '" (User ID: ' . $activity_id . ') by ' .
+					$this->impersonator->getName() . ' (Activity ID: ' . $this->impersonator->getID() .
+						') on behalf of ' . $this->getName() . ' (User ID: ' . $this->getID() . ')');
 			return;
 		}
 
