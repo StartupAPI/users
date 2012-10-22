@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'/User.php');
+require_once(dirname(__FILE__) . '/User.php');
 
 /**
  * StartupAPI class contains some global static functions and entry points for API
@@ -7,6 +7,32 @@ require_once(dirname(__FILE__).'/User.php');
  * @package StartupAPI
  */
 class StartupAPI {
+
+	/**
+	 * @var int Startup API major version number - to be changed only manually in this code
+	 */
+	private static $major_version = 0;
+
+	/**
+	 * @var int Startup API minor version - to be incremented automatically when asked for
+	 */
+	private static $minor_version = 4;
+
+	/**
+	 * @var int	Startup API patch level (version number) - to be incremented automatically when build script is ran
+	 */
+	private static $patch_level = 0;
+
+	/**
+	 * @var string Startup API pre-release version string
+	 */
+	private static $pre_release_version;
+
+	/**
+	 * @var string Startup API build version string
+	 */
+	private static $build_version;
+
 	/**
 	 * Just a proxy to static User::get() method in User class
 	 *
@@ -28,16 +54,15 @@ class StartupAPI {
 	/**
 	 * This finction should be called within the head of HTML to insert
 	 * styles, scripts and potentially meta-tags into the head of the pages on the site
-	*/
+	 */
 	static function head() {
 		?><link rel="stylesheet" type="text/css" href="<?php echo UserConfig::$USERSROOTURL ?>/themes/<?php echo UserConfig::$theme ?>/startupapi.css"><?php
 	}
 
 	/**
 	 * This finction renders the power strip (navigation bar at the top right corner)
-	*/
-	static function power_strip()
-	{
+	 */
+	static function power_strip() {
 		$current_user = User::get();
 		$current_account = null;
 
@@ -48,86 +73,119 @@ class StartupAPI {
 			$current_account = Account::getCurrentAccount($current_user);
 		}
 		?>
-	<div id="startupapi-navbox">
-		<?php if (!is_null($current_user))
-		{
-			if ($current_user->isImpersonated()) {
-				?><b id="startupapi-navbox-impersonating"><a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/stopimpersonation.php" title="Impersonated by <?php echo UserTools::escape($current_user->getImpersonator()->getName())?>">Stop Impersonation</a></b> | <?php
+		<div id="startupapi-navbox">
+			<?php
+			if (!is_null($current_user)) {
+				if ($current_user->isImpersonated()) {
+					?><b id="startupapi-navbox-impersonating"><a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/stopimpersonation.php" title="Impersonated by <?php echo UserTools::escape($current_user->getImpersonator()->getName()) ?>">Stop Impersonation</a></b> | <?php
 			}
 
 			if ($current_user->isAdmin()) {
-				?><b id="startupapi-navbox-admin"><a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/">Admin</a></b> | <?php
+					?><b id="startupapi-navbox-admin"><a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/">Admin</a></b> | <?php
 			}
 
-			if (count($accounts) > 1)
-			{
+			if (count($accounts) > 1) {
 				$destination = "'+encodeURIComponent(document.location)+'";
 				if (!is_null(UserConfig::$accountSwitchDestination)) {
 					$destination = UserConfig::$accountSwitchDestination;
 				}
-
-				?><select id="startupapi-navbox-account-picker" name="account" onchange="document.location.href='<?php echo UserConfig::$USERSROOTURL ?>/change_account.php?return=<?php echo $destination ?>&account='+this.value"><?php
-
-				foreach ($accounts as $account)
-				{
-					?><option value="<?php echo $account->getID()?>"<?php if ($current_account->isTheSameAs($account)) { echo ' selected'; } ?>><?php echo UserTools::escape($account->getName())?></option><?php
+					?><select id="startupapi-navbox-account-picker" name="account" onchange="document.location.href='<?php echo UserConfig::$USERSROOTURL ?>/change_account.php?return=<?php echo $destination ?>&account='+this.value"><?php
+				foreach ($accounts as $account) {
+						?><option value="<?php echo $account->getID() ?>"<?php
+					if ($current_account->isTheSameAs($account)) {
+						echo ' selected';
+					}
+						?>><?php echo UserTools::escape($account->getName()) ?></option><?php
 				}
-			?></select>
-			<?php
-			}
+					?></select>
+					<?php
+				}
 
-			if (!is_null(UserConfig::$onLoginStripLinks)) {
-				$links = call_user_func_array(
-					UserConfig::$onLoginStripLinks,
-					array($current_user, $current_account)
-				);
+				if (!is_null(UserConfig::$onLoginStripLinks)) {
+					$links = call_user_func_array(
+							UserConfig::$onLoginStripLinks, array($current_user, $current_account)
+					);
 
-				foreach ($links as $link) {
-					?><span<?php
-						if (array_key_exists('id', $link)) {
+					foreach ($links as $link) {
+						?><span<?php
+					if (array_key_exists('id', $link)) {
 							?> id="<?php echo $link['id'] ?>"<?php
-						}
-					?>><a href="<?php echo $link['url'] ?>"<?php
-						if (array_key_exists('title', $link)) {
+					}
+						?>><a href="<?php echo $link['url'] ?>"<?php
+					if (array_key_exists('title', $link)) {
 							?> title="<?php echo $link['title'] ?>"<?php
-						}
-						if (array_key_exists('target', $link)) {
+					}
+					if (array_key_exists('target', $link)) {
 							?> target="<?php echo $link['target'] ?>"<?php
-						}
-					?>><?php echo $link['text'] ?></a></span> | <?php
+					}
+						?>><?php echo $link['text'] ?></a></span> | <?php
 				}
+			}
+				?>
+
+				<span id="startupapi-navbox-username"><a href="<?php echo UserConfig::$USERSROOTURL ?>/edit.php" title="<?php echo UserTools::escape($current_user->getName()) ?>'s user information"><?php echo UserTools::escape($current_user->getName()) ?></a></span> |
+				<span id="startupapi-navbox-logout"><a href="<?php echo UserConfig::$USERSROOTURL ?>/logout.php">logout</a></span>
+				<?php
+			} else {
+				?>
+				<span id="startupapi-navbox-signup"><a href="<?php echo UserConfig::$USERSROOTURL ?>/register.php">Sign Up Now!</a></span> |
+				<span id="startupapi-navbox-login"><a href="<?php echo UserConfig::$USERSROOTURL ?>/login.php">log in</a></span>
+				<?php
 			}
 			?>
-
-			<span id="startupapi-navbox-username"><a href="<?php echo UserConfig::$USERSROOTURL ?>/edit.php" title="<?php echo UserTools::escape($current_user->getName())?>'s user information"><?php echo UserTools::escape($current_user->getName()) ?></a></span> |
-			<span id="startupapi-navbox-logout"><a href="<?php echo UserConfig::$USERSROOTURL ?>/logout.php">logout</a></span>
-			<?php
-		}
-		else
-		{
-		?>
-			<span id="startupapi-navbox-signup"><a href="<?php echo UserConfig::$USERSROOTURL ?>/register.php">Sign Up Now!</a></span> |
-			<span id="startupapi-navbox-login"><a href="<?php echo UserConfig::$USERSROOTURL ?>/login.php">log in</a></span>
+		</div>
 		<?php
+	}
+
+	/**
+	 * Incrememts minor version of software
+	 */
+	public static function incrementMinorVersion() {
+		self::$minor_version++;
+	}
+
+	/**
+	 * Incrememts patch level of software
+	 */
+	public static function incrementPatchLevel() {
+		self::$patch_level++;
+	}
+
+	/**
+	 * Returns a string representing Statup API version
+	 *
+	 * @return string Startup API version
+	 */
+	public static function getVersion() {
+		$version = self::$major_version . '.' . self::$minor_version . '.' . self::$patch_level;
+
+		if (!is_null(self::$pre_release_version)) {
+			$version .= '-' . self::$pre_release_version;
 		}
-		?>
-	</div>
-	<?php
+
+		if (!is_null(self::$build_version)) {
+			$version .= '+build.' . self::$build_version;
+		}
+
+		return $version;
 	}
 
 	/**
 	 * This function should be called after all configuration is loaded to initialize the system.
-	*/
+	 */
 	static function _init() {
 		//currently empty
 	}
+
 }
+
 /**
  * Exception superclass used for all exceptions in StartupAPI
  *
  * @package StartupAPI
  */
 class StartupAPIException extends Exception {
+
 	/**
 	 * General Startup API Exception
 	 *
@@ -138,6 +196,7 @@ class StartupAPIException extends Exception {
 	function __construct($message, $code, $previous) {
 		parent::__construct('[StartupAPI] ' . $message, $code, $previous);
 	}
+
 }
 
 /**
@@ -146,6 +205,7 @@ class StartupAPIException extends Exception {
  * @package StartupAPI
  */
 class DBException extends StartupAPIException {
+
 	/**
 	 * Creates a database-related exception
 	 *
@@ -166,17 +226,17 @@ class DBException extends StartupAPIException {
 			$exception_message = "[DB] DB Error: " . $db->error;
 		} else if (!$stmt) {
 			$exception_message = '[DB]' .
-				' $db->error: ' . $db->error .
-				' with message: ' . $message;
+					' $db->error: ' . $db->error .
+					' with message: ' . $message;
 		} else {
 			$exception_message = '[DB]' .
-				' $stmt->error: ' . $stmt->error .
-				' with message: ' . $message;
-
+					' $stmt->error: ' . $stmt->error .
+					' with message: ' . $message;
 		}
 
 		parent::__construct($exception_message, $code, $previous);
 	}
+
 }
 
 /**
@@ -184,25 +244,34 @@ class DBException extends StartupAPIException {
  *
  * @package StartupAPI
  */
-class DBBindParamException extends DBException {}
+class DBBindParamException extends DBException {
+
+}
 
 /**
  * Result binding Exception
  *
  * @package StartupAPI
  */
-class DBBindResultException extends DBException {}
+class DBBindResultException extends DBException {
+
+}
 
 /**
  * Statement Execution Exception
  *
  * @package StartupAPI
  */
-class DBExecuteStmtException extends DBException {}
+class DBExecuteStmtException extends DBException {
+
+}
 
 /**
  * Statement preparation Exception
  *
  * @package StartupAPI
  */
-class DBPrepareStmtException extends DBException {}
+class DBPrepareStmtException extends DBException {
+
+}
+
