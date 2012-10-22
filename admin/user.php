@@ -169,7 +169,7 @@ require_once(dirname(__FILE__) . '/header.php');
 					</label>
 				</div>
 			<?php } ?>
-			<input class="btn btn-primary"
+			<input class="btn<?php if ($has_features_to_save) { ?> btn-primary<?php } ?>"
 				   type="submit"
 				   name="savefeatures"
 				   value="update features"
