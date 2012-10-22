@@ -204,7 +204,7 @@ class Feature {
 		}
 
 		// if feature is forced, return true
-		if (!$this->rolled_out_to_all_users) {
+		if ($this->rolled_out_to_all_users) {
 			return true;
 		}
 

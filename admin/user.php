@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'/admin.php');
+require_once(dirname(__FILE__) . '/admin.php');
 
 if (!array_key_exists('id', $_GET) || !$_GET['id']) {
 	header("HTTP/1.0 400 User ID is not specified");
@@ -7,7 +7,9 @@ if (!array_key_exists('id', $_GET) || !$_GET['id']) {
 	exit;
 }
 
-$user = User::getUser($_GET['id']);
+$user_id = intval(trim($_GET['id']));
+
+$user = User::getUser($user_id);
 if (is_null($user)) {
 	header("HTTP/1.0 404 User Not Found");
 	?><h1>404 User Not Found</h3><?php
@@ -32,131 +34,143 @@ if (array_key_exists("savefeatures", $_POST)) {
 if (array_key_exists("activate", $_POST)) {
 	$user->setStatus(true);
 	$user->save();
+
+	header('Location: ' . UserConfig::$USERSROOTURL . '/admin/user.php?id=' . $_GET['id']);
+	exit;
 }
 
 if (array_key_exists("deactivate", $_POST)) {
 	$user->setStatus(false);
 	$user->save();
+
+	header('Location: ' . UserConfig::$USERSROOTURL . '/admin/user.php?id=' . $_GET['id']);
+	exit;
 }
 
 $ADMIN_SECTION = 'registrations';
 $BREADCRUMB_EXTRA = $user->getName();
-require_once(dirname(__FILE__).'/header.php');
+require_once(dirname(__FILE__) . '/header.php');
 ?>
 <div class="span9">
 
-<h2>User information: <?php echo UserTools::escape($user->getName()); ?></h2>
+	<form action="" method="POST">
+		<h2><?php echo UserTools::escape($user->getName()); ?>
+			<div class="pull-right">
+				<?php
+				if ($user->isDisabled()) {
+					?>
+					<b style="color: red">Deactivated</b>
+					<input class="btn btn-success" type="submit" name="activate" value="Activate" style="font: small" onclick="return confirm('Are you sure you want to activate this user?')"/>
+					<?php
+				} else {
+					if (!$user->isTheSameAs($current_user)) {
+						?>
+						<form name="imp" action="" method="POST"><input class="btn btn-inverse" type="submit" value="impersonate" style="font: small"/><input type="hidden" name="impersonate" value="<?php echo $user->getID() ?>"/>
+							<?php UserTools::renderCSRFNonce(); ?>
+						</form>
+						<?php
+					}
+					?>
+					<input type="submit" class="btn btn-danger" name="deactivate" value="Deactivate" style="font: small" onclick="return confirm('Are you sure you want to disable access for this user?')"/>
+					<?php
+				}
+				UserTools::renderCSRFNonce();
+				?>
+			</div>
+		</h2>
+	</form>
 
-<p><b>Email:</b>
-<?php
-$email = $user->getEmail();
-if ($email) {
-	?><a href="mailto:<?php echo urlencode(UserTools::escape($email)) ?>"><?php echo UserTools::escape($email) ?></a><?php
-} else {
-	?><i>not specified</i><?php
-}
-?></p>
+	<p>
+		<?php
+		$email = $user->getEmail();
 
-<p><b>Total points:</b> <?php echo $user->getPoints(); ?> (<a href="activity.php?userid=<?php echo $user->getID() ?>">see activity</a>)
-</p>
-
-<h2>Status</h2>
-<?php
-if ($user->isDisabled()) {
-?>
-<form action="" method="POST">
-<b style="background: red; padding: 0.5em; color: white">Deactivated</b>
-<input type="submit" name="activate" value="activate" style="font: small" onclick="return confirm('Are you sure you want to activate this user?')"/>
-<?php UserTools::renderCSRFNonce(); ?>
-</form>
-<?php
-} else {
-?>
-<form action="" method="POST">
-Active
-<input type="submit" name="deactivate" value="deactivate" style="font: small" onclick="return confirm('Are you sure you want to disable access for this user?')"/>
-<?php UserTools::renderCSRFNonce(); ?>
-</form>
-<?php
-}
-?>
-
-
-<h2>Source of registration</h2>
-<p>Referer: <?php
-
-$referer = $user->getReferer();
-
-if (is_null($referer)) {
-	?><i>unknown</i><?php
-} else {
-	?><a href="<?php echo UserTools::escape($referer)?>"><?php echo UserTools::escape($referer)?></a><?php
-}
-?>
-</p>
-
-<h2>Authentication Credentials</h2>
-<ul><?php
-foreach (UserConfig::$authentication_modules as $module)
-{
-	$creds = $module->getUserCredentials($user);
-
-	if (!is_null($creds)) {
-	?>
-	<li><b><?php echo $module->getID() ?>: </b><?php echo $creds->getHTML() ?></li>
-	<?php
-	}
-}
-?>
-</ul>
-<?php
-
-if (!$user->isTheSameAs($current_user)) {
-?>
-<form name="imp" action="" method="POST"><input type="submit" value="impersonate" style="font: small"/><input type="hidden" name="impersonate" value="<?php echo $user->getID()?>"/>
-<?php UserTools::renderCSRFNonce(); ?>
-</form>
-<?php
-}
-
-if (UserConfig::$useAccounts) { ?>
-	<h2>Accounts:</h2>
-	<ul>
-	<?php
-	$accounts = $user->getAccounts();
-
-	foreach ($accounts as $user_account) {
-		?><li>
-		<?php echo UserTools::escape($user_account->getName()) ?> (<?php echo UserTools::escape($user_account->getPlan()->getName()) ?>)<?php
-		if ($user_account->getUserRole() == Account::ROLE_ADMIN) {
-			?> (admin)<?php
+		if ($email) {
+			?>
+			<a href="mailto:<?php echo urlencode(UserTools::escape($email)) ?>">
+				<i class="icon-envelope"></i> <?php echo UserTools::escape($email) ?>
+			</a>
+			<?php
 		}
-		?></li><?php
+		?>
+	</p>
+
+	<p>
+		<b>Activity points:</b> <span class="badge"><?php echo $user->getPoints(); ?></span> <a class="btn btn-small" href="activity.php?userid=<?php echo $user->getID() ?>"><i class="icon-signal"></i> See activity</a>
+	</p>
+
+
+
+
+	<h3>Source of registration</h3>
+	<p>Referer: <?php
+		$referer = $user->getReferer();
+
+		if (is_null($referer)) {
+			?><i>unknown</i><?php
+	} else {
+			?><a href="<?php echo UserTools::escape($referer) ?>"><?php echo UserTools::escape($referer) ?></a><?php
 	}
-	?>
+		?>
+	</p>
+
+	<h3>Authentication Credentials</h3>
+	<ul><?php
+		foreach (UserConfig::$authentication_modules as $module) {
+			$creds = $module->getUserCredentials($user);
+
+			if (!is_null($creds)) {
+				?>
+				<li><b><?php echo $module->getID() ?>: </b><?php echo $creds->getHTML() ?></li>
+				<?php
+			}
+		}
+		?>
 	</ul>
 	<?php
-}
+	if (UserConfig::$useAccounts) {
+		?>
+		<h3>Accounts:</h3>
+		<ul>
+			<?php
+			$accounts = $user->getAccounts();
 
-$features = Feature::getAll();
+			foreach ($accounts as $user_account) {
+				?><li>
+					<?php echo UserTools::escape($user_account->getName()) ?> (<?php echo UserTools::escape($user_account->getPlan()->getName()) ?>)<?php
+			if ($user_account->getUserRole() == Account::ROLE_ADMIN) {
+						?> (admin)<?php
+		}
+					?></li><?php
+		}
+				?>
+		</ul>
+		<?php
+	}
 
-if (count($features) > 0) {
-	?><h2>Features</h2>
-	<form action="" method="POST">
-	<?php foreach ($features as $id => $feature) {
-		?><div<?php if (!$feature->isEnabled()) {?> style="color: grey; text-decoration: line-through"<?php } ?>>
-		<label>
-		<input id="feature_<?php echo UserTools::escape($feature->getID()) ?>" type="checkbox" name="feature[<?php echo UserTools::escape($feature->getID()) ?>]"<?php echo $feature->isEnabledForUser($user) ? ' checked="true"' : '' ?><?php echo !$feature->isEnabled() || $feature->isRolledOutToAllUsers() ? ' disabled="disabled"' : '' ?>>
-		<?php echo UserTools::escape($feature->getName()) ?></label>
-		</div><?php
-	} ?>
-	<input type="submit" name="savefeatures" value="update features">
-	<?php UserTools::renderCSRFNonce(); ?>
-	</form>
-<?php
-}
-?>
+	$features = Feature::getAll();
+	if (count($features) > 0) {
+		?><h3>Features</h3>
+		<form class="form" action="" method="POST">
+			<?php foreach ($features as $id => $feature) {
+				?><div<?php if (!$feature->isEnabled()) { ?> style="color: grey; text-decoration: line-through"<?php } ?>>
+					<label class="checkbox">
+						<input id="feature_<?php echo UserTools::escape($feature->getID()) ?>"
+							   type="checkbox"
+							   name="feature[<?php echo UserTools::escape($feature->getID()) ?>]"
+							   <?php echo $feature->isEnabledForUser($user) ? ' checked="true"' : '' ?>
+							   <?php echo!$feature->isEnabled() || $feature->isRolledOutToAllUsers() ? ' disabled="disabled"' : '' ?>
+							   >
+							   <?php echo UserTools::escape($feature->getName()) ?>
+					</label>
+				</div><?php }
+						   ?>
+			<input class="btn btn-primary" type="submit" name="savefeatures" value="update features">
+			<?php UserTools::renderCSRFNonce(); ?>
+		</form>
+		<?php
+	}
+	?>
 
 </div>
 <?php
-require_once(dirname(__FILE__).'/footer.php');
+require_once(dirname(__FILE__) . '/footer.php');
