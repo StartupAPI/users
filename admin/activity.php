@@ -165,7 +165,7 @@ foreach (UserConfig::$activities as $id => $activity) {
 
 <?php if (!is_null($activityuser)) {
 	?> for
-	<a href="user.php?id=<?php echo $activityuser->getID()?>"><?php echo UserTools::escape($activityuser->getName())?></a>
+	<a href="user.php?id=<?php echo $activityuser->getID()?>"><i class="icon-user"></i> <?php echo UserTools::escape($activityuser->getName())?></a>
 	<a href="activity.php" class="btn btn-mini">×</a>
 <?php
 }
@@ -262,8 +262,8 @@ foreach ($activities as $activity)
 	?>
 		<td>
 
-			<a href="activity.php?userid=<?php echo $user->getID()?>"><?php echo UserTools::escape($user->getName());?></a>
-			<a class="btn btn-mini pull-right" href="user.php?id=<?php echo $user->getID()?>"><i class="icon-user"></i> user profile</a>
+			<a href="user.php?id=<?php echo $user->getID()?>"><i class="icon-user"></i> <?php echo UserTools::escape($user->getName());?></a>
+			<a class="btn btn-mini pull-right" href="activity.php?userid=<?php echo $user->getID()?>"><i class="icon-signal"></i> user activity</a>
 		</td>
 	<?php
 	}?>
