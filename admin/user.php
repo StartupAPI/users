@@ -65,7 +65,7 @@ require_once(dirname(__FILE__) . '/header.php');
 				} else {
 					if (!$user->isTheSameAs($current_user)) {
 						?>
-						<form name="imp" action="" method="POST"><input class="btn btn-inverse" type="submit" value="impersonate" style="font: small"/><input type="hidden" name="impersonate" value="<?php echo $user->getID() ?>"/>
+						<form name="imp" action="" method="POST"><input class="btn btn-inverse" type="submit" value="Impersonate" style="font: small"/><input type="hidden" name="impersonate" value="<?php echo $user->getID() ?>"/>
 							<?php UserTools::renderCSRFNonce(); ?>
 						</form>
 						<?php

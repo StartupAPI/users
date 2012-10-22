@@ -2795,6 +2795,9 @@ class User
 
 		$user->impersonator = $this;
 
+		error_log('[Impersonation log] ' . $this->getName() . ' (ID: ' . $this->getID() .
+				') started impersonating ' . $user->getName() . ' (ID: ' . $user->getID() . ')');
+
 		return $user;
 	}
 
@@ -2803,6 +2806,8 @@ class User
 	 */
 	public static function stopImpersonation()
 	{
+		$user = self::get();
+
 		$storage = new MrClay_CookieStorage(array(
 			'secret' => UserConfig::$SESSION_SECRET,
 			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
@@ -2810,6 +2815,11 @@ class User
 		));
 
 		$storage->delete(UserConfig::$impersonation_userid_key);
+
+		if (!is_null($user)) {
+			error_log('[Impersonation log] ' . $user->impersonator->getName() . ' (ID: ' . $user->impersonator->getID() .
+					') stopped impersonating ' . $user->getName() . ' (ID: ' . $user->getID() . ')');
+		}
 	}
 
 	/**
@@ -2820,6 +2830,15 @@ class User
 	 */
 	public function recordActivity($activity_id)
 	{
+		if ($this->isImpersonated())
+		{
+			// TODO Implement real impersonation logging instead of tracking activity for a user
+			error_log('[Impersonation log] Activity "' . UserConfig::$activities[$activity_id][1] .  '" by ' .
+					$this->impersonator->getName() . ' (ID: ' . $this->impersonator->getID() . ')
+						on behalf of ' . $this->getName() . ' (ID: ' . $this->getID() . ')');
+			return;
+		}
+
 		$db = UserConfig::getDB();
 
 		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'activity (user_id, activity_id) VALUES (?, ?)'))
