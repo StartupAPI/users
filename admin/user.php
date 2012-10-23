@@ -98,8 +98,33 @@ require_once(dirname(__FILE__) . '/header.php');
 		<b>Activity points:</b> <span class="badge"><?php echo $user->getPoints(); ?></span> <a class="btn btn-small" href="activity.php?userid=<?php echo $user->getID() ?>"><i class="icon-signal"></i> See activity</a>
 	</p>
 
+	<h3>Gamification</h3>
+	<?php
+	$adminBadgeSize = 57;
 
+	$user_badges = $user->getBadges();
+	$available_badges = Badge::getAvailableBadges();
 
+	foreach($available_badges as $badge) {
+		if (array_key_exists($badge->getID(), $user_badges)) {
+			$badge_level = $user_badges[$badge->getID()][1];
+			?><img
+					style="margin-right: 0.5em"
+					src="<?php echo $badge->getImageURL($adminBadgeSize, $badge_level) ?>"
+					title="<?php echo $badge->getTitle() ?>"
+					width="<?php echo $adminBadgeSize ?>"
+					height="<?php echo $adminBadgeSize ?>"/>
+			<?php
+		} else {
+			?><img style="margin-right: 0.5em"
+				 src="<?php echo $badge->getPlaceholderImageURL($adminBadgeSize) ?>"
+				 title="Hint: <?php echo $badge->getHint() ?>"
+				 width="<?php echo $adminBadgeSize ?>"
+				 height="<?php echo $adminBadgeSize ?>"/>
+		<?php
+		}
+	}
+	?>
 
 	<h3>Source of registration</h3>
 	<p>Referer: <?php

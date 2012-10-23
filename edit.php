@@ -79,31 +79,34 @@ require_once(UserConfig::$header);
 </div>
 
 <?php
-$available_badges = Badge::getAvailableBadges();
+if (UserConfig::$enableGamification) {
+	$available_badges = Badge::getAvailableBadges();
 
-if (count($available_badges) > 0 && UserConfig::$enableGamification) { ?>
-<div id="startupapi-edit-badges">
-<h2>Badges:</h2>
-<?php
+	if (count($available_badges) > 0) { ?>
+	<div id="startupapi-edit-badges">
+	<h2>Badges:</h2>
+	<?php
 
-	$user_badges = $user->getBadges();
+		$user_badges = $user->getBadges();
 
-	foreach($available_badges as $badge) {
+		foreach($available_badges as $badge) {
 
-		if (array_key_exists($badge->getID(), $user_badges)) {
-			$badge_level = $user_badges[$badge->getID()][1];
+			if (array_key_exists($badge->getID(), $user_badges)) {
+				$badge_level = $user_badges[$badge->getID()][1];
 
-			?><a href="<?php echo UserConfig::$USERSROOTURL.'/show_badge.php?name='.$badge->getSlug() ?>"><img class="startupapi-badge" src="<?php echo $badge->getImageURL(UserConfig::$badgeListingSize, $badge_level) ?>" title="<?php echo $badge->getTitle() ?>" width="<?php echo UserConfig::$badgeListingSize ?>" height="<?php echo UserConfig::$badgeListingSize ?>"/></a><?php
-		} else {
-			?><img class="startupapi-badge" src="<?php echo $badge->getPlaceholderImageURL(UserConfig::$badgeListingSize) ?>" title="Hint: <?php echo $badge->getHint() ?>" width="<?php echo UserConfig::$badgeListingSize ?>" height="<?php echo UserConfig::$badgeListingSize ?>"/><?php
+				?><a href="<?php echo UserConfig::$USERSROOTURL.'/show_badge.php?name='.$badge->getSlug() ?>"><img class="startupapi-badge" src="<?php echo $badge->getImageURL(UserConfig::$badgeListingSize, $badge_level) ?>" title="<?php echo $badge->getTitle() ?>" width="<?php echo UserConfig::$badgeListingSize ?>" height="<?php echo UserConfig::$badgeListingSize ?>"/></a><?php
+			} else {
+				?><img class="startupapi-badge" src="<?php echo $badge->getPlaceholderImageURL(UserConfig::$badgeListingSize) ?>" title="Hint: <?php echo $badge->getHint() ?>" width="<?php echo UserConfig::$badgeListingSize ?>" height="<?php echo UserConfig::$badgeListingSize ?>"/><?php
+			}
 		}
+	?></div><?php
 	}
-?></div><?php
+	?>
+	</div>
+<?php
 }
-?>
-</div>
 
-<?php if (!is_null(UserConfig::$maillist) && file_exists(UserConfig::$maillist))
+if (!is_null(UserConfig::$maillist) && file_exists(UserConfig::$maillist))
 {
 ?>
 <?php include(UserConfig::$maillist); ?>
