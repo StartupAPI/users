@@ -180,6 +180,19 @@ if (array_key_exists('page', $_GET)) {
 ?>
 </form>
 </div>
+<?php
+// TODO get activities only for specific activity
+
+if (!is_null($selectedactivity)) {
+	$activities = User::getUsersByActivity($selectedactivityid, $pagenumber, $perpage);
+} else if (is_null($activityuser)) {
+	$activities = User::getUsersActivity($showactivities == 'all', $pagenumber, $perpage);
+}
+else
+{
+	$activities = $activityuser->getActivity($showactivities == 'all', $pagenumber, $perpage);
+}
+?>
 
 <div id='chart_div' style='width: 100%; height: 240px; margin-bottom: 1em'></div>
 
@@ -219,20 +232,6 @@ if (is_null($activityuser)) {
 <?php
 }?>
 </tr>
-<?php
-
-// TODO get activities only for specific activity
-
-if (!is_null($selectedactivity)) {
-	$activities = User::getUsersByActivity($selectedactivityid, $pagenumber, $perpage);
-} else if (is_null($activityuser)) {
-	$activities = User::getUsersActivity($showactivities == 'all', $pagenumber, $perpage);
-}
-else
-{
-	$activities = $activityuser->getActivity($showactivities == 'all', $pagenumber, $perpage);
-}
-?>
 </thead>
 
 <tbody>
