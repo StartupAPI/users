@@ -50,15 +50,23 @@ $admin_menu = new adminMenu(array(
 			new menuSection('promotion', 'Promotion', null, array(
 				new menu('sources', 'Sources', $ADMIN_ROOT . '/sources.php', 'random', FALSE),
 				new menu('campaigns', 'Campaign management', $ADMIN_ROOT . '/campaigns.php', 'comment', FALSE)
+			)),
+			new menuSection('gamification', 'Gamification', null, array(
+				new menu('badges', 'Badges', $ADMIN_ROOT . '/badges.php', 'star')
 			))
 		));
 
 if (isset($ADMIN_SECTION)) {
 	$admin_menu->setActive($ADMIN_SECTION);
 }
+
+if (!isset($BREADCRUMB_EXTRA)) {
+	$BREADCRUMB_EXTRA = null;
+}
 ?><!DOCTYPE html>
 <html lang="en">
 	<head>
+		<title><?php echo is_null(UserConfig::$appName) ? '' : UserConfig::$appName; ?> Admin / </title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/css/bootstrap.css" rel="stylesheet">
 		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
@@ -115,11 +123,6 @@ if (isset($ADMIN_SECTION)) {
 
 				<div class="span9">
 					<?php
-					if (!isset($BREADCRUMB_EXTRA)) {
-						$BREADCRUMB_EXTRA = null;
-					}
-
 					$admin_menu->renderBreadCrumbs($BREADCRUMB_EXTRA);
 					?>
-
 				</div>

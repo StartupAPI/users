@@ -22,6 +22,14 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 20
+ * Adding badge timestamp
+*/
+$versions[20]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."user_badges`
+	ADD time TIMESTAMP NOT NULL COMMENT 'Time when user got the badge'";
+$versions[20]['down'][]	= "ALTER TABLE `".UserConfig::$mysql_prefix."user_badges` DROP time";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 19
  * Invitation issuer is optional
 */

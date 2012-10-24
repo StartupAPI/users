@@ -152,6 +152,15 @@ class Badge {
 	}
 
 	/**
+	 * Returns calls to actions for all levels
+	 *
+	 * @return string[] Array of calls to action for each level
+	 */
+	public function getCallsToAction() {
+		return $this->calls_to_action;
+	}
+
+	/**
 	 * Returns URL of Badge image
 	 *
 	 * You can specify a size you're looking for, sizes are standard:
@@ -253,15 +262,13 @@ class Badge {
 	 * @throws DBException
 	 */
 	public function getUserBadges($user) {
-		// TODO implement a list of badges for the user
-
 		$db = UserConfig::getDB();
 
 		$user_badges = array();
 
 		$user_id = $user->getID();
 
-		if ($stmt = $db->prepare('SELECT badge_id, MAX(badge_level) as level FROM ' . UserConfig::$mysql_prefix . 'user_badges WHERE user_id = ? GROUP BY badge_id')) {
+		if ($stmt = $db->prepare('SELECT badge_id, MAX(badge_level) as level, time FROM ' . UserConfig::$mysql_prefix . 'user_badges WHERE user_id = ? GROUP BY badge_id')) {
 			if (!$stmt->bind_param('i', $user_id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -273,7 +280,7 @@ class Badge {
 			}
 
 			while ($stmt->fetch() === TRUE) {
-				$user_badges[$id] = array(Badge::getByID($id), $level);
+				$user_badges[$id] = array(Badge::getByID($id), $level, $time);
 			}
 
 			$stmt->close();
@@ -282,6 +289,98 @@ class Badge {
 		}
 
 		return $user_badges;
+	}
+
+	/**
+	 * Returns user counts for each level of the badge
+	 *
+	 * @return array Array of user counts for each level (0 if not present)
+	 *
+	 * @throws DBException
+	 */
+	public function getUserCounts() {
+		$db = UserConfig::getDB();
+
+		$counts = array();
+
+		if ($stmt = $db->prepare('SELECT badge_level, count(user_id) as total FROM ' . UserConfig::$mysql_prefix . 'user_badges WHERE badge_id = ? GROUP BY badge_level')) {
+			if (!$stmt->bind_param('i', $this->id)) {
+				throw new DBBindParamException($db, $stmt);
+			}
+			if (!$stmt->execute()) {
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+			if (!$stmt->bind_result($level, $total)) {
+				throw new DBBindResultException($db, $stmt);
+			}
+
+			while ($stmt->fetch() === TRUE) {
+				$counts[$level] = $total;
+			}
+
+			$stmt->close();
+		} else {
+			throw new DBPrepareStmtException($db);
+		}
+
+		return $counts;
+	}
+
+	/**
+	 * Returns a list of users who gt the badge, ordered by time, most recent first
+	 *
+	 * @param int $pagenumber Page number
+	 * @param int $perpage Page size
+	 *
+	 * @return User[] Array of users objects ordered by time
+	 *
+	 * @throws DBException
+	 */
+	public function getBadgeUsers($level = null, $pagenumber = 0, $perpage = 20) {
+		$db = UserConfig::getDB();
+
+		$user_ids = array();
+
+		if (is_null($level)) {
+			$query = 'SELECT user_id FROM ' . UserConfig::$mysql_prefix . 'user_badges
+				WHERE badge_id = ?
+				ORDER BY time DESC
+				LIMIT ?, ?';
+		} else {
+			$query = 'SELECT user_id FROM ' . UserConfig::$mysql_prefix . 'user_badges
+				WHERE badge_id = ? AND badge_level = ?
+				ORDER BY time DESC
+				LIMIT ?, ?';
+		}
+
+		if ($stmt = $db->prepare($query)) {
+			if (is_null($level)) {
+				$result = $stmt->bind_param('iii', $this->id, $start = $pagenumber * $perpage, $perpage);
+			} else {
+				$result = $stmt->bind_param('iiii', $this->id, $level, $start = $pagenumber * $perpage, $perpage);
+			}
+			if (!$result) {
+				throw new DBBindParamException($db, $stmt);
+			}
+			if (!$stmt->execute()) {
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+			if (!$stmt->bind_result($user_id)) {
+				throw new DBBindResultException($db, $stmt);
+			}
+
+			while ($stmt->fetch() === TRUE) {
+				$user_ids[] = $user_id;
+			}
+
+			$stmt->close();
+		} else {
+			throw new DBPrepareStmtException($db);
+		}
+
+		$badge_users = User::getUsersByIDs($user_ids);
+
+		return $badge_users;
 	}
 
 	/**
