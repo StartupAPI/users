@@ -1806,6 +1806,10 @@ class User
 
 		$users = array();
 
+		if (!is_array($userids) || count($userids) == 0) {
+			return $users;
+		}
+
 		$ids = array();
 		foreach ($userids as $userid) {
 			if (is_int($userid)){
