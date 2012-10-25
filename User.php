@@ -259,6 +259,41 @@ class User
 		return $referer;
 	}
 
+	public static function getReferers($days = 30) {
+		$db = UserConfig::getDB();
+
+		$sources = array();
+
+		if ($stmt = $db->prepare('SELECT referer, id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE regtime > DATE_SUB(NOW(), INTERVAL ? DAY) ORDER BY regtime DESC'))
+		{
+			if (!$stmt->bind_param('i', $days))
+			{
+				throw new DBBindParamException($db, $stmt);
+			}
+			if (!$stmt->execute())
+			{
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+			if (!$stmt->bind_result($referer, $userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified))
+			{
+				throw new DBBindResultException($db, $stmt);
+			}
+
+			while($stmt->fetch() === TRUE)
+			{
+				$sources[$referer][] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new DBPrepareStmtException($db);
+		}
+
+		return $sources;
+	}
+
 	/**
 	 * Sets user's campaign they came from
 	 *

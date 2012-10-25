@@ -48,7 +48,7 @@ $admin_menu = new adminMenu(array(
 				new menu('templates', 'Templates', $ADMIN_ROOT . '/templates.php', 'list-alt', false),
 			)),
 			new menuSection('promotion', 'Promotion', null, array(
-				new menu('sources', 'Sources', $ADMIN_ROOT . '/sources.php', 'random', FALSE),
+				new menu('sources', 'Sources', $ADMIN_ROOT . '/sources.php', 'random'),
 				new menu('campaigns', 'Campaign management', $ADMIN_ROOT . '/campaigns.php', 'comment', FALSE)
 			)),
 			new menuSection('gamification', 'Gamification', null, array(
