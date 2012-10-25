@@ -7,11 +7,9 @@ require_once(dirname(__FILE__) . '/header.php');
 $days = 30;
 
 $sources = User::getReferers($days);
-/*
- * uksort($sources, function($a, $b) {
-  return count($a) - count($b);
+uasort($sources, function($a, $b) {
+  return count($b) - count($a);
   });
- */
 ?>
 <div class="span9">
 	<p>Sources that attracted the most registered users in the last <?php echo $days ?> days.</p>
