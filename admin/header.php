@@ -66,7 +66,7 @@ if (!isset($BREADCRUMB_EXTRA)) {
 ?><!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title><?php echo is_null(UserConfig::$appName) ? '' : UserConfig::$appName; ?> Admin / </title>
+		<title><?php echo is_null(UserConfig::$appName) ? '' : UserConfig::$appName; ?><?php $admin_menu->renderTitle($BREADCRUMB_EXTRA) ?></title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/css/bootstrap.css" rel="stylesheet">
 		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">

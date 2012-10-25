@@ -10,6 +10,8 @@
  */
 abstract class menuElement {
 
+	protected static $titleSeparator = ' / ';
+
 	/**
 	 * @var string Menu slug to be used to identify this particular menu element
 	 */
@@ -141,6 +143,19 @@ abstract class menuElement {
 	 * @param string $extra Extra string to attach to the end of breadcrumbs
 	 */
 	abstract protected function renderBreadCrumbs($extra = null);
+
+	protected function renderTitle($extra = null) {
+		if ($this->active) {
+			echo self::$titleSeparator.$this->title;
+		}
+
+		if (!is_null($this->sub_menus) && is_array($this->sub_menus) && count($this->sub_menus) > 0) {
+			foreach ($this->sub_menus as $menu) {
+				$menu->renderTitle($extra);
+			}
+		}
+	}
+
 }
 
 /**
@@ -157,7 +172,7 @@ class adminMenu extends menuElement {
 	 * @param menuElement[] $sub_menus
 	 */
 	public function __construct($sub_menus = null) {
-		parent::__construct(null, null, null, $sub_menus);
+		parent::__construct(admin, 'Admin', null, $sub_menus);
 	}
 
 	public function render() {
@@ -187,6 +202,14 @@ class adminMenu extends menuElement {
 		if (!is_null($extra)) {
 			?><span class="divider">/</span></li><?php
 			?><li class="active"><?php echo $extra ?></li><?php
+		}
+	}
+
+	public function renderTitle($extra = null) {
+		parent::renderTitle($extra);
+
+		if (!is_null($extra)) {
+			echo self::$titleSeparator . $extra;
 		}
 	}
 
