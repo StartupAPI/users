@@ -1,9 +1,10 @@
 <?php
-require_once(dirname(__FILE__).'/global.php');
-require_once(dirname(__FILE__).'/Account.php');
-require_once(dirname(__FILE__).'/Badge.php');
-require_once(dirname(__FILE__).'/CookieStorage.php');
-require_once(dirname(__FILE__).'/CampaignTracker.php');
+
+require_once(dirname(__FILE__) . '/global.php');
+require_once(dirname(__FILE__) . '/Account.php');
+require_once(dirname(__FILE__) . '/Badge.php');
+require_once(dirname(__FILE__) . '/CookieStorage.php');
+require_once(dirname(__FILE__) . '/CampaignTracker.php');
 
 /**
  * This class represents a registerd user in the system
@@ -33,8 +34,8 @@ require_once(dirname(__FILE__).'/CampaignTracker.php');
  *
  * @package StartupAPI
  */
-class User
-{
+class User {
+
 	/**
 	 * Checks if user is logged in and returns use object or redirects to login page
 	 *
@@ -55,16 +56,12 @@ class User
 	 *
 	 * @return User Current user
 	 */
-	public static function require_login($allow_impersonation = true)
-	{
+	public static function require_login($allow_impersonation = true) {
 		$user = self::get($allow_impersonation);
 
-		if (!is_null($user))
-		{
+		if (!is_null($user)) {
 			return $user;
-		}
-		else
-		{
+		} else {
 			self::redirectToLogin();
 		}
 	}
@@ -79,7 +76,7 @@ class User
 	 * $user = User::get();
 	 *
 	 * if (!is_null($user)) {
-	 *		echo 'Welcome, ' . $user->getName() . '!';
+	 * 		echo 'Welcome, ' . $user->getName() . '!';
 	 * }
 	 * </code>
 	 *
@@ -92,14 +89,13 @@ class User
 	 *
 	 * @return User|null Current user or null if user is not logged in
 	 */
-	public static function get($allow_impersonation = true)
-	{
+	public static function get($allow_impersonation = true) {
 		$storage = new MrClay_CookieStorage(array(
-			'secret' => UserConfig::$SESSION_SECRET,
-			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
-			'path' => UserConfig::$SITEROOTURL,
-			'httponly' => true
-		));
+					'secret' => UserConfig::$SESSION_SECRET,
+					'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+					'path' => UserConfig::$SITEROOTURL,
+					'httponly' => true
+				));
 
 		$userid = $storage->fetch(UserConfig::$session_userid_key);
 
@@ -117,8 +113,7 @@ class User
 
 			// only forsing password reset on non-impersonated users
 			if ($user->requiresPasswordReset() &&
-				!UsernamePasswordAuthenticationModule::$IGNORE_PASSWORD_RESET)
-			{
+					!UsernamePasswordAuthenticationModule::$IGNORE_PASSWORD_RESET) {
 				self::redirectToPasswordReset();
 			}
 
@@ -161,11 +156,11 @@ class User
 	 */
 	public static function updateReturnActivity() {
 		$storage = new MrClay_CookieStorage(array(
-			'secret' => UserConfig::$SESSION_SECRET,
-			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
-			'path' => UserConfig::$SITEROOTURL,
-			'httponly' => true
-		));
+					'secret' => UserConfig::$SESSION_SECRET,
+					'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+					'path' => UserConfig::$SITEROOTURL,
+					'httponly' => true
+				));
 
 		$last = $storage->fetch(UserConfig::$last_login_key);
 		if (!$storage->store(UserConfig::$last_login_key, time())) {
@@ -175,8 +170,7 @@ class User
 		$user = self::get();
 
 		if (!is_null($user) && $last > 0
-			&& $last < time() - UserConfig::$last_login_session_length * 60)
-		{
+				&& $last < time() - UserConfig::$last_login_session_length * 60) {
 			if ($last > time() - 86400) {
 				$user->recordActivity(USERBASE_ACTIVITY_RETURN_DAILY);
 			} else if ($last > time() - 7 * 86400) {
@@ -202,21 +196,16 @@ class User
 
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET referer = ? WHERE id = ?'))
-		{
-			if (!$stmt->bind_param('si', $referer, $this->userid))
-			{
+		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'users SET referer = ? WHERE id = ?')) {
+			if (!$stmt->bind_param('si', $referer, $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 	}
@@ -233,26 +222,20 @@ class User
 
 		$referer = null;
 
-		if ($stmt = $db->prepare('SELECT referer FROM '.UserConfig::$mysql_prefix.'users WHERE id = ?'))
-		{
-			if (!$stmt->bind_param('i', $this->userid))
-			{
+		if ($stmt = $db->prepare('SELECT referer FROM ' . UserConfig::$mysql_prefix . 'users WHERE id = ?')) {
+			if (!$stmt->bind_param('i', $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->bind_result($referer))
-			{
+			if (!$stmt->bind_result($referer)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->fetch();
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -264,30 +247,23 @@ class User
 
 		$sources = array();
 
-		if ($stmt = $db->prepare('SELECT referer, id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE referer IS NOT NULL AND regtime > DATE_SUB(NOW(), INTERVAL ? DAY) ORDER BY regtime DESC'))
-		{
-			if (!$stmt->bind_param('i', $days))
-			{
+		if ($stmt = $db->prepare('SELECT referer, id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users WHERE referer IS NOT NULL AND regtime > DATE_SUB(NOW(), INTERVAL ? DAY) ORDER BY regtime DESC')) {
+			if (!$stmt->bind_param('i', $days)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($referer, $userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified))
-			{
+			if (!$stmt->bind_result($referer, $userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while($stmt->fetch() === TRUE)
-			{
+			while ($stmt->fetch() === TRUE) {
 				$sources[$referer][] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -326,7 +302,8 @@ class User
 
 		$cmp_content_id = null;
 		if (array_key_exists('cmp_content', $campaign)) {
-			$cmp_content_id = CampaignTracker::getCampaignContentID($campaign['cmp_content']);;
+			$cmp_content_id = CampaignTracker::getCampaignContentID($campaign['cmp_content']);
+			;
 		}
 
 		$cmp_name_id = null;
@@ -335,35 +312,74 @@ class User
 		}
 
 		// update user record with compaign IDs
-		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET
+		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'users SET
 			reg_cmp_source_id = ?,
 			reg_cmp_medium_id = ?,
 			reg_cmp_keywords_id = ?,
 			reg_cmp_content_id = ?,
 			reg_cmp_name_id = ?
-			WHERE id = ?'))
-		{
-			if (!$stmt->bind_param('sssssi',
-				$cmp_source_id,
-				$cmp_medium_id,
-				$cmp_keywords_id,
-				$cmp_content_id,
-				$cmp_name_id,
-				$this->userid))
-			{
+			WHERE id = ?')) {
+			if (!$stmt->bind_param('sssssi', $cmp_source_id, $cmp_medium_id, $cmp_keywords_id, $cmp_content_id, $cmp_name_id, $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
+	}
+
+	public static function getCampaigns($days = 30) {
+		$db = UserConfig::getDB();
+
+		$campaigns = array();
+
+		if ($stmt = $db->prepare('SELECT cmp.name, cmp_content.content, cmp_keywords.keywords, cmp_medium.medium, cmp_source.source,
+			users.id, status, users.name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified
+			FROM ' . UserConfig::$mysql_prefix . 'users AS users
+				INNER JOIN ' . UserConfig::$mysql_prefix . 'cmp AS cmp ON users.reg_cmp_name_id = cmp.id
+				INNER JOIN ' . UserConfig::$mysql_prefix . 'cmp_content AS cmp_content ON users.reg_cmp_content_id = cmp_content.id
+				INNER JOIN ' . UserConfig::$mysql_prefix . 'cmp_keywords AS cmp_keywords ON users.reg_cmp_keywords_id = cmp_keywords.id
+				INNER JOIN ' . UserConfig::$mysql_prefix . 'cmp_medium AS cmp_medium ON users.reg_cmp_medium_id = cmp_medium.id
+				INNER JOIN ' . UserConfig::$mysql_prefix . 'cmp_source AS cmp_source ON users.reg_cmp_source_id = cmp_source.id
+			WHERE regtime > DATE_SUB(NOW(), INTERVAL ? DAY)
+				AND (reg_cmp_name_id IS NOT NULL
+					OR reg_cmp_content_id IS NOT NULL
+					OR reg_cmp_keywords_id IS NOT NULL
+					OR reg_cmp_medium_id IS NOT NULL
+					OR reg_cmp_source_id IS NOT NULL
+				)
+				ORDER BY regtime DESC')) {
+			if (!$stmt->bind_param('i', $days)) {
+				throw new DBBindParamException($db, $stmt);
+			}
+			if (!$stmt->execute()) {
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+			if (!$stmt->bind_result($cmp_name, $cmp_content, $cmp_keywords, $cmp_medium, $cmp_source,
+					$userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
+				throw new DBBindResultException($db, $stmt);
+			}
+
+			while ($stmt->fetch() === TRUE) {
+				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
+
+				$campaigns['cmp_name'][$cmp_name][] = $user;
+				$campaigns['cmp_content'][$cmp_content][] = $user;
+				$campaigns['cmp_keywords'][$cmp_keywords][] = $user;
+				$campaigns['cmp_medium'][$cmp_medium][] = $user;
+				$campaigns['cmp_source'][$cmp_source][] = $user;
+			}
+
+			$stmt->close();
+		} else {
+			throw new DBPrepareStmtException($db);
+		}
+
+		return $campaigns;
 	}
 
 	/**
@@ -371,38 +387,30 @@ class User
 	 *
 	 * @throws DBException
 	 */
-	private function init()
-	{
+	private function init() {
 		$db = UserConfig::getDB();
 
 		if (UserConfig::$useAccounts) {
 			$userid = $this->getID();
 
-			if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'user_preferences (user_id) VALUES (?)'))
-			{
-				if (!$stmt->bind_param('i', $userid))
-				{
+			if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . 'user_preferences (user_id) VALUES (?)')) {
+				if (!$stmt->bind_param('i', $userid)) {
 					throw new DBBindParamException($db, $stmt);
 				}
-				if (!$stmt->execute())
-				{
+				if (!$stmt->execute()) {
 					throw new DBExecuteStmtException($db, $stmt, "Can't update user preferences (set current account)");
 				}
 				$stmt->close();
-			}
-			else
-			{
+			} else {
 				throw new DBPrepareStmtException($db, "Can't update user preferences (set current account)");
 			}
 
-			$personal = Account::createAccount('FREE ('.$this->getName().')',
-							Plan::getFreePlan(), $this, Account::ROLE_ADMIN);
+			$personal = Account::createAccount('FREE (' . $this->getName() . ')', Plan::getFreePlan(), $this, Account::ROLE_ADMIN);
 
 			$personal->setAsCurrent($this);
 		}
 
-		if (!is_null(UserConfig::$onCreate))
-		{
+		if (!is_null(UserConfig::$onCreate)) {
 			call_user_func_array(UserConfig::$onCreate, array($this));
 		}
 
@@ -445,14 +453,14 @@ class User
 		}
 
 		if (is_null($user)) {
-			$query = 'UPDATE '.UserConfig::$mysql_prefix.'users
+			$query = 'UPDATE ' . UserConfig::$mysql_prefix . 'users
 						SET email_verified = 1,
 							email_verification_code = null,
 							email_verification_code_time = null
 						WHERE email_verification_code = ?
 							AND email_verification_code_time > DATE_SUB(NOW(), INTERVAL ? DAY)';
 		} else {
-			$query = 'UPDATE '.UserConfig::$mysql_prefix.'users
+			$query = 'UPDATE ' . UserConfig::$mysql_prefix . 'users
 						SET email_verified = 1,
 							email_verification_code = null,
 							email_verification_code_time = null
@@ -461,32 +469,26 @@ class User
 							AND email_verification_code_time > DATE_SUB(NOW(), INTERVAL ? DAY)';
 		}
 
-		if ($stmt = $db->prepare($query))
-		{
+		if ($stmt = $db->prepare($query)) {
 			if (is_null($user)) {
-						if (!$stmt->bind_param('si', $code, UserConfig::$emailVerificationCodeExpiresInDays))
-				{
+				if (!$stmt->bind_param('si', $code, UserConfig::$emailVerificationCodeExpiresInDays)) {
 					throw new DBBindParamException($db, $stmt);
 				}
 			} else {
 				$user_id = $user->getID();
 
-				if (!$stmt->bind_param('isi', $user_id, $code, UserConfig::$emailVerificationCodeExpiresInDays))
-				{
+				if (!$stmt->bind_param('isi', $user_id, $code, UserConfig::$emailVerificationCodeExpiresInDays)) {
 					throw new DBBindParamException($db, $stmt);
 				}
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$verified = ($db->affected_rows == 1);
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -512,37 +514,31 @@ class User
 
 		$code = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 10);
 
-		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET
+		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'users SET
 										email_verification_code = ?,
 										email_verification_code_time = now()
-									WHERE id = ?'))
-		{
-			if (!$stmt->bind_param('si', $code, $this->userid))
-			{
+									WHERE id = ?')) {
+			if (!$stmt->bind_param('si', $code, $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
-		$verification_link = UserConfig::$USERSROOTFULLURL.'/verify_email.php?code='.urlencode($code);
+		$verification_link = UserConfig::$USERSROOTFULLURL . '/verify_email.php?code=' . urlencode($code);
 
-		$message = call_user_func_array(UserConfig::$onRenderVerificationCodeEmail,
-			array($verification_link, $code));
+		$message = call_user_func_array(UserConfig::$onRenderVerificationCodeEmail, array($verification_link, $code));
 
 		$subject = UserConfig::$emailVerificationSubject;
 
-		$headers = 'From: '.UserConfig::$supportEmailFrom."\r\n".
-			'Reply-To: '.UserConfig::$supportEmailReplyTo."\r\n".
-			'X-Mailer: '.UserConfig::$supportEmailXMailer;
+		$headers = 'From: ' . UserConfig::$supportEmailFrom . "\r\n" .
+				'Reply-To: ' . UserConfig::$supportEmailReplyTo . "\r\n" .
+				'X-Mailer: ' . UserConfig::$supportEmailXMailer;
 
 		mail($email, $subject, $message, $headers);
 	}
@@ -552,48 +548,37 @@ class User
 	 *
 	 * @deprecated
 	 */
-	public static function createNewGoogleFriendConnectUser($name, $googleid, $userpic)
-	{
+	public static function createNewGoogleFriendConnectUser($name, $googleid, $userpic) {
 		$name = mb_convert_encoding($name, 'UTF-8');
 
 		$db = UserConfig::getDB();
 
 		$user = null;
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix."users (name, regmodule) VALUES (?, 'google' )"))
-		{
-			if (!$stmt->bind_param('s', $name))
-			{
+		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . "users (name, regmodule) VALUES (?, 'google' )")) {
+			if (!$stmt->bind_param('s', $name)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 			$id = $stmt->insert_id;
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'googlefriendconnect (user_id, google_id, userpic) VALUES (?, ?, ?)'))
-		{
-			if (!$stmt->bind_param('iss', $id, $googleid, $userpic))
-			{
+		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . 'googlefriendconnect (user_id, google_id, userpic) VALUES (?, ?, ?)')) {
+			if (!$stmt->bind_param('iss', $id, $googleid, $userpic)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -618,8 +603,7 @@ class User
 	 *
 	 * @throws DBException
 	 */
-	public static function createNewFacebookUser($name, $fb_id, $me = null)
-	{
+	public static function createNewFacebookUser($name, $fb_id, $me = null) {
 		$name = mb_convert_encoding($name, 'UTF-8');
 
 		$db = UserConfig::getDB();
@@ -631,23 +615,18 @@ class User
 
 		$user = null;
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix."users (name, regmodule, email, fb_id) VALUES (?, 'facebook', ?, ?)"))
-		{
-			if (!$stmt->bind_param('ssi', $name, $email, $fb_id))
-			{
+		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . "users (name, regmodule, email, fb_id) VALUES (?, 'facebook', ?, ?)")) {
+			if (!$stmt->bind_param('ssi', $name, $email, $fb_id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 			$id = $stmt->insert_id;
 
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -675,8 +654,7 @@ class User
 	 *
 	 * @throws DBException
 	 */
-	public static function createNewWithoutCredentials($module, $name, $email = null)
-	{
+	public static function createNewWithoutCredentials($module, $name, $email = null) {
 		$module_id = $module->getID();
 
 		$name = mb_convert_encoding($name, 'UTF-8');
@@ -690,22 +668,17 @@ class User
 			$email = null;
 		}
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'users (name, email, regmodule) VALUES (?, ?, ?)'))
-		{
-			if (!$stmt->bind_param('sss', $name, $email, $module_id))
-			{
+		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . 'users (name, email, regmodule) VALUES (?, ?, ?)')) {
+			if (!$stmt->bind_param('sss', $name, $email, $module_id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 			$id = $stmt->insert_id;
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -731,8 +704,7 @@ class User
 	 *
 	 * @throws DBException
 	 */
-	public static function createNew($name, $username, $email, $password)
-	{
+	public static function createNew($name, $username, $email, $password) {
 		$name = mb_convert_encoding($name, 'UTF-8');
 		$username = mb_convert_encoding($username, 'UTF-8');
 
@@ -740,25 +712,21 @@ class User
 
 		$user = null;
 
-		$salt = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 13);;
-		$pass = sha1($salt.$password);
+		$salt = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 13);
+		;
+		$pass = sha1($salt . $password);
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix."users (regmodule, name, username, email, pass, salt) VALUES ('userpass', ?, ?, ?, ?, ?)"))
-		{
-			if (!$stmt->bind_param('sssss', $name, $username, $email, $pass, $salt))
-			{
+		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . "users (regmodule, name, username, email, pass, salt) VALUES ('userpass', ?, ?, ?, ?, ?)")) {
+			if (!$stmt->bind_param('sssss', $name, $username, $email, $pass, $salt)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 			$id = $stmt->insert_id;
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -777,33 +745,26 @@ class User
 	 *
 	 * @throws DBException
 	 */
-	public static function getTotalUsers()
-	{
+	public static function getTotalUsers() {
 		$db = UserConfig::getDB();
 
 		$total = 0;
 
-		if ($stmt = $db->prepare('SELECT COUNT(*) FROM '.UserConfig::$mysql_prefix.'users'))
-		{
-			if (!$stmt->execute())
-			{
+		if ($stmt = $db->prepare('SELECT COUNT(*) FROM ' . UserConfig::$mysql_prefix . 'users')) {
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($total))
-			{
+			if (!$stmt->bind_result($total)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
 		return $total;
-
 	}
 
 	/**
@@ -818,8 +779,7 @@ class User
 	 *
 	 * @throws DBException
 	 */
-	public static function getActiveUsers($date = null)
-	{
+	public static function getActiveUsers($date = null) {
 		$db = UserConfig::getDB();
 
 		$total = 0;
@@ -842,55 +802,49 @@ class User
 
 			$query = 'SELECT count(*) AS total FROM (
 					SELECT user_id, count(*)
-					FROM '.UserConfig::$mysql_prefix.'activity a
-					INNER JOIN '.UserConfig::$mysql_prefix.'users u
+					FROM ' . UserConfig::$mysql_prefix . 'activity a
+					INNER JOIN ' . UserConfig::$mysql_prefix . 'users u
 						ON a.user_id = u.id
 					WHERE a.time > DATE_ADD(u.regtime, INTERVAL 1 DAY)
-						AND a.time > DATE_SUB('.
-						(is_null($date) ? 'NOW()' : '?').
-						', INTERVAL 30 DAY)'.
-						(is_null($date) ? '' : ' AND a.time < ?').'
-						AND a.activity_id IN ('.$in.')
+						AND a.time > DATE_SUB(' .
+					(is_null($date) ? 'NOW()' : '?') .
+					', INTERVAL 30 DAY)' .
+					(is_null($date) ? '' : ' AND a.time < ?') . '
+						AND a.activity_id IN (' . $in . ')
 					GROUP BY user_id
 				) AS active';
 		} else {
 			$query = 'SELECT count(*) AS total FROM (
 					SELECT user_id, count(*)
-					FROM '.UserConfig::$mysql_prefix.'activity a
-					INNER JOIN '.UserConfig::$mysql_prefix.'users u
+					FROM ' . UserConfig::$mysql_prefix . 'activity a
+					INNER JOIN ' . UserConfig::$mysql_prefix . 'users u
 						ON a.user_id = u.id
 					WHERE a.time > DATE_ADD(u.regtime, INTERVAL 1 DAY)
-						AND a.time > DATE_SUB('.
-						(is_null($date) ? 'NOW()' : '?').
-						', INTERVAL 30 DAY)'.
-						(is_null($date) ? '' : ' AND a.time < ?').'
+						AND a.time > DATE_SUB(' .
+					(is_null($date) ? 'NOW()' : '?') .
+					', INTERVAL 30 DAY)' .
+					(is_null($date) ? '' : ' AND a.time < ?') . '
 					GROUP BY user_id
 				) AS active';
 		}
 
-		if ($stmt = $db->prepare($query))
-		{
+		if ($stmt = $db->prepare($query)) {
 			if (!is_null($date)) {
-				if (!$stmt->bind_param('ss', $date, $date))
-				{
+				if (!$stmt->bind_param('ss', $date, $date)) {
 					throw new DBBindParamException($db, $stmt);
 				}
 			}
 
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($total))
-			{
+			if (!$stmt->bind_result($total)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -906,8 +860,7 @@ class User
 	 *
 	 * @throws DBException
 	 */
-	public static function getDailyActiveUsers($lastndays = null)
-	{
+	public static function getDailyActiveUsers($lastndays = null) {
 		$db = UserConfig::getDB();
 
 		$daily_activity = array();
@@ -922,25 +875,20 @@ class User
 			DAYOFMONTH(MIN(time)) as day,
 			MONTH(MIN(time)) as month,
 			YEAR(MIN(time)) as year
-			FROM '.UserConfig::$mysql_prefix.'activity'.
-			((!is_null($lastndays) && is_int($lastndays)) ?
-				' WHERE time > DATE_SUB(NOW(), INTERVAL '.$lastndays.' DAY)' : '')
-		))
-		{
-			if (!$stmt->execute())
-			{
+			FROM ' . UserConfig::$mysql_prefix . 'activity' .
+				((!is_null($lastndays) && is_int($lastndays)) ?
+						' WHERE time > DATE_SUB(NOW(), INTERVAL ' . $lastndays . ' DAY)' : '')
+		)) {
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($start_date, $start_day, $start_month, $start_year))
-			{
+			if (!$stmt->bind_result($start_date, $start_day, $start_month, $start_year)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -951,28 +899,22 @@ class User
 
 		// now getting all cached numbers
 		if ($stmt = $db->prepare('SELECT day, active_users
-			FROM '.UserConfig::$mysql_prefix.'admin_daily_stats_cache'.
-			((!is_null($lastndays) && is_int($lastndays)) ?
-				' WHERE day > DATE_SUB(NOW(), INTERVAL '.$lastndays.' DAY)' : '')))
-		{
-			if (!$stmt->execute())
-			{
+			FROM ' . UserConfig::$mysql_prefix . 'admin_daily_stats_cache' .
+				((!is_null($lastndays) && is_int($lastndays)) ?
+						' WHERE day > DATE_SUB(NOW(), INTERVAL ' . $lastndays . ' DAY)' : ''))) {
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($date, $active_users))
-			{
+			if (!$stmt->bind_result($date, $active_users)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while($stmt->fetch() === TRUE)
-			{
+			while ($stmt->fetch() === TRUE) {
 				$daily_activity[$date] = $active_users;
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -981,7 +923,7 @@ class User
 
 		$updates = array();
 
-		while($timestamp < $current_timestamp) {
+		while ($timestamp < $current_timestamp) {
 			$date = date('Y-m-d', $timestamp);
 
 			if (!array_key_exists($date, $daily_activity)) {
@@ -998,7 +940,7 @@ class User
 		$totalupdates = count($updates);
 
 		if ($totalupdates > 0) {
-			$query = 'REPLACE INTO '.UserConfig::$mysql_prefix.'admin_daily_stats_cache
+			$query = 'REPLACE INTO ' . UserConfig::$mysql_prefix . 'admin_daily_stats_cache
 				(day, active_users) VALUES';
 
 			$first = true;
@@ -1011,17 +953,13 @@ class User
 				$first = false;
 			}
 
-			if ($stmt = $db->prepare($query))
-			{
-				if (!$stmt->execute())
-				{
+			if ($stmt = $db->prepare($query)) {
+				if (!$stmt->execute()) {
 					throw new DBExecuteStmtException($db, $stmt);
 				}
 
 				$stmt->close();
-			}
-			else
-			{
+			} else {
 				throw new DBPrepareStmtException($db);
 			}
 		}
@@ -1040,36 +978,28 @@ class User
 	 *
 	 * @internal Used in admin dashboard
 	 */
-	public static function getDailyPointsByActivity($activityid)
-	{
+	public static function getDailyPointsByActivity($activityid) {
 		$db = UserConfig::getDB();
 
 		$daily_activity = array();
 
-		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, count(*) AS cnt FROM '.UserConfig::$mysql_prefix.'activity WHERE activity_id = ? GROUP BY activity_date'))
-		{
-			if (!$stmt->bind_param('i', $activityid))
-			{
+		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, count(*) AS cnt FROM ' . UserConfig::$mysql_prefix . 'activity WHERE activity_id = ? GROUP BY activity_date')) {
+			if (!$stmt->bind_param('i', $activityid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($date, $cnt))
-			{
+			if (!$stmt->bind_result($date, $cnt)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while($stmt->fetch() === TRUE)
-			{
+			while ($stmt->fetch() === TRUE) {
 				$daily_activity[$date] = $cnt;
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -1089,39 +1019,32 @@ class User
 	 *
 	 * @internal Used in admin dashboard
 	 */
-	public static function getDailyActivityPoints($user = null)
-	{
+	public static function getDailyActivityPoints($user = null) {
 		$db = UserConfig::getDB();
 
 		$daily_activity = array();
 
 		$where = '';
 		if (!is_null($user)) {
-			$where = ' WHERE user_id = '.$user->getID().' ';
+			$where = ' WHERE user_id = ' . $user->getID() . ' ';
 		} else if (count(UserConfig::$dont_display_activity_for) > 0) {
-			$where = ' WHERE user_id NOT IN('.join(', ', UserConfig::$dont_display_activity_for).') ';
+			$where = ' WHERE user_id NOT IN(' . join(', ', UserConfig::$dont_display_activity_for) . ') ';
 		}
 
-		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total FROM '.UserConfig::$mysql_prefix.'activity '.$where.'GROUP BY activity_date, activity_id'))
-		{
-			if (!$stmt->execute())
-			{
+		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total FROM ' . UserConfig::$mysql_prefix . 'activity ' . $where . 'GROUP BY activity_date, activity_id')) {
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($date, $id, $total))
-			{
+			if (!$stmt->bind_result($date, $id, $total)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while($stmt->fetch() === TRUE)
-			{
+			while ($stmt->fetch() === TRUE) {
 				$daily_activity[] = array('date' => $date, 'activity' => $id, 'total' => $total);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -1137,32 +1060,25 @@ class User
 	 *
 	 * @internal Used in admin dashboard
 	 */
-	public static function getDailyRegistrations()
-	{
+	public static function getDailyRegistrations() {
 		$db = UserConfig::getDB();
 
 		$dailyregs = array();
 
-		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, count(*) AS regs FROM '.UserConfig::$mysql_prefix.'users GROUP BY regdate'))
-		{
-			if (!$stmt->execute())
-			{
+		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, count(*) AS regs FROM ' . UserConfig::$mysql_prefix . 'users GROUP BY regdate')) {
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($regdate, $regs))
-			{
+			if (!$stmt->bind_result($regdate, $regs)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while($stmt->fetch() === TRUE)
-			{
+			while ($stmt->fetch() === TRUE) {
 				$dailyregs[] = array('regdate' => $regdate, 'regs' => $regs);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -1178,31 +1094,25 @@ class User
 	 *
 	 * @internal Used in admin dashboard
 	 */
-	public static function getDailyRegistrationsByModule()
-	{
+	public static function getDailyRegistrationsByModule() {
 		$db = UserConfig::getDB();
 
 		$dailyregs = array();
 
-		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, regmodule, count(*) AS reg FROM '.UserConfig::$mysql_prefix.'users GROUP BY regdate, regmodule'))
-		{
-			if (!$stmt->execute())
-			{
+		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, regmodule, count(*) AS reg FROM ' . UserConfig::$mysql_prefix . 'users GROUP BY regdate, regmodule')) {
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($date, $module, $regs))
-			{
+			if (!$stmt->bind_result($date, $module, $regs)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while($stmt->fetch()) {
+			while ($stmt->fetch()) {
 				$dailyregs[$date][$module] = $regs;
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -1225,31 +1135,25 @@ class User
 	 *
 	 * @internal Used on admin dashboard
 	 */
-	public static function getRecentRegistrationsByModule()
-	{
+	public static function getRecentRegistrationsByModule() {
 		$db = UserConfig::getDB();
 
 		$regs = array();
 
-		if ($stmt = $db->prepare('SELECT regmodule, count(*) AS reg FROM '.UserConfig::$mysql_prefix.'users u WHERE regtime > DATE_SUB(NOW(), INTERVAL 30 DAY) GROUP BY regmodule'))
-		{
-			if (!$stmt->execute())
-			{
+		if ($stmt = $db->prepare('SELECT regmodule, count(*) AS reg FROM ' . UserConfig::$mysql_prefix . 'users u WHERE regtime > DATE_SUB(NOW(), INTERVAL 30 DAY) GROUP BY regmodule')) {
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($module, $reg))
-			{
+			if (!$stmt->bind_result($module, $reg)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while($stmt->fetch()) {
+			while ($stmt->fetch()) {
 				$regs[$module] = $reg;
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -1274,8 +1178,7 @@ class User
 	 *
 	 * @return UserCredentials|array User credentials object for the module or array of credentials for all modules
 	 */
-	public function getUserCredentials($requested_module_id = null)
-	{
+	public function getUserCredentials($requested_module_id = null) {
 		$credentials = array();
 
 		foreach (UserConfig::$authentication_modules as $module) {
@@ -1308,8 +1211,7 @@ class User
 	 *
 	 * @internal Used in admin dashboard to show users
 	 */
-	public static function getUsers($pagenumber = 0, $perpage = 20, $sort = 'registration')
-	{
+	public static function getUsers($pagenumber = 0, $perpage = 20, $sort = 'registration') {
 		$db = UserConfig::getDB();
 
 		$users = array();
@@ -1321,30 +1223,23 @@ class User
 			$orderby = 'points';
 		}
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users ORDER BY '.$orderby.' DESC LIMIT ?, ?'))
-		{
-			if (!$stmt->bind_param('ii', $first, $perpage))
-			{
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users ORDER BY ' . $orderby . ' DESC LIMIT ?, ?')) {
+			if (!$stmt->bind_param('ii', $first, $perpage)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified))
-			{
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while($stmt->fetch() === TRUE)
-			{
+			while ($stmt->fetch() === TRUE) {
 				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -1366,8 +1261,7 @@ class User
 	 *
 	 * @internal Used in admin dashboard
 	 */
-	public static function searchUsers($search, $pagenumber = 0, $perpage = 20, $sort = 'registration')
-	{
+	public static function searchUsers($search, $pagenumber = 0, $perpage = 20, $sort = 'registration') {
 		$db = UserConfig::getDB();
 
 		$users = array();
@@ -1380,30 +1274,23 @@ class User
 		}
 
 		// TODO Replace with real, fast and powerful full-text search
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE INSTR(name, ?) > 0 OR INSTR(username, ?) > 0 OR INSTR(email, ?) > 0 ORDER BY '.$orderby.' DESC LIMIT ?, ?'))
-		{
-			if (!$stmt->bind_param('sssii', $search, $search, $search, $first, $perpage))
-			{
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users WHERE INSTR(name, ?) > 0 OR INSTR(username, ?) > 0 OR INSTR(email, ?) > 0 ORDER BY ' . $orderby . ' DESC LIMIT ?, ?')) {
+			if (!$stmt->bind_param('sssii', $search, $search, $search, $first, $perpage)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified))
-			{
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while($stmt->fetch() === TRUE)
-			{
+			while ($stmt->fetch() === TRUE) {
 				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -1415,7 +1302,7 @@ class User
 	 */
 
 	/**
- 	 * Returns a paged list of user's activities
+	 * Returns a paged list of user's activities
 	 *
 	 * @param boolean $all Set to false if you want to return only acttivities with non-zero value
 	 * @param int $pagenumber Page number
@@ -1427,17 +1314,16 @@ class User
 	 *
 	 * @internal Used in admin dashboard
 	 */
-	public static function getUsersActivity($all, $pagenumber = 0, $perpage = 20)
-	{
+	public static function getUsersActivity($all, $pagenumber = 0, $perpage = 20) {
 		$activities = array();
 
 		$exclude = '';
 		if (count(UserConfig::$dont_display_activity_for) > 0) {
-			$exclude = ' user_id NOT IN('.join(', ', UserConfig::$dont_display_activity_for).') ';
+			$exclude = ' user_id NOT IN(' . join(', ', UserConfig::$dont_display_activity_for) . ') ';
 		}
 
 		if ($all) {
-			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM '.UserConfig::$mysql_prefix.'activity '.($exclude != '' ? 'WHERE '.$exclude : '').' ORDER BY time DESC LIMIT ?, ?';
+			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM ' . UserConfig::$mysql_prefix . 'activity ' . ($exclude != '' ? 'WHERE ' . $exclude : '') . ' ORDER BY time DESC LIMIT ?, ?';
 		} else {
 			$ids = array();
 
@@ -1451,37 +1337,30 @@ class User
 				return $activities; // no activities are configured to be worthy
 			}
 
-			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM '.UserConfig::$mysql_prefix.'activity WHERE activity_id IN ('.implode(', ', $ids).') '.($exclude != '' ? 'AND '.$exclude : '').'ORDER BY time DESC LIMIT ?, ?';
+			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM ' . UserConfig::$mysql_prefix . 'activity WHERE activity_id IN (' . implode(', ', $ids) . ') ' . ($exclude != '' ? 'AND ' . $exclude : '') . 'ORDER BY time DESC LIMIT ?, ?';
 		}
 
 		$db = UserConfig::getDB();
 
 		$first = $perpage * $pagenumber;
 
-		if ($stmt = $db->prepare($query))
-		{
-			if (!$stmt->bind_param('ii', $first, $perpage))
-			{
+		if ($stmt = $db->prepare($query)) {
+			if (!$stmt->bind_param('ii', $first, $perpage)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($time, $user_id, $activity_id))
-			{
+			if (!$stmt->bind_result($time, $user_id, $activity_id)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while($stmt->fetch() === TRUE)
-			{
+			while ($stmt->fetch() === TRUE) {
 				$activities[] = array('time' => $time, 'user_id' => $user_id, 'activity_id' => $activity_id);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -1501,45 +1380,37 @@ class User
 	 *
 	 * @internal Used in admin dashboard
 	 */
-	public static function getUsersByActivity($activityid, $pagenumber = 0, $perpage = 20)
-	{
+	public static function getUsersByActivity($activityid, $pagenumber = 0, $perpage = 20) {
 		$activities = array();
 
 		$exclude = '';
 		if (count(UserConfig::$dont_display_activity_for) > 0) {
-			$exclude = ' AND user_id NOT IN('.join(', ', UserConfig::$dont_display_activity_for).') ';
+			$exclude = ' AND user_id NOT IN(' . join(', ', UserConfig::$dont_display_activity_for) . ') ';
 		}
 
-		$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id FROM '.UserConfig::$mysql_prefix.'activity WHERE activity_id = ? '.$exclude.' ORDER BY time DESC LIMIT ?, ?';
+		$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id FROM ' . UserConfig::$mysql_prefix . 'activity WHERE activity_id = ? ' . $exclude . ' ORDER BY time DESC LIMIT ?, ?';
 
 		$db = UserConfig::getDB();
 
 		$first = $perpage * $pagenumber;
 
-		if ($stmt = $db->prepare($query))
-		{
-			if (!$stmt->bind_param('iii', $activityid, $first, $perpage))
-			{
+		if ($stmt = $db->prepare($query)) {
+			if (!$stmt->bind_param('iii', $activityid, $first, $perpage)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($time, $user_id))
-			{
+			if (!$stmt->bind_result($time, $user_id)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while($stmt->fetch() === TRUE)
-			{
+			while ($stmt->fetch() === TRUE) {
 				$activities[] = array('time' => $time, 'user_id' => $user_id);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -1557,38 +1428,30 @@ class User
 	 *
 	 * @throws DBException
 	 */
-	public static function getUsersByEmailOrUsername($nameoremail)
-	{
+	public static function getUsersByEmailOrUsername($nameoremail) {
 		$db = UserConfig::getDB();
 
 		$nameoremail = trim($nameoremail);
 
 		$users = array();
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE username = ? OR email = ?'))
-		{
-			if (!$stmt->bind_param('ss', $nameoremail, $nameoremail))
-			{
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users WHERE username = ? OR email = ?')) {
+			if (!$stmt->bind_param('ss', $nameoremail, $nameoremail)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified))
-			{
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while ($stmt->fetch() === TRUE)
-			{
+			while ($stmt->fetch() === TRUE) {
 				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -1608,39 +1471,32 @@ class User
 	 *
 	 * @internal Used in admin dashboard
 	 */
-	public static function getActivityStatistics()
-	{
+	public static function getActivityStatistics() {
 		$stats = array();
 
 		$where = '';
 		if (count(UserConfig::$dont_display_activity_for) > 0) {
-			$where = ' WHERE user_id NOT IN('.join(', ', UserConfig::$dont_display_activity_for).') ';
+			$where = ' WHERE user_id NOT IN(' . join(', ', UserConfig::$dont_display_activity_for) . ') ';
 		}
 
-		$query = 'SELECT activity_id, count(*) as cnt FROM '.UserConfig::$mysql_prefix."activity $where GROUP BY activity_id";
+		$query = 'SELECT activity_id, count(*) as cnt FROM ' . UserConfig::$mysql_prefix . "activity $where GROUP BY activity_id";
 
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare($query))
-		{
-			if (!$stmt->execute())
-			{
+		if ($stmt = $db->prepare($query)) {
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($activity_id, $cnt))
-			{
+			if (!$stmt->bind_result($activity_id, $cnt)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while($stmt->fetch() === TRUE)
-			{
+			while ($stmt->fetch() === TRUE) {
 				$stats[$activity_id] = $cnt;
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -1660,12 +1516,11 @@ class User
 	 *
 	 * @internal Used in admin dashboard
 	 */
-	public function getActivity($all, $pagenumber = 0, $perpage = 20)
-	{
+	public function getActivity($all, $pagenumber = 0, $perpage = 20) {
 		$activities = array();
 
 		if ($all) {
-			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM '.UserConfig::$mysql_prefix.'activity WHERE user_id = ? ORDER BY time DESC LIMIT ?, ?';
+			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM ' . UserConfig::$mysql_prefix . 'activity WHERE user_id = ? ORDER BY time DESC LIMIT ?, ?';
 		} else {
 			$ids = array();
 
@@ -1679,37 +1534,30 @@ class User
 				return $activities; // no activities are configured to be worthy
 			}
 
-			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM '.UserConfig::$mysql_prefix.'activity WHERE user_id = ? AND activity_id IN ('.implode(', ', $ids).')  ORDER BY time DESC LIMIT ?, ?';
+			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM ' . UserConfig::$mysql_prefix . 'activity WHERE user_id = ? AND activity_id IN (' . implode(', ', $ids) . ')  ORDER BY time DESC LIMIT ?, ?';
 		}
 
 		$db = UserConfig::getDB();
 
 		$first = $perpage * $pagenumber;
 
-		if ($stmt = $db->prepare($query))
-		{
-			if (!$stmt->bind_param('iii', $this->userid, $first, $perpage))
-			{
+		if ($stmt = $db->prepare($query)) {
+			if (!$stmt->bind_param('iii', $this->userid, $first, $perpage)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($time, $user_id, $activity_id))
-			{
+			if (!$stmt->bind_result($time, $user_id, $activity_id)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while($stmt->fetch() === TRUE)
-			{
+			while ($stmt->fetch() === TRUE) {
 				$activities[] = array('time' => $time, 'user_id' => $user_id, 'activity_id' => $activity_id);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -1727,27 +1575,22 @@ class User
 	 *
 	 * @throws DBException
 	 */
-	public function generateTemporaryPassword()
-	{
+	public function generateTemporaryPassword() {
 		$db = UserConfig::getDB();
 
-		$temppass = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 13);;
+		$temppass = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 13);
+		;
 
-		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET temppass = ?, temppasstime = now() WHERE id = ?'))
-		{
-			if (!$stmt->bind_param('si', $temppass, $this->userid))
-			{
+		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'users SET temppass = ?, temppasstime = now() WHERE id = ?')) {
+			if (!$stmt->bind_param('si', $temppass, $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -1761,25 +1604,19 @@ class User
 	 *
 	 * @throws DBException
 	 */
-	public function resetTemporaryPassword()
-	{
+	public function resetTemporaryPassword() {
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET temppass = null, temppasstime = null WHERE id = ?'))
-		{
-			if (!$stmt->bind_param('s', $this->userid))
-			{
+		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'users SET temppass = null, temppasstime = null WHERE id = ?')) {
+			if (!$stmt->bind_param('s', $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 	}
@@ -1795,27 +1632,21 @@ class User
 	 *
 	 * @deprecated
 	 */
-	public function setRegistrationModule($module)
-	{
+	public function setRegistrationModule($module) {
 		$db = UserConfig::getDB();
 
 		$module_id = $module->getID();
 
-		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET regmodule = ? WHERE id = ?'))
-		{
-			if (!$stmt->bind_param('si', $module_id, $this->userid))
-			{
+		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'users SET regmodule = ? WHERE id = ?')) {
+			if (!$stmt->bind_param('si', $module_id, $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 	}
@@ -1835,8 +1666,7 @@ class User
 	 *
 	 * @throws DBException
 	 */
-	public static function getUsersByIDs($userids)
-	{
+	public static function getUsersByIDs($userids) {
 		$db = UserConfig::getDB();
 
 		$users = array();
@@ -1847,33 +1677,27 @@ class User
 
 		$ids = array();
 		foreach ($userids as $userid) {
-			if (is_int($userid)){
+			if (is_int($userid)) {
 				$ids[] = $userid;
 			}
 		}
 
 		$idlist = join(', ', $ids);
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE id IN ('.$idlist.')'))
-		{
-			if (!$stmt->execute())
-			{
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users WHERE id IN (' . $idlist . ')')) {
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified))
-			{
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while ($stmt->fetch() === TRUE)
-			{
+			while ($stmt->fetch() === TRUE) {
 				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -1889,25 +1713,19 @@ class User
 	 *
 	 * @deprecated
 	 */
-	public function removeGoogleFriendConnectAssociation($google_id)
-	{
+	public function removeGoogleFriendConnectAssociation($google_id) {
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.'googlefriendconnect WHERE user_id = ? AND google_id = ?'))
-		{
-			if (!$stmt->bind_param('is', $this->userid, $google_id))
-			{
+		if ($stmt = $db->prepare('DELETE FROM ' . UserConfig::$mysql_prefix . 'googlefriendconnect WHERE user_id = ? AND google_id = ?')) {
+			if (!$stmt->bind_param('is', $this->userid, $google_id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 		$this->recordActivity(USERBASE_ACTIVITY_REMOVED_GFC);
@@ -1923,25 +1741,19 @@ class User
 	 *
 	 * @deprecated
 	 */
-	public function addGoogleFriendConnectAssociation($google_id, $userpic)
-	{
+	public function addGoogleFriendConnectAssociation($google_id, $userpic) {
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('INSERT IGNORE INTO '.UserConfig::$mysql_prefix.'googlefriendconnect (user_id, google_id, userpic) VALUES (?, ?, ?)'))
-		{
-			if (!$stmt->bind_param('iss', $this->userid, $google_id, $userpic))
-			{
+		if ($stmt = $db->prepare('INSERT IGNORE INTO ' . UserConfig::$mysql_prefix . 'googlefriendconnect (user_id, google_id, userpic) VALUES (?, ?, ?)')) {
+			if (!$stmt->bind_param('iss', $this->userid, $google_id, $userpic)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -1957,36 +1769,28 @@ class User
 	 *
 	 * @deprecated
 	 */
-	public function getGoogleFriendsConnectAssociations()
-	{
+	public function getGoogleFriendsConnectAssociations() {
 		$db = UserConfig::getDB();
 
 		$associations = array();
 
-		if ($stmt = $db->prepare('SELECT google_id, userpic FROM '.UserConfig::$mysql_prefix.'users u INNER JOIN '.UserConfig::$mysql_prefix.'googlefriendconnect g ON u.id = g.user_id WHERE u.id = ?'))
-		{
-			if (!$stmt->bind_param('i', $this->userid))
-			{
+		if ($stmt = $db->prepare('SELECT google_id, userpic FROM ' . UserConfig::$mysql_prefix . 'users u INNER JOIN ' . UserConfig::$mysql_prefix . 'googlefriendconnect g ON u.id = g.user_id WHERE u.id = ?')) {
+			if (!$stmt->bind_param('i', $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($google_id, $userpic))
-			{
+			if (!$stmt->bind_result($google_id, $userpic)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while ($stmt->fetch() === TRUE)
-			{
+			while ($stmt->fetch() === TRUE) {
 				$associations[] = array('google_id' => $google_id, 'userpic' => $userpic);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -2006,33 +1810,25 @@ class User
 	 *
 	 * @throws DBException
 	 */
-	public static function getUserByUsernamePassword($entered_username, $entered_password)
-	{
+	public static function getUserByUsernamePassword($entered_username, $entered_password) {
 		$db = UserConfig::getDB();
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, pass, salt, temppass, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE username = ?'))
-		{
-			if (!$stmt->bind_param('s', $entered_username))
-			{
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, pass, salt, temppass, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users WHERE username = ?')) {
+			if (!$stmt->bind_param('s', $entered_username)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($id, $status, $name, $username, $email, $pass, $salt, $temppass, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified))
-			{
+			if (!$stmt->bind_result($id, $status, $name, $username, $email, $pass, $salt, $temppass, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			if ($stmt->fetch() === TRUE)
-			{
-				if (sha1($salt.$entered_password) == $pass)
-				{
+			if ($stmt->fetch() === TRUE) {
+				if (sha1($salt . $entered_password) == $pass) {
 					$user = new self($id, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
-
 				}
 			}
 
@@ -2041,56 +1837,42 @@ class User
 			// if user used password recovery and remembered his old password
 			// then clean temporary password and password reset flag
 			// (don't reset the flag if was was set for some other reasons)
-			if (!is_null($user) && !$user->isDisabled() && !is_null($temppass) && $user->requiresPasswordReset())
-			{
+			if (!is_null($user) && !$user->isDisabled() && !is_null($temppass) && $user->requiresPasswordReset()) {
 				$user->setRequiresPasswordReset(false);
 				$user->save();
 
 				$user->resetTemporaryPassword();
 			}
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
-		if (is_null($user))
-		{
-			if ($stmt = $db->prepare('SELECT id, status, name, username, email, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE username = ? AND temppass = ? AND temppasstime > DATE_SUB(NOW(), INTERVAL 1 DAY)'))
-			{
-				if (!$stmt->bind_param('ss', $entered_username, $entered_password))
-				{
+		if (is_null($user)) {
+			if ($stmt = $db->prepare('SELECT id, status, name, username, email, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users WHERE username = ? AND temppass = ? AND temppasstime > DATE_SUB(NOW(), INTERVAL 1 DAY)')) {
+				if (!$stmt->bind_param('ss', $entered_username, $entered_password)) {
 					throw new DBBindParamException($db, $stmt);
 				}
-				if (!$stmt->execute())
-				{
+				if (!$stmt->execute()) {
 					throw new DBExecuteStmtException($db, $stmt);
 				}
-				if (!$stmt->bind_result($id, $status, $name, $username, $email, $fb_id, $regtime, $points, $is_email_verified))
-				{
+				if (!$stmt->bind_result($id, $status, $name, $username, $email, $fb_id, $regtime, $points, $is_email_verified)) {
 					throw new DBBindResultException($db, $stmt);
 				}
 
-				if ($stmt->fetch() === TRUE)
-				{
+				if ($stmt->fetch() === TRUE) {
 					$user = new self($id, $status, $name, $username, $email, null, $fb_id, $regtime, $points, $is_email_verified);
 				}
 
 				$stmt->close();
 
-				if (!is_null($user))
-				{
+				if (!is_null($user)) {
 					$user->setRequiresPasswordReset(true);
 					$user->save();
 				}
-			}
-			else
-			{
+			} else {
 				throw new DBPrepareStmtException($db);
 			}
-		}
-		else
-		{
+		} else {
 			$user->resetTemporaryPassword();
 		}
 
@@ -2113,41 +1895,34 @@ class User
 	 *
 	 * @deprecated
 	 */
-	public static function getUserByGoogleFriendConnectID($googleid)
-	{
+	public static function getUserByGoogleFriendConnectID($googleid) {
 		$db = UserConfig::getDB();
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users u INNER JOIN '.UserConfig::$mysql_prefix.'googlefriendconnect g ON u.id = g.user_id WHERE g.google_id = ?'))
-		{
-			if (!$stmt->bind_param('s', $googleid))
-			{
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users u INNER JOIN ' . UserConfig::$mysql_prefix . 'googlefriendconnect g ON u.id = g.user_id WHERE g.google_id = ?')) {
+			if (!$stmt->bind_param('s', $googleid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified))
-			{
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			if ($stmt->fetch() === TRUE)
-			{
+			if ($stmt->fetch() === TRUE) {
 				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
 		return $user;
 	}
+
 	/*
 	 *
 	 */
@@ -2161,36 +1936,28 @@ class User
 	 *
 	 * @throws DBException
 	 */
-	public static function getUserByFacebookID($fb_id)
-	{
+	public static function getUserByFacebookID($fb_id) {
 		$db = UserConfig::getDB();
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE fb_id = ?'))
-		{
-			if (!$stmt->bind_param('i', $fb_id))
-			{
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users WHERE fb_id = ?')) {
+			if (!$stmt->bind_param('i', $fb_id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $regtime, $points, $is_email_verified))
-			{
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $regtime, $points, $is_email_verified)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			if ($stmt->fetch() === TRUE)
-			{
+			if ($stmt->fetch() === TRUE) {
 				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -2206,36 +1973,28 @@ class User
 	 *
 	 * @throws DBException
 	 */
-	public static function getUser($userid)
-	{
+	public static function getUser($userid) {
 		$db = UserConfig::getDB();
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE id = ?'))
-		{
-			if (!$stmt->bind_param('i', $userid))
-			{
+		if ($stmt = $db->prepare('SELECT status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users WHERE id = ?')) {
+			if (!$stmt->bind_param('i', $userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified))
-			{
+			if (!$stmt->bind_result($status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			if ($stmt->fetch() === TRUE)
-			{
+			if ($stmt->fetch() === TRUE) {
 				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -2249,14 +2008,13 @@ class User
 	 *
 	 * @throws StartupAPIException
 	 */
-	private static function setReturn($return)
-	{
+	private static function setReturn($return) {
 		$storage = new MrClay_CookieStorage(array(
-			'secret' => UserConfig::$SESSION_SECRET,
-			'path' => UserConfig::$SITEROOTURL,
-			'expire' => 0,
-			'httponly' => true
-		));
+					'secret' => UserConfig::$SESSION_SECRET,
+					'path' => UserConfig::$SITEROOTURL,
+					'expire' => 0,
+					'httponly' => true
+				));
 
 		if (!$storage->store(UserConfig::$session_return_key, $return)) {
 			throw new StartupAPIException(implode('; ', $storage->errors));
@@ -2268,13 +2026,12 @@ class User
 	 *
 	 * @return string|null Return URL or null if no return URL was stored
 	 */
-	public static function getReturn()
-	{
+	public static function getReturn() {
 		$storage = new MrClay_CookieStorage(array(
-			'secret' => UserConfig::$SESSION_SECRET,
-			'path' => UserConfig::$SITEROOTURL,
-			'httponly' => true
-		));
+					'secret' => UserConfig::$SESSION_SECRET,
+					'path' => UserConfig::$SITEROOTURL,
+					'httponly' => true
+				));
 
 		$return = $storage->fetch(UserConfig::$session_return_key);
 
@@ -2288,13 +2045,12 @@ class User
 	/**
 	 * Crears return URL
 	 */
-	public static function clearReturn()
-	{
+	public static function clearReturn() {
 		$storage = new MrClay_CookieStorage(array(
-			'secret' => UserConfig::$SESSION_SECRET,
-			'path' => UserConfig::$SITEROOTURL,
-			'httponly' => true
-		));
+					'secret' => UserConfig::$SESSION_SECRET,
+					'path' => UserConfig::$SITEROOTURL,
+					'httponly' => true
+				));
 
 		$storage->delete(UserConfig::$session_return_key);
 	}
@@ -2302,22 +2058,20 @@ class User
 	/**
 	 * Sends user to login page (remembering current page to be returned to upon success)
 	 */
-	public static function redirectToLogin()
-	{
+	public static function redirectToLogin() {
 		self::setReturn($_SERVER['REQUEST_URI']);
 
-		header('Location: '.UserConfig::$USERSROOTURL.'/login.php');
+		header('Location: ' . UserConfig::$USERSROOTURL . '/login.php');
 		exit;
 	}
 
 	/**
 	 * Sends user to password reset page (remembering current page to be returned to upon success)
 	 */
-	private static function redirectToPasswordReset()
-	{
+	private static function redirectToPasswordReset() {
 		self::setReturn($_SERVER['REQUEST_URI']);
 
-		header('Location: '.UserConfig::$USERSROOTURL.'/modules/usernamepass/passwordreset.php');
+		header('Location: ' . UserConfig::$USERSROOTURL . '/modules/usernamepass/passwordreset.php');
 		exit;
 	}
 
@@ -2327,7 +2081,7 @@ class User
 	private static function redirectToEmailVerification() {
 		self::setReturn($_SERVER['REQUEST_URI']);
 
-		header('Location: '.UserConfig::$USERSROOTURL.'/verify_email.php');
+		header('Location: ' . UserConfig::$USERSROOTURL . '/verify_email.php');
 		exit;
 	}
 
@@ -2408,8 +2162,7 @@ class User
 	 * @param int $points Total points user has
 	 * @param boolean $is_email_verified Is user's email verified or not
 	 */
-	private function __construct($userid, $status = true, $name, $username = null, $email = null, $requirespassreset = false, $fbid = null, $regtime = null, $points = 0, $is_email_verified = false)
-	{
+	private function __construct($userid, $status = true, $name, $username = null, $email = null, $requirespassreset = false, $fbid = null, $regtime = null, $points = 0, $is_email_verified = false) {
 		$this->userid = $userid;
 		$this->status = $status ? true : false;
 		$this->name = $name;
@@ -2427,8 +2180,7 @@ class User
 	 *
 	 * @return boolean
 	 */
-	public function requiresPasswordReset()
-	{
+	public function requiresPasswordReset() {
 		return $this->requirespassreset;
 	}
 
@@ -2439,8 +2191,7 @@ class User
 	 *
 	 * @param boolean $requires Set to true to require user to reset their password
 	 */
-	public function setRequiresPasswordReset($requires)
-	{
+	public function setRequiresPasswordReset($requires) {
 		$this->requirespassreset = $requires ? true : false;
 	}
 
@@ -2449,8 +2200,7 @@ class User
 	 *
 	 * @return int User ID
 	 */
-	public function getID()
-	{
+	public function getID() {
 		return $this->userid;
 	}
 
@@ -2459,8 +2209,7 @@ class User
 	 *
 	 * @return string User's display name
 	 */
-	public function getName()
-	{
+	public function getName() {
 		return $this->name;
 	}
 
@@ -2471,8 +2220,7 @@ class User
 	 *
 	 * @param string $name User's display name
 	 */
-	public function setName($name)
-	{
+	public function setName($name) {
 		$this->name = $name;
 	}
 
@@ -2481,8 +2229,7 @@ class User
 	 *
 	 * @return string|null User's login name
 	 */
-	public function getUsername()
-	{
+	public function getUsername() {
 		return $this->username;
 	}
 
@@ -2495,10 +2242,8 @@ class User
 	 *
 	 * @throws StartupAPIException
 	 */
-	public function setUsername($username)
-	{
-		if (is_null($this->username))
-		{
+	public function setUsername($username) {
+		if (is_null($this->username)) {
 			$this->username = $username;
 		} else {
 			throw new StartupAPIException('This user already has username set.');
@@ -2510,8 +2255,7 @@ class User
 	 *
 	 * @return string|null User's email address
 	 */
-	public function getEmail()
-	{
+	public function getEmail() {
 		return $this->email;
 	}
 
@@ -2522,8 +2266,7 @@ class User
 	 *
 	 * @param string $email User's email address
 	 */
-	public function setEmail($email)
-	{
+	public function setEmail($email) {
 		if ($this->email != $email) {
 			$this->setEmailVerified(false);
 		}
@@ -2556,8 +2299,7 @@ class User
 	 *
 	 * @return int|null User's Facebook account ID
 	 */
-	public function getFacebookID()
-	{
+	public function getFacebookID() {
 		return $this->fbid;
 	}
 
@@ -2568,8 +2310,7 @@ class User
 	 *
 	 * @param int $fbid User's Facebook account ID
 	 */
-	public function setFacebookID($fbid)
-	{
+	public function setFacebookID($fbid) {
 		$this->fbid = $fbid;
 	}
 
@@ -2589,8 +2330,7 @@ class User
 	 *
 	 * @return int Unix timestamp representing user's registration time
 	 */
-	public function getRegTime()
-	{
+	public function getRegTime() {
 		return $this->regtime;
 	}
 
@@ -2599,8 +2339,7 @@ class User
 	 *
 	 * @return int Aggregated activity points
 	 */
-	public function getPoints()
-	{
+	public function getPoints() {
 		return $this->points;
 	}
 
@@ -2611,8 +2350,7 @@ class User
 	 *
 	 * @return boolean Returns whatever this is the same user or not
 	 */
-	public function isTheSameAs($user)
-	{
+	public function isTheSameAs($user) {
 		return $this->getID() == $user->getID();
 	}
 
@@ -2621,8 +2359,7 @@ class User
 	 *
 	 * @return boolean True if user is disabled
 	 */
-	public function isDisabled()
-	{
+	public function isDisabled() {
 		return (!$this->status ? true : false);
 	}
 
@@ -2635,34 +2372,26 @@ class User
 	 *
 	 * @throws DBException
 	 */
-	public function checkPass($password)
-	{
+	public function checkPass($password) {
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('SELECT pass, salt FROM '.UserConfig::$mysql_prefix.'users WHERE id = ?'))
-		{
-			if (!$stmt->bind_param('i', $this->userid))
-			{
+		if ($stmt = $db->prepare('SELECT pass, salt FROM ' . UserConfig::$mysql_prefix . 'users WHERE id = ?')) {
+			if (!$stmt->bind_param('i', $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($pass, $salt))
-			{
+			if (!$stmt->bind_result($pass, $salt)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			if ($stmt->fetch() === TRUE)
-			{
-				return ($pass == sha1($salt.$password));
+			if ($stmt->fetch() === TRUE) {
+				return ($pass == sha1($salt . $password));
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -2676,28 +2405,22 @@ class User
 	 *
 	 * @throws DBException
 	 */
-	public function setPass($password)
-	{
+	public function setPass($password) {
 		$db = UserConfig::getDB();
 
 		$salt = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 13);
-		$pass = sha1($salt.$password);
+		$pass = sha1($salt . $password);
 
-		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET pass = ?, salt = ? WHERE id = ?'))
-		{
-			if (!$stmt->bind_param('ssi', $pass, $salt, $this->userid))
-			{
+		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'users SET pass = ?, salt = ? WHERE id = ?')) {
+			if (!$stmt->bind_param('ssi', $pass, $salt, $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 	}
@@ -2707,8 +2430,7 @@ class User
 	 *
 	 * @throws DBException
 	 */
-	public function save()
-	{
+	public function save() {
 		$db = UserConfig::getDB();
 
 		$passresetnum = $this->requirespassreset ? 1 : 0;
@@ -2719,32 +2441,23 @@ class User
 		// properties
 		// TODO implement some protection from reading or writing to DB based on this user's info,
 		// just reading object properties.
-
 		// creating a copy of the user in case we need to update their email subscription
 		$old_user = self::getUser($this->getID());
 
-		$username = is_null($this->username) || $this->username == '' ? null
-			: mb_convert_encoding($this->username, 'UTF-8');
-		$name = is_null($this->name) || $this->name == '' ? null
-			: mb_convert_encoding($this->name, 'UTF-8');
-		$email = is_null($this->email) || $this->email == '' ? null
-			: mb_convert_encoding($this->email, 'UTF-8');
+		$username = is_null($this->username) || $this->username == '' ? null : mb_convert_encoding($this->username, 'UTF-8');
+		$name = is_null($this->name) || $this->name == '' ? null : mb_convert_encoding($this->name, 'UTF-8');
+		$email = is_null($this->email) || $this->email == '' ? null : mb_convert_encoding($this->email, 'UTF-8');
 
-		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET status = ?, username = ?, name = ?, email = ?, email_verified = ?, requirespassreset = ?, fb_id = ? WHERE id = ?'))
-		{
-			if (!$stmt->bind_param('isssiiii', $status, $username, $name, $email, $email_verifiednum, $passresetnum, $this->fbid, $this->userid))
-			{
+		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'users SET status = ?, username = ?, name = ?, email = ?, email_verified = ?, requirespassreset = ?, fb_id = ? WHERE id = ?')) {
+			if (!$stmt->bind_param('isssiiii', $status, $username, $name, $email, $email_verifiednum, $passresetnum, $this->fbid, $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -2768,16 +2481,14 @@ class User
 	 *
 	 * @throws StartupAPIException
 	 */
-	public function setSession($remember)
-	{
+	public function setSession($remember) {
 		$storage = new MrClay_CookieStorage(array(
-			'secret' => UserConfig::$SESSION_SECRET,
-			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
-			'path' => UserConfig::$SITEROOTURL,
-			'expire' => UserConfig::$allowRememberMe && $remember
-				? time() + UserConfig::$rememberMeTime : 0,
-			'httponly' => true
-		));
+					'secret' => UserConfig::$SESSION_SECRET,
+					'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+					'path' => UserConfig::$SITEROOTURL,
+					'expire' => UserConfig::$allowRememberMe && $remember ? time() + UserConfig::$rememberMeTime : 0,
+					'httponly' => true
+				));
 
 		if (!$storage->store(UserConfig::$session_userid_key, $this->userid)) {
 			throw new StartupAPIException(implode('; ', $storage->errors));
@@ -2787,15 +2498,14 @@ class User
 	/**
 	 * Clears user session cookie
 	 */
-	public static function clearSession()
-	{
+	public static function clearSession() {
 		self::stopImpersonation();
 
 		$storage = new MrClay_CookieStorage(array(
-			'secret' => UserConfig::$SESSION_SECRET,
-			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
-			'path' => UserConfig::$SITEROOTURL
-		));
+					'secret' => UserConfig::$SESSION_SECRET,
+					'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+					'path' => UserConfig::$SITEROOTURL
+				));
 
 		$storage->delete(UserConfig::$session_userid_key);
 	}
@@ -2811,21 +2521,20 @@ class User
 	 *
 	 * @throws StartupAPIException
 	 */
-	public function impersonate($user)
-	{
+	public function impersonate($user) {
 		if (is_null($user) || $user->isTheSameAs($this)) {
 			return null;
 		}
 
 		$storage = new MrClay_CookieStorage(array(
-			'secret' => UserConfig::$SESSION_SECRET,
-			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
-			'path' => UserConfig::$SITEROOTURL,
-			'httponly' => true
-		));
+					'secret' => UserConfig::$SESSION_SECRET,
+					'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+					'path' => UserConfig::$SITEROOTURL,
+					'httponly' => true
+				));
 
 		if (!$this->isAdmin()) {
-			throw new StartupAPIException('Not admin (userid: '.$this->userid.') is trying to impersonate another user (userid: '.$user->userid.')');
+			throw new StartupAPIException('Not admin (userid: ' . $this->userid . ') is trying to impersonate another user (userid: ' . $user->userid . ')');
 		}
 
 		if (!$storage->store(UserConfig::$impersonation_userid_key, $user->userid)) {
@@ -2843,15 +2552,14 @@ class User
 	/**
 	 * Stops impersonation
 	 */
-	public static function stopImpersonation()
-	{
+	public static function stopImpersonation() {
 		$user = self::get();
 
 		$storage = new MrClay_CookieStorage(array(
-			'secret' => UserConfig::$SESSION_SECRET,
-			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
-			'path' => UserConfig::$SITEROOTURL
-		));
+					'secret' => UserConfig::$SESSION_SECRET,
+					'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+					'path' => UserConfig::$SITEROOTURL
+				));
 
 		$storage->delete(UserConfig::$impersonation_userid_key);
 
@@ -2867,52 +2575,40 @@ class User
 	 *
 	 * @throws DBException
 	 */
-	public function recordActivity($activity_id)
-	{
-		if ($this->isImpersonated())
-		{
+	public function recordActivity($activity_id) {
+		if ($this->isImpersonated()) {
 			// TODO Implement real impersonation logging instead of tracking activity for a user
-			error_log('[Impersonation log] Activity "' . UserConfig::$activities[$activity_id][0] .  '" (User ID: ' . $activity_id . ') by ' .
+			error_log('[Impersonation log] Activity "' . UserConfig::$activities[$activity_id][0] . '" (User ID: ' . $activity_id . ') by ' .
 					$this->impersonator->getName() . ' (Activity ID: ' . $this->impersonator->getID() .
-						') on behalf of ' . $this->getName() . ' (User ID: ' . $this->getID() . ')');
+					') on behalf of ' . $this->getName() . ' (User ID: ' . $this->getID() . ')');
 			return;
 		}
 
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'activity (user_id, activity_id) VALUES (?, ?)'))
-		{
-			if (!$stmt->bind_param('ii', $this->userid, $activity_id))
-			{
+		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . 'activity (user_id, activity_id) VALUES (?, ?)')) {
+			if (!$stmt->bind_param('ii', $this->userid, $activity_id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
-		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users SET points = points + ? WHERE id = ?'))
-		{
-			if (!$stmt->bind_param('ii', UserConfig::$activities[$activity_id][1], $this->userid))
-			{
+		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'users SET points = points + ? WHERE id = ?')) {
+			if (!$stmt->bind_param('ii', UserConfig::$activities[$activity_id][1], $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -2951,31 +2647,24 @@ class User
 
 		$in = implode(', ', $activity_ids);
 
-		if ($stmt = $db->prepare('SELECT count(*) as count FROM '.UserConfig::$mysql_prefix.'activity
-									WHERE user_id = ? AND activity_id IN (' . $in . ')'))
-		{
-			if (!$stmt->bind_param('i', $this->userid))
-			{
+		if ($stmt = $db->prepare('SELECT count(*) as count FROM ' . UserConfig::$mysql_prefix . 'activity
+									WHERE user_id = ? AND activity_id IN (' . $in . ')')) {
+			if (!$stmt->bind_param('i', $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($count))
-			{
+			if (!$stmt->bind_result($count)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			if($stmt->fetch() === TRUE)
-			{
+			if ($stmt->fetch() === TRUE) {
 				$activity_count = $count;
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -2987,8 +2676,7 @@ class User
 	 *
 	 * @return array Array of Account objects
 	 */
-	public function getAccounts()
-	{
+	public function getAccounts() {
 		return Account::getUserAccounts($this);
 	}
 
@@ -2997,8 +2685,7 @@ class User
 	 *
 	 * @return Account Currently selected account
 	 */
-	public function getCurrentAccount()
-	{
+	public function getCurrentAccount() {
 		return Account::getCurrentAccount($this);
 	}
 
@@ -3077,8 +2764,9 @@ class User
 	 * Registers a badge for a user
 	 *
 	 * @param Badge $badge Badge to Register for a user
-	*/
+	 */
 	public function registerBadge($badge) {
 		$badge->registerForUser();
 	}
+
 }

@@ -49,7 +49,7 @@ $admin_menu = new adminMenu(array(
 			)),
 			new menuSection('promotion', 'Promotion', null, array(
 				new menu('sources', 'Sources', $ADMIN_ROOT . '/sources.php', 'random'),
-				new menu('campaigns', 'Campaign management', $ADMIN_ROOT . '/campaigns.php', 'comment', FALSE)
+				new menu('campaigns', 'Campaign management', $ADMIN_ROOT . '/campaigns.php', 'comment')
 			)),
 			new menuSection('gamification', 'Gamification', null, array(
 				new menu('badges', 'Badges', $ADMIN_ROOT . '/badges.php', 'star')
