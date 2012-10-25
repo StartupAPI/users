@@ -43,16 +43,16 @@ $admin_menu = new adminMenu(array(
 				new menu('bymodule', 'Registrations By Module', $ADMIN_ROOT . '/bymodule.php', 'th-large'),
 				new menu('invitations', 'Invitations', $ADMIN_ROOT . '/invitations.php', 'envelope', UserConfig::$enableInvitations, 'Invitations are disabled in configuration')
 			)),
-			new menuSection('settings', 'Settings', null, array(
-				new menu('features', 'Features', $ADMIN_ROOT . '/features.php', 'check', $features_num > 0, 'No features defined in this app'),
-				new menu('templates', 'Templates', $ADMIN_ROOT . '/templates.php', 'list-alt', false),
-			)),
 			new menuSection('promotion', 'Promotion', null, array(
 				new menu('sources', 'Sources', $ADMIN_ROOT . '/sources.php', 'random'),
 				new menu('campaigns', 'Campaign management', $ADMIN_ROOT . '/campaigns.php', 'comment')
 			)),
 			new menuSection('gamification', 'Gamification', null, array(
 				new menu('badges', 'Badges', $ADMIN_ROOT . '/badges.php', 'star')
+			)),
+			new menuSection('settings', 'Settings', null, array(
+				new menu('features', 'Features', $ADMIN_ROOT . '/features.php', 'check', $features_num > 0, 'No features defined in this app'),
+				new menu('templates', 'Templates', $ADMIN_ROOT . '/templates.php', 'list-alt', false),
 			))
 		));
 

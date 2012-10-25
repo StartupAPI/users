@@ -332,6 +332,45 @@ class User {
 		}
 	}
 
+	public function getCampaign() {
+		$db = UserConfig::getDB();
+
+		$campaign = array();
+
+		if ($stmt = $db->prepare('SELECT cmp.name, cmp_content.content, cmp_keywords.keywords, cmp_medium.medium, cmp_source.source
+			FROM ' . UserConfig::$mysql_prefix . 'users AS users
+				INNER JOIN ' . UserConfig::$mysql_prefix . 'cmp AS cmp ON users.reg_cmp_name_id = cmp.id
+				INNER JOIN ' . UserConfig::$mysql_prefix . 'cmp_content AS cmp_content ON users.reg_cmp_content_id = cmp_content.id
+				INNER JOIN ' . UserConfig::$mysql_prefix . 'cmp_keywords AS cmp_keywords ON users.reg_cmp_keywords_id = cmp_keywords.id
+				INNER JOIN ' . UserConfig::$mysql_prefix . 'cmp_medium AS cmp_medium ON users.reg_cmp_medium_id = cmp_medium.id
+				INNER JOIN ' . UserConfig::$mysql_prefix . 'cmp_source AS cmp_source ON users.reg_cmp_source_id = cmp_source.id
+			WHERE users.id = ?')) {
+			if (!$stmt->bind_param('i', $this->userid)) {
+				throw new DBBindParamException($db, $stmt);
+			}
+			if (!$stmt->execute()) {
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+			if (!$stmt->bind_result($cmp_name, $cmp_content, $cmp_keywords, $cmp_medium, $cmp_source)) {
+				throw new DBBindResultException($db, $stmt);
+			}
+
+			if ($stmt->fetch() === TRUE) {
+				$campaign['cmp_name'] = $cmp_name;
+				$campaign['cmp_content'] = $cmp_content;
+				$campaign['cmp_keywords'] = $cmp_keywords;
+				$campaign['cmp_medium'] = $cmp_medium;
+				$campaign['cmp_source'] = $cmp_source;
+			}
+
+			$stmt->close();
+		} else {
+			throw new DBPrepareStmtException($db);
+		}
+
+		return $campaign;
+	}
+
 	public static function getCampaigns($days = 30) {
 		$db = UserConfig::getDB();
 

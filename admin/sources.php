@@ -12,7 +12,7 @@ uasort($sources, function($a, $b) {
   });
 ?>
 <div class="span9">
-	<p>Sources that attracted the most registered users in the last <?php echo $days ?> days.</p>
+	<p>Sources that attracted the most registered users in the <b>last <?php echo $days ?> days</b>.</p>
 	<table class="table">
 		<?php foreach ($sources as $source => $users) { ?>
 			<tr>

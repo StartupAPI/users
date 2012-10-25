@@ -128,18 +128,6 @@ require_once(dirname(__FILE__) . '/header.php');
 	}
 	?>
 
-	<h3>Source of registration</h3>
-	<p>Referer: <?php
-		$referer = $user->getReferer();
-
-		if (is_null($referer)) {
-			?><i>unknown</i><?php
-	} else {
-			?><a href="<?php echo UserTools::escape($referer) ?>"><?php echo UserTools::escape($referer) ?></a><?php
-	}
-		?>
-	</p>
-
 	<h3>Authentication Credentials</h3>
 	<ul><?php
 		foreach (UserConfig::$authentication_modules as $module) {
@@ -153,6 +141,7 @@ require_once(dirname(__FILE__) . '/header.php');
 		}
 		?>
 	</ul>
+
 	<?php
 	if (UserConfig::$useAccounts) {
 		?>
@@ -172,6 +161,36 @@ require_once(dirname(__FILE__) . '/header.php');
 				?>
 		</ul>
 		<?php
+	}
+	?>
+
+	<h3>Source of registration</h3>
+	<p>Referer: <?php
+		$referer = $user->getReferer();
+
+		if (is_null($referer)) {
+			?><i>unknown</i><?php
+	} else {
+			?><a target="_blank" href="<?php echo UserTools::escape($referer) ?>"><?php echo UserTools::escape($referer) ?></a><?php
+	}
+		?>
+	</p>
+	<?php
+	$campaign = $user->getCampaign();
+	if (count($campaign) > 0) {
+		?><h4>Campaign codes</h4><?php
+	}
+
+	if (array_key_exists('cmp_name', $campaign)) {
+		?><p>Name: <b><?php echo UserTools::escape($campaign['cmp_name']) ?></b></p><?php }
+	if (array_key_exists('cmp_source', $campaign)) {
+		?><p>Source: <b><?php echo UserTools::escape($campaign['cmp_source']) ?></b></p><?php }
+	if (array_key_exists('cmp_medium', $campaign)) {
+		?><p>Medium: <b><?php echo UserTools::escape($campaign['cmp_medium']) ?></b></p><?php }
+	if (array_key_exists('cmp_keywords', $campaign)) {
+		?><p>Keywords: <b><?php echo UserTools::escape($campaign['cmp_keywords']) ?></b></p><?php }
+	if (array_key_exists('cmp_content', $campaign)) {
+		?><p>Content: <b><?php echo UserTools::escape($campaign['cmp_content']) ?></b></p><?php
 	}
 
 	$features = Feature::getAll();
