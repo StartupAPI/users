@@ -18,7 +18,7 @@ $sources = User::getReferers($days);
 	<table class="table">
 		<?php foreach ($sources as $source => $users) { ?>
 			<tr>
-				<td><a href="<?php echo UserTools::escape($source) ?>" target="_blank"><?php echo UserTools::escape($source) ?></a></td>
+				<td><a href="<?php echo UserTools::escape($source) ?>" target="_blank"><?php echo UserTools::escape(substr($source,0,100)) ?><?php if (strlen($source) > 100) { ?>...<?php } ?></a></td>
 				<td><span class="badge"><?php echo count($users) ?> users</span></td>
 				<td>
 					<?php foreach ($users as $user) { ?>

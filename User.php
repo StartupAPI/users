@@ -264,7 +264,7 @@ class User
 
 		$sources = array();
 
-		if ($stmt = $db->prepare('SELECT referer, id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE regtime > DATE_SUB(NOW(), INTERVAL ? DAY) ORDER BY regtime DESC'))
+		if ($stmt = $db->prepare('SELECT referer, id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM '.UserConfig::$mysql_prefix.'users WHERE referer IS NOT NULL AND regtime > DATE_SUB(NOW(), INTERVAL ? DAY) ORDER BY regtime DESC'))
 		{
 			if (!$stmt->bind_param('i', $days))
 			{
