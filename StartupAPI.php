@@ -193,7 +193,7 @@ class StartupAPIException extends Exception {
 	 * @param int $code Exception code
 	 * @param Exception $previous Previous exception in the chain
 	 */
-	function __construct($message, $code, $previous) {
+	function __construct($message, $code = null, $previous = null) {
 		parent::__construct('[StartupAPI] ' . $message, $code, $previous);
 	}
 
