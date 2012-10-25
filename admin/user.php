@@ -93,6 +93,14 @@ require_once(dirname(__FILE__) . '/header.php');
 		}
 		?>
 	</p>
+	<p>
+		<?php
+		$regtime = $user->getRegTime();
+		$ago = intval(floor((time() - $regtime)/86400));
+		?>
+		<b>Registered:</b> <?php echo date('M j, Y h:iA', $regtime) ?>
+		<span class="badge<?php if ($ago <= 5) {?> badge-success<?php }?>"><?php echo $ago?></span> day<?php echo $ago != 1 ? 's' : '' ?> ago
+	</p>
 
 	<p>
 		<b>Activity points:</b> <span class="badge"><?php echo $user->getPoints(); ?></span> <a class="btn btn-small" href="activity.php?userid=<?php echo $user->getID() ?>"><i class="icon-signal"></i> See activity</a>
