@@ -106,6 +106,7 @@ require_once(dirname(__FILE__) . '/header.php');
 	$available_badges = Badge::getAvailableBadges();
 
 	foreach($available_badges as $badge) {
+		?><a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/badge.php?id=<?php echo $badge->getID() ?>"><?php
 		if (array_key_exists($badge->getID(), $user_badges)) {
 			$badge_level = $user_badges[$badge->getID()][1];
 			?><img
@@ -123,6 +124,7 @@ require_once(dirname(__FILE__) . '/header.php');
 				 height="<?php echo $adminBadgeSize ?>"/>
 		<?php
 		}
+		?></a><?php
 	}
 	?>
 

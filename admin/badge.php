@@ -47,8 +47,8 @@ function showLevelUsers($level) {
 			} else {
 				foreach ($badge_users as $user) {
 					?>
-					<a href="<?php UserConfig::$USERSROOTURL ?>/admin/user.php?id=<?php echo $user->getID() ?>">
-						<li class="icon-user"></li> <?php echo UserTools::escape($user->getName()) ?>
+					<a style="margin-right: 0.5em" href="<?php echo UserConfig::$USERSROOTURL ?>/admin/user.php?id=<?php echo $user->getID() ?>">
+						<i class="icon-user"></i> <?php echo UserTools::escape($user->getName()) ?>
 					</a>
 					<?php
 				}

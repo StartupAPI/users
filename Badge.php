@@ -275,7 +275,7 @@ class Badge {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($id, $level)) {
+			if (!$stmt->bind_result($id, $level, $time)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
