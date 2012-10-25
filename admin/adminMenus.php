@@ -172,7 +172,7 @@ class adminMenu extends menuElement {
 	 * @param menuElement[] $sub_menus
 	 */
 	public function __construct($sub_menus = null) {
-		parent::__construct(admin, 'Admin', null, $sub_menus);
+		parent::__construct('admin', 'Admin', null, $sub_menus);
 	}
 
 	public function render() {
