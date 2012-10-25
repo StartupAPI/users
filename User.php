@@ -379,11 +379,11 @@ class User {
 		if ($stmt = $db->prepare('SELECT cmp.name, cmp_content.content, cmp_keywords.keywords, cmp_medium.medium, cmp_source.source,
 			users.id, status, users.name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified
 			FROM ' . UserConfig::$mysql_prefix . 'users AS users
-				INNER JOIN ' . UserConfig::$mysql_prefix . 'cmp AS cmp ON users.reg_cmp_name_id = cmp.id
-				INNER JOIN ' . UserConfig::$mysql_prefix . 'cmp_content AS cmp_content ON users.reg_cmp_content_id = cmp_content.id
-				INNER JOIN ' . UserConfig::$mysql_prefix . 'cmp_keywords AS cmp_keywords ON users.reg_cmp_keywords_id = cmp_keywords.id
-				INNER JOIN ' . UserConfig::$mysql_prefix . 'cmp_medium AS cmp_medium ON users.reg_cmp_medium_id = cmp_medium.id
-				INNER JOIN ' . UserConfig::$mysql_prefix . 'cmp_source AS cmp_source ON users.reg_cmp_source_id = cmp_source.id
+				LEFT JOIN ' . UserConfig::$mysql_prefix . 'cmp AS cmp ON users.reg_cmp_name_id = cmp.id
+				LEFT JOIN ' . UserConfig::$mysql_prefix . 'cmp_content AS cmp_content ON users.reg_cmp_content_id = cmp_content.id
+				LEFT JOIN ' . UserConfig::$mysql_prefix . 'cmp_keywords AS cmp_keywords ON users.reg_cmp_keywords_id = cmp_keywords.id
+				LEFT JOIN ' . UserConfig::$mysql_prefix . 'cmp_medium AS cmp_medium ON users.reg_cmp_medium_id = cmp_medium.id
+				LEFT JOIN ' . UserConfig::$mysql_prefix . 'cmp_source AS cmp_source ON users.reg_cmp_source_id = cmp_source.id
 			WHERE regtime > DATE_SUB(NOW(), INTERVAL ? DAY)
 				AND (reg_cmp_name_id IS NOT NULL
 					OR reg_cmp_content_id IS NOT NULL
