@@ -39,7 +39,8 @@ $admin_menu = new adminMenu(array(
 			 */
 			new menuSection('users', 'Users', null, array(
 				new menu('activity', 'Activity', $ADMIN_ROOT . '/activity.php', 'signal'),
-				new menu('accounts', 'Accounts	', null, 'folder-open'),
+				new menu('accounts', 'Accounts', null, 'folder-open'),
+				new menu('plans', 'Plans', null, 'folder-open'),
 				new menu('registrations', 'Registered Users', $ADMIN_ROOT . '/registrations.php', 'user'),
 				new menu('cohorts', 'Cohort Analysis', $ADMIN_ROOT . '/cohorts.php', 'th'),
 				new menu('bymodule', 'Registrations By Module', $ADMIN_ROOT . '/bymodule.php', 'th-large'),
