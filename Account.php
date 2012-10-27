@@ -215,7 +215,7 @@ class Account
 		if ($this->plan->isIndividual())
 		{
 			$users = $this->getUsers();
-			return $users[0]->getName();
+			return $users[0][0]->getName();
 		}
 		else
 		{
@@ -235,7 +235,7 @@ class Account
 		$db = UserConfig::getDB();
 		$userids = array();
 
-		if ($stmt = $db->prepare('SELECT user_id FROM '.UserConfig::$mysql_prefix.'account_users WHERE account_id = ?'))
+		if ($stmt = $db->prepare('SELECT user_id, role FROM '.UserConfig::$mysql_prefix.'account_users WHERE account_id = ?'))
 		{
 			if (!$stmt->bind_param('i', $this->id))
 			{
@@ -245,14 +245,14 @@ class Account
 			{
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($userid))
+			if (!$stmt->bind_result($userid, $role))
 			{
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
 			{
-				$userids[] = $userid;
+				$userids[$userid] = $role;
 			}
 
 			$stmt->close();
@@ -262,9 +262,14 @@ class Account
 			throw new DBPrepareStmtException($db);
 		}
 
-		$users = User::getUsersByIDs($userids);
+		$users = User::getUsersByIDs(array_keys($userids));
+		$users_and_roles = array();
 
-		return $users;
+		foreach ($users as $user) {
+			$users_and_roles[] = array($user, $userids[$user->getID()]);
+		}
+
+		return $users_and_roles;
 	}
 
 	/**

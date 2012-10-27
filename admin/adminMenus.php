@@ -146,7 +146,7 @@ abstract class menuElement {
 
 	protected function renderTitle($extra = null) {
 		if ($this->active) {
-			echo self::$titleSeparator.$this->title;
+			echo self::$titleSeparator . $this->title;
 		}
 
 		if (!is_null($this->sub_menus) && is_array($this->sub_menus) && count($this->sub_menus) > 0) {
@@ -252,9 +252,15 @@ class menuSection extends menuElement {
 			}
 			?>
 			<li<?php if ($this->active) { ?> class="active"<?php } ?>>
-				<a href="<?php echo $this->sub_menus[0]->link ?>">
-					<?php echo $this->title ?>
-				</a>
+				<?php if (!is_null($link)) { ?>
+					<a href="<?php echo $link ?>">
+						<?php echo $this->title ?>
+					</a>
+					<?php
+				} else {
+					echo $this->title;
+				}
+				?>
 			</li>
 			<?php
 		} else {
@@ -270,13 +276,28 @@ class menuSection extends menuElement {
 
 	protected function renderBreadCrumbs($extra = null) {
 		if ($this->active) {
+			if (is_null($this->sub_menus)) {
+				$link = $this->link;
+			} else if (count($this->sub_menus) > 0) {
+				$link = $this->sub_menus[0]->link;
+			}
 			?>
 			<li>
-				<a href="<?php echo $this->link ?>">
-					<?php if (!is_null($this->icon)) { ?><i class="icon-<?php echo $this->icon ?>"></i><?php } ?>
-					<?php echo $this->title ?>
-				</a>
-				<?php
+				<?php if (!is_null($link)) { ?>
+					<a href="<?php echo $link ?>">
+						<?php if (!is_null($this->icon)) { ?><i class="icon-<?php echo $this->icon ?>"></i><?php } ?>
+						<?php echo $this->title ?>
+					</a>
+					<?php
+				} else {
+					if (!is_null($this->icon)) {
+						?>
+						<i class="icon-<?php echo $this->icon ?>"></i>
+						<?php
+					}
+					echo $this->title;
+				}
+
 				if (is_array($this->sub_menus)) {
 					?><span class="divider">/</span><?php
 			}
@@ -315,6 +336,9 @@ class menu extends menuElement {
 
 	protected function render() {
 		if ($this->enabled) {
+			if (is_null($this->link)) {
+				return;
+			}
 			?>
 			<li<?php if ($this->active) { ?> class="active"<?php } ?>>
 				<a href="<?php echo $this->link ?>">
@@ -353,11 +377,22 @@ class menu extends menuElement {
 			if (is_null($extra)) {
 				?><li class="active"><?php echo $this->title ?></li><?php
 			} else {
+				if (is_null($this->sub_menus)) {
+					$link = $this->link;
+				} else if (count($this->sub_menus) > 0) {
+					$link = $this->sub_menus[0]->link;
+				}
 				?>
 				<li class="active">
-					<a href="<?php echo $this->link ?>">
-						<?php echo $this->title ?>
-					</a>
+					<?php if (!is_null($link)) { ?>
+						<a href="<?php echo $link ?>">
+							<?php echo $this->title ?>
+						</a>
+						<?php
+					} else {
+						echo $this->title;
+					}
+					?>
 				</li>
 				<?php
 			}

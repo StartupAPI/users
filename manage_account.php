@@ -24,7 +24,7 @@ if (array_key_exists('account', $_GET)) {
 	foreach ($manageable_accounts as $account) {
 		if ($account->getID() == $_GET['account']) {
 			$managed_account = $account;
-			break;	
+			break;
 		}
 	}
 }
@@ -49,9 +49,12 @@ if (!$managed_account->getPlan()->isIndividual() && $managed_account->getUserRol
 <ul>
 <?php
 
-$members = $managed_account->getUsers();
+$users_and_roles = $managed_account->getUsers();
 
-foreach ($members as $member) {
+foreach ($users_and_roles as $user_and_role) {
+	$member = $user_and_role[0];
+	$role = $user_and_role[1];
+
 	?><li><?php echo $member->getName(); ?></li><?php
 }
 ?>

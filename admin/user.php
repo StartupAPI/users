@@ -96,10 +96,10 @@ require_once(dirname(__FILE__) . '/header.php');
 	<p>
 		<?php
 		$regtime = $user->getRegTime();
-		$ago = intval(floor((time() - $regtime)/86400));
+		$ago = intval(floor((time() - $regtime) / 86400));
 		?>
 		<b>Registered:</b> <?php echo date('M j, Y h:iA', $regtime) ?>
-		<span class="badge<?php if ($ago <= 5) {?> badge-success<?php }?>"><?php echo $ago?></span> day<?php echo $ago != 1 ? 's' : '' ?> ago
+		<span class="badge<?php if ($ago <= 5) { ?> badge-success<?php } ?>"><?php echo $ago ?></span> day<?php echo $ago != 1 ? 's' : '' ?> ago
 	</p>
 
 	<p>
@@ -113,36 +113,36 @@ require_once(dirname(__FILE__) . '/header.php');
 	$user_badges = $user->getBadges();
 	$available_badges = Badge::getAvailableBadges();
 
-	foreach($available_badges as $badge) {
+	foreach ($available_badges as $badge) {
 		?><a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/badge.php?id=<?php echo $badge->getID() ?>"><?php
-		if (array_key_exists($badge->getID(), $user_badges)) {
-			$badge_level = $user_badges[$badge->getID()][1];
+	if (array_key_exists($badge->getID(), $user_badges)) {
+		$badge_level = $user_badges[$badge->getID()][1];
 			?><img
 					style="margin-right: 0.5em"
 					src="<?php echo $badge->getImageURL($adminBadgeSize, $badge_level) ?>"
 					title="<?php echo $badge->getTitle() ?>"
 					width="<?php echo $adminBadgeSize ?>"
 					height="<?php echo $adminBadgeSize ?>"/>
-			<?php
-		} else {
-			?><img style="margin-right: 0.5em"
-				 src="<?php echo $badge->getPlaceholderImageURL($adminBadgeSize) ?>"
-				 title="Hint: <?php echo $badge->getHint() ?>"
-				 width="<?php echo $adminBadgeSize ?>"
-				 height="<?php echo $adminBadgeSize ?>"/>
-		<?php
-		}
-		?></a><?php
+					<?php
+				} else {
+					?><img style="margin-right: 0.5em"
+					 src="<?php echo $badge->getPlaceholderImageURL($adminBadgeSize) ?>"
+					 title="Hint: <?php echo $badge->getHint() ?>"
+					 width="<?php echo $adminBadgeSize ?>"
+					 height="<?php echo $adminBadgeSize ?>"/>
+					 <?php
+				 }
+				 ?></a><?php
 	}
-	?>
+			 ?>
 
 	<h3>Authentication Credentials</h3>
 	<ul><?php
-		foreach (UserConfig::$authentication_modules as $module) {
-			$creds = $module->getUserCredentials($user);
+	foreach (UserConfig::$authentication_modules as $module) {
+		$creds = $module->getUserCredentials($user);
 
-			if (!is_null($creds)) {
-				?>
+		if (!is_null($creds)) {
+					 ?>
 				<li><b><?php echo $module->getID() ?>: </b><?php echo $creds->getHTML() ?></li>
 				<?php
 			}
@@ -150,60 +150,70 @@ require_once(dirname(__FILE__) . '/header.php');
 		?>
 	</ul>
 
-	<?php
-	if (UserConfig::$useAccounts) {
-		?>
+	<?php if (UserConfig::$useAccounts) { ?>
 		<h3>Accounts:</h3>
 		<ul>
 			<?php
 			$accounts = $user->getAccounts();
 
 			foreach ($accounts as $user_account) {
-				?><li>
-					<?php echo UserTools::escape($user_account->getName()) ?> (<?php echo UserTools::escape($user_account->getPlan()->getName()) ?>)<?php
-			if ($user_account->getUserRole() == Account::ROLE_ADMIN) {
-						?> (admin)<?php
-		}
-					?></li><?php
-		}
+				$plan = $user_account->getPlan();
 				?>
+				<li>
+					<a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/account.php?id=<?php echo $user_account->getID() ?>">
+						<?php echo UserTools::escape($user_account->getName()); ?>
+					</a>
+					<span style="margin: 0 0.3em" class="label" href="<?php echo UserConfig::$USERSROOTURL ?>/admin/plan.php?id=<?php echo UserTools::escape($plan->getID()); ?>">
+						<i class="icon-star-empty icon-white"></i>
+						<?php echo UserTools::escape($plan->getName()); ?>
+					</span>
+
+					<?php if ($user_account->getUserRole() == Account::ROLE_ADMIN) { ?>
+					<spam class = "label label-important">admin</span>
+					<?php } else { ?>
+					<spam class = "label label-info">user</span>
+					<?php } ?>
+					</li>
+				<?php } ?>
 		</ul>
-		<?php
-	}
-	?>
+	<?php } ?>
 
 	<h3>Source of registration</h3>
 	<p>Referer: <?php
-		$referer = $user->getReferer();
+	$referer = $user->getReferer();
 
-		if (is_null($referer)) {
-			?><i>unknown</i><?php
+	if (is_null($referer)) {
+		?><i>unknown</i><?php
 	} else {
-			?><a target="_blank" href="<?php echo UserTools::escape($referer) ?>"><?php echo UserTools::escape($referer) ?></a><?php
+		?><a target="_blank" href="<?php echo UserTools::escape($referer) ?>"><?php echo UserTools::escape($referer) ?></a><?php
 	}
-		?>
+	?>
 	</p>
 	<?php
 	$campaign = $user->getCampaign();
 	if (count($campaign) > 0) {
 		?><h4>Campaign codes</h4><?php
-	}
+}
 
-	if (array_key_exists('cmp_name', $campaign)) {
-		?><p>Name: <b><?php echo UserTools::escape($campaign['cmp_name']) ?></b></p><?php }
-	if (array_key_exists('cmp_source', $campaign)) {
-		?><p>Source: <b><?php echo UserTools::escape($campaign['cmp_source']) ?></b></p><?php }
-	if (array_key_exists('cmp_medium', $campaign)) {
-		?><p>Medium: <b><?php echo UserTools::escape($campaign['cmp_medium']) ?></b></p><?php }
-	if (array_key_exists('cmp_keywords', $campaign)) {
-		?><p>Keywords: <b><?php echo UserTools::escape($campaign['cmp_keywords']) ?></b></p><?php }
-	if (array_key_exists('cmp_content', $campaign)) {
+if (array_key_exists('cmp_name', $campaign)) {
+		?><p>Name: <b><?php echo UserTools::escape($campaign['cmp_name']) ?></b></p><?php
+}
+if (array_key_exists('cmp_source', $campaign)) {
+		?><p>Source: <b><?php echo UserTools::escape($campaign['cmp_source']) ?></b></p><?php
+}
+if (array_key_exists('cmp_medium', $campaign)) {
+		?><p>Medium: <b><?php echo UserTools::escape($campaign['cmp_medium']) ?></b></p><?php
+}
+if (array_key_exists('cmp_keywords', $campaign)) {
+		?><p>Keywords: <b><?php echo UserTools::escape($campaign['cmp_keywords']) ?></b></p><?php
+}
+if (array_key_exists('cmp_content', $campaign)) {
 		?><p>Content: <b><?php echo UserTools::escape($campaign['cmp_content']) ?></b></p><?php
-	}
+}
 
-	$features = Feature::getAll();
-	if (count($features) > 0) {
-		$has_features_to_save = false;
+$features = Feature::getAll();
+if (count($features) > 0) {
+	$has_features_to_save = false;
 		?><h3>Features</h3>
 		<form class="form" action="" method="POST">
 			<?php foreach ($features as $id => $feature) {

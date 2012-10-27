@@ -1701,7 +1701,7 @@ class User {
 	 *
 	 * @param array $userids Array of integers representing user IDs
 	 *
-	 * @return array Array of User objects
+	 * @return User[] Array of User objects
 	 *
 	 * @throws DBException
 	 */
@@ -2713,7 +2713,7 @@ class User {
 	/**
 	 * Returns a list of user's accounts
 	 *
-	 * @return array Array of Account objects
+	 * @return Account[] Array of Account objects
 	 */
 	public function getAccounts() {
 		return Account::getUserAccounts($this);

@@ -36,8 +36,10 @@ $admin_menu = new adminMenu(array(
 			  new menuSection('dashboards', 'Dashboards', array(
 			  new menu('basic', 'Basic Metrics', $ADMIN_ROOT . '/', 'signal')
 			  )),
-			 */ new menuSection('users', 'Users', null, array(
+			 */
+			new menuSection('users', 'Users', null, array(
 				new menu('activity', 'Activity', $ADMIN_ROOT . '/activity.php', 'signal'),
+				new menu('accounts', 'Accounts	', null, 'folder-open'),
 				new menu('registrations', 'Registered Users', $ADMIN_ROOT . '/registrations.php', 'user'),
 				new menu('cohorts', 'Cohort Analysis', $ADMIN_ROOT . '/cohorts.php', 'th'),
 				new menu('bymodule', 'Registrations By Module', $ADMIN_ROOT . '/bymodule.php', 'th-large'),
@@ -96,7 +98,7 @@ if (!isset($BREADCRUMB_EXTRA)) {
 	<body>
 		<div class="navbar">
 			<div class="navbar-inner navbar-fixed-top">
-				<span class="brand"><a href="<?php echo UserConfig::$SITEROOTURL ?>"><img class="logo" src="<?php echo UserConfig::$USERSROOTURL ?>/images/header_icon.png"/><?php echo is_null(UserConfig::$appName) ? '' : UserConfig::$appName; ?></a></span>
+				<span class="brand"><a href="<?php echo UserConfig::$SITEROOTURL ?>"><img class="logo" width="20" height="20" src="<?php echo UserConfig::$USERSROOTURL ?>/images/header_icon.png"/><?php echo is_null(UserConfig::$appName) ? '' : UserConfig::$appName; ?></a></span>
 
 				<span></span>
 
