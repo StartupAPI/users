@@ -80,7 +80,7 @@ foreach (UserConfig::$authentication_modules as $module) {
 	<table id="metrics_dashboard" cellpadding="10" border="0" style="margin: 0 auto;">
 		<tr>
 			<th><a href="activity.php">Active</a> users</th>
-			<th>Total <a href="registrations.php">registered users</a></th>
+			<th>Total <a href="users.php">registered users</a></th>
 			<th>Registrations <a href="bymodule.php">by module</a></th>
 		</tr>
 		<tr id="metric_values">
