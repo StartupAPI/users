@@ -1250,7 +1250,7 @@ class User {
 	 *
 	 * @internal Used in admin dashboard to show users
 	 */
-	public static function getUsers($pagenumber = 0, $perpage = 20, $sort = 'registration') {
+	public static function getUsers($pagenumber = 0, $perpage = 20, $sort = 'registration', $date_from = null, $date_to = null) {
 		$db = UserConfig::getDB();
 
 		$users = array();
@@ -1262,8 +1262,35 @@ class User {
 			$orderby = 'points';
 		}
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users ORDER BY ' . $orderby . ' DESC LIMIT ?, ?')) {
-			if (!$stmt->bind_param('ii', $first, $perpage)) {
+		$date_where = '';
+		if (!is_null($date_from) && !is_null($date_to)) {
+			$date_where = ' WHERE regtime >= ? AND regtime <= DATE_ADD(?, INTERVAL 1 DAY)';
+		} else if (!is_null($date_from)) {
+			$date_where = ' WHERE regtime >= ?';
+		} else if (!is_null($date_to)) {
+			$date_where = ' WHERE regtime <= DATE_ADD(?, INTERVAL 1 DAY)';
+		}
+
+		$query = 'SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified
+			FROM ' . UserConfig::$mysql_prefix . 'users' .
+			$date_where . '
+			ORDER BY ' . $orderby . ' DESC
+			LIMIT ?, ?';
+
+		UserTools::debug($query);
+
+		if ($stmt = $db->prepare($query)) {
+			if (!is_null($date_from) && !is_null($date_to)) {
+				$result = $stmt->bind_param('ssii', $date_from, $date_to, $first, $perpage);
+			} else if (!is_null($date_from)) {
+				$result = $stmt->bind_param('sii', $date_from, $first, $perpage);
+			} else if (!is_null($date_to)) {
+				$result = $stmt->bind_param('sii', $date_to, $first, $perpage);
+			} else {
+				$result = $stmt->bind_param('ii', $first, $perpage);
+			}
+
+			if (!$result) {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {

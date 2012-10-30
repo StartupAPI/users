@@ -30,7 +30,15 @@ if (array_key_exists('sort', $_GET) && $_GET['sort'] == 'activity') {
 }
 
 if (is_null($search)) {
-	$users = User::getUsers($pagenumber, $perpage, $sortby);
+	if (array_key_exists('date_from', $_GET) && array_key_exists('date_from', $_GET)) {
+		$users = User::getUsers($pagenumber, $perpage, $sortby, $_GET['date_from'], $_GET['date_to']);
+	} else if (array_key_exists('date_from', $_GET)) {
+		$users = User::getUsers($pagenumber, $perpage, $sortby, $_GET['date_from']);
+	} else if (array_key_exists('date_to', $_GET)) {
+		$users = User::getUsers($pagenumber, $perpage, $sortby, null, $_GET['date_to']);
+	} else {
+		$users = User::getUsers($pagenumber, $perpage, $sortby);
+	}
 } else {
 	$users = User::searchUsers($search, $pagenumber, $perpage, $sortby);
 }
