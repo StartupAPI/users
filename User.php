@@ -1243,6 +1243,8 @@ class User {
 	 * @param int $pagenumber Page number
 	 * @param int $perpage Number of rows per page
 	 * @param string $sort String indicating the way to sort the list (either 'registration' or 'activity')
+	 * @param $string $date_from Registration date range start string in YYYYMMDD format
+	 * @param $string $date_to Registration date range end string in YYYYMMDD format
 	 *
 	 * @return User[] Array of user objects
 	 *
@@ -1262,22 +1264,26 @@ class User {
 			$orderby = 'points';
 		}
 
-		$date_where = '';
-		if (!is_null($date_from) && !is_null($date_to)) {
-			$date_where = ' WHERE regtime >= ? AND regtime <= DATE_ADD(?, INTERVAL 1 DAY)';
-		} else if (!is_null($date_from)) {
-			$date_where = ' WHERE regtime >= ?';
-		} else if (!is_null($date_to)) {
-			$date_where = ' WHERE regtime <= DATE_ADD(?, INTERVAL 1 DAY)';
+		$where_conditions = array();
+
+		if (!is_null($date_from)) {
+			$where_conditions[] = 'regtime >= ?';
+		}
+
+		if (!is_null($date_to)) {
+			$where_conditions[] = 'regtime <= DATE_ADD(?, INTERVAL 1 DAY)';
+		}
+
+		$where = '';
+		if (count($where_conditions) > 0) {
+			$where = ' WHERE ' . implode(' AND ', $where_conditions);
 		}
 
 		$query = 'SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified
-			FROM ' . UserConfig::$mysql_prefix . 'users' .
-			$date_where . '
+			FROM ' . UserConfig::$mysql_prefix . 'users ' .
+			$where . '
 			ORDER BY ' . $orderby . ' DESC
 			LIMIT ?, ?';
-
-		UserTools::debug($query);
 
 		if ($stmt = $db->prepare($query)) {
 			if (!is_null($date_from) && !is_null($date_to)) {
