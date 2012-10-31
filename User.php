@@ -242,6 +242,15 @@ class User {
 		return $referer;
 	}
 
+	/**
+	 * Returns a list of users by referrer
+	 *
+	 * @param int $days Number of days to look back for
+	 *
+	 * @return array Array with URLs as keys and values are arrays of users
+	 *
+	 * @throws DBException
+	 */
 	public static function getReferers($days = 30) {
 		$db = UserConfig::getDB();
 
@@ -332,6 +341,13 @@ class User {
 		}
 	}
 
+	/**
+	 * Returns campaign they came from when registerd
+	 *
+	 * @return array Array of campaign parameters
+	 *
+	 * @throws DBException
+	 */
 	public function getCampaign() {
 		$db = UserConfig::getDB();
 
@@ -371,6 +387,15 @@ class User {
 		return $campaign;
 	}
 
+	/**
+	 * Returns 2-dimensional array with first keys for each campaign param and second keys for each value of that parameter, values of the array are arrays of users.
+	 *
+	 * @param int $days A number of days to look back for
+	 *
+	 * @return array Array of campaign users data
+	 *
+	 * @throws DBException
+	 */
 	public static function getCampaigns($days = 30) {
 		$db = UserConfig::getDB();
 
@@ -1243,8 +1268,8 @@ class User {
 	 * @param int $pagenumber Page number
 	 * @param int $perpage Number of rows per page
 	 * @param string $sort String indicating the way to sort the list (either 'registration' or 'activity')
-	 * @param $string $date_from Registration date range start string in YYYYMMDD format
-	 * @param $string $date_to Registration date range end string in YYYYMMDD format
+	 * @param string $date_from Registration date range start string in YYYYMMDD format
+	 * @param string $date_to Registration date range end string in YYYYMMDD format
 	 *
 	 * @return User[] Array of user objects
 	 *
@@ -1326,6 +1351,7 @@ class User {
 	 * @param string $search Search query
 	 * @param int $pagenumber Page number
 	 * @param int $perpage Number of rows per page
+	 * @param string $sort String indicating the way to sort the list (either 'registration' or 'activity')
 	 *
 	 * @return User[] Array of user objects
 	 *

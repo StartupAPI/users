@@ -12,10 +12,6 @@ require_once(dirname(__FILE__) . '/header.php');
 
 $largeBadgeSize = 300;
 $smallBadgeSize = 57;
-
-function showLevelUsers($level) {
-
-}
 ?>
 <div class="span9">
 	<img class="pull-right" style="margin-left: 1em" src="<?php echo $badge->getImageURL($largeBadgeSize, 1) ?>" title="<?php echo $badge->getTitle() ?>" width="<?php echo $largeBadgeSize ?>" height="<?php echo $largeBadgeSize ?>"/>

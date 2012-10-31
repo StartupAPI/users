@@ -139,6 +139,8 @@ class Invitation
 	 * Cancels invitation code
 	 *
 	 * @param string $code Invitation code to cancel
+	 *
+	 * @throws DBException
 	 */
 	public static function cancel($code) {
 		$db = UserConfig::getDB();

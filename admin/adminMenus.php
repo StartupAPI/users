@@ -10,6 +10,9 @@
  */
 abstract class menuElement {
 
+	/**
+	 * @var string String that separates menu sections in the title of the page
+	 */
 	protected static $titleSeparator = ' / ';
 
 	/**
@@ -144,6 +147,11 @@ abstract class menuElement {
 	 */
 	abstract protected function renderBreadCrumbs($extra = null);
 
+	/**
+	 * Renders portion of page title for this menu element
+	 *
+	 * @param string $extra Extra item to be appended at the end
+	 */
 	protected function renderTitle($extra = null) {
 		if ($this->active) {
 			echo self::$titleSeparator . $this->title;

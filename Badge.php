@@ -329,6 +329,7 @@ class Badge {
 	/**
 	 * Returns a list of users who gt the badge, ordered by time, most recent first
 	 *
+	 * @param int $level Badge level
 	 * @param int $pagenumber Page number
 	 * @param int $perpage Page size
 	 *
