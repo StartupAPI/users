@@ -70,44 +70,49 @@ require_once(dirname(__FILE__) . '/header.php');
 
 		<h3>Members</h3>
 		<table class="table">
-			<?php
-			$users_and_roles = $account->getUsers();
-			usort($users_and_roles, function($a, $b) {
-				// If users have different roles, show admins first
-				if ($a[1] != $b[1]) {
-					return $b[1] - $a[1];
-				}
+			<thead>
+				<tr><th>User</th><th>Role</th><th>Actions</th></tr>
+			</thead>
+			<tbody>
+				<?php
+				$users_and_roles = $account->getUsers();
+				usort($users_and_roles, function($a, $b) {
+							// If users have different roles, show admins first
+							if ($a[1] != $b[1]) {
+								return $b[1] - $a[1];
+							}
 
-				// Otherwise sort alphabetically by name
-				return strcmp($a[0]->getName(), $b[0]->getName());
-			});
+							// Otherwise sort alphabetically by name
+							return strcmp($a[0]->getName(), $b[0]->getName());
+						});
 
-			foreach ($users_and_roles as $user_and_role) {
-				$user = $user_and_role[0];
-				$role = $user_and_role[1];
-				?>
-				<tr>
-					<td>
-						<a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/user.php?id=<?php echo UserTools::escape($user->getID()) ?>">
-							<?php echo UserTools::escape($user->getName()) ?>
-						</a>
-					</td>
-					<td>
-						<?php if ($role == Account::ROLE_ADMIN) { ?>
-							<span class="label label-important">admin</span>
-						<?php } else { ?>
-							<span class="label">user</span>
-						<?php } ?>
-					</td>
-					<td>
-						<?php if ($role == Account::ROLE_ADMIN) { ?>
-						<span class="btn btn-mini disabled" title="Can't remove account administrator">remove</span>
-						<?php } else { ?>
-							<input type="submit" class="btn btn-mini" name="delete_user_<?php echo UserTools::escape($user->getID()) ?>" value="remove"/>
-						<?php } ?>
-					</td>
-				</tr>
-			<?php } ?>
+				foreach ($users_and_roles as $user_and_role) {
+					$user = $user_and_role[0];
+					$role = $user_and_role[1];
+					?>
+					<tr>
+						<td>
+							<a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/user.php?id=<?php echo UserTools::escape($user->getID()) ?>">
+								<?php echo UserTools::escape($user->getName()) ?>
+							</a>
+						</td>
+						<td>
+							<?php if ($role == Account::ROLE_ADMIN) { ?>
+								<span class="label label-important">admin</span>
+							<?php } else { ?>
+								<span class="label">user</span>
+							<?php } ?>
+						</td>
+						<td>
+							<?php if ($role == Account::ROLE_ADMIN) { ?>
+								<span class="btn btn-mini disabled" title="Can't remove account administrator">remove</span>
+							<?php } else { ?>
+								<input type="submit" class="btn btn-mini" name="delete_user_<?php echo UserTools::escape($user->getID()) ?>" value="remove"/>
+							<?php } ?>
+						</td>
+					</tr>
+				<?php } ?>
+			</tbody>
 		</table>
 		<?php UserTools::renderCSRFNonce(); ?>
 	</form>
