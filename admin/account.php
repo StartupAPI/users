@@ -71,7 +71,18 @@ require_once(dirname(__FILE__) . '/header.php');
 		<h3>Members</h3>
 		<table class="table">
 			<?php
-			foreach ($account->getUsers() as $user_and_role) {
+			$users_and_roles = $account->getUsers();
+			usort($users_and_roles, function($a, $b) {
+				// If users have different roles, show admins first
+				if ($a[1] != $b[1]) {
+					return $b[1] - $a[1];
+				}
+
+				// Otherwise sort alphabetically by name
+				return strcmp($a[0]->getName(), $b[0]->getName());
+			});
+
+			foreach ($users_and_roles as $user_and_role) {
 				$user = $user_and_role[0];
 				$role = $user_and_role[1];
 				?>
