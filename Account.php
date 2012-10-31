@@ -273,6 +273,59 @@ class Account
 	}
 
 	/**
+	 * Adds a user to account
+	 *
+	 * @param User $user User to add
+	 * @param int $role User role in the account
+	 *
+	 * @throws DBException
+	 */
+	public function addUser($user, $role = self::ROLE_USER) {
+		$db = UserConfig::getDB();
+
+		$userid = $user->getID();
+
+		if ($stmt = $db->prepare('INSERT IGNORE INTO ' . UserConfig::$mysql_prefix . 'account_users (account_id, user_id, role) VALUES (?, ?, ?)')) {
+			if (!$stmt->bind_param('iii', $this->id, $userid, $role)) {
+				throw new DBBindParamException($db, $stmt);
+			}
+			if (!$stmt->execute()) {
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+
+			$stmt->close();
+		} else {
+			throw new DBPrepareStmtException($db);
+		}
+	}
+
+	/**
+	 * Remove user from account
+	 *
+	 * @param User $user User to add
+	 *
+	 * @throws DBException
+	 */
+	public function removeUser($user) {
+		$db = UserConfig::getDB();
+
+		$userid = $user->getID();
+
+		if ($stmt = $db->prepare('DELETE FROM ' . UserConfig::$mysql_prefix . 'account_users WHERE account_id = ? AND user_id = ?')) {
+			if (!$stmt->bind_param('ii', $this->id, $userid)) {
+				throw new DBBindParamException($db, $stmt);
+			}
+			if (!$stmt->execute()) {
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+
+			$stmt->close();
+		} else {
+			throw new DBPrepareStmtException($db);
+		}
+	}
+
+	/**
 	 * Returns account's subscription plan
 	 *
 	 * @return Plan Subscription Plan
@@ -330,30 +383,14 @@ class Account
 			throw new DBPrepareStmtException($db);
 		}
 
+		$account = new self($id, $name, $plan, $role);
+
 		if ($user !== null)
 		{
-			$userid = $user->getID();
-
-			if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'account_users (account_id, user_id, role) VALUES (?, ?, ?)'))
-			{
-				if (!$stmt->bind_param('iii', $id, $userid, $role))
-				{
-					throw new DBBindParamException($db, $stmt);
-				}
-				if (!$stmt->execute())
-				{
-					throw new DBExecuteStmtException($db, $stmt);
-				}
-
-				$stmt->close();
-			}
-			else
-			{
-				throw new DBPrepareStmtException($db);
-			}
+			$account->addUser($user, $role);
 		}
 
-		return new self($id, $name, $plan, $role);
+		return $account;
 	}
 
 	/**

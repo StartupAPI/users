@@ -22,6 +22,15 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION _
+ * ... add version description here ...
+*/
+$versions[21]['up'][] = 'ALTER TABLE  `'.UserConfig::$mysql_prefix.'account_users` ADD PRIMARY KEY (  `account_id` ,  `user_id` )';
+$versions[21]['up'][] = 'ALTER TABLE  `'.UserConfig::$mysql_prefix.'account_users` DROP KEY user_account';
+$versions[21]['down'][]	= 'ALTER TABLE  `'.UserConfig::$mysql_prefix.'account_users` ADD KEY `user_account` (`account_id`)';
+$versions[21]['down'][]	= 'ALTER TABLE  `'.UserConfig::$mysql_prefix.'account_users` DROP PRIMARY KEY';
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 20
  * Adding badge timestamp
 */
