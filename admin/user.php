@@ -54,7 +54,11 @@ require_once(dirname(__FILE__) . '/header.php');
 <div class="span9">
 
 	<form action="" method="POST">
-		<h2><?php echo UserTools::escape($user->getName()); ?>
+		<h2>
+			<?php echo UserTools::escape($user->getName()); ?>
+			<?php if ($user->isAdmin()) { ?>
+				<span class="label label-important">system admin</span>
+			<?php } ?>
 			<div class="pull-right">
 				<?php
 				if ($user->isDisabled()) {
@@ -169,12 +173,12 @@ require_once(dirname(__FILE__) . '/header.php');
 					</span>
 
 					<?php if ($user_account->getUserRole() == Account::ROLE_ADMIN) { ?>
-					<spam class = "label label-important">admin</span>
+						<span class = "label label-important">admin</span>
 					<?php } else { ?>
-					<spam class = "label label-info">user</span>
+						<span class = "label">user</span>
 					<?php } ?>
-					</li>
-				<?php } ?>
+				</li>
+			<?php } ?>
 		</ul>
 	<?php } ?>
 
