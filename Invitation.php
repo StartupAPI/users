@@ -30,6 +30,11 @@ class Invitation
 	private $issuedby;
 
 	/**
+	 * @var boolean Whatever this invitation was generated using admin UI or not
+	 */
+	private $is_admin_invite;
+
+	/**
 	 * @var string Invitation comment (reminder to issuer why it was sent)
 	 */
 	private $usagecomment;
@@ -48,17 +53,18 @@ class Invitation
 	 * @param string $usagecomment Invitation comment (reminder to issuer why it was sent)
 	 * @param int $user ID of the User who got invited
 	 */
-	private function __construct($code, $time_created, $issuedby, $usagecomment = null, $user = null)
+	private function __construct($code, $time_created, $issuedby, $is_admin_invite = true, $usagecomment = null, $user = null)
 	{
 		$this->code = $code;
 		$this->time_created = $time_created;
 		$this->issuedby = $issuedby;
+		$this->is_admin_invite = $is_admin_invite;
 		$this->usagecomment = $usagecomment;
 		$this->user = $user;
 	}
 
 	/**
-	 * Returns invitations that were generated, but not sent yet
+	 * Returns admin invitations that were generated, but not sent yet
 	 *
 	 * @return array Array of Invitation objects
 	 *
@@ -70,7 +76,7 @@ class Invitation
 
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('SELECT code, created, issuedby FROM '.UserConfig::$mysql_prefix.'invitation WHERE sentto IS NULL AND user IS NULL'))
+		if ($stmt = $db->prepare('SELECT code, created, issuedby FROM '.UserConfig::$mysql_prefix.'invitation WHERE is_admin_invite = 1 AND sent_to_note IS NULL AND user IS NULL'))
 		{
 			if (!$stmt->execute())
 			{
@@ -83,7 +89,7 @@ class Invitation
 
 			while($stmt->fetch() === TRUE)
 			{
-				$invitations[] = new self($code, $time_created, $issuedby);
+				$invitations[] = new self($code, $time_created, $issuedby, true);
 			}
 
 			$stmt->close();
@@ -103,26 +109,34 @@ class Invitation
 	 *
 	 * @throws DBException
 	 */
-	public static function getSent()
+	public static function getSent($admin = null)
 	{
 		$invitations = array();
 
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('SELECT code, created, issuedby, sentto FROM '.UserConfig::$mysql_prefix.'invitation WHERE sentto IS NOT NULL AND user IS NULL'))
+		$query = 'SELECT code, created, issuedby, is_admin_invite, sent_to_note
+			FROM '.UserConfig::$mysql_prefix.'invitation
+			WHERE sent_to_note IS NOT NULL AND user IS NULL';
+
+		if (!is_null($admin)) {
+			$query .= ' AND is_admin_invite = ' . ($admin ? 1 : 0);
+		}
+
+		if ($stmt = $db->prepare($query))
 		{
 			if (!$stmt->execute())
 			{
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($code, $time_created, $issuedby, $sentto))
+			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_note))
 			{
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
 			{
-				$invitations[] = new self($code, $time_created, $issuedby, $sentto);
+				$invitations[] = new self($code, $time_created, $issuedby, $is_admin_invite ? true : false, $sent_to_note);
 			}
 
 			$stmt->close();
@@ -171,26 +185,34 @@ class Invitation
 	 *
 	 * @throws DBException
 	 */
-	public static function getAccepted()
+	public static function getAccepted($admin = null)
 	{
 		$invitations = array();
 
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('SELECT code, created, issuedby, sentto, user FROM '.UserConfig::$mysql_prefix.'invitation WHERE user IS NOT NULL'))
+		$query = 'SELECT code, created, issuedby, is_admin_invite, sent_to_note, user
+			FROM '.UserConfig::$mysql_prefix.'invitation
+			WHERE user IS NOT NULL';
+
+		if (!is_null($admin)) {
+			$query .= ' AND is_admin_invite = ' . ($admin ? 1 : 0);
+		}
+
+		if ($stmt = $db->prepare($query))
 		{
 			if (!$stmt->execute())
 			{
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($code, $time_created, $issuedby, $sentto, $userid))
+			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_note, $userid))
 			{
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
 			{
-				$invitations[] = new self($code, $time_created, $issuedby, $sentto, $userid);
+				$invitations[] = new self($code, $time_created, $issuedby, $is_admin_invite ? true : false, $sent_to_note, $userid);
 			}
 
 			$stmt->close();
@@ -218,7 +240,7 @@ class Invitation
 
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('SELECT code, created, issuedby, sentto, user FROM '.UserConfig::$mysql_prefix.'invitation WHERE code = ?'))
+		if ($stmt = $db->prepare('SELECT code, created, issuedby, is_admin_invite, sent_to_note, user FROM '.UserConfig::$mysql_prefix.'invitation WHERE code = ?'))
 		{
 			if (!$stmt->bind_param('s', $code))
 			{
@@ -228,14 +250,14 @@ class Invitation
 			{
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($code, $time_created, $issuedby, $sentto, $userid))
+			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_note, $userid))
 			{
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE)
 			{
-				$invitation = new self($code, $time_created, $issuedby, $sentto, $userid);
+				$invitation = new self($code, $time_created, $issuedby, $is_admin_invite ? true : false, $sent_to_note, $userid);
 			}
 
 			$stmt->close();
@@ -249,7 +271,7 @@ class Invitation
 	}
 
 	/**
-	 * Creates new invitation codes to be used for inviting new users
+	 * Creates new invitation codes to be used for inviting new users in admin UI
 	 *
 	 * @param int $howmany How many codes to generate
 	 *
@@ -259,7 +281,7 @@ class Invitation
 	{
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'invitation (code) VALUES (?)'))
+		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'invitation (code, is_admin_invite) VALUES (?, 1)'))
 		{
 			for ($i = 0; $i < $howmany; $i++)
 			{
@@ -384,9 +406,14 @@ class Invitation
 
 		$comment = mb_convert_encoding($this->usagecomment, 'UTF-8');
 
-		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'invitation SET sentto = ?, issuedby = ?, user = ? WHERE code = ?'))
+		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'invitation SET
+			sent_to_note = ?,
+			issuedby = ?,
+			is_admin_invite = ?,
+			user = ?
+			WHERE code = ?'))
 		{
-			if (!$stmt->bind_param('siis', $comment, $this->issuedby, $this->user, $this->code))
+			if (!$stmt->bind_param('siiis', $comment, $this->issuedby, $this->is_admin_invite, $this->user, $this->code))
 			{
 				throw new DBBindParamException($db, $stmt);
 			}

@@ -22,8 +22,38 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
- * VERSION _
- * ... add version description here ...
+ * VERSION 22
+ * Adding email invitations for users
+*/
+$versions[22]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."invitation`
+	ADD is_admin_invite TINYINT NOT NULL DEFAULT '1'
+		COMMENT  'Whatever it is an invitation sent using admin UI or not'
+		AFTER  `issuedby`,
+	ADD sent_to_email VARCHAR(255) NULL DEFAULT NULL
+		COMMENT 'Email address we sent invitation to'
+		AFTER is_admin_invite,
+	ADD sent_to_name TEXT
+		CHARACTER SET utf8 COLLATE utf8_general_ci
+		COMMENT 'Name of the person who got invited'
+		AFTER sent_to_email,
+	CHANGE sentto sent_to_note
+		TEXT CHARACTER SET utf8 COLLATE utf8_general_ci
+		NULL DEFAULT NULL
+		COMMENT 'Note about who this invitation was sent to'
+";
+$versions[22]['down'][]	= "ALTER TABLE `".UserConfig::$mysql_prefix."invitation`
+	DROP is_admin_invite,
+	DROP sent_to_email,
+	DROP sent_to_name,
+	CHANGE sent_to_note sentto
+		TEXT CHARACTER SET utf8 COLLATE utf8_general_ci
+		NULL DEFAULT NULL
+		COMMENT 'Note about who this invitation was sent to'
+";
+
+/* -------------------------------------------------------------------------------------------------------
+ * VERSION 21
+ * Adding missing primary key on account user
 */
 $versions[21]['up'][] = 'ALTER TABLE  `'.UserConfig::$mysql_prefix.'account_users` ADD PRIMARY KEY (  `account_id` ,  `user_id` )';
 $versions[21]['up'][] = 'ALTER TABLE  `'.UserConfig::$mysql_prefix.'account_users` DROP KEY user_account';

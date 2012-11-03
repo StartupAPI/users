@@ -122,7 +122,7 @@ else
 <?php
 }
 
-$invitations = Invitation::getSent();
+$invitations = Invitation::getSent(true);
 
 if (count($invitations) > 0)
 {
@@ -164,7 +164,7 @@ if (count($invitations) > 0)
 <?php
 }
 
-$invitations = Invitation::getAccepted();
+$invitations = Invitation::getAccepted(true);
 
 if (count($invitations) > 0)
 {
