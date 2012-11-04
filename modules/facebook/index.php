@@ -272,6 +272,11 @@ Logging out from Facebook...
 		<input type="hidden" name="<?php echo $formsubmit ?>" value="Connect &gt;&gt;&gt;"/>
 		<?php UserTools::renderCSRFNonce(); ?>
 		</form>
+		<?php
+		if ($form == 'register' && !is_null(UserConfig::$currentTOSVersion) && is_callable(UserConfig::$onRenderTOSLinks)) {
+			call_user_func(UserConfig::$onRenderTOSLinks);
+		}
+		?>
 		<a class="startupapi-fb-connect" href="#" onclick="UserBaseFBConnectButtonClicked(); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); <?php echo $buttonspritestyle ?> display: block; cursor: hand; margin-top: 0.3em" title="<?php echo $buttontitle ?>"></span></a>
 
 		<script>

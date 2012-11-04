@@ -619,8 +619,8 @@ class User {
 
 		$user = null;
 
-		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . "users (name, regmodule) VALUES (?, 'google' )")) {
-			if (!$stmt->bind_param('s', $name)) {
+		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . "users (name, regmodule, tos_version) VALUES (?, 'google', ?)")) {
+			if (!$stmt->bind_param('si', $name, UserConfig::$currentTOSVersion)) {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
@@ -679,8 +679,8 @@ class User {
 
 		$user = null;
 
-		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . "users (name, regmodule, email, fb_id) VALUES (?, 'facebook', ?, ?)")) {
-			if (!$stmt->bind_param('ssi', $name, $email, $fb_id)) {
+		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . "users (name, regmodule, tos_version, email, fb_id) VALUES (?, 'facebook', ?, ?, ?)")) {
+			if (!$stmt->bind_param('sisi', $name, UserConfig::$currentTOSVersion, $email, $fb_id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
@@ -732,8 +732,8 @@ class User {
 			$email = null;
 		}
 
-		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . 'users (name, email, regmodule) VALUES (?, ?, ?)')) {
-			if (!$stmt->bind_param('sss', $name, $email, $module_id)) {
+		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . 'users (name, email, regmodule, tos_version) VALUES (?, ?, ?, ?)')) {
+			if (!$stmt->bind_param('sss', $name, $email, $module_id, UserConfig::$currentTOSVersion)) {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
@@ -780,8 +780,8 @@ class User {
 		;
 		$pass = sha1($salt . $password);
 
-		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . "users (regmodule, name, username, email, pass, salt) VALUES ('userpass', ?, ?, ?, ?, ?)")) {
-			if (!$stmt->bind_param('sssss', $name, $username, $email, $pass, $salt)) {
+		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . "users (regmodule, tos_version, name, username, email, pass, salt) VALUES ('userpass', ?, ?, ?, ?, ?, ?)")) {
+			if (!$stmt->bind_param('isssss', UserConfig::$currentTOSVersion, $name, $username, $email, $pass, $salt)) {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {

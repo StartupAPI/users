@@ -28,6 +28,27 @@ UserConfig::$admins = array(
 #UserConfig::$appName = '';
 
 /*
+ * It is usually important to obtain Terms of Service and Privacy Policy consent
+ * from your users, but you should consult your lawyer before launching the app
+ * and to obtain a copy of such documents.
+ *
+ * Uncomment following lines will enable the Terms of Service and Privacy Policy verbiage on sign up forms.
+ *
+ * You can also override exact verbiage by registering your own UserConfig::$onRenderTOSLinks hook
+ */
+// Increment this number every time you update TOS and Privacy Policy
+// to help you track which user concented to which version
+#UserConfig::$currentTOSVersion = 1;
+
+// Terms of Service URLs
+#UserConfig::$termsOfServiceURL = UserConfig::$SITEROOTURL . '/terms_of_service.php';
+#UserConfig::$termsOfServiceFullURL = UserConfig::$SITEROOTFULLURL . '/terms_of_service.php';
+
+// Privacy Policy URLs
+#UserConfig::$privacyPolicyURL = UserConfig::$SITEROOTURL . '/privacy_policy.php';
+#UserConfig::$privacyPolicyFullURL = UserConfig::$SITEROOTFULLURL . '/privacy_policy.php';
+
+/*
  * Uncomment next line to require email address verification before users can access the site
  */
 #UserConfig::$requireVerifiedEmail = true;

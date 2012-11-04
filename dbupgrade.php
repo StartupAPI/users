@@ -22,6 +22,17 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 23
+ * Tracking terms of service
+*/
+$versions[23]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."users`
+	ADD tos_version INT NULL
+	COMMENT  'Version of Terms Of Service User consented to when signed up'
+	AFTER regmodule";
+$versions[23]['down'][]	= "ALTER TABLE `".UserConfig::$mysql_prefix."users`
+	DROP tos_version";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 22
  * Adding email invitations for users
 */

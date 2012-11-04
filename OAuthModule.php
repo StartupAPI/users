@@ -556,6 +556,10 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 			<p>Sign in using your existing account with <b><?php echo UserTools::escape($this->serviceName)?></b>.</p>
 		<?php
 		}
+
+		if (!is_null(UserConfig::$currentTOSVersion) && is_callable(UserConfig::$onRenderTOSLinks)) {
+			call_user_func(UserConfig::$onRenderTOSLinks);
+		}
 		?>
 		<form action="<?php echo $action?>" method="POST">
 		<input type="hidden" name="register" value="register"/>

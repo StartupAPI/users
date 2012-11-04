@@ -158,6 +158,11 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		<li><label for="startupapi-usernamepass-register-passrepeat">Repeat password</label><input id="startupapi-usernamepass-register-passrepeat" name="repeatpass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('repeatpass', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['repeatpass'])).'">*</abbr>' : ''?></li>
 		<li><label for="startupapi-usernamepass-register-name">Name</label><input id="startupapi-usernamepass-register-name" name="name" type="test" size="25" value="<?php echo array_key_exists('name', $data) ? UserTools::escape($data['name']) : ''?>"/><?php echo array_key_exists('name', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['name'])).'">*</abbr>' : ''?></li>
 		<li><label for="startupapi-usernamepass-register-email">E-mail</label><input id="startupapi-usernamepass-register-email" name="email" type="email" size="25" value="<?php echo array_key_exists('email', $data) ? UserTools::escape($data['email']) : ''?>"/><?php echo array_key_exists('email', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</abbr>' : ''?></li>
+		<li><?php
+		if (!is_null(UserConfig::$currentTOSVersion) && is_callable(UserConfig::$onRenderTOSLinks)) {
+			call_user_func(UserConfig::$onRenderTOSLinks);
+		}
+		?></li>
 		<li><button id="startupapi-usernamepass-register-button" type="submit" name="register">Register</button> <a href="<?php echo UserConfig::$USERSROOTURL?>/login.php">or login here</a></li>
 		</ul>
 		</form>

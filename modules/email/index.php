@@ -133,6 +133,11 @@ class EmailAuthenticationModule extends AuthenticationModule
 		<ul>
 		<li><label for="startupapi-email-register-name">Name</label><input id="startupapi-email-register-name" name="name" type="test" size="40" value="<?php echo array_key_exists('name', $data) ? UserTools::escape($data['name']) : ''?>"/><?php echo array_key_exists('name', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['name'])).'">*</abbr>' : ''?></li>
 		<li><label for="startupapi-email-signup-email">Email</label><input id="startupapi-email-signup-email" name="email" type="text" size="40"/><?php echo array_key_exists('email', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</abbr>' : ''?></li>
+		<li><?php
+		if (!is_null(UserConfig::$currentTOSVersion) && is_callable(UserConfig::$onRenderTOSLinks)) {
+			call_user_func(UserConfig::$onRenderTOSLinks);
+		}
+		?></li>
 		<li><button id="startupapi-email-signup-button" type="submit" name="register">Sign up</button> <a href="<?php echo UserConfig::$USERSROOTURL?>/login.php">or re-send login link</a></li>
 		</ul>
 		</fieldset>

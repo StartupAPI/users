@@ -451,6 +451,34 @@ class UserConfig
 	 */
 	public static $invitationRequiredMessage = 'Please enter your invitation code';
 
+	/**
+	 * @var string URL of Terms of Service Document
+	 */
+	public static $termsOfServiceURL;
+
+	/**
+	 * @var string Absolute URL of Terms of Service Document (used in emails and such)
+	 */
+	public static $termsOfServiceFullURL;
+
+	/**
+	 * @var string URL of Privacy Policy Document
+	 */
+	public static $privacyPolicyURL;
+
+	/**
+	 * @var string Absolute URL of Privacy Policy Document (used in emails and such)
+	 */
+	public static $privacyPolicyFullURL;
+
+	/**
+	 * Version of the Terms Of Service Document users consent to when signing up,
+	 * increment it when you change TOS document contents
+	 *
+	 * @var int
+	 */
+	public static $currentTOSVersion;
+
 
 	/**************************************************************************
 	 *
@@ -582,6 +610,11 @@ class UserConfig
 	 */
 	public static $onLoginStripLinks = null;
 
+	/**
+	 * @var callable Hook for rendering Terms of Service and Privacy Policy verbiage on signup forms
+	 */
+	public static $onRenderTOSLinks = 'UserConfig::renderTOSLinks';
+
 
 	/**************************************************************************
 	 *
@@ -631,6 +664,15 @@ class UserConfig
 	public static function setDB($db)
 	{
 		self::$db = $db;
+	}
+
+	/**
+	 * Default handler for UserConfig::$onRenderTOSLinks hook
+	 */
+	public static function renderTOSLinks()
+	{
+		?><p style="font-size: smaller">By signing up you agree to our <a target="_blank" href="<?php echo UserConfig::$termsOfServiceURL ?>">Terms of Service</a>
+					and that you have read our <a target="_blank" href="<?php echo UserConfig::$privacyPolicyURL ?>">Privacy Policy</a>.</p><?php
 	}
 
 	/**
@@ -767,6 +809,12 @@ EOD;
 		UserConfig::$DEFAULTREGISTERRETURN = UserConfig::$SITEROOTURL;
 		UserConfig::$DEFAULTUPDATEPASSWORDRETURN = UserConfig::$SITEROOTURL;
 		UserConfig::$DEFAULT_EMAIL_VERIFIED_RETURN = UserConfig::$SITEROOTURL;
+
+		// Default locations for terms of service and privacy policy documents
+		UserConfig::$termsOfServiceURL = UserConfig::$SITEROOTURL . 'terms_of_service.php';
+		UserConfig::$termsOfServiceFullURL = UserConfig::$SITEROOTFULLURL . 'terms_of_service.php';
+		UserConfig::$privacyPolicyURL = UserConfig::$SITEROOTURL . 'privacy_policy.php';
+		UserConfig::$privacyPolicyFullURL = UserConfig::$SITEROOTFULLURL . 'privacy_policy.php';
 
 		if (array_key_exists('HTTP_HOST', $_SERVER))
 		{

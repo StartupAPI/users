@@ -125,7 +125,7 @@ if (UserConfig::$enableRegistration)
 			<?php
 		}
 	}
-	
+
 	if ($show_registration_form)
 	{
 		foreach (UserConfig::$authentication_modules as $module)
@@ -163,5 +163,6 @@ else
 	<p>If you already have an account, you can <a href="<?php echo UserConfig::$USERSROOTURL?>/login.php">log in here</a>.</p>
 <?php
 }
-?></div><?php
+?>
+</div><?php
 require_once(UserConfig::$footer);
