@@ -170,9 +170,7 @@ require_once(dirname(__FILE__) . '/header.php');
 					<a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/account.php?id=<?php echo $user_account->getID() ?>">
 						<?php echo UserTools::escape($user_account->getName()); ?>
 					</a>
-					<span style="margin: 0 0.3em" class="label" href="<?php echo UserConfig::$USERSROOTURL ?>/admin/plan.php?id=<?php echo UserTools::escape($plan->slug); ?>">
-						<?php echo UserTools::escape($plan->name); ?>
-					</span>
+					<a style="margin: 0 0.3em" class="label" href="<?php echo UserConfig::$USERSROOTURL ?>/admin/plan.php?slug=<?php echo UserTools::escape($plan->slug); ?>"><?php echo UserTools::escape($plan->name); ?></a>
 
 					<?php if ($role == Account::ROLE_ADMIN) { ?>
 						<span class = "label label-important">admin</span>

@@ -629,7 +629,10 @@ class UserConfig {
 		'PLAN_FREE' => array(
 			'id' => 0,
 			'name' => 'Free account',
-			'description' => 'Free access with basic functionality'
+			'description' => 'Free access with basic functionality',
+			'capabilities' => array(
+				'individual' => true
+			)
 		)
 	);
 	// default plan
