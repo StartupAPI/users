@@ -21,7 +21,7 @@ require_once(dirname(__FILE__) . '/Plan.php');
  */
 class Account {
 
-	private $slug;
+	private $id;
 
 	/**
 	 * @var string Account name
@@ -1072,7 +1072,7 @@ class Account {
 				$this->getBalance() >= $new_schedule->charge_amount)) {
 
 			if (!is_null($this->paymentEngine)) {
-				$this->paymentEngine->changeSubscription($plan_slug, $schedule_slug);
+				$this->paymentEngine->changeSubscription($this->id, $plan_slug, $schedule_slug);
 			}
 
 			return $this->activatePlan($plan_slug, $schedule_slug);
@@ -1121,7 +1121,7 @@ class Account {
 		if (is_null($this->nextCharge) &&
 				$this->getBalance() >= $schedule->charge_amount) {
 			if (!is_null($this->paymentEngine)) {
-				$this->paymentEngine->changeSubscription($this->plan, $schedule);
+				$this->paymentEngine->changeSubscription($this->id, $this->plan, $schedule);
 			}
 
 			return $this->setPaymentSchedule($schedule_slug);
