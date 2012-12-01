@@ -4,6 +4,11 @@ require_once(dirname(__FILE__).'/User.php');
 
 User::require_login();
 
+if (!UserConfig::$useSubscriptions) {
+	header('Location: '.UserConfig::$DEFAULTLOGOUTRETURN);
+	exit;
+}
+
 # this yields Smarty object as $smarty
 include(dirname(__FILE__).'/view/account/transaction_log.php');
 
