@@ -4,21 +4,59 @@
  * this protects some of your user's data when sent over the network
  * and must be different from other sites
  */
-UserConfig::$SESSION_SECRET= '...some.random.characters.go.here...';
+UserConfig::$SESSION_SECRET= '...type.some.random.characters.here...';
 
 /**
- * Database connectivity 
+ * Database connectivity
  */
-UserConfig::$mysql_host = 'localhost';
 UserConfig::$mysql_db = '...database...';
 UserConfig::$mysql_user = '...username...';
 UserConfig::$mysql_password = '...password...';
-UserConfig::$mysql_port = '...port...';
+#UserConfig::$mysql_host = 'localhost';
+#UserConfig::$mysql_port = 3306;
 
 /**
  * User IDs of admins for this instance (to be able to access dashboard at /users/admin/)
  */
-UserConfig::$admins = array(  ); // usually first user has ID of 1
+UserConfig::$admins = array(
+#	1, // usually first user has ID of 1
+);
+
+/*
+ * Name of your application to be used in UI and emails to users
+ */
+#UserConfig::$appName = '';
+
+/*
+ * It is usually important to obtain Terms of Service and Privacy Policy consent
+ * from your users, but you should consult your lawyer before launching the app
+ * and to obtain a copy of such documents.
+ *
+ * Uncomment following lines will enable the Terms of Service and Privacy Policy verbiage on sign up forms.
+ *
+ * You can also override exact verbiage by registering your own UserConfig::$onRenderTOSLinks hook
+ */
+// Increment this number every time you update TOS and Privacy Policy
+// to help you track which user concented to which version
+#UserConfig::$currentTOSVersion = 1;
+
+// Terms of Service URLs
+#UserConfig::$termsOfServiceURL = UserConfig::$SITEROOTURL . '/terms_of_service.php';
+#UserConfig::$termsOfServiceFullURL = UserConfig::$SITEROOTFULLURL . '/terms_of_service.php';
+
+// Privacy Policy URLs
+#UserConfig::$privacyPolicyURL = UserConfig::$SITEROOTURL . '/privacy_policy.php';
+#UserConfig::$privacyPolicyFullURL = UserConfig::$SITEROOTFULLURL . '/privacy_policy.php';
+
+/*
+ * Uncomment next line to require email address verification before users can access the site
+ */
+#UserConfig::$requireVerifiedEmail = true;
+
+/*
+ * Uncomment next line to enable debug messages in error_log
+ */
+#UserConfig::$DEBUG = true;
 
 /**
  * Set these to point at your header and footer or leave them commented out to use default ones
@@ -35,8 +73,8 @@ new UsernamePasswordAuthenticationModule();
 
 /**
  * Facebook Connect configuration
- * Register your app here: http://www.facebook.com/developers/createapp.php
- * Click "Edit settings" -> "Web Site" and enter your site's URL
+ * Register your app here: https://developers.facebook.com/apps
+ * Click "Edit settings" -> "Website with Facebook Login" and enter your site's URL
  * And then uncomment two lines below and copy API Key and App Secret
  */
 #UserConfig::loadModule('facebook');

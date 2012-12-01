@@ -1,7 +1,9 @@
 <?php
-require_once(dirname(__FILE__).'/config.php');
+require_once(dirname(__FILE__).'/global.php');
 
 require_once(dirname(__FILE__).'/User.php');
+
+UserConfig::$IGNORE_REQUIRED_EMAIL_VERIFICATION = true;
 
 $user = User::require_login();
 
@@ -22,7 +24,7 @@ if (array_key_exists('module', $_GET))
 
 if (is_null($module))
 {
-	throw new Exception('Wrong module specified');
+	throw new StartupAPIException('Wrong module specified');
 }
 
 if (array_key_exists('save', $_POST))
@@ -54,50 +56,18 @@ if (array_key_exists('save', $_POST))
 require_once(UserConfig::$header);
 
 ?>
-<style>
-#userbase-edit-info {
-	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-	background: white;
-	padding: 0 1em;
-	margin: 0;
-}
-
-#userbase-edit-info h2 {
-	font-weight: bold;
-	font-size: 2.5em;
-}
-
-#userbase-edit-info h3 {
-	font-weight: bold;
-	font-size: 1.5em;
-}
-
-.userbase-errorbox {
-	background: #f7dfb9;
-	padding: 0.4em 1em;
-	margin: 1em 0;
-	width: 515px;
-	border: 4px solid #f77;
-	border-radius: 7px;
-	-moz-border-radius: 7px;
-	-webkit-border-radius: 7px;
-	font-size: 1.2em;
-	color: #500;
-	font-weight: bold;
-}
-</style>
-<div id="userbase-edit-info">
+<div id="startupapi-edit-info">
 <h2>Edit Your Information</h2>
 
-<div style="float: right; width: 400px">
-<div>
+<div id="startupapi-edit-rightcol">
+<div id="startupapi-edit-account">
 <?php if (UserConfig::$useAccounts) { ?>
 	<h2>Current account:</h2>
 	<div>
 <?php
 	$account = Account::getCurrentAccount($user);
 	echo $account->getName()," ( ",$account->getPlan()->name," )";
-	if($account->getUserRole() == Account::ROLE_ADMIN)
+	if($account->getUserRole($user) == Account::ROLE_ADMIN)
 		echo " - <a href=\"",UserConfig::$USERSROOTURL."/manage_account.php\">manage</a>\n";
 ?>
 	</div>
@@ -106,14 +76,42 @@ require_once(UserConfig::$header);
 ?>
 </div>
 
-<?php if (!is_null(UserConfig::$maillist) && file_exists(UserConfig::$maillist))
+<?php
+if (UserConfig::$enableGamification) {
+	$available_badges = Badge::getAvailableBadges();
+
+	if (count($available_badges) > 0) { ?>
+	<div id="startupapi-edit-badges">
+	<h2>Badges:</h2>
+	<?php
+
+		$user_badges = $user->getBadges();
+
+		foreach($available_badges as $badge) {
+
+			if (array_key_exists($badge->getID(), $user_badges)) {
+				$badge_level = $user_badges[$badge->getID()][1];
+
+				?><a href="<?php echo UserConfig::$USERSROOTURL.'/show_badge.php?name='.$badge->getSlug() ?>"><img class="startupapi-badge" src="<?php echo $badge->getImageURL(UserConfig::$badgeListingSize, $badge_level) ?>" title="<?php echo $badge->getTitle() ?>" width="<?php echo UserConfig::$badgeListingSize ?>" height="<?php echo UserConfig::$badgeListingSize ?>"/></a><?php
+			} else {
+				?><img class="startupapi-badge" src="<?php echo $badge->getPlaceholderImageURL(UserConfig::$badgeListingSize) ?>" title="Hint: <?php echo $badge->getHint() ?>" width="<?php echo UserConfig::$badgeListingSize ?>" height="<?php echo UserConfig::$badgeListingSize ?>"/><?php
+			}
+		}
+	?></div><?php
+	}
+	?>
+	</div>
+<?php
+}
+
+if (!is_null(UserConfig::$maillist) && file_exists(UserConfig::$maillist))
 {
 ?>
 <?php include(UserConfig::$maillist); ?>
 <?php
 }
 ?></div>
-<div id="userbase-authlist">
+<div id="startupapi-authlist">
 <?php
 
 foreach (UserConfig::$authentication_modules as $module)
@@ -125,7 +123,7 @@ foreach (UserConfig::$authentication_modules as $module)
 <?php
 	if (array_key_exists($id, $errors) && is_array($errors[$id]) && count($errors[$id]) > 0)
 	{
-		?><div class="userbase-errorbox"><ul><?php
+		?><div class="startupapi-errorbox"><ul><?php
 		foreach ($errors[$id] as $field => $errorset)
 		{
 			foreach ($errorset as $error)
@@ -146,5 +144,6 @@ foreach (UserConfig::$authentication_modules as $module)
 </div>
 
 </div>
+<div style="clear: both"></div>
 <?php
 require_once(UserConfig::$footer);

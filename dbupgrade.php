@@ -6,7 +6,7 @@
  * Note: this script should be versioned in your code repository so it always reflects current code's
  *       requirements for the database structure.
 */
-require_once(dirname(__FILE__).'/config.php');
+require_once(dirname(__FILE__).'/global.php');
 require_once(dirname(__FILE__).'/dbupgrade/lib.php');
 
 $versions = array();
@@ -22,10 +22,10 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
- * VERSION 18
+ * VERSION 25
  * Adding transaciton details table for PaymentEngine_Manual
 */
-$versions[18]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."transaction_details_PaymentEngine_Manual` (
+$versions[25]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."transaction_details_PaymentEngine_Manual` (
   `transaction_id` int(10) UNSIGNED NOT NULL,
   `operator_id` int(10) UNSIGNED NOT NULL,
   `funds_source` varchar(256) DEFAULT NULL,
@@ -33,20 +33,14 @@ $versions[18]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."transaction_
   CONSTRAINT `transaction_id_fk1` FOREIGN KEY (`transaction_id`) REFERENCES `".
   UserConfig::$mysql_prefix."transaction_log` (`transaction_id`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-$versions[18]['down'][] = "DROP TABLE `".UserConfig::$mysql_prefix."transaction_details_PaymentEngine_Manual`";
+$versions[25]['down'][] = "DROP TABLE `".UserConfig::$mysql_prefix."transaction_details_PaymentEngine_Manual`";
+
 
 /* -------------------------------------------------------------------------------------------------------
- * VERSION 17
- * Adding login link code
-*/
-$versions[17]['up'][] = "ALTER TABLE  `".UserConfig::$mysql_prefix."users` ADD  `loginlinkcode` VARCHAR( 10 ) NULL DEFAULT NULL COMMENT  'One time code used to login' AFTER  `temppass`";
-$versions[17]['down'][] = "ALTER TABLE  `".UserConfig::$mysql_prefix."users` DROP  `loginlinkcode`";
-
-/* -------------------------------------------------------------------------------------------------------
- * VERSION 16
+ * VERSION 24
  * Payment Plans and Engines
 */
-$versions[16]['up'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
+$versions[24]['up'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
   CHANGE COLUMN plan plan_slug varchar(256) DEFAULT NULL,
   ADD COLUMN next_plan_slug varchar(256) DEFAULT NULL,
   ADD COLUMN schedule_slug varchar(256) DEFAULT NULL,
@@ -54,16 +48,17 @@ $versions[16]['up'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
   ADD COLUMN engine_slug varchar(256) DEFAULT NULL,
   ADD COLUMN active tinyint(1) DEFAULT '1',
   ADD COLUMN next_charge datetime DEFAULT NULL";
+
 /*
  * Now, if upgrading from plan numeric IDs to slugs, convert ID to slug using
  * 'id' attribute to plan key in UserConfig::$PLANS as slug
 */
 $plan_slugs = array_keys(UserConfig::$PLANS);
 foreach ($plan_slugs as $slug) {
-	$versions[16]['up'][] = sprintf('UPDATE '.UserConfig::$mysql_prefix."accounts SET plan_slug = '%s'".
+	$versions[24]['up'][] = sprintf('UPDATE '.UserConfig::$mysql_prefix."accounts SET plan_slug = '%s'".
 			" WHERE plan_slug = '%d'", $slug, UserConfig::$PLANS[$slug]['id']);
 }
-$versions[16]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."transaction_log (
+$versions[24]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."transaction_log (
   `transaction_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `date_time` datetime NOT NULL,
   `account_id` int(10) UNSIGNED NOT NULL,
@@ -75,7 +70,7 @@ $versions[16]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."transaction_l
   CONSTRAINT `transaction_acct_id` FOREIGN KEY (`account_id`) REFERENCES `".
   UserConfig::$mysql_prefix."accounts` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-$versions[16]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."account_charge (
+$versions[24]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."account_charge (
   account_id int(10) UNSIGNED NOT NULL,
   date_time datetime NOT NULL,
   amount float DEFAULT NULL,
@@ -91,15 +86,119 @@ $versions[16]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."account_charg
 */
 $plan_slugs = array_keys(UserConfig::$PLANS);
 foreach ($plan_slugs as $slug) {
-	$versions[16]['down'][] = sprintf('UPDATE '.UserConfig::$mysql_prefix."accounts SET plan_slug = '%d'".
+	$versions[24]['down'][] = sprintf('UPDATE '.UserConfig::$mysql_prefix."accounts SET plan_slug = '%d'".
 			" WHERE plan_slug = '%s'", UserConfig::$PLANS[$slug]['id'], $slug);
 }
-$versions[16]['down'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
+$versions[24]['down'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
   CHANGE COLUMN plan_slug plan tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'Payment plan ID',
-  DROP COLUMN next_plan_slug, DROP COLUMN schedule_slug, DROP COLUMN next_schedule_slug, 
+  DROP COLUMN next_plan_slug, DROP COLUMN schedule_slug, DROP COLUMN next_schedule_slug,
   DROP COLUMN engine_slug, DROP COLUMN active, DROP COLUMN next_charge";
-$versions[16]['down'][] = "DROP TABLE ".UserConfig::$mysql_prefix."account_charge";
-$versions[16]['down'][] = "DROP TABLE ".UserConfig::$mysql_prefix."transaction_log";
+$versions[24]['down'][] = "DROP TABLE ".UserConfig::$mysql_prefix."account_charge";
+$versions[24]['down'][] = "DROP TABLE ".UserConfig::$mysql_prefix."transaction_log";
+
+/* -------------------------------------------------------------------------------------------------------
+ * VERSION 23
+ * Tracking terms of service
+*/
+$versions[23]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."users`
+	ADD tos_version INT NULL
+	COMMENT  'Version of Terms Of Service User consented to when signed up'
+	AFTER regmodule";
+$versions[23]['down'][]	= "ALTER TABLE `".UserConfig::$mysql_prefix."users`
+	DROP tos_version";
+
+/* -------------------------------------------------------------------------------------------------------
+ * VERSION 22
+ * Adding email invitations for users
+*/
+$versions[22]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."invitation`
+	ADD is_admin_invite TINYINT NOT NULL DEFAULT '1'
+		COMMENT  'Whatever it is an invitation sent using admin UI or not'
+		AFTER  `issuedby`,
+	ADD sent_to_email VARCHAR(255) NULL DEFAULT NULL
+		COMMENT 'Email address we sent invitation to'
+		AFTER is_admin_invite,
+	ADD sent_to_name TEXT
+		CHARACTER SET utf8 COLLATE utf8_general_ci
+		COMMENT 'Name of the person who got invited'
+		AFTER sent_to_email,
+	CHANGE sentto sent_to_note
+		TEXT CHARACTER SET utf8 COLLATE utf8_general_ci
+		NULL DEFAULT NULL
+		COMMENT 'Note about who this invitation was sent to'
+";
+$versions[22]['down'][]	= "ALTER TABLE `".UserConfig::$mysql_prefix."invitation`
+	DROP is_admin_invite,
+	DROP sent_to_email,
+	DROP sent_to_name,
+	CHANGE sent_to_note sentto
+		TEXT CHARACTER SET utf8 COLLATE utf8_general_ci
+		NULL DEFAULT NULL
+		COMMENT 'Note about who this invitation was sent to'
+";
+
+/* -------------------------------------------------------------------------------------------------------
+ * VERSION 21
+ * Adding missing primary key on account user
+*/
+$versions[21]['up'][] = 'ALTER TABLE  `'.UserConfig::$mysql_prefix.'account_users` ADD PRIMARY KEY (  `account_id` ,  `user_id` )';
+$versions[21]['up'][] = 'ALTER TABLE  `'.UserConfig::$mysql_prefix.'account_users` DROP KEY user_account';
+$versions[21]['down'][]	= 'ALTER TABLE  `'.UserConfig::$mysql_prefix.'account_users` ADD KEY `user_account` (`account_id`)';
+$versions[21]['down'][]	= 'ALTER TABLE  `'.UserConfig::$mysql_prefix.'account_users` DROP PRIMARY KEY';
+
+/* -------------------------------------------------------------------------------------------------------
+ * VERSION 20
+ * Adding badge timestamp
+*/
+$versions[20]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."user_badges`
+	ADD time TIMESTAMP NOT NULL COMMENT 'Time when user got the badge'";
+$versions[20]['down'][]	= "ALTER TABLE `".UserConfig::$mysql_prefix."user_badges` DROP time";
+
+/* -------------------------------------------------------------------------------------------------------
+ * VERSION 19
+ * Invitation issuer is optional
+*/
+$versions[19]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."invitation`
+CHANGE `issuedby` `issuedby` bigint(10) unsigned DEFAULT NULL COMMENT 'User who issued the invitation'";
+$versions[19]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."invitation`
+CHANGE `issuedby` `issuedby` bigint(10) unsigned NOT NULL DEFAULT '1' COMMENT 'User who issued the invitation'";
+
+/* -------------------------------------------------------------------------------------------------------
+ * VERSION 18
+ * Gamification badges
+*/
+$versions[18]['up'][] = "CREATE TABLE IF NOT EXISTS `".UserConfig::$mysql_prefix."user_badges` (
+	`user_id` INT(10) UNSIGNED NOT NULL,
+	`badge_id` INT(4) NOT NULL,
+	`badge_level` INT(4) NOT NULL DEFAULT 1,
+
+	PRIMARY KEY (user_id, badge_id, badge_level),
+
+	CONSTRAINT badge_user
+		FOREIGN KEY (user_id)
+		REFERENCES ".UserConfig::$mysql_prefix."users (id)
+		ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='User badges'";
+$versions[18]['down'][]	= "DROP TABLE `".UserConfig::$mysql_prefix."user_badges`";
+
+/* -------------------------------------------------------------------------------------------------------
+ * VERSION 17
+ * Adding email verification field
+*/
+$versions[17]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."users`
+		ADD email_verified TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'Is email address verified or not' AFTER email,
+		ADD email_verification_code VARCHAR(10) NULL DEFAULT NULL COMMENT 'One time code used to verify users email address' AFTER `email_verified`,
+		ADD email_verification_code_time timestamp NULL DEFAULT NULL COMMENT 'Email verification code generation time' AFTER email_verification_code
+";
+$versions[17]['down'][] = "ALTER TABLE  `".UserConfig::$mysql_prefix."users` DROP email_verified, DROP email_verification_code, DROP email_verification_code_time";
+
+
+/* -------------------------------------------------------------------------------------------------------
+ * VERSION 16
+ * Adding login link code
+*/
+$versions[16]['up'][] = "ALTER TABLE  `".UserConfig::$mysql_prefix."users` ADD  `loginlinkcode` VARCHAR( 10 ) NULL DEFAULT NULL COMMENT  'One time code used to login' AFTER  `temppass`";
+$versions[16]['down'][] = "ALTER TABLE  `".UserConfig::$mysql_prefix."users` DROP  `loginlinkcode`";
 
 /* -------------------------------------------------------------------------------------------------------
  * VERSION 15
@@ -314,13 +413,13 @@ $versions[10]['down'][]	= "ALTER TABLE `".UserConfig::$mysql_prefix."user_oauth_
 */
 $versions[9]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."user_oauth_identity` (
 	oauth_user_id INT(11) NOT NULL AUTO_INCREMENT COMMENT 'oauth-php user id',
-	user_id INT(10) UNSIGNED DEFAULT NULL COMMENT  'UserBase user id',
+	user_id INT(10) UNSIGNED DEFAULT NULL COMMENT  'Startup API user id',
 	identity TEXT DEFAULT NULL COMMENT 'String uniquely identifying user on the oauth server',
 	PRIMARY KEY (oauth_user_id),
 	CONSTRAINT oauth_identity_user_id FOREIGN KEY (user_id)
 		REFERENCES `".UserConfig::$mysql_prefix."users` (id)
 		ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = INNODB COMMENT =  'Table that links UserBase users and oauth-php users and their consumer tokens';
+) ENGINE = INNODB COMMENT =  'Table that links Startup API users and oauth-php users and their consumer tokens';
 ";
 $versions[9]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."oauth_log (
 	olg_id                  INT(11) NOT NULL AUTO_INCREMENT,

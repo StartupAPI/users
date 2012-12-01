@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/global.php');
 
 require_once(dirname(dirname(dirname(__FILE__))).'/User.php');
 
@@ -41,84 +41,18 @@ if (array_key_exists('recover', $_POST))
 	}
 	else
 	{
-		throw new Exception('Can\'t render temporary password email, check if UserConfig::$onRenderTemporaryPasswordEmail is set');
+		throw new StartupAPIException('Can\'t render temporary password email, check if UserConfig::$onRenderTemporaryPasswordEmail is set');
 	}
 }
 
 require_once(UserConfig::$header);
 ?>
-<style>
-#userbase-forgotpassword {
-	font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-	padding: 0 1em;
-	margin: 0 auto;
-	width: 400px;
-}
-
-#userbase-forgotpassword h2 {
-	font-weight: bold;
-	font-size: 2.5em;
-}
-
-#userbase-forgotpassword h3 {
-	font-weight: bold;
-	font-size: 1.5em;
-}
-
-#userbase-passwordsent {
-	padding: 0 1em;
-	margin: 2em 0;
-	width: 350px;
-	border: 4px solid #ccc;
-	border-radius: 7px;
-	-moz-border-radius: 7px;
-	-webkit-border-radius: 7px;
-}
-
-#userbase-forgotpassword-form {
-	padding: 0.4em 1em;
-	margin: 0;
-	width: 350px;
-	border: 4px solid #ccc;
-	border-radius: 7px;
-	-moz-border-radius: 7px;
-	-webkit-border-radius: 7px;
-}
-
-#userbase-forgotpassword-form input {
-	background: #f6f6f6;
-	border: 2px solid #888;
-	border-radius: 2px;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
-	padding: 4px;
-}
-#userbase-forgotpassword-button {
-	padding: 0.3em 10px;
-	cursor: pointer;
-}
-#userbase-forgotpassword fieldset {
-	border: 0;
-	padding: 0;
-	margin: 0;
-}
-
-#userbase-forgotpassword legend {
-	border: 0;
-	padding: 0;
-	margin: 0;
-	font-size: 1.5em;
-	line-height: 1.8;
-	padding-bottom: .6em;
-}
-</style>
-
-<div id="userbase-forgotpassword">
+<div id="startupapi-forgotpassword">
 <?php
 if (array_key_exists('status', $_GET) && $_GET['status'] == 'sent')
 {
 ?>
-	<div id="userbase-passwordsent">
+	<div id="startupapi-passwordsent">
 	<fieldset>
 	<legend>Temporary password is sent</legend>
 	<p>We generated temporary password and sent it to email address on file with your account.</p>
@@ -131,12 +65,12 @@ if (array_key_exists('status', $_GET) && $_GET['status'] == 'sent')
 else
 {
 	?><h2>Forgot password?</h2>
-	<div id="userbase-forgotpassword-form">
+	<div id="startupapi-forgotpassword-form">
 	<form action="" method="POST">
 	<fieldset>
 	<legend>Please enter your email or username</legend>
 	<input type="text" name="emailorusername" value="" size="40"/>
-	<button id="userbase-forgotpassword-button" type="submit" name="recover">Send</button>
+	<button id="startupapi-forgotpassword-button" type="submit" name="recover">Send</button>
 
 	<p>Email with temporary password will be sent to email address associated with your user account.</p>
 	</fieldset>

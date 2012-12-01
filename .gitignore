@@ -3,3 +3,4 @@ docs
 tags
 cache
 .phptidy-cache
+.DS_Store

@@ -1,0 +1,27 @@
+source: .
+
+destination: docs/apigen
+
+exclude:
+	- */oauth-php/*
+	- */modules/facebook/php-sdk/*
+	- */dbupgrade/*
+	- */admin/swfobject/*
+	- */docs/*
+	- */smarty/*
+	- */phptidy/*
+	- */apigen-docs/*
+	- */CookieStorage.php
+
+php: no
+
+report: docs/apigen/report.xml
+
+todo: yes
+
+accessLevels:
+	- public
+	- protected
+	- private
+
+updateCheck: no

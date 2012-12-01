@@ -1,15 +1,54 @@
 <?php
 require_once(dirname(__FILE__).'/CookieStorage.php');
 
-/*
- * This file should be included on all pages if referer tracking is required
+/**
+ * Tracks sources of marketing campaigns using variables in the incoming URLs
+ * as well as incoming links and preserves this information for registered users.
+ *
+ * Configure it using UserConfig::$campaign_variables array, by default it uses
+ * Google Analytics (Urchin) campaign tracking URL parameters.
+ *
+ * @see UserConfig::$campaign_variables
+ *
+ * @package StartupAPI
+ * @subpackage Analytics
  */
-
 class CampaignTracker
 {
+	/**
+	 * @var string Referer URL
+	 */
 	private static $referer = null;
+
+	/**
+	 * @var array Array of campaign tracking paramaters
+	 *
+	 * @see self::recordCampaignVariables
+	 */
 	private static $campaign = null;
 
+	/**
+	 * Preserves campaign variables
+	 *
+	 * Preserves original campaign variables in a cookie on first incoming
+	 * page view to be saved into user object later upon registration.
+	 *
+	 * Will populate self::$campaign variable with values for zero or more of the following keys:
+	 *
+	 * - cmp_source - campaign source ('utm_source' URL parameter is tracked by default)
+	 * - cmp_medium - campaign medium ('utm_medium' URL parameter is tracked by default)
+	 * - cmp_keywords - campaign keyworkds ('utm_term' URL parameter is tracked by default)
+	 * - cmp_content - campaign content ('utm_content' URL parameter is tracked by default)
+	 * - cmp_name - campaign name ('utm_campaign' URL parameter is tracked by default)
+	 *
+	 * You can add more URL parameters to be tracked using UserConfig::$campaign_variables configuration array
+	 *
+	 * This function is called on every page view, let's keep it fast and simple.
+	 *
+	 * @throws StartupAPIException
+	 *
+	 * @see UserConfig::$campaign_variables
+	 */
 	public static function recordCampaignVariables() {
 		$campaign = array();
 
@@ -34,11 +73,20 @@ class CampaignTracker
 		));
 
 		if (!$storage->store(UserConfig::$entry_cmp_key, serialize($campaign))) {
-			throw new Exception(implode("\n", $storage->errors));
+			throw new StartupAPIException(implode("\n", $storage->errors));
 		}
 	}
 
-	// sets the referrer into a cookie
+	/**
+	 * Preserves HTTP_REFERER into a cookie
+	 *
+	 * Preserves original HTTP_REFERER in a cookie on first incoming
+	 * page view to be saved into user object later upon registration.
+	 *
+	 * This function is called on every page view, let's keep it fast and simple.
+	 *
+	 * @throws StartupAPIException
+	 */
 	public static function preserveReferer() {
 		if (array_key_exists('HTTP_REFERER', $_SERVER)) {
 			$referer = $_SERVER['HTTP_REFERER'];
@@ -56,14 +104,19 @@ class CampaignTracker
 				'httponly' => true
 			));
 
-			if (!$storage->store(UserConfig::$entry_referer_key, $referer)) { 
-				throw new Exception(implode("\n", $storage->errors));
+			if (!$storage->store(UserConfig::$entry_referer_key, $referer)) {
+				throw new StartupAPIException(implode("\n", $storage->errors));
 			}
 
 			self::$referer = $referer;
 		}
 	}
 
+	/**
+	 * Returns original referer for this browsing session
+	 *
+	 * @return string Referer URL
+	 */
 	public static function getReferer() {
 		// use static one if we're on an entry page
 		if (!is_null(self::$referer)) {
@@ -80,6 +133,11 @@ class CampaignTracker
 		return($storage->fetch(UserConfig::$entry_referer_key));
 	}
 
+	/**
+	 * Returns campaign array for this browser session
+	 *
+	 * @return array Array of campaign tracking variables
+	 */
 	public static function getCampaign() {
 		// use static one if we're on an entry page
 		if (!is_null(self::$campaign)) {
@@ -96,243 +154,121 @@ class CampaignTracker
 		return(unserialize($storage->fetch(UserConfig::$entry_cmp_key)));
 	}
 
+	/**
+	 * Upserts campaign source string into database and returns numeric ID for it
+	 *
+	 * @param string $source Campaign source string
+	 *
+	 * @return int Numeric campaign source ID
+	 *
+	 * @throws DBException
+	 */
 	public static function getCampaignSourceID($source) {
-		$source = mb_convert_encoding($source, 'UTF-8');
-
-		$db = UserConfig::getDB();
-
-		$cmp_source_id = null;
-		if ($stmt = $db->prepare('INSERT IGNORE INTO '.UserConfig::$mysql_prefix.'cmp_source (source) VALUES (?)'))
-		{
-			if (!$stmt->bind_param('s', $source))
-			{
-				throw new Exception("Can't bind parameter");
-			}
-			if (!$stmt->execute())
-			{
-				throw new Exception("Can't insert compaign source");
-			}
-			$stmt->close();
-		}
-		else
-		{
-			throw new Exception("Can't insert compaign source");
-		}
-
-		if ($stmt = $db->prepare('SELECT id FROM '.UserConfig::$mysql_prefix.'cmp_source
-						WHERE source = ?'))
-		{
-			if (!$stmt->bind_param('s', $source))
-			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
-			}
-			if (!$stmt->execute())
-			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
-			}
-			if (!$stmt->bind_result($cmp_source_id))
-			{
-				throw new Exception("Can't bind result: ".$stmt->error);
-			}
-
-			$stmt->fetch();
-			$stmt->close();
-		}
-		else
-		{
-			throw new Exception("Can't prepare statement: ".$db->error);
-		}
-
-		return $cmp_source_id;
+		return self::getCampaignDictionaryID($source, 'cmp_source', 'source');
 	}
 
+	/**
+	 * Upserts campaign medium string into database and returns numeric ID for it
+	 *
+	 * @param string $medium Campaign medium string
+	 *
+	 * @return int Numeric campaign medium ID
+	 *
+	 * @throws DBException
+	 */
 	public static function getCampaignMediumID($medium) {
-		$medium = mb_convert_encoding($medium, 'UTF-8');
-
-		$db = UserConfig::getDB();
-
-		$cmp_medium_id = null;
-		if ($stmt = $db->prepare('INSERT IGNORE INTO '.UserConfig::$mysql_prefix.'cmp_medium (medium) VALUES (?)'))
-		{
-			if (!$stmt->bind_param('s', $medium))
-			{
-				throw new Exception("Can't bind parameter");
-			}
-			if (!$stmt->execute())
-			{
-				throw new Exception("Can't insert compaign medium");
-			}
-			$stmt->close();
-		}
-		else
-		{
-			throw new Exception("Can't insert compaign medium");
-		}
-
-		if ($stmt = $db->prepare('SELECT id FROM '.UserConfig::$mysql_prefix.'cmp_medium
-						WHERE medium = ?'))
-		{
-			if (!$stmt->bind_param('s', $medium))
-			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
-			}
-			if (!$stmt->execute())
-			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
-			}
-			if (!$stmt->bind_result($cmp_medium_id))
-			{
-				throw new Exception("Can't bind result: ".$stmt->error);
-			}
-
-			$stmt->fetch();
-			$stmt->close();
-		}
-		else
-		{
-			throw new Exception("Can't prepare statement: ".$db->error);
-		}
-
-		return $cmp_medium_id;
+		return self::getCampaignDictionaryID($medium, 'cmp_medium', 'medium');
 	}
-
+	/**
+	 * Upserts campaign keywords string into database and returns numeric ID for it
+	 *
+	 * @param string $keywords Campaign keywords string
+	 *
+	 * @return int Numeric campaign keywords ID
+	 *
+	 * @throws DBException
+	 */
 	public static function getCampaignKeywordsID($keywords) {
-		$keywords = mb_convert_encoding($keywords, 'UTF-8');
-
-		$db = UserConfig::getDB();
-
-		$cmp_keywords_id = null;
-		if ($stmt = $db->prepare('INSERT IGNORE INTO '.UserConfig::$mysql_prefix.'cmp_keywords (keywords) VALUES (?)'))
-		{
-			if (!$stmt->bind_param('s', $keywords))
-			{
-				throw new Exception("Can't bind parameter");
-			}
-			if (!$stmt->execute())
-			{
-				throw new Exception("Can't insert compaign keywords");
-			}
-			$stmt->close();
-		}
-		else
-		{
-			throw new Exception("Can't insert compaign keywords");
-		}
-
-		if ($stmt = $db->prepare('SELECT id FROM '.UserConfig::$mysql_prefix.'cmp_keywords
-						WHERE keywords = ?'))
-		{
-			if (!$stmt->bind_param('s', $keywords))
-			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
-			}
-			if (!$stmt->execute())
-			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
-			}
-			if (!$stmt->bind_result($cmp_keywords_id))
-			{
-				throw new Exception("Can't bind result: ".$stmt->error);
-			}
-
-			$stmt->fetch();
-			$stmt->close();
-		}
-		else
-		{
-			throw new Exception("Can't prepare statement: ".$db->error);
-		}
-
-		return $cmp_keywords_id;
+		return self::getCampaignDictionaryID($keywords, 'cmp_keywords', 'keywords');
 	}
 
+	/**
+	 * Upserts campaign content string into database and returns numeric ID for it
+	 *
+	 * @param string $content Campaign content string
+	 *
+	 * @return int Numeric campaign content ID
+	 *
+	 * @throws DBException
+	 */
 	public static function getCampaignContentID($content) {
-		$content = mb_convert_encoding($content, 'UTF-8');
-
-		$db = UserConfig::getDB();
-
-		$cmp_content_id = null;
-		if ($stmt = $db->prepare('INSERT IGNORE INTO '.UserConfig::$mysql_prefix.'cmp_content (content) VALUES (?)'))
-		{
-			if (!$stmt->bind_param('s', $content))
-			{
-				throw new Exception("Can't bind parameter");
-			}
-			if (!$stmt->execute())
-			{
-				throw new Exception("Can't insert compaign content");
-			}
-			$stmt->close();
-		}
-		else
-		{
-			throw new Exception("Can't insert compaign content");
-		}
-
-		if ($stmt = $db->prepare('SELECT id FROM '.UserConfig::$mysql_prefix.'cmp_content
-						WHERE content = ?'))
-		{
-			if (!$stmt->bind_param('s', $content))
-			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
-			}
-			if (!$stmt->execute())
-			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
-			}
-			if (!$stmt->bind_result($cmp_content_id))
-			{
-				throw new Exception("Can't bind result: ".$stmt->error);
-			}
-
-			$stmt->fetch();
-			$stmt->close();
-		}
-		else
-		{
-			throw new Exception("Can't prepare statement: ".$db->error);
-		}
-
-		return $cmp_content_id;
+		return self::getCampaignDictionaryID($content, 'cmp_content', 'content');
 	}
 
+	/**
+	 * Upserts campaign name into database and returns numeric ID for it
+	 *
+	 * @param string $name Campaign name string
+	 *
+	 * @return int Numeric campaign name ID
+	 *
+	 * @throws DBException
+	 */
 	public static function getCampaignNameID($name) {
-		$name = mb_convert_encoding($name, 'UTF-8');
+		return self::getCampaignDictionaryID($name, 'cmp', 'name');
+	}
+
+	/**
+	 * Campaign dictionary management helper function
+	 *
+	 * Returns numeric ID for campaign string identifiers passed in URLs
+	 *
+	 * @param string $string_value String to be looked up
+	 * @param string $dictionary_table Dictionary table name
+	 * @param string $dictionary_column Dictionary column name
+	 *
+	 * @return int Numeric ID for a dictionary term
+	 *
+	 * @throws DBException
+	 */
+	protected static function getCampaignDictionaryID($string_value, $dictionary_table, $dictionary_column) {
+		$string_value = mb_convert_encoding($string_value, 'UTF-8');
 
 		$db = UserConfig::getDB();
 
-		$cmp_name_id = null;
-		if ($stmt = $db->prepare('INSERT IGNORE INTO '.UserConfig::$mysql_prefix.'cmp (name) VALUES (?)'))
+		if ($stmt = $db->prepare('INSERT IGNORE INTO '.UserConfig::$mysql_prefix."$dictionary_table ($dictionary_column)
+						VALUES (?)"))
 		{
-			if (!$stmt->bind_param('s', $name))
+			if (!$stmt->bind_param('s', $string_value))
 			{
-				throw new Exception("Can't bind parameter");
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't insert compaign name");
+				throw new DBExecuteStmtException($db, $stmt, "Can't insert compaign $dictionary_column");
 			}
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't insert compaign name");
+			throw new DBPrepareStmtException($db, "Can't insert compaign $dictionary_column");
 		}
 
-		if ($stmt = $db->prepare('SELECT id FROM '.UserConfig::$mysql_prefix.'cmp
-						WHERE name = ?'))
+		$id = null;
+		if ($stmt = $db->prepare('SELECT id FROM '.UserConfig::$mysql_prefix."$dictionary_table
+						WHERE $dictionary_column = ?"))
 		{
-			if (!$stmt->bind_param('s', $name))
+			if (!$stmt->bind_param('s', $string_value))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($cmp_name_id))
+			if (!$stmt->bind_result($id))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -340,9 +276,9 @@ class CampaignTracker
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
-		return $cmp_name_id;
+		return $id;
 	}
 }

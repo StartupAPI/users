@@ -1,14 +1,25 @@
 <?php
-/**
- * @package StartupAPI
- * @subpackage Authentication
- */
 require_once(dirname(dirname(dirname(__FILE__))).'/OAuthModule.php');
 
+/**
+ * Meetup authentication module
+ *
+ * Provides authentication using Meetup.com accounts and API access using OAuth
+ *
+ * @package StartupAPI
+ * @subpackage Authentication\Meetup
+ */
 class MeetupAuthenticationModule extends OAuthAuthenticationModule
 {
 	protected $userCredentialsClass = 'MeetupUserCredentials';
 
+	/**
+	 * Instantiates Meetup authentication module and registers it with the system
+	 *
+	 * @param string $oAuthConsumerKey OAuth Consumer Key
+	 * @param string $oAuthConsumerSecret OAuth Consumer Secret
+	 * @param string $oAuthScope Requested permission scopes (zero or more scope strings, usually URLs, separated by spaces)
+	 */
 	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret, $oAuthScope = 'basic')
 	{
 		parent::__construct(
@@ -74,6 +85,12 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 	}
 }
 
+/**
+ * Meetup user credentials class
+ *
+ * @package StartupAPI
+ * @subpackage Authentication\Meetup
+ */
 class MeetupUserCredentials extends OAuthUserCredentials {
 	public function getHTML() {
 		return '<a href="'.UserTools::escape($this->userinfo['link']).'" target="_blank">'.$this->userinfo['name'].'</a>';

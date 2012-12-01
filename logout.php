@@ -1,7 +1,9 @@
 <?php
-require_once(dirname(__FILE__).'/config.php');
+require_once(dirname(__FILE__).'/global.php');
 
 require_once(dirname(__FILE__).'/User.php');
+
+UserConfig::$IGNORE_REQUIRED_EMAIL_VERIFICATION = true;
 
 // first, we need to auto-logout all modules that require that
 $autologgedout_module_reached = false;

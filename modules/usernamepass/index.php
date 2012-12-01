@@ -1,7 +1,14 @@
 <?php
 /**
+ * Basic authentication module using username and password
+ *
+ * Registers users with their username, password, name and email address
+ *
+ * This is the module that is enabled by default in user_config.sample.php
+ * because it requires not configuration.
+ *
  * @package StartupAPI
- * @subpackage Authentication
+ * @subpackage Authentication\UsernamePassword
  */
 class UsernamePasswordAuthenticationModule extends AuthenticationModule
 {
@@ -30,15 +37,15 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		{
 			if (!$stmt->bind_param('i', $userid))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($username))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -54,7 +61,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return null;
@@ -70,11 +77,11 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		{
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($conns))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -82,13 +89,13 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $conns;
 	}
 	/*
-	 * retrieves aggregated registrations numbers 
+	 * retrieves aggregated registrations numbers
 	 */
 	public function getDailyRegistrations()
 	{
@@ -100,11 +107,11 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		{
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($regdate, $regs))
 			{
-				throw new Exception("Can't bind result: ".$stmt->error);
+				throw new DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -116,7 +123,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		return $dailyregs;
@@ -125,117 +132,14 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 	public function renderLoginForm($action)
 	{
 		?>
-		<style>
-		#userbase-usernamepass-login-form {
-			font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-			padding: 0.4em 1em;
-			margin: 0;
-			width: 480px;
-			border: 4px solid #ccc;
-			border-radius: 7px;
-			-moz-border-radius: 7px;
-			-webkit-border-radius: 7px;
-		}
-
-		#userbase-usernamepass-login-form li {
-			font-size: 1.2em;
-			line-height: 1.5;
-
-			clear: both;
-			margin: 0 0 .75em;
-			padding: 0;
-		}
-
-		#userbase-usernamepass-login-form fieldset {
-			border: 0;
-			padding: 0;
-			margin: 0;
-		}
-
-		#userbase-usernamepass-login-form legend {
-			border: 0;
-			padding: 0;
-			margin: 0;
-			font-size: 1.8em;
-			line-height: 1.8;
-			padding-bottom: .6em;
-		}
-
-		#userbase-usernamepass-login-form ul {
-			list-style: none;
-			margin: 0;
-			padding: 0;
-		}
-
-		#userbase-usernamepass-login-form label {
-			display: block;
-			float: left;
-			line-height: 1.6;
-			margin-right: 10px;
-			text-align: right;
-			width: 110px;
-			padding: 3px 0;
-		}
-
-		#userbase-usernamepass-login-form label:after {
-			content: ':';
-		}
-
-		#userbase-usernamepass-login-button {
-			margin-left: 125px;
-			padding: 0.3em 25px;
-			cursor: pointer;
-		}
-
-		#userbase-usernamepass-login-forgotpass {
-			margin-left: 130px;
-                        cursor: pointer;
-			font-size: 0.6em;
-			display: block;
-		}
-
-		#userbase-usernamepass-login-form input {
-			background: #f6f6f6;
-			border: 2px solid #888;
-			border-radius: 2px;
-			-moz-border-radius: 2px;
-			-webkit-border-radius: 2px;
-			padding: 4px;
-		}
-
-		#userbase-usernamepass-login-form input:focus {
-			background: #fff;
-		}
-
-		#userbase-usernamepass-login-form .remember label {
-			display: block;
-			float: none;
-			margin-left: 127px;
-			text-align: left;
-			width: 270px;
-		}
-
-		#userbase-usernamepass-login-form .remember input {
-			border: 0;
-			background: #fff;
-		}
-
-		#userbase-usernamepass-login-form .remember {
-			margin-bottom: 0;
-		}
-
-		#userbase-usernamepass-login-form .remember label:after {
-			content: ''
-		}
-		</style>
-		<form id="userbase-usernamepass-login-form" action="<?php echo $action?>" method="POST">
+		<form id="startupapi-usernamepass-login-form" action="<?php echo $action?>" method="POST">
 		<fieldset>
 		<legend>Enter your username and password to log in</legend>
 		<ul>
-		<li><label for="userbase-usernamepass-login-username">Username</label><input id="userbase-usernamepass-login-username" name="username" type="text" size="25" maxlength="25"/></li>
-		<li><label for="userbase-usernamepass-login-password">Password</label><input id="userbase-usernamepass-login-password" name="pass" type="password" size="25" autocomplete="off"/><a id="userbase-usernamepass-login-forgotpass" href="<?php echo UserConfig::$USERSROOTURL?>/modules/usernamepass/forgotpassword.php">Forgot password?</a></li>
+		<li><label for="startupapi-usernamepass-login-username">Username</label><input id="startupapi-usernamepass-login-username" name="username" type="text" size="25" maxlength="25"/></li>
+		<li><label for="startupapi-usernamepass-login-password">Password</label><input id="startupapi-usernamepass-login-password" name="pass" type="password" size="25" autocomplete="off"/><a id="startupapi-usernamepass-login-forgotpass" href="<?php echo UserConfig::$USERSROOTURL?>/modules/usernamepass/forgotpassword.php">Forgot password?</a></li>
 		<?php if (UserConfig::$allowRememberMe) {?><li class="remember"><label for="remember"><input type="checkbox" name="remember" value="yes" id="remember"<?php if (UserConfig::$rememberMeDefault) {?> checked<?php }?>/>remember me</label></li> <?php }?>
-		<li><button id="userbase-usernamepass-login-button" type="submit" name="login">Log in</button><?php if (UserConfig::$enableRegistration) {?> <a href="<?php echo UserConfig::$USERSROOTURL?>/register.php">or register</a><?php } ?></li>
+		<li><button id="startupapi-usernamepass-login-button" type="submit" name="login">Log in</button><?php if (UserConfig::$enableRegistration) {?> <a href="<?php echo UserConfig::$USERSROOTURL?>/register.php">or register</a><?php } ?></li>
 		</ul>
 		</fieldset>
 		</form>
@@ -245,223 +149,31 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 	public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null)
 	{
 		?>
-		<style>
-		#userbase-usernamepass-register-form {
-			font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-			padding: 0.4em 1em;
-			margin: 0;
-			width: 470px;
-			border: 4px solid #ccc;
-			border-radius: 7px;
-			-moz-border-radius: 7px;
-			-webkit-border-radius: 7px;
-		}
-
-		#userbase-usernamepass-register-form li {
-			font-size: 1.2em;
-			line-height: 1.5;
-
-			clear: both;
-			margin: 0 0 .75em;
-			padding: 0;
-		}
-
-		#userbase-usernamepass-register-form fieldset {
-			border: 0;
-			padding: 0;
-			margin: 0;
-		}
-
-		#userbase-usernamepass-register-form legend {
-			border: 0;
-			padding: 0;
-			margin: 0;
-			font-size: 1.8em;
-			line-height: 1.8;
-			padding-bottom: .6em;
-		}
-
-		#userbase-usernamepass-register-form ul {
-			list-style: none;
-			margin: 0;
-			padding: 0;
-		}
-
-		#userbase-usernamepass-register-form label {
-			display: block;
-			float: left;
-			line-height: 1.6;
-			margin-right: 10px;
-			text-align: right;
-			width: 140px;
-			padding: 3px 0;
-		}
-
-		#userbase-usernamepass-register-form label:after {
-			content: ':';
-		}
-
-		#userbase-usernamepass-register-button {
-			margin-left: 155px;
-			padding: 0.3em 25px;
-			cursor: pointer;
-		}
-
-		#userbase-usernamepass-register-forgotpass {
-			margin-left: 130px;
-                        cursor: pointer;
-			font-size: 0.6em;
-			display: block;
-		}
-
-		#userbase-usernamepass-register-form input {
-			background: #f6f6f6;
-			border: 2px solid #888;
-			border-radius: 2px;
-			-moz-border-radius: 2px;
-			-webkit-border-radius: 2px;
-			padding: 4px;
-		}
-
-		#userbase-usernamepass-register-form input:focus {
-			background: #fff;
-		}
-
-		#userbase-usernamepass-register-form abbr {
-			cursor: help;
-			font-style: normal;
-			border: 0;
-			color: red;
-			font-size: 1.2em;
-			font-weight: bold;
-		}
-		</style>
-		<form id="userbase-usernamepass-register-form" action="<?php echo $action?>" method="POST">
+		<form id="startupapi-usernamepass-register-form" action="<?php echo $action?>" method="POST">
 		<fieldset>
 		<legend>Enter your information to create an account</legend>
 		<ul>
-		<li><label for="userbase-usernamepass-register-username">Username</label><input id="userbase-usernamepass-register-username" name="username" type="text" size="25" maxlength="25" value="<?php echo array_key_exists('username', $data) ? UserTools::escape($data['username']) : ''?>"/><?php echo array_key_exists('username', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['username'])).'">*</abbr>' : ''?></li>
-		<li><label for="userbase-usernamepass-register-pass">Password</label><input id="userbase-usernamepass-register-pass" name="pass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('pass', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['pass'])).'">*</abbr>' : ''?></li>
-		<li><label for="userbase-usernamepass-register-passrepeat">Repeat password</label><input id="userbase-usernamepass-register-passrepeat" name="repeatpass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('repeatpass', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['repeatpass'])).'">*</abbr>' : ''?></li>
-		<li><label for="userbase-usernamepass-register-name">Name</label><input id="userbase-usernamepass-register-name" name="name" type="test" size="25" value="<?php echo array_key_exists('name', $data) ? UserTools::escape($data['name']) : ''?>"/><?php echo array_key_exists('name', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['name'])).'">*</abbr>' : ''?></li>
-		<li><label for="userbase-usernamepass-register-email">E-mail</label><input id="userbase-usernamepass-register-email" name="email" type="text" size="25" value="<?php echo array_key_exists('email', $data) ? UserTools::escape($data['email']) : ''?>"/><?php echo array_key_exists('email', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</abbr>' : ''?></li>
-		<li><button id="userbase-usernamepass-register-button" type="submit" name="register">Register</button> <a href="<?php echo UserConfig::$USERSROOTURL?>/login.php">or login here</a></li>
+		<li><label for="startupapi-usernamepass-register-username">Username</label><input id="startupapi-usernamepass-register-username" name="username" type="text" size="25" maxlength="25" value="<?php echo array_key_exists('username', $data) ? UserTools::escape($data['username']) : ''?>"/><?php echo array_key_exists('username', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['username'])).'">*</abbr>' : ''?></li>
+		<li><label for="startupapi-usernamepass-register-pass">Password</label><input id="startupapi-usernamepass-register-pass" name="pass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('pass', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['pass'])).'">*</abbr>' : ''?></li>
+		<li><label for="startupapi-usernamepass-register-passrepeat">Repeat password</label><input id="startupapi-usernamepass-register-passrepeat" name="repeatpass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('repeatpass', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['repeatpass'])).'">*</abbr>' : ''?></li>
+		<li><label for="startupapi-usernamepass-register-name">Name</label><input id="startupapi-usernamepass-register-name" name="name" type="test" size="25" value="<?php echo array_key_exists('name', $data) ? UserTools::escape($data['name']) : ''?>"/><?php echo array_key_exists('name', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['name'])).'">*</abbr>' : ''?></li>
+		<li><label for="startupapi-usernamepass-register-email">E-mail</label><input id="startupapi-usernamepass-register-email" name="email" type="email" size="25" value="<?php echo array_key_exists('email', $data) ? UserTools::escape($data['email']) : ''?>"/><?php echo array_key_exists('email', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</abbr>' : ''?></li>
+		<li><?php
+		if (!is_null(UserConfig::$currentTOSVersion) && is_callable(UserConfig::$onRenderTOSLinks)) {
+			call_user_func(UserConfig::$onRenderTOSLinks);
+		}
+		?></li>
+		<li><button id="startupapi-usernamepass-register-button" type="submit" name="register">Register</button> <a href="<?php echo UserConfig::$USERSROOTURL?>/login.php">or login here</a></li>
 		</ul>
 		</form>
 		</fieldset>
 		<?php
 	}
 
-	/*
-	 * Renders user editing form
-	 *
-	 * Parameters:
-	 * $action - form action to post back to
-	 * $errors - error messages to display
-	 * $user - user object for current user that is being edited
-	 * $data - data submitted to the form
-	 */
 	public function renderEditUserForm($action, $errors, $user, $data)
 	{
 		?>
-		<style>
-		#userbase-usernamepass-edit-form {
-			font: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-			padding: 0.4em 1em;
-			margin: 0;
-			width: 520px;
-			border: 4px solid #ccc;
-			border-radius: 7px;
-			-moz-border-radius: 7px;
-			-webkit-border-radius: 7px;
-		}
-
-		#userbase-usernamepass-edit-form li {
-			font-size: 1.2em;
-			line-height: 1.5;
-
-			clear: both;
-			margin: 0 0 .75em;
-			padding: 0;
-		}
-
-		#userbase-usernamepass-edit-form fieldset {
-			border: 0;
-			padding: 0;
-			margin: 0;
-		}
-
-		#userbase-usernamepass-edit-form legend {
-			border: 0;
-			padding: 0;
-			margin: 0;
-			font-size: 1.8em;
-			line-height: 1.8;
-			padding-bottom: .6em;
-		}
-
-		#userbase-usernamepass-edit-form ul {
-			list-style: none;
-			margin: 0;
-			padding: 0;
-		}
-
-		#userbase-usernamepass-edit-form label {
-			display: block;
-			float: left;
-			line-height: 1.6;
-			margin-right: 10px;
-			text-align: right;
-			width: 165px;
-			padding: 3px 0;
-		}
-
-		#userbase-usernamepass-edit-form label:after {
-			content: ':';
-		}
-
-		#userbase-usernamepass-edit-button {
-			margin-left: 180px;
-			padding: 0.3em 25px;
-			cursor: pointer;
-		}
-
-		#userbase-usernamepass-edit-forgotpass {
-			margin-left: 130px;
-                        cursor: pointer;
-			font-size: 0.6em;
-			display: block;
-		}
-
-		#userbase-usernamepass-edit-form input {
-			background: #f6f6f6;
-			border: 2px solid #888;
-			border-radius: 2px;
-			-moz-border-radius: 2px;
-			-webkit-border-radius: 2px;
-			padding: 4px;
-		}
-
-		#userbase-usernamepass-edit-form input:focus {
-			background: #fff;
-		}
-
-		#userbase-usernamepass-edit-form abbr {
-			cursor: help;
-			font-style: normal;
-			border: 0;
-			color: red;
-			font-size: 1.2em;
-			font-weight: bold;
-		}
-
-		#userbase-usernamepass-edit-form .userbase-usernamepass-edit-section {
-			font-size: 1.5em;
-			font-weight: bold;
-			margin-top: 1em;
-		}
-		</style>
-		<form id="userbase-usernamepass-edit-form" action="<?php echo $action?>" method="POST">
+		<form id="startupapi-usernamepass-edit-form" action="<?php echo $action?>" method="POST">
 		<fieldset>
 		<legend>Update your name, email and password</legend>
 		<ul>
@@ -470,23 +182,25 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 
 		if (is_null($username)) {
 		?>
-		<li><label>Username</label><input name="username" type="text" size="25" maxlength="25" value="<?php echo array_key_exists('username', $data) ? UserTools::escape($data['username']) : ''?>"/><?php echo array_key_exists('username', $errors) ? ' <span style="color:red" title="'.UserTools::escape(implode("\n", $errors['username'])).'">*</span>' : ''?></li>
+		<li><label>Username</label><input name="username" type="text" size="25" maxlength="25" value="<?php echo array_key_exists('username', $data) ? UserTools::escape($data['username']) : ''?>"/><?php echo array_key_exists('username', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['username'])).'">*</span>' : ''?></li>
 		<?php }
 		else
 		{?>
 		<li><label>Username</label><b title="Sorry, you can't change your username">&nbsp;<?php echo UserTools::escape($username)?></b></li>
 		<?php }?>
-		<li class="userbase-usernamepass-edit-section">Name and email</li>
-		<li><label>Name</label><input name="name" type="test" size="40" value="<?php echo UserTools::escape(array_key_exists('name', $data) ? $data['name'] : $user->getName())?>"/><?php echo array_key_exists('name', $errors) ? ' <span style="color:red" title="'.UserTools::escape(implode("\n", $errors['name'])).'">*</span>' : ''?></li>
-		<li><label>E-mail</label><input name="email" type="text" size="40" value="<?php echo UserTools::escape(array_key_exists('email', $data) ? $data['email'] : $user->getEmail())?>"/><?php echo array_key_exists('email', $errors) ? ' <span style="color:red" title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</span>' : ''?></li>
+		<li class="startupapi-usernamepass-edit-section">Name and email</li>
+		<li><label>Name</label><input name="name" type="test" size="40" value="<?php echo UserTools::escape(array_key_exists('name', $data) ? $data['name'] : $user->getName())?>"/><?php echo array_key_exists('name', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['name'])).'">*</span>' : ''?></li>
+		<li><label>E-mail</label><input name="email" type="email" size="40" value="<?php echo UserTools::escape(array_key_exists('email', $data) ? $data['email'] : $user->getEmail())?>"/><?php echo array_key_exists('email', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</span>' : ''?>
+			<?php if (!$user->isEmailVerified()) { ?><a id="startupapi-usernamepass-edit-verify-email" href="<?php echo UserConfig::$USERSROOTURL ?>/verify_email.php">Email address not verified yet, click here to verify</a><?php } ?>
+		</li>
 
-		<li class="userbase-usernamepass-edit-section">Change password</li>
+		<li class="startupapi-usernamepass-edit-section">Change password</li>
 		<?php if (!is_null($user->getUsername())) {?>
-		<li><label>Current password</label><input name="currentpass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('currentpass', $errors) ? ' <span style="color:red" title="'.UserTools::escape(implode("\n", $errors['currentpass'])).'">*</span>' : ''?></li>
+		<li><label>Current password</label><input name="currentpass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('currentpass', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['currentpass'])).'">*</span>' : ''?></li>
 		<?php } ?>
-		<li><label><?php if (is_null($user->getUsername())) {?>Set a<?php } else {?>New<?php } ?> password</label><input name="pass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('pass', $errors) ? ' <span style="color:red" title="'.UserTools::escape(implode("\n", $errors['pass'])).'">*</span>' : ''?></li>
-		<li><label>Repeat new password</label><input name="repeatpass" type="password" size="25" autocomplete="off"/><?php array_key_exists('repeatpass', $errors) ? ' <span style="color:red" title="'.UserTools::escape(implode("\n", $errors['repeatpass'])).'">*</span>' : ''?></li>
-		<li><button id="userbase-usernamepass-edit-button" type="submit" name="save">Save</button></li>
+		<li><label><?php if (is_null($user->getUsername())) {?>Set a<?php } else {?>New<?php } ?> password</label><input name="pass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('pass', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['pass'])).'">*</span>' : ''?></li>
+		<li><label>Repeat new password</label><input name="repeatpass" type="password" size="25" autocomplete="off"/><?php array_key_exists('repeatpass', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['repeatpass'])).'">*</span>' : ''?></li>
+		<li><button id="startupapi-usernamepass-edit-button" type="submit" name="save">Save</button></li>
 		</ul>
 		</fieldset>
 		<?php UserTools::renderCSRFNonce(); ?>
@@ -762,12 +476,15 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		return true;
 	}
 
-	/*
+	/**
 	 * Updates user's password
 	 *
-	 * returns true if successful and false if unsuccessful
+	 * @param User $user User object
+	 * @param array $data Form data
 	 *
-	 * throws InputValidationException if there are problems with input data
+	 * @return boolean True if password update was successful, false otherwise
+	 *
+	 * @throws InputValidationException
 	 */
 	public function processUpdatePassword($user, $data)
 	{
@@ -807,18 +524,45 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		return true;
 	}
 
-	// THIS SHOULD ONLY BE SET ON PASSWORD RESET PAGE
-	// SETTING THIS ON OTHER PAGES CAN RESULT IN SECURITY BREACH
+	/**
+	 * Bypasses required password reset flag if set to true
+	 *
+	 * THIS SHOULD ONLY BE SET ON PASSWORD RESET PAGE
+	 * SETTING THIS ON OTHER PAGES CAN RESULT IN SECURITY BREACH
+	 *
+	 * @var boolean
+	 *
+	 * @internal
+	 */
 	public static $IGNORE_PASSWORD_RESET = false;
 }
 
+/**
+ * Username credentials
+ *
+ * @package StartupAPI
+ * @subpackage Authentication\UsernamePassword
+ */
 class UsernamePassUserCredentials extends UserCredentials {
+	/**
+	 * @var string Username
+	 */
 	private $username;
 
+	/**
+	 * Creates Username credentials object
+	 *
+	 * @param type $username
+	 */
 	public function __construct($username) {
 		$this->username = $username;
 	}
 
+	/**
+	 * Returns user's username
+	 *
+	 * @return string Username
+	 */
 	public function getUsername() {
 		return $this->username;
 	}

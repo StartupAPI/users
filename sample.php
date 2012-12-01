@@ -15,15 +15,16 @@ if (!is_null($user)) {
 }
 ?>
 <html>
-<head><title>UserBase sample page</title></head>
+<head><title>Sample page</title></head>
 <body>
+<div style="float: right"><?php StartupAPI::power_strip() ?></div>
 <?php
 
 if (!is_null($user)) {
 ?>
 <h1>Welcome, <?php echo $user->getName() ?>!</h1>
 
-<p>You successfully logged into UserBase.</p>
+<p>You successfully logged in.</p>
 <?php
 }
 else
@@ -31,7 +32,7 @@ else
 ?>
 <h1>Welcome!</h1>
 
-<p><a href="<?php echo UserConfig::$USERSROOTURL ?>/login.php">Log in</a> to enjoy the magic of UserBase.</p>
+<p><a href="<?php echo UserConfig::$USERSROOTURL ?>/login.php">Log in</a> to enjoy the magic.</p>
 <?php
 }
 ?> 

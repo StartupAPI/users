@@ -1,4 +1,7 @@
-all:	updatecode updatedb
+all:	updatecode depcheck updatedb
+
+depcheck:
+	php depcheck.php
 
 updatecode:
 ifneq "$(wildcard .svn )" ""
@@ -38,7 +41,15 @@ ifneq "$(wildcard .git )" ""
 	git submodule update
 endif
 
-updatedb:
+checkconfig:
+ifeq ($(wildcard ../users_config.php),)
+	$(error "Can't find ../users_config.php in parent folder. Create it first by copying users_config.sample.php and edit it")
+else
+	@echo Found configuration file ../users_config.php
+endif
+
+db:	updatedb
+updatedb: checkconfig
 	php dbupgrade.php
 	php aggregatepoints.php
 
@@ -47,10 +58,10 @@ release: releasetag packages
 
 releasetag:
 ifndef v
-	# Must specify version as 'v' param
 	#
 	#   make rel v=1.1.1
 	#
+	$(error You must specify version number in 'v' parameter: make release v=1.1.1)
 else
 	#
 	# Tagging it with release tag
@@ -61,10 +72,10 @@ endif
 
 packages:
 ifndef v
-	# Must specify version as 'v' param
 	#
-	#   make rel v=1.1.1
+	#   make packages v=1.1.1
 	#
+	$(error You must specify version number in 'v' parameter: make packages v=1.1.1)
 else
 	mkdir StartupAPI_${v}
 
@@ -80,9 +91,15 @@ else
 endif
 
 docs:	documentation
-documentation:
-	# Using PHPDocumentator 2.x that works with phpdoc.dist.xml file for configuration
+documentation: phpdoc apigen
+
+phpdoc:
+	# Using PHPDocumentor which wirks with phpdocx.dist.xml
 	phpdoc
+
+apigen:
+	# Using ApiGen which works with apigen.neon file for configuration
+	apigen
 
 code:
 	php phptidy/phptidy.php replace

@@ -1,38 +1,18 @@
 <?php
-interface IEmailModule extends IUserBaseModule
-{
+/**
+ * Abstract class for newsletter management modules to subclass
+ *
+ * @package StartupAPI
+ * @subpackage Email
+ */
+abstract class EmailModule extends StartupAPIModule {
 	/**
-	 * This function should be called when new user is created
-	 * or email is recorded for the user for the first time
-	 */
-	public function registerSubscriber($user);
-
-	/**
-	 * This function should be called when user information has changed
-	 * e.g. email address or additional information passed to provider like name or gender and etc.
-	 */
-	public function updateSubscriber($old_user, $new_user);
-
-	/**
-	 * This function should be called when user chose to unsubscribe from the mailing list
-	 */
-	public function removeSubscriber($user);
-
-	/**
-	 * This method will be called if some user info is changed
-	 */
-	public function userChanged($old_user, $new_user);
-
-	/**
-	 * This method should be called by userChanged to decide if updateSubscriber needs to be called
-	 * It's up to implementing class to decide if email provider needs to be updated
+	 * Registers newsletter management module with the system
 	 *
-	 * @return boolean Returns true if user's information has changed and needs to be synced
+	 * Only one module can be registered simultaneously
+	 *
+	 * @throws EmailModuleException
 	 */
-	public function hasUserInfoChanged($old_user, $new_user);
-}
-
-abstract class EmailModule extends UserBaseModule implements IEmailModule {
 	public function __construct() {
 		parent::__construct();
 
@@ -43,6 +23,47 @@ abstract class EmailModule extends UserBaseModule implements IEmailModule {
 		UserConfig::$email_module = $this;
 	}
 
+	/**
+	 * This function should be called when new user is created
+	 * or email is recorded for the user for the first time
+	 *
+	 * @param User $user User with newly registered email
+	 */
+	abstract public function registerSubscriber($user);
+
+	/**
+	 * This function should be called when user information has changed
+	 * e.g. email address or additional information passed to provider like name or gender and etc.
+	 *
+	 * @param User $old_user User object representing old state of user information
+	 * @param User $new_user User object representing new state of user information
+	 */
+	abstract public function updateSubscriber($old_user, $new_user);
+
+	/**
+	 * This function should be called when user chose to unsubscribe from the mailing list
+	 *
+	 * @param User $user User to remove subscription for
+	 */
+	abstract public function removeSubscriber($user);
+
+	/**
+	 * This method should be called by userChanged to decide if updateSubscriber needs to be called
+	 * It's up to implementing class to decide if email provider needs to be updated
+	 *
+	 * @param User $old_user User object representing old state of user information
+	 * @param User $new_user User object representing new state of user information
+	 *
+	 * @return boolean Returns true if user's information has changed and needs to be synced
+	 */
+	abstract public function hasUserInfoChanged($old_user, $new_user);
+
+	/**
+	 * This method will be called if some user info is changed
+	 *
+	 * @param User $old_user User object representing old state of user information
+	 * @param User $new_user User object representing new state of user information
+	 */
 	public function userChanged($old_user, $new_user) {
 		// submodule to decide if it needs to sync the user info
 		$userInfoChanged = $this->hasUserInfoChanged($old_user, $new_user);
@@ -66,10 +87,34 @@ abstract class EmailModule extends UserBaseModule implements IEmailModule {
 	}
 }
 
+/**
+ * Generic Email Module Exception
+ *
+ * @package StartupAPI
+ * @subpackage Email
+ */
 class EmailModuleException extends Exception {}
 
+/**
+ * Exception thrown when there are subscription problems
+ *
+ * @package StartupAPI
+ * @subpackage Email
+ */
 class EmailSubscriptionException extends EmailModuleException { }
 
+/**
+ * Exception thrown when there are problem with updating subscriber information
+ *
+ * @package StartupAPI
+ * @subpackage Email
+ */
 class EmailSubscriberUpdateException extends EmailModuleException { }
 
+/**
+ * Exception thrown when there are problems with unsubscribing a user
+ *
+ * @package StartupAPI
+ * @subpackage Email
+ */
 class EmailUnSubscriptionException extends EmailModuleException { }

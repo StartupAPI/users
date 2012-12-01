@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'/config.php');
+require_once(dirname(__FILE__).'/global.php');
 
 require_once(dirname(__FILE__).'/User.php');
 
@@ -11,8 +11,7 @@ if (!UserConfig::$useAccounts) {
 $user = User::require_login();
 
 $account = Account::getCurrentAccount($user);
-
-if($account->getUserRole() != Account::ROLE_ADMIN) {
+if ($account->getUserRole($user) !== Account::ROLE_ADMIN) {
 	header('Location: '.UserConfig::$DEFAULTLOGOUTRETURN);
 	exit;
 }
@@ -21,7 +20,7 @@ require_once(UserConfig::$header);
 ?>
 <h2>Account Info (<?php echo $account->getName() ?>)</h2>
 <div id="plan">
-<p>Subscription plan: <b><?php echo $account->getPlan()->name ?></b> - 
+<p>Subscription plan: <b><?php echo $account->getPlan()->name ?></b> -
 <a href="<?php echo UserConfig::$USERSROOTURL ?>/subscription_details.php">[ details ]</a>
 <a href="<?php echo UserConfig::$USERSROOTURL ?>/plans.php">[ change ]</a>
 </div>
@@ -30,10 +29,16 @@ require_once(UserConfig::$header);
 <ul>
 <?php
 
-$members = $account->getUsers();
+$users_and_roles = $account->getUsers();
 
-foreach ($members as $member) {
-	?><li><?php echo $member->getName(); ?></li><?php
+foreach ($users_and_roles as $user_and_role) {
+	$member = $user_and_role[0];
+	$role = $user_and_role[1];
+
+	?><li>
+		<?php echo $member->getName(); ?>
+		<?php if ($role == Account::ROLE_ADMIN) { ?>(<span class="badge badge-important">admin</span>)<?php } ?>
+	</li><?php
 }
 ?>
 </ul>

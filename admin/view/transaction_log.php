@@ -10,8 +10,12 @@ if(is_null($account = Account::getByID($account_id))) {
   $smarty->assign('fatal',1);
   return;
 }
+$BREADCRUMB_EXTRA = $account->getName();
+
 $smarty->assign('account_id',$account_id);
 $smarty->assign('account_name',$account->getName());
+
+$smarty->assign('useSubscriptions', UserConfig::$useSubscriptions);
 
 # This view depends on request parameters
 $date = array();

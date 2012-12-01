@@ -24,6 +24,8 @@ if(is_null($account = Account::getByID($account_id))) {
   return;
 }
 
+$BREADCRUMB_EXTRA = $account->getName();
+
 $smarty->assign('account_name',$account->getName());
 $smarty->assign('account_id',$account->getID());
 
@@ -36,7 +38,7 @@ foreach (UserConfig::$payment_modules as $mod) {
   $engine['id'] = $mod->getID();
   $engine['title'] = $mod->getTitle();
   $engine['current'] = $engine['id'] == $current_engine;
-  
+
   $engines[] = $engine;
 }
 

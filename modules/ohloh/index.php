@@ -1,14 +1,24 @@
 <?php
-/**
- * @package StartupAPI
- * @subpackage Authentication
- */
 require_once(dirname(dirname(dirname(__FILE__))).'/OAuthModule.php');
 
+/**
+ * Ohloh authentication module
+ *
+ * Provides authentication using Ohloh.com accounts and API access using OAuth
+ *
+ * @package StartupAPI
+ * @subpackage Authentication\Ohloh
+ */
 class OhlohAuthenticationModule extends OAuthAuthenticationModule
 {
 	protected $userCredentialsClass = 'OhlohUserCredentials';
 
+	/**
+	 * Instantiates Ohloh authentication module and registers it with the system
+	 *
+	 * @param string $oAuthConsumerKey OAuth Consumer Key
+	 * @param string $oAuthConsumerSecret OAuth Consumer Secret
+	 */
 	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret)
 	{
 		parent::__construct(
@@ -77,6 +87,12 @@ class OhlohAuthenticationModule extends OAuthAuthenticationModule
 	}
 }
 
+/**
+ * Ohloh user credentials class
+ *
+ * @package StartupAPI
+ * @subpackage Authentication\Ohloh
+ */
 class OhlohUserCredentials extends OAuthUserCredentials {
 	public function getHTML() {
 		return '<a href="http://www.ohloh.net/accounts/'.UserTools::escape($user_info['id']).'" target="_blank">@'.$this->userinfo['name'].'</a>';
