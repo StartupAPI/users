@@ -1,12 +1,12 @@
 <?php
-require_once(dirname(__FILE__).'/config.php');
+require_once(dirname(__FILE__).'/global.php');
 require_once(dirname(__FILE__).'/User.php');
 
 User::require_login();
 
 include(dirname(__FILE__).'/view/account/subscription_details.php');
 
-# this yields Smarty object as $smarty 
+# this yields Smarty object as $smarty
 $smarty->setTemplateDir(UserConfig::$smarty_templates.'/account');
 $smarty->setCompileDir(UserConfig::$smarty_compile);
 $smarty->setCacheDir(UserConfig::$smarty_cache);

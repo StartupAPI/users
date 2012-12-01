@@ -1,7 +1,7 @@
 <?php
 
 class Clock {
-  static protected $instance; 
+  static protected $instance;
 
   static function format( $format )
   {
@@ -20,7 +20,7 @@ class Clock {
 
   static function getDateTime()
   {
-    if (!isset( self::$instance)) 
+    if (!isset( self::$instance))
       self::$instance = new RealClock();
 
     return self::$instance -> _getDateTime();
@@ -55,7 +55,7 @@ class ModelledClock extends Clock {
     return $this -> datetime;
   }
 
-  function _addTime( $date_interval ) 
+  function _addTime( $date_interval )
   {
     $this -> datetime -> add( new DateInterval ( $date_interval ));
   }

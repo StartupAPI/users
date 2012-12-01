@@ -2,7 +2,7 @@
 /**
  * @package StartupAPI
  */
-require_once(dirname(__FILE__).'/config.php');
+require_once(dirname(__FILE__).'/global.php');
 
 interface IUserBaseModule
 {

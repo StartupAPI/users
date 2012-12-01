@@ -21,7 +21,7 @@ if(!is_null($account->getPaymentEngine()) && $account->getPaymentEngine()->getSl
 // Check if engine exists
 $engine_found = NULL;
 foreach(UserConfig::$payment_modules as $mod) {
-  
+
   if ($mod->getID() == $engine) {
     $engine_found = $mod;
     break;

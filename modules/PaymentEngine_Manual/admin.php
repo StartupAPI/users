@@ -1,17 +1,17 @@
 <?php
-  
+
   # Ensure we are serving admin
   require_once(dirname(dirname(dirname(__FILE__))).'/admin/admin.php');
 
   $ADMIN_SECTION = 'PaymentEngine_Manual';
   require_once(dirname(dirname(dirname(__FILE__))).'/admin/header.php');
-  
+
   $action = isset($_REQUEST['action']) ? htmlspecialchars($_REQUEST['action']) : '';
   switch($action) {
-  
+
     case 'ProcessAddPayment':
     case 'ProcessRefund':
-    
+
       $account_id = isset($_REQUEST['account_id']) ? intval(htmlspecialchars($_REQUEST['account_id'])) : NULL;
       $amount = isset($_REQUEST['howmuch']) ? sprintf("%.2f",htmlspecialchars($_REQUEST['howmuch'])) : NULL;
 
@@ -19,7 +19,7 @@
       if (is_null($account = Account::getByID($account_id))) {
       ?>
         <p>Can't find account with ID <?php echo $account_id ?></p>
-      <?php    
+      <?php
         break;
       } elseif(is_null($amount) || !is_numeric($amount)) {
       ?>
@@ -49,7 +49,7 @@
             $engine->storeTransactionDetails($tr_id, array(
               'operator_id' => $operator->getID(),
               'funds_source' => htmlspecialchars($_REQUEST['funds_source']),
-              'comment' => htmlspecialchars($_REQUEST['comment']) 
+              'comment' => htmlspecialchars($_REQUEST['comment'])
             ));
 
             echo "<p>", $subject, " of ", $amount, " recorded.</p>\n";
@@ -62,7 +62,7 @@
 
     case 'DisplayAddPayment':
     case 'DisplayMakeRefund':
-    
+
       $hint = $action == 'DisplayMakeRefund' ? 'Make refund' : 'Add funds';
       $process = $action == 'DisplayMakeRefund' ? 'ProcessRefund' : 'ProcessAddPayment';
       $source = $action == 'DisplayMakeRefund' ? 'Reason' : 'Funds source';
@@ -72,7 +72,7 @@
         <p>Can't find account with ID <?php echo $account_id ?></p>
       <?php
         break;
-      } else { 
+      } else {
         $balance = preg_replace("/(^|-)/","$$1",sprintf("%.2f",$account->getBalance()),1);
       ?>
       <div>
@@ -89,7 +89,7 @@
         <p><input type="submit" value="Ok" /></p>
         </form>
       </div>
-    
+
       <?php
       }
       break;
@@ -101,7 +101,7 @@
 <table cellpadding="5" cellspacing="0" border="1" width="100%">
 <tr><th>ID</th><th>Name</th><th>Plan</th><th>Schedule</th><th>Active</th><th>Balance</th><th>&nbsp;</th><th>&nbsp;</th></tr>
 <?php
-      $perpage = 20;  
+      $perpage = 20;
       $pagenumber = 0;
 
       if (array_key_exists('page', $_GET))
@@ -121,7 +121,7 @@
         'schedule_slug' => 'Payment Schedule',
         'active' => 'Account status',
         'balance' => 'Account balance');
-        
+
       if (array_key_exists('sort', $_GET) && in_array($_GET['sort'],array_keys($sort_by)))
         $sortby = $_GET['sort'];
       else
@@ -150,13 +150,13 @@
       $accounts = array();
       while($stmt->fetch() === TRUE)
         $accounts[] = array(
-          'id' => $id, 
-          'name' => $name, 
-          'plan_slug' => $plan_slug, 
-          'schedule_slug' => $schedule_slug, 
-          'active' => $active, 
+          'id' => $id,
+          'name' => $name,
+          'plan_slug' => $plan_slug,
+          'schedule_slug' => $schedule_slug,
+          'active' => $active,
           'balance' => $balance);
-          
+
       $stmt->close();
 
       ?>
@@ -165,13 +165,13 @@
       if (count($accounts) == $perpage) {
         ?><a style="float: right" href="?page=<?php echo $pagenumber+1; echo is_null($search) ? '' : '&q='.urlencode($search)?>">next &gt;&gt;&gt;<a><?php
       }
-      else {   
+      else {
         ?><span style="color: silver; float: right">next &gt;&gt;&gt;</span><?php
       }
       if ($pagenumber > 0) {
         ?><a style="float: left" href="?page=<?php echo $pagenumber-1; echo is_null($search) ? '' : '&q='.urlencode($search) ?>">&lt;&lt;&lt;prev</a><?php
       }
-      else {   
+      else {
         ?><span style="color: silver; float: left">&lt;&lt;&lt;prev</span><?php
       }
       ?>
@@ -185,11 +185,11 @@
           echo "<option value=\"".$k."\" ".($sortby == $k ? ' selected="yes"' : '')." >".$v."</option>\n";
       ?>
       </select>
-      </form>  
+      </form>
       </td></tr>
       <?php
       foreach($accounts as $a) {
-      
+
         echo "<tr valign=\"top\">\n";
         echo "<td><a href=\"".UserConfig::$USERSROOTURL."/admin/account.php?account_id=".$a['id']."\">".$a['id']."</a></td>\n";
         echo "<td><a href=\"".UserConfig::$USERSROOTURL."/admin/account.php?account_id=".$a['id']."\">".$a['name']."</a></td>\n";
@@ -204,14 +204,14 @@
       if (count($accounts) == $perpage) {
         ?><a style="float: right" href="?page=<?php echo $pagenumber+1; echo is_null($search) ? '' : '&q='.urlencode($search)?>">next &gt;&gt;&gt;</a><?php
       }
-      else {   
+      else {
         ?><span style="color: silver; float: right">next &gt;&gt;&gt;</span><?php
       }
-       
+
       if ($pagenumber > 0) {
         ?><a style="float: left" href="?page=<?php echo $pagenumber-1; echo is_null($search) ? '' : '&q='.urlencode($search)?>">&lt;&lt;&lt;prev</a><?php
       }
-      else {   
+      else {
         ?><span style="color: silver; float: left">&lt;&lt;&lt;prev</span><?php
       }
       ?>
@@ -220,11 +220,10 @@
       </td></tr>
       </table>
       <?php
-      
+
       # end of default
   }
-  
+
   if($action != '')
     echo "<p><a href=\"".UserConfig::$USERSROOTURL."/modules/PaymentEngine_Manual/admin.php\">Back to list</a></p>\n";
   require_once(dirname(dirname(dirname(__FILE__))).'/admin/footer.php');
-            

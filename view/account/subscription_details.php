@@ -7,10 +7,10 @@ $account = Account::getCurrentAccount($user);
 
 $plan_data = array(
   'name', 'description', 'base_price', 'base_period', 'details_url', 'grace_period');
-  
+
 $schedule_data = array(
   'name', 'description', 'charge_amount', 'charge_period');
-  
+
 $smarty = new Smarty();
 
 session_start();
@@ -30,11 +30,11 @@ $smarty->assign('account_role',$account->getUserRole());
 $smarty->assign('account_isActive',$account->isActive());
 $smarty->assign('account_engine', is_null($account->getPaymentEngine()) ? 'None' : $account->getPaymentEngine()->getTitle());
 $smarty->assign('account_next_charge', preg_replace("/ .*/","",$account->getNextCharge()));
-  
+
 $plan = $account->getPlan();
 foreach ($plan_data as $d)
   $smarty->assign('plan_'.$d, $plan->$d);
-  
+
 $downgrade = Plan::getPlanBySlug($plan->downgrade_to);
 if ($downgrade) $smarty->assign('plan_downgrade_to', $downgrade->name);
 

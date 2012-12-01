@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/global.php');
 require_once(dirname(dirname(dirname(__FILE__))).'/User.php');
 
 $user = User::require_login();
@@ -18,7 +18,7 @@ if(!is_null($account->getPaymentEngine()) && $account->getPaymentEngine()->getSl
 // Check if engine exists
 $engine_found = NULL;
 foreach(UserConfig::$payment_modules as $mod) {
-  
+
   if ($mod->getID() == $engine) {
     $engine_found = $mod;
     break;

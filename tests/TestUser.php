@@ -64,7 +64,7 @@ class TestUser extends UnitTestCase {
     $found = User::getUsersByEmailOrUsername('me2');
     $this -> assertEqual( count($found), 0 );
   }
-  
+
   function _activatePlan( $user, $acc, $plan_slug, $schedule_slug )
   {
     $acc->activatePlan($plan_slug, $schedule_slug);
@@ -90,7 +90,7 @@ class TestUser extends UnitTestCase {
 
   function testActivatePlan()
   {
-    $user = $this -> user; 
+    $user = $this -> user;
 
     $acc = Account::getCurrentAccount($user);
     $this -> assertNotNull( $acc );

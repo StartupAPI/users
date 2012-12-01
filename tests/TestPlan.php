@@ -20,7 +20,7 @@ class TestSimple1 extends UnitTestCase {
 
   function testSimpleCreation()
   {
-    $plan = new Plan(0,array('name' => 'test plan', 
+    $plan = new Plan(0,array('name' => 'test plan',
                              'details_url' => 'lalala'));
     $this -> assertNotNull( $plan );
     $this -> assertEqual( $plan->name, 'test plan' );
@@ -30,9 +30,9 @@ class TestSimple1 extends UnitTestCase {
 
   function testSchedules()
   {
-    $plan = new Plan(0,array('name' => 'test plan', 
+    $plan = new Plan(0,array('name' => 'test plan',
       'details_url' => 'lalala',
-      'payment_schedules' => array(0 => array('slug' => '0', 
+      'payment_schedules' => array(0 => array('slug' => '0',
                                    'name' => 'some schedule',
                                    'charge_amount' => '5',
                                    'charge_period' => '10'))
@@ -42,18 +42,18 @@ class TestSimple1 extends UnitTestCase {
 
   function testDefaultSchedule()
   {
-    $plan = new Plan(0,array('name' => 'test plan', 
+    $plan = new Plan(0,array('name' => 'test plan',
       'details_url' => 'lalala',
       'payment_schedules' => array(
-                                    0 => array('slug' => '0', 
+                                    0 => array('slug' => '0',
                                    'name' => 'some schedule',
                                    'charge_amount' => '5',
                                    'charge_period' => '10'),
 
-                                    1 => array('slug' => '1', 
+                                    1 => array('slug' => '1',
                                    'name' => 'some other schedule',
                                    'charge_amount' => '6',
-                                   'charge_period' => '11'), 
+                                   'charge_period' => '11'),
        )));
     $this -> assertEqual( $plan -> getPaymentScheduleSlugs(), array(0, 1));
     $this -> assertNotNull( $plan -> getDefaultPaymentSchedule() );
@@ -62,18 +62,18 @@ class TestSimple1 extends UnitTestCase {
 
   function testGetSchedule()
   {
-    $plan = new Plan(0,array('name' => 'test plan', 
+    $plan = new Plan(0,array('name' => 'test plan',
       'details_url' => 'lalala',
       'payment_schedules' => array(
-                                    0 => array('slug' => '0', 
+                                    0 => array('slug' => '0',
                                    'name' => 'some schedule',
                                    'charge_amount' => '5',
                                    'charge_period' => '10'),
 
-                                    1 => array('slug' => '1', 
+                                    1 => array('slug' => '1',
                                    'name' => 'some other schedule',
                                    'charge_amount' => '6',
-                                   'charge_period' => '11'), 
+                                   'charge_period' => '11'),
        )));
     $this -> assertEqual( $plan -> getPaymentScheduleSlugs(), array(0, 1));
 
@@ -96,7 +96,7 @@ class TestSimple1 extends UnitTestCase {
   /* TODO
   function testDuplicateIDsInSchedules()
   {
-    // TEST what happens if there are duplicate IDs of plans specified 
+    // TEST what happens if there are duplicate IDs of plans specified
   }
    */
 

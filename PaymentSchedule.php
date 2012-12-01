@@ -13,7 +13,7 @@ class PaymentSchedule {
 	private $description;
 	private $charge_amount;
 	private $charge_period;
-  
+
 
 	public function __construct($slug,$a) {
 
@@ -26,7 +26,7 @@ class PaymentSchedule {
       'charge_period' => NULL,
       'is_default' => 0,
     );
-    
+
     if ($slug === NULL)
       throw new Exception("slug required");
     if (!is_array($a))
@@ -47,14 +47,14 @@ class PaymentSchedule {
     foreach($parameters as $p => $v)
       if (isset($a[$p])) $this->$p = $a[$p];
 	}
-	
-  # Making private variables visible, but read-only 
+
+  # Making private variables visible, but read-only
   public function __get($v) {
     return (!in_array($v,array('instance')) && isset($this->$v)) ? $this->$v : false;
-  }   
-  
+  }
+
   public function setAsDefault() {
     $this->is_default = 1;
   }
-	          
+
 }

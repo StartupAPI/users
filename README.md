@@ -1,6 +1,6 @@
 # Startup API
 
-Startup API is a drop-in user management tool for on-line projects and SaaS (Software As A Service) web sites.  
+Startup API is a drop-in user management tool for on-line projects and SaaS (Software As A Service) web sites.
 
 It supports many registration and authentication methods, integrates with various useful services like newsletters and provides comprehensive administrative dashboard that helps make business decisions based on data collected from the users.
 

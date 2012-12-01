@@ -5,7 +5,7 @@ include(dirname(__FILE__).'/view/plan/plans.php');
 
 User::require_login();
 
-# this yields Smarty object as $smarty 
+# this yields Smarty object as $smarty
 $smarty->setTemplateDir(UserConfig::$smarty_templates.'/plan');
 $smarty->setCompileDir(UserConfig::$smarty_compile);
 $smarty->setCacheDir(UserConfig::$smarty_cache);

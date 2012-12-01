@@ -29,7 +29,7 @@ foreach (UserConfig::$payment_modules as $mod) {
   $engine['id'] = $mod->getID();
   $engine['title'] = $mod->getTitle();
   $engine['current'] = $engine['id'] == $current_engine;
-  
+
   $engines[] = $engine;
 }
 

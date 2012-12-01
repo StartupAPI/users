@@ -95,7 +95,7 @@ class TestPayments extends UnitTestCase {
     $acc -> paymentIsDue();
 
     $acc -> paymentReceived( $acc->getSchedule()->charge_amount - 3 );
-    
+
     $this -> assertEqual( count($acc -> getCharges()), 0, 'should use my excessive money!');
 
     // TODO test excessive payment storage
@@ -139,7 +139,7 @@ class TestPayments extends UnitTestCase {
 
     $acc -> paymentIsDue();
     $acc -> paymentIsDue();
-    
+
     $acc -> paymentReceived( $amount * 3);
 
     $this -> assertEqual( count($acc -> getCharges()), 0);
