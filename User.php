@@ -2691,7 +2691,7 @@ class User {
 
 		$storage->delete(UserConfig::$impersonation_userid_key);
 
-		if (!is_null($user)) {
+		if (!is_null($user) && !is_null($user->impersonator)) {
 			error_log('[Impersonation log] ' . $user->impersonator->getName() . ' (User ID: ' . $user->impersonator->getID() .
 					') stopped impersonating ' . $user->getName() . ' (User ID: ' . $user->getID() . ')');
 		}
