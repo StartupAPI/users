@@ -56,7 +56,7 @@ $offset = $page * $perpage;
 $smarty->assign('perpage',$perpage);
 $smarty->assign('page',$page);
 
-$log = TransactionLogger::getAccountTransactions($account->getID(),$date['from'],$date['to'],$perpage,$offset);
+$log = TransactionLogger::getAccountTransactions($account->getID(),$date['from'],$date['to'], false, $perpage,$offset);
 
 # Cheating on payment modules :)
 

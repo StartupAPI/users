@@ -21,7 +21,7 @@
       return $id;
     }
 
-    public static function getAccountTransactions($account_id, $from = NULL, $to = NULL, $limit = NULL, $offset = NULL) {
+    public static function getAccountTransactions($account_id, $from = NULL, $to = NULL, $order = false, $limit = NULL, $offset = NULL) {
 
       $db = UserConfig::getDB();
 
@@ -29,7 +29,7 @@
         UserConfig::$mysql_prefix.'transaction_log WHERE account_id = ?'.
         (is_null($from)   ? '' : ' AND date_time >= ?').
         (is_null($to)     ? '' : ' AND date_time - INTERVAL 1 DAY <= ?').
-        ' ORDER BY date_time'.
+        ' ORDER BY date_time ' . $order ? 'ASC' : 'DESC' .
         (is_null($limit)  ? '' : ' LIMIT ?').
         (is_null($offset) ? '' : ' OFFSET ?');
 
