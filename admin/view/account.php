@@ -20,7 +20,10 @@ $schedule_data = array('name', 'description', 'charge_amount', 'charge_period');
 
 $BREADCRUMB_EXTRA = $account->getName();
 
+$smarty->assign('useSubscriptions', UserConfig::$useSubscriptions);
+
 $smarty->assign('account_id', $account_id);
+
 $smarty->assign('account_name', $account->getName());
 $smarty->assign('account_isActive', $account->isActive());
 $smarty->assign('account_engine', is_null($account->getPaymentEngine()) ? 'None' : $account->getPaymentEngine()->getTitle());
