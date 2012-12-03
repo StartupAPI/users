@@ -345,10 +345,10 @@ class menu extends menuElement {
 	}
 
 	protected function render() {
+		if (is_null($this->link)) {
+			return;
+		}
 		if ($this->enabled) {
-			if (is_null($this->link)) {
-				return;
-			}
 			?>
 			<li<?php if ($this->active) { ?> class="active"<?php } ?>>
 				<a href="<?php echo $this->link ?>">
