@@ -14,7 +14,7 @@ if (is_null($account = Account::getByID($account_id))) {
 
 // UserTools::debug("Account: " . var_export($account, true));
 
-$plan_data = array('name', 'description', 'base_price', 'base_period', 'details_url', 'grace_period');
+$plan_data = array('slug', 'name', 'description', 'base_price', 'base_period', 'details_url', 'grace_period');
 
 $schedule_data = array('name', 'description', 'charge_amount', 'charge_period');
 
@@ -27,7 +27,11 @@ $smarty->assign('account_id', $account_id);
 $smarty->assign('account_name', $account->getName());
 $smarty->assign('account_isActive', $account->isActive());
 $smarty->assign('account_engine', is_null($account->getPaymentEngine()) ? 'None' : $account->getPaymentEngine()->getTitle());
-$smarty->assign('account_next_charge', preg_replace("/ .*/", "", $account->getNextCharge()));
+
+$next_charge = $account->getNextCharge();
+if (!is_null($next_charge)) {
+	$smarty->assign('account_next_charge', preg_replace("/ .*/", "", $next_charge));
+}
 
 if (UserConfig::$useSubscriptions) {
 	$plan = $account->getPlan();
