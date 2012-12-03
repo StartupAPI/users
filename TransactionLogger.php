@@ -29,7 +29,7 @@
         UserConfig::$mysql_prefix.'transaction_log WHERE account_id = ?'.
         (is_null($from)   ? '' : ' AND date_time >= ?').
         (is_null($to)     ? '' : ' AND date_time - INTERVAL 1 DAY <= ?').
-        ' ORDER BY date_time ' . $order ? 'ASC' : 'DESC' .
+        ' ORDER BY date_time ' . ($order ? 'ASC' : 'DESC') .
         (is_null($limit)  ? '' : ' LIMIT ?').
         (is_null($offset) ? '' : ' OFFSET ?');
 
