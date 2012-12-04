@@ -21,6 +21,9 @@ require_once(dirname(__FILE__) . '/Plan.php');
  */
 class Account {
 
+	/**
+	 * @var int Account id
+	 */
 	private $id;
 
 	/**
