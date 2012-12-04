@@ -124,6 +124,14 @@ class Plan {
 		return $slugs;
 	}
 
+	/**
+	 * Returns schedule slugs
+	 *
+	 * @param string $slug Schedule slug
+	 *
+	 * @return PaymentSchedule|null|false Returns false if null slug is passed,
+	 * null if there is no schedule with such slug and PaymentSchedule if found
+	 */
 	public function getPaymentScheduleBySlug($slug) {
 
 		if ($slug === NULL) {
@@ -194,6 +202,14 @@ class Plan {
 		}
 	}
 
+	/**
+	 * Returns plan based on a slug string
+	 *
+	 * @param string $slug Plan slug
+	 *
+	 * @return Plan|false|null Returns false if null slug is passed,
+	 * null if there is no such plan with a slug and Plan object if found
+	 */
 	public static function getPlanBySlug($slug) {
 
 		if ($slug === NULL || !count(self::$Plans)) {

@@ -7,7 +7,7 @@ if (!array_key_exists('slug', $_GET)) {
 	exit;
 }
 
-$plan_slug = intval(trim($_GET['slug']));
+$plan_slug = trim($_GET['slug']);
 
 $plan = Plan::getPlanBySlug($plan_slug);
 if (is_null($plan)) {
@@ -27,6 +27,30 @@ require_once(dirname(__FILE__) . '/header.php');
 			<span class="label">individual</span>
 		<?php } ?>
 	</p>
+	<p>
+		<?php echo UserTools::escape($plan->description); ?><br/>
+		<i>Details page: <a target="_blank" href="<?php echo UserTools::escape($plan->details_url); ?>"><?php echo UserTools::escape($plan->details_url); ?></a></i>
+	</p>
+	<?php
+	$schedule_slugs = $plan->getPaymentScheduleSlugs(); # Iterate over all schedules of this plan
+
+	if (count($schedule_slugs) > 0) {
+		?>
+		<h3>Payment Schedules</h3>
+		<ul>
+			<?php
+			foreach ($schedule_slugs as $s) {
+				$schedule = $plan->getPaymentScheduleBySlug($s);
+				?><li>
+					<b><?php echo $schedule->name ?></b><?php if ($schedule->is_default) { ?> (default)<?php } ?>
+					<p><b>$<?php echo $schedule->charge_amount ?></b>
+						every <b><?php echo $schedule->charge_period ?></b> days</p>
+					<p><?php echo $schedule->description ?></p>
+				</li><?php
+	}
+			?>
+		</ul>
+	<?php } ?>
 </div>
 
 <?php
