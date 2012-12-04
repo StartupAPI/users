@@ -3,7 +3,8 @@
   # Ensure we are serving admin
   require_once(dirname(dirname(dirname(__FILE__))).'/admin/admin.php');
 
-  $ADMIN_SECTION = 'PaymentEngine_Manual';
+  $ADMIN_SECTION = 'payment_method';
+  $BREADCRUMB_EXTRA = 'Manual';
   require_once(dirname(dirname(dirname(__FILE__))).'/admin/header.php');
 
   $action = isset($_REQUEST['action']) ? htmlspecialchars($_REQUEST['action']) : '';
@@ -98,6 +99,7 @@
 
       # Display account list and filter form
       ?>
+		<div class="span9">
 <table cellpadding="5" cellspacing="0" border="1" width="100%">
 <tr><th>ID</th><th>Name</th><th>Plan</th><th>Schedule</th><th>Active</th><th>Balance</th><th>&nbsp;</th><th>&nbsp;</th></tr>
 <?php
@@ -219,6 +221,7 @@
 
       </td></tr>
       </table>
+</div>
       <?php
 
       # end of default
