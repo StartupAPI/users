@@ -103,7 +103,8 @@ class Plan {
 		}
 
 		self::$Plans[] = $this;
-		# We are set
+
+		# We are all set
 	}
 
 	/**
@@ -115,6 +116,12 @@ class Plan {
 
 	public function getPaymentScheduleSlugs() {
 		$slugs = array();
+
+		foreach ($this->payment_schedules as $schedule) {
+			$slugs[] = $schedule->slug;
+		}
+
+		return $slugs;
 	}
 
 	public function getPaymentScheduleBySlug($slug) {
