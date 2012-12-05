@@ -13,7 +13,7 @@ if(is_null($account = Account::getByID($account_id))) {
 
 // Check for no-op
 if(!is_null($account->getPaymentEngine()) && $account->getPaymentEngine()->getSlug() == $engine) {
-  $_SESSION['message'][] = "This account already using '".$account->getPaymentEngine()->getTitle()."'";
+  $_SESSION['message'][] = "This account already uses '".$account->getPaymentEngine()->getTitle()."'";
   header('Location: '.$_SERVER['HTTP_REFERER']);
   exit;
 }

@@ -104,18 +104,6 @@
 
     }
 
-    // Admin UI functions
-
-    public function renderAdminMenuItem()
-    {
-
-      global $ADMIN_SECTION;
-      if($ADMIN_SECTION == $this->engineSlug)
-        echo " | Payments (manual mode)";
-      else
-        echo " | <a href=\"".UserConfig::$USERSROOTURL."/modules/".$this->engineSlug."/admin.php\">Payments (manual mode)</a>\n";
-    }
-
     public function renderTransactionLogDetails($transaction_id)
     {
       $details = $this->expandTransactionDetails($transaction_id);

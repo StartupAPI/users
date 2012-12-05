@@ -1,20 +1,9 @@
 <?php
 
   require_once(dirname(__FILE__).'/Account.php');
+  require_once(dirname(__FILE__).'/StartupAPIModule.php');
 
-  interface IPaymentEngine extends IUserBaseModule
-  {
-    public function changeSubscription($account_id, $plan_slug, $schedule_slug);
-    public function paymentReceived($data);
-    public function refund($data);
-    public function unsubscribe($account_id);
-    public function cronHandler();
-    public function getSlug();
-    public function storeTransactionDetails($transaction_id,$details);
-    public function expandTransactionDetails($transaction_id);
-  }
-
-  abstract class PaymentEngine extends UserBaseModule implements IPaymentEngine
+  abstract class PaymentEngine extends StartupAPIModule
   {
     protected $engineSlug;
     // ???
@@ -24,6 +13,11 @@
       parent::__construct();
       UserConfig::$payment_modules[] = $this;
     }
+
+    public abstract function changeSubscription($account_id, $plan_slug, $schedule_slug);
+    public abstract function getSlug();
+    public abstract function storeTransactionDetails($transaction_id,$details);
+    public abstract function expandTransactionDetails($transaction_id);
 
     public function paymentReceived($data)
     {
