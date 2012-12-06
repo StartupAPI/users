@@ -149,3 +149,63 @@ new UsernamePasswordAuthenticationModule();
  */
 #UserConfig::loadModule('linkedin');
 #new LinkedInAuthenticationModule('...OAuth.key.goes.here...', '...OAuth.secret.goes.here...');
+
+/* ========================================================================
+ *
+ * Subscriptions (experimental)
+ *
+ * ===================================================================== */
+
+/**
+ * Enables subscriptions which are off by default, assumes UserConfig::$useAccounts is set to true (default)
+ */
+#UserConfig::$useSubscriptions = true;
+
+/**
+ * Loads manual payments emodule
+ *
+ * This can be used for consierge subscriptions or off-band subscriptions managed by an operator
+ *
+ * More modules to come (e.g. PayPal, Amazon & etc)
+ */
+#UserConfig::loadModule('PaymentEngine_Manual');
+#new PaymentEngine_Manual();
+
+/**
+ * Configure your subscription plans  and payment schedules in addition to a default free subscription
+ */
+/*
+UserConfig::$PLANS['basic'] = array(
+	'name' => 'Basic account',
+	'description' => 'Paid access with basic functionality',
+	'capabilities' => array(
+		'individual' => true
+	),
+	'base_price' => 3,
+	'base_period' => 'month',
+	'details_url' => UserConfig::$SITEROOTFULLURL . 'plans/basic.php',
+	'downgrade_to' => UserConfig::$default_plan_slug,
+	'grace_period' => 15,
+	'payment_schedules' => array(
+		'monthly' => array(
+			'name' => 'Monthly',
+			'description' => 'Small monthly fee',
+			'charge_amount' => 3,
+			'charge_period' => 31,
+			'is_default' => 1,
+		),
+		'6mo' => array(
+			'name' => '6 Months',
+			'description' => 'Pay every 6 months',
+			'charge_amount' => 15,
+			'charge_period' => 183
+		),
+		'yearly' => array(
+			'name' => 'Yearly',
+			'description' => 'Discounted annual fee',
+			'charge_amount' => 25,
+			'charge_period' => 365
+		)
+	)
+);
+*/
