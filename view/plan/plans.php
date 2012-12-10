@@ -1,29 +1,25 @@
 <?php
-
-require_once(dirname(dirname(dirname(__FILE__))) . '/smarty/libs/Smarty.class.php');
-
 $user = User::require_login();
 $account = Account::getCurrentAccount($user);
 
-$smarty = new Smarty();
-$smarty->assign('account', array('name' => $account->getName()));
+$template_data['account'] = array('name' => $account->getName());
 
 session_start();
 
 if (isset($_SESSION['message'])) {
-	$smarty->assign('message', $_SESSION['message']);
+	$template_data['message'] = $_SESSION['message'];
 	unset($_SESSION['message']);
 	$fatal = isset($_SESSION['fatal']) ? $_SESSION['fatal'] : 0;
 	unset($_SESSION['fatal']);
 	if ($fatal) {
-		$smarty->assign('fatal', 1);
+		$template_data['fatal'] = 1;
 		return;
 	}
 }
 
 if (!$account->isActive()) {
-	$smarty->assign('message', array('This account is not active. Please activate it first.'));
-	$smarty->assign('fatal', 1);
+	$template_data['message'] = array('This account is not active. Please activate it first.');
+	$template_data['fatal'] = 1;
 	return;
 }
 
@@ -34,10 +30,10 @@ $schedule_data = array(
 
 $plans = array();
 
-$smarty->assign('next_charge', $account->getNextCharge());
+$template_data['next_charge'] = $account->getNextCharge();
 
 $balance = $account->getBalance();
-$smarty->assign('balance', $balance);
+$template_data['balance'] = $balance;
 $plan_slugs = Plan::getPlanSlugs();
 
 foreach ($plan_slugs as $p) { # Iterate over all configured plans
@@ -93,5 +89,5 @@ foreach ($plan_slugs as $p) { # Iterate over all configured plans
 	$plans[] = $plan;
 }
 
-$smarty->assign('plans', $plans);
-$smarty->assign('USERSROOTURL', UserConfig::$USERSROOTURL);
+$template_data['plans'] = $plans;
+$template_data['USERSROOTURL'] = UserConfig::$USERSROOTURL;

@@ -2,6 +2,9 @@
 require_once(dirname(__FILE__) . '/User.php');
 require_once(dirname(__FILE__) . '/Plan.php');
 
+require_once(dirname(__FILE__) . '/twig/lib/Twig/Autoloader.php');
+Twig_Autoloader::register();
+
 /**
  * StartupAPI class contains some global static functions and entry points for API
  *
@@ -33,6 +36,11 @@ class StartupAPI {
 	 * @var string Startup API build version string
 	 */
 	private static $build_version;
+
+	/**
+	 * @var Twig_Environment Templating tool to use for rendering templates
+	 */
+	public static $template;
 
 	/**
 	 * Just a proxy to static User::get() method in User class
@@ -177,6 +185,12 @@ class StartupAPI {
 	static function _init() {
 		// Initializing more structures based on user configurations
 		Plan::init(UserConfig::$PLANS);
+
+		// Configuring the templating
+		$loader = new Twig_Loader_Filesystem(dirname(__FILE__) . '/templates/');
+		$loader->addPath(dirname(__FILE__) . '/admin/templates', 'admin');
+
+		self::$template = new Twig_Environment($loader, array());
 	}
 
 }

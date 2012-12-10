@@ -19,3 +19,6 @@
 [submodule "phptidy"]
 	path = phptidy
 	url = git://github.com/sergeychernyshev/phptidy.git
+[submodule "twig"]
+	path = twig
+	url = git://github.com/fabpot/Twig.git
