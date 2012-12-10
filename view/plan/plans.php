@@ -1,7 +1,4 @@
 <?php
-$user = User::require_login();
-$account = Account::getCurrentAccount($user);
-
 $template_data['account'] = array('name' => $account->getName());
 
 session_start();
