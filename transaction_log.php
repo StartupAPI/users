@@ -8,6 +8,11 @@ if (!UserConfig::$useSubscriptions) {
 
 include(dirname(__FILE__).'/view/account/transaction_log.php');
 
+if ($account->getUserRole($user) !== Account::ROLE_ADMIN) {
+	header('Location: '.UserConfig::$DEFAULTLOGOUTRETURN);
+	exit;
+}
+
 require_once(UserConfig::$header);
 
 StartupAPI::$template->display('account/transaction_log.html.twig', $template_data);
