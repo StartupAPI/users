@@ -1,9 +1,6 @@
 <?php
-
 require_once(dirname(dirname(dirname(__FILE__))).'/users.php');
-require_once(dirname(dirname(dirname(__FILE__))).'/smarty/libs/Smarty.class.php');
 
-$smarty = new Smarty();
 $user = User::require_login();
 $account = Account::getCurrentAccount($user);
 
@@ -31,8 +28,8 @@ foreach($date as $k => $v) {
 
 if(count($message)) {
 
-  $smarty->assign('fatal',1);
-  $smarty->assign('message',$message);
+  $template_data['fatal'] = 1;
+  $template_data['message'] = $message;
   return;
 }
 
@@ -42,19 +39,18 @@ if(isset($tms['from'],$tms['to']) && $tms['from'] > $tms['to']) {
   $date['to'] = $d;
 }
 
-$smarty->assign('from',$date['from']);
-$smarty->assign('to',$date['to']);
+$template_data['from'] = $date['from'];
+$template_data['to'] = $date['to'];
 
 $from_to = (is_null($date['from']) ? '' : '&from='.$date['from']).(is_null($date['to']) ? '' : '&to='.$date['to']);
-$smarty->assign('from_to',$from_to);
-
+$template_data['from_to'] = $from_to;
 
 # Pagination
 $perpage = 20;
 $page = isset($_REQUEST['page']) ? intval($_REQUEST['page']) : 0;
 $offset = $page * $perpage;
-$smarty->assign('perpage',$perpage);
-$smarty->assign('page',$page);
+$template_data['perpage'] = $perpage;
+$template_data['page'] = $page;
 
 $log = TransactionLogger::getAccountTransactions($account->getID(),$date['from'],$date['to'], false, $perpage,$offset);
 
@@ -71,5 +67,5 @@ foreach($log as $k => $l) {
     $log[$k]['engine_slug'] = 'Unknown';
 }
 
-$smarty->assign('log',$log);
-$smarty->assign('USERSROOTURL',UserConfig::$USERSROOTURL);
+$template_data['log'] = $log;
+$template_data['USERSROOTURL'] = UserConfig::$USERSROOTURL;

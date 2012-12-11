@@ -1,23 +1,15 @@
 <?php
 require_once(dirname(__FILE__).'/global.php');
-require_once(dirname(__FILE__).'/User.php');
-
-User::require_login();
 
 if (!UserConfig::$useSubscriptions) {
 	header('Location: '.UserConfig::$DEFAULTLOGOUTRETURN);
 	exit;
 }
 
-# this yields Smarty object as $smarty
 include(dirname(__FILE__).'/view/account/transaction_log.php');
-
-$smarty->setTemplateDir(UserConfig::$smarty_templates.'/account');
-$smarty->setCompileDir(UserConfig::$smarty_compile);
-$smarty->setCacheDir(UserConfig::$smarty_cache);
 
 require_once(UserConfig::$header);
 
-$smarty->display('transaction_log.tpl');
+StartupAPI::$template->display('account/transaction_log.html.twig', $template_data);
 
 require_once(UserConfig::$footer);
