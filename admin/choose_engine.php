@@ -5,13 +5,8 @@ $ADMIN_SECTION = 'payment_method';
 
 include(dirname(__FILE__).'/view/choose_engine.php');
 
-# this yields Smarty object as $smarty
-$smarty->setTemplateDir(dirname(__FILE__).'/templates');
-$smarty->setCompileDir(UserConfig::$smarty_compile);
-$smarty->setCacheDir(UserConfig::$smarty_cache);
-
 require_once(dirname(__FILE__).'/header.php');
 
-$smarty->display('choose_engine.tpl');
+StartupAPI::$template->display('@admin/choose_engine.html.twig', $template_data);
 
 require_once(dirname(__FILE__).'/footer.php');

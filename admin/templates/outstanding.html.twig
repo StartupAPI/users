@@ -1,0 +1,27 @@
+<div class="span9">
+	{%if message %}
+		{%for msg in message %}
+			<h2>{{ msg }}</h2>
+		{%endfor%}
+	{%endif%}
+	{%if not fatal %}
+		<div>
+			Accounts with outstanding charges:
+		</div>
+		{%if debtors|length == 0 %}
+			<h2>No accounts with outstanding charges found</h2>
+		{%else%}
+			<div class="debtors">
+				<table class="debtors">
+					<tr><th>Account</th><th>Payment Plan</th><th>Payment Schedule</th><th>Debt</th></tr>
+					{%for debtor in debtors %}
+						<tr>
+							<td><a href="{{ USERSROOTURL }}/admin/account.php?account_id={{ debtor.id }}">{{ debtor.name }}</a></td>
+							<td>{{ debtor.plan }}</td><td>{{ debtor.schedule }}</td><td>-${{ debtor.debt }}</td>
+						</tr>
+					{%endfor%}
+				</table>
+			</div>
+		{%endif%}
+	{%endif%}
+</div>

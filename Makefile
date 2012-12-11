@@ -5,7 +5,7 @@ depcheck:
 
 updatecode:
 ifneq "$(wildcard .svn )" ""
-	rm -rf dbupgrade oauth-php admin/swfobject modules/facebook/php-sdk smarty
+	rm -rf dbupgrade oauth-php admin/swfobject modules/facebook/php-sdk twig 
 	svn update
 
 	mkdir dbupgrade/
@@ -29,11 +29,11 @@ ifneq "$(wildcard .svn )" ""
 	( cd _php-sdk; git archive HEAD | tar -x -C ../modules/facebook/php-sdk )
 	rm -rf _php-sdk
 
-	rm -rf smarty
-	mkdir smarty
-	svn export git://github.com/ericingram/smarty.git _smarty
-	mv _smarty/* smarty/
-	rm -rf _smarty
+	rm -rf twig 
+	mkdir twig 
+	svn export git://github.com/fabpot/Twig.git _twig
+	mv _twig/* twig/
+	rm -rf _twig
 endif
 ifneq "$(wildcard .git )" ""
 	git pull origin master

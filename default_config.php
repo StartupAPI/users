@@ -639,10 +639,6 @@ class UserConfig {
 	public static $default_plan_slug = 'PLAN_FREE';
 	// default schedule
 	public static $default_schedule_slug = 'default';
-	// Smarty base directory
-	public static $smarty_compile;
-	public static $smarty_cache;
-	public static $smarty_templates;
 
 
 	/* ========================================================================
@@ -992,10 +988,6 @@ EOD;
 		UserConfig::$cohort_providers[] = new GenerationCohorts(GenerationCohorts::WEEK);
 		UserConfig::$cohort_providers[] = new GenerationCohorts(GenerationCohorts::YEAR);
 		UserConfig::$cohort_providers[] = new RegMethodCohorts();
-
-		UserConfig::$smarty_cache = dirname(__FILE__) . '/cache/smarty/cache';
-		UserConfig::$smarty_compile = dirname(__FILE__) . '/cache/smarty/templates_c';
-		UserConfig::$smarty_templates = dirname(__FILE__) . '/templates';
 	}
 
 	/**

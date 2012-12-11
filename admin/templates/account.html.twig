@@ -1,0 +1,86 @@
+<div class="span9">
+	{%if message %}
+		{%for msg in message %}
+			<h2>{{ msg }}</h2>
+		{%endfor%}
+	{%endif%}
+	{%if  not fatal %}
+		<h2>Account: {{ account_name }}</h2>
+		<p>Status: {%if account_isActive %}<b class="badge badge-success">Active</b>{%else%}<b class="badge badge-important">Suspended</b>{%endif%}</p>
+
+		{%if useSubscriptions %}
+			<h3>Subscription</h3>
+			<div>
+
+				<p>Plan Name: <b><a class="label" href="plan.php?slug={{ plan_slug }}">{{ plan_name }}</a></b></p>
+				<p>Plan Description: {{ plan_description }}</p>
+				<p>Plan Details: <a href="{{ plan_details_url }}">{{ plan_details_url }}</a></p>
+				{%if plan_downgrade_to %}
+					<p>Plan automatically downgrades to: <b>{{ plan_downgrade_to }}</b>
+						if payment is due more than {{ plan_grace_period }} day(s)</p>
+				{%endif%}
+				{%if schedule_name %}
+					<p>Payment Schedule: <b>{{ schedule_name }}</b></p>
+					<p>Payment Schedule description: {{ schedule_description }}</p>
+					<p>Charge Amount: <b>${{ schedule_charge_amount }}</b></p>
+					<p>Charge Period: <b>{{ schedule_charge_period }}</b> days</p>
+				{%endif%}
+			</div>
+
+			<h3>Payments</h3>
+			<p>Payment Engine used: <b>{{ account_engine }}</b>
+				<a href="{{ USERSROOTURL }}/admin/choose_engine.php?account_id={{ account_id }}">[ change ]</a>
+			</p>
+
+			<div>
+				{%if balance < 0 %}
+					<p>Amount owed</p>
+					<ul>
+						{% set total = 0 %}
+						{%for c in charges %}
+							<li>{{ c.datetime }} ${{ c.amount }}</li>
+							{% set total = total + c.amount %}
+						{%endfor%}
+					</ul>
+					<p>Total debt: <b>${{ "%.2f"|format(total) }}</b></p>
+				{%else%}
+					<p>Balance: <b>${{ "%.2f"|format(balance) }}</b></p>
+				{%endif%}
+			</div>
+
+			{%if account_next_charge %}
+				<div>
+					<p>Next charge: <b>{{ account_next_charge }}</b></p>
+				</div>
+			{%endif%}
+			{%if next_plan_name and next_plan_name != plan_name %}
+				<div>
+					<p>After this date following plan used:</p>
+					<p>Plan Name: <b><a href="plan.php?slug={{ next_plan_slug }}">{{ next_plan_name }}</a></b></p>
+					<p>Plan Description: {{ next_plan_description }}</p>
+					<p>Plan Details: <a href="{{ plan_details_url }}">{{ next_plan_details_url }}</a></p>
+				</div>
+			{%endif%}
+			{%if next_schedule and next_plan_name == plan_name %}
+				<p>After this date following schedule used:</p>
+			{%endif%}
+			{%if next_schedule %}
+				<p>Payment Schedule: <b>{{ next_schedule_name }}</b></p>
+				<p>Payment Schedule description: {{ next_schedule_description }}</p>
+				<p>Charge Amount: <b>${{ next_schedule_charge_amount }}</b></p>
+				<p>Charge Period: <b>{{ next_schedule_charge_period }}</b> days</p>
+			{%endif%}
+
+			<div>
+				<a href="{{ USERSROOTURL }}/admin/transaction_log.php?account_id={{ account_id }}">View account transaction log</a>
+			</div>
+		{%endif%}
+
+		<h3>Account Users:</h3>
+		<ul>
+			{%for user in users %}
+				<li><a href="{{ USERSROOTURL }}/admin/user.php?id={{ user.id }}">{{ user.name }}</a>{%if user.admin %} <span class="badge badge-important">admin</span>{%endif%}</li>
+			{%endfor%}
+		</ul>
+	{%endif%}
+</div>

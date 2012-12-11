@@ -17,7 +17,7 @@ $project_files_exclude_regexes = array(
 	"|^modules/facebook/php-sdk/|",
 	"|^dbupgrade/|",
 	"|^phptidy/|",
-	"|^smarty/|"
+	"|^twig/|"
 );
 
 $default_package = "StartupAPI";

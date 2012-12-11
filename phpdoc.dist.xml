@@ -18,7 +18,7 @@
 		<ignore>dbupgrade/*</ignore>
 		<ignore>admin/swfobject/*</ignore>
 		<ignore>docs/*</ignore>
-		<ignore>smarty/*</ignore>
+		<ignore>twig/*</ignore>
 		<ignore>cache/*</ignore>
 		<ignore>phptidy/*</ignore>
 		<ignore>CookieStorage.php</ignore>

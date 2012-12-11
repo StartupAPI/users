@@ -8,7 +8,7 @@ exclude:
 	- */dbupgrade/*
 	- */admin/swfobject/*
 	- */docs/*
-	- */smarty/*
+	- */twig/*
 	- */phptidy/*
 	- */apigen-docs/*
 	- */CookieStorage.php
