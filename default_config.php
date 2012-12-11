@@ -314,6 +314,11 @@ class UserConfig {
 	 */
 	public static $theme = 'classic';
 
+	/**
+	 * @var mixed[] Array of Twig environment options
+	 */
+	public static $twig_options = array();
+
 
 	/* ========================================================================
 	 *

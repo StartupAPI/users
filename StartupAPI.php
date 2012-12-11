@@ -190,7 +190,7 @@ class StartupAPI {
 		$loader = new Twig_Loader_Filesystem(dirname(__FILE__) . '/templates/');
 		$loader->addPath(dirname(__FILE__) . '/admin/templates', 'admin');
 
-		self::$template = new Twig_Environment($loader, array());
+		self::$template = new Twig_Environment($loader, UserConfig::$twig_options);
 	}
 
 }
