@@ -1,20 +1,17 @@
 <?php
-
-require_once(dirname(dirname(dirname(__FILE__))).'/users.php');
-require_once(dirname(dirname(dirname(__FILE__))).'/smarty/libs/Smarty.class.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/global.php');
 
 $user = User::require_login();
 
-$smarty = new Smarty();
 session_start();
 
 if(isset($_SESSION['message'])) {
-  $smarty->assign('message',$_SESSION['message']);
+  $template_data['message'] = $_SESSION['message'];
   unset($_SESSION['message']);
   $fatal = isset($_SESSION['fatal']) ? $_SESSION['fatal'] : 0;
   unset($_SESSION['fatal']);
   if($fatal) {
-    $smarty->assign('fatal',1);
+    $template_data['fatal'] = 1;
     return;
   }
 }
@@ -33,5 +30,5 @@ foreach (UserConfig::$payment_modules as $mod) {
   $engines[] = $engine;
 }
 
-$smarty->assign('engines',$engines);
-$smarty->assign('USERSROOTURL',UserConfig::$USERSROOTURL);
+$template_data['engines'] = $engines;
+$template_data['USERSROOTURL'] = UserConfig::$USERSROOTURL;

@@ -1,0 +1,23 @@
+{% if message %}
+{% for msg in message %}
+<h2>{{ msg }}</h2>
+{% endfor %}
+{% endif %}
+
+{% if not fatal %}
+<div>
+	Choose your payment method:
+	<div>
+		<form action="{{ USERSROOTURL }}/controller/engine/choose_engine.php" method="POST">
+			<ul style="list-style-type: none">
+				{% for engine in engines %}
+				<li><input type="radio" name="engine" value="{{ engine.id }}" id="engine_radio_{{ engine.id }}"{% if engine.current %} checked{% endif %} />
+						   <label for="engine_radio_{{ engine.id }}">{{ engine.title }}</label>
+				</li>
+				{% endfor %}
+			</ul>
+			<input type="submit" value="Ok" />
+		</form>
+	</div>
+</div>
+{% endif %}
