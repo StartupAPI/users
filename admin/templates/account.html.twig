@@ -10,26 +10,25 @@
 
 		{%if useSubscriptions %}
 			<h3>Subscription</h3>
-			<div>
 
-				<p>Plan Name: <b><a class="label" href="plan.php?slug={{ plan_slug }}">{{ plan_name }}</a></b></p>
-				<p>Plan Description: {{ plan_description }}</p>
-				<p>Plan Details: <a href="{{ plan_details_url }}">{{ plan_details_url }}</a></p>
-				{%if plan_downgrade_to %}
-					<p>Plan automatically downgrades to: <b>{{ plan_downgrade_to }}</b>
-						if payment is due more than {{ plan_grace_period }} day(s)</p>
-				{%endif%}
-				{%if schedule_name %}
-					<p>Payment Schedule: <b>{{ schedule_name }}</b></p>
-					<p>Payment Schedule description: {{ schedule_description }}</p>
-					<p>Charge Amount: <b>${{ schedule_charge_amount }}</b></p>
-					<p>Charge Period: <b>{{ schedule_charge_period }}</b> days</p>
-				{%endif%}
-			</div>
+			<h4>Plan</h4>
+			<p>Name: <a class="label" href="plan.php?slug={{ plan_slug }}">{{ plan_name }}</a></p>
+			<p>{{ plan_description }}</p>
+			<p>Details: <a href="{{ plan_details_url }}">{{ plan_details_url }}</a></p>
+			{%if plan_downgrade_to %}
+				<p>Plan automatically downgrades to: <a class="label" href="plan.php?slug={{ plan_downgrade_to_slug }}">{{ plan_downgrade_to }}</a>
+					if payment is due more than {{ plan_grace_period }} day(s)</p>
+			{%endif%}
+				<h4>Payment Schedule</h4>
+			{%if schedule_name %}
+				<p>Payment Schedule: <b>{{ schedule_name }}</b> ({{ schedule_description }})</p>
+				<p>Charge Amount: <b>${{ schedule_charge_amount }}</b></p>
+				<p>Charge Period: <b>{{ schedule_charge_period }}</b> days</p>
+			{%endif%}
 
-			<h3>Payments</h3>
+			<h4>Payments</h4>
 			<p>Payment Engine used: <b>{{ account_engine }}</b>
-				<a href="{{ USERSROOTURL }}/admin/choose_engine.php?account_id={{ account_id }}">[ change ]</a>
+				<a class="btn btn-mini" href="{{ USERSROOTURL }}/admin/choose_engine.php?account_id={{ account_id }}">change</a>
 			</p>
 
 			<div>
@@ -72,7 +71,7 @@
 			{%endif%}
 
 			<div>
-				<a href="{{ USERSROOTURL }}/admin/transaction_log.php?account_id={{ account_id }}">View account transaction log</a>
+				<i class="icon-list-alt"></i> <a href="{{ USERSROOTURL }}/admin/transaction_log.php?account_id={{ account_id }}">View account transaction log</a>
 			</div>
 		{%endif%}
 

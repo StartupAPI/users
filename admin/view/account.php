@@ -37,6 +37,7 @@ if (UserConfig::$useSubscriptions) {
 	$downgrade = Plan::getPlanBySlug($plan->downgrade_to);
 	if ($downgrade) {
 		$template_data['plan_downgrade_to'] = $downgrade->name;
+		$template_data['plan_downgrade_to_slug'] = $downgrade->slug;
 	}
 
 	$next_plan = $account->getNextPlan();
