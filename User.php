@@ -805,6 +805,8 @@ class User {
 
   /**
    * Deletes user from the system
+   *
+   * @throws DBException
    */
   public function delete()
   {
@@ -817,18 +819,18 @@ class User {
 		{
 			if (!$stmt->bind_param('s', $username))
 			{
-				 throw new Exception("Can't bind parameter".$stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exception("Can't execute statement: ".$stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		}
 		else
 		{
-			throw new Exception("Can't prepare statement: ".$db->error);
+			throw new DBPrepareStmtException($db);
 		}
   }
 
@@ -2809,6 +2811,14 @@ class User {
 		return Account::getUserAccounts($this);
 	}
 
+	/**
+	 * Gets all accounts associated with the user
+	 *
+	 * @return array Array of User, role pairs
+	 *
+	 * @throws DBException
+	 * @throws StartupAPIException
+	 */
 	public function getAccountsAndRoles() {
 		return Account::getUserAccountsAndRoles($this);
 	}

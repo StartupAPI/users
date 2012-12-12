@@ -26,7 +26,7 @@ class UserConfig {
 	 * ===================================================================== */
 
 	/**
-	 * @var array List of all available modules (StartupAPIModule objects). Do not modify!
+	 * @var StartupAPIModule[] List of all available modules (StartupAPIModule objects). Do not modify!
 	 */
 	public static $all_modules = array();
 
@@ -34,10 +34,26 @@ class UserConfig {
 	 * List of authentication modules (AuthenticationModule objects). Do not modify!
 	 * Multiple authentication modules can be assigned for the same instance
 	 *
-	 * @var array
+	 * @var AuthenticationModule[]
 	 */
 	public static $authentication_modules = array();
 	// payment modules
+
+	/**
+	 * List of payment methods to be used for subscription. Do not modify!
+	 * Multiple payment modules can be enabled in the system, but only one can
+	 * be used by account at a time.
+	 *
+	 * Imitialize your like the following:
+	 * <code>
+	 * UserConfig::loadModule('PaymentEngine_Manual');
+	 * new PaymentEngine_Manual();
+	 * </code>
+	 *
+	 * Only used when $useSubscriptions is set
+	 *
+	 * @var PaymentEngineModule[]
+	 */
 	public static $payment_modules = array();
 
 	/**
@@ -626,10 +642,43 @@ class UserConfig {
 	 *
 	 * ===================================================================== */
 
-	public static $useSubscriptions = false; // works only if $useAccounts is true!!!
-	// free plan id, set to user with registration
+	/**
+	 * Enables subscription plans and payments management
+	 *
+	 * Only works when $useAccounts is set (default)
+	 *
+	 * @var boolean
+	 */
+	public static $useSubscriptions = false;
+
+	/**
+	 * Free plan slug which is set to the user when they register without payment
+	 *
+	 * @var string Free plan slug
+	 */
 	public static $plan_free = 'PLAN_FREE';
+
 	// subscription plans list, MUST have free plan index
+	/**
+	 * Plan configuration array with plan slugs as keys and config parameters as details
+	 *
+	 * This array must contain plan configuration for the plan defined in UserConfig::$plan_free
+	 *
+	 * <code>
+	 * UserConfig::$PLANS = array(
+	 * 	'PLAN_FREE' => array(
+	 *			'id' => 0,
+	 *			'name' => 'Free account',
+	 *			'description' => 'Free access with basic functionality',
+	 *			'capabilities' => array(
+	 *				'individual' => true
+	 *			)
+	 * 	)
+	 * );
+	 * </code>
+	 *
+	 * @var array
+	 */
 	public static $PLANS = array(
 		'PLAN_FREE' => array(
 			'id' => 0,
@@ -640,9 +689,19 @@ class UserConfig {
 			)
 		)
 	);
-	// default plan
+
+	/**
+	 * The slug of the plan that gets assigned to the user by default
+	 *
+	 * @var string
+	 */
 	public static $default_plan_slug = 'PLAN_FREE';
-	// default schedule
+
+	/**
+	 * The slug of the payment schedule that gets assigned to the user by default
+	 *
+	 * @var string
+	 */
 	public static $default_schedule_slug = 'default';
 
 
