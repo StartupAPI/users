@@ -29,7 +29,7 @@ require_once(dirname(__FILE__) . '/header.php');
 	</p>
 	<p>
 		<?php echo UserTools::escape($plan->description); ?><br/>
-		<i>Details page: <a target="_blank" href="<?php echo UserTools::escape($plan->details_url); ?>"><?php echo UserTools::escape($plan->details_url); ?></a></i>
+		<?php if ($plan->details_url) { ?><i>Details page: <a target="_blank" href="<?php echo UserTools::escape($plan->details_url); ?>"><?php echo UserTools::escape($plan->details_url); ?></a></i><?php } ?>
 	</p>
 	<?php
 	$schedule_slugs = $plan->getPaymentScheduleSlugs(); # Iterate over all schedules of this plan

@@ -1,26 +1,27 @@
 <div class="span9">
 	{%if message %}
 		{%for msg in message %}
-			<h2>{{ msg }}</h2>
+			<h3>{{ msg }}</h3>
 		{%endfor%}
 	{%endif%}
 	{%if not fatal %}
 		<div>
-			Choose payment method for account <b>
-				<a href="{{ USERSROOTURL }}/admin/account.php?id={{ account_id }}">{{ account_name }}</a></b> (ID: {{ account_id }}):
-			<div>
-				<form action="{{ USERSROOTURL }}/admin/controller/choose_engine.php" method="POST">
-					<input type="hidden" name="account_id" value="{{ account_id }}" />
-						{%for engine in engines %}
-							<p>
-								<input type="radio" name="engine" value="{{ engine.id }}" id="engine_radio_{{ engine.id }}"{%if engine.current %} checked{%endif%} />
-								<label for="engine_radio_{{ engine.id }}">{{ engine.title }}</label>
-							</p>
-						{%endfor%}
-					<input type="submit" value="Ok" />
-					<input type="hidden" name="CSRF_NONCE" value="{{ CSRFNonce }}"/>
-				</form>
-			</div>
+			Choose payment method for account
+			<b><a href="{{ USERSROOTURL }}/admin/account.php?id={{ account_id }}">{{ account_name }}</a></b> (ID: {{ account_id }}):
+
+			<form action="{{ USERSROOTURL }}/admin/controller/choose_engine.php" method="POST">
+				<input type="hidden" name="account_id" value="{{ account_id }}" />
+					{%for engine in engines %}
+						<p>
+							<label for="engine_radio_{{ engine.id }}" class="radio">
+							<input type="radio" name="engine" value="{{ engine.id }}" id="engine_radio_{{ engine.id }}"{%if engine.current %} checked{%endif%} />
+							{{ engine.title }}
+							</label>
+						</p>
+					{%endfor%}
+				<input type="submit" value="Save" class="btn btn-primary"/>
+				<input type="hidden" name="CSRF_NONCE" value="{{ CSRFNonce }}"/>
+			</form>
 		</div>
 	{%endif%}
 </div>
