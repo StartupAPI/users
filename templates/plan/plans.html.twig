@@ -1,5 +1,8 @@
 {% for msg in message %}
-<h2>{{ msg }}</h2>
+<p class="alert">
+	<button type="button" class="close" data-dismiss="alert">×</button>
+	{{ msg }}
+</p>
 {% endfor %}
 
 {% if not fatal %}
@@ -75,15 +78,6 @@
 	}
 	.userbase-account-schedule-details {
 		color: gray;
-	}
-	.userbase-account-until-label, .userbase-account-starting-label {
-		font-weight: bold;
-		color: white;
-		background-color: gray;
-		padding: 0 0.2em;
-		border-radius: 5px;
-		-moz-border-radius: 5px;
-		-webkit-border-radius: 5px;
 	}
 </style>
 
@@ -161,7 +155,7 @@
 								name="plan"
 								id="plan-radio-{{ col }}-{{ n }}"
 								value="{{ plan.slug }}.{{ schedule.slug }}"
-								{% if not schedule.available %}disabled{% endif %}
+								{% if not plan.available or not schedule.available %}disabled{% endif %}
 								{% if next_chosen %}
 									{% if schedule.chosen%}checked{% endif %}
 								{% else %}
@@ -178,11 +172,11 @@
 								<span class="userbase-account-schedule-details">{{ schedule.description }}</span>
 								{% if schedule.current and next_chosen %}
 									<br/>
-									<span class="userbase-account-until-label">until {{ next_charge|date("M d, Y") }}</span>
+									<span class="badge badge-important">until {{ next_charge|date("M d, Y") }}</span>
 								{% endif %}
 								{% if schedule.chosen %}
 									<br/>
-									<span class="userbase-account-starting-label">starting {{ next_charge|date("M d, Y") }}</span>
+									<span class="badge badge-success">starting {{ next_charge|date("M d, Y") }}</span>
 								{% endif %}
 							</label>
 						</td>
@@ -191,21 +185,22 @@
 				{% endfor %}
 			</table>
 		{% else %}
-			<input type="radio" name="plan" value="{{ plan.slug }}"
+			<label class="radio" for="plan-radio-{{ col }}"{% if plan.current %} class="userbase-account-current-plan"{% endif %}>
+				<input type="radio" name="plan" value="{{ plan.slug }}"
 				   id="plan-radio-{{ col }}"
+				   {% if not plan.available %}disabled{% endif %}
 				   {% if next_chosen %}
 					   {% if plan.chosen %}checked{% endif %}
 				   {% else %}
 					   {% if plan.current %}checked{% endif %}
 				    {% endif %}
 				   />
-			<label for="plan-radio-{{ col }}"{% if plan.current %} class="userbase-account-current-plan"{% endif %}>
-				<span class="userbase-account-plan-name">free</span>
+				<span class="userbase-account-plan-name">Free</span>
 				{% if next_chosen and plan.current %}
-				<span class="userbase-account-until-label">until {{ next_charge }}</span>
+				<span class="badge badge-important">until {{ next_charge }}</span>
 				{% endif %}
 				{% if plan.chosen %}
-				<span class="userbase-account-starting-label">starting {{ next_charge }}</span>
+				<span class="badge badge-success">starting {{ next_charge }}</span>
 				{% endif %}
 			</label>
 		{% endif %}
@@ -218,7 +213,23 @@
 	<tr>
 		{% for plan in plans %}
 			<td class="userbase-account-pay-button {% if col == current_plan_col %} userbase-account-plan-current{% endif %}">
-				<input type="submit" value="{% if not current_plan_col %}{% if plan.base_price %}Pay Now{% else %}Sign Up{% endif %}{% else %}{% if col == current_plan_col %}Update{% else %}Change{% endif %}{% endif %}"/>
+				{% if plan.available %}
+					{% if not current_plan_col %}
+						{% if plan.base_price %}
+							<input class="btn" type="submit" value="Pay Now"/>
+						{% else %}
+							<input class="btn" type="submit" value="Sign Up"/>
+						{% endif %}
+					{% else %}
+						{% if col == current_plan_col %}
+							<input class="btn" type="submit" value="Update"/>
+						{% else %}
+							<input class="btn" type="submit" value="Change"/>
+						{% endif %}
+					{% endif %}
+				{%else%}
+					<input class="btn disabled" type="button" value="Coming soon"/>
+				{% endif %}
 			</td>
 			{% set col = col + 1 %}
 		{% endfor %}

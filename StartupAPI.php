@@ -65,7 +65,15 @@ class StartupAPI {
 	 * styles, scripts and potentially meta-tags into the head of the pages on the site
 	 */
 	static function head() {
-		?><link rel="stylesheet" type="text/css" href="<?php echo UserConfig::$USERSROOTURL ?>/themes/<?php echo UserConfig::$theme ?>/startupapi.css"><?php
+		?>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/css/bootstrap.css" rel="stylesheet">
+		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+		<script src="<?php echo UserConfig::$USERSROOTURL ?>/jquery-1.8.2.min.js"></script>
+		<script src="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/js/bootstrap.min.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="<?php echo UserConfig::$USERSROOTURL ?>/themes/<?php echo UserConfig::$theme ?>/startupapi.css">
+		<?php
 	}
 
 	/**

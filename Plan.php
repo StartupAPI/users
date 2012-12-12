@@ -35,6 +35,7 @@ class Plan {
 		$parameters = array(
 			'slug' => NULL,
 			'name' => NULL,
+			'available' => TRUE,
 			'description' => NULL,
 			'base_price' => NULL,
 			'base_period' => NULL,

@@ -21,7 +21,7 @@ if (!$account->isActive()) {
 }
 
 $plan_data = array(
-	'slug', 'name', 'description', 'base_price', 'base_period', 'details_url', 'downgrade_to', 'grace_period');
+	'slug', 'name', 'description', 'base_price', 'base_period', 'details_url', 'downgrade_to', 'grace_period', 'available');
 $schedule_data = array(
 	'slug', 'name', 'description', 'charge_amount', 'charge_period');
 
