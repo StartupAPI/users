@@ -5,7 +5,7 @@ depcheck:
 
 updatecode:
 ifneq "$(wildcard .svn )" ""
-	rm -rf dbupgrade oauth-php admin/swfobject modules/facebook/php-sdk twig 
+	rm -rf dbupgrade oauth-php admin/swfobject modules/facebook/facebook-php-sdk
 	svn update
 
 	mkdir dbupgrade/
@@ -24,9 +24,9 @@ ifneq "$(wildcard .svn )" ""
 	rm -rf _swfobject
 
 	rm -rf _php-sdk
-	mkdir modules/facebook/php-sdk
-	git clone git://github.com/facebook/php-sdk.git _php-sdk
-	( cd _php-sdk; git archive HEAD | tar -x -C ../modules/facebook/php-sdk )
+	mkdir modules/facebook/facebook-php-sdk
+	git clone git://github.com/facebook/facebook-php-sdk.git _php-sdk
+	( cd _php-sdk; git archive HEAD | tar -x -C ../modules/facebook/facebook-php-sdk )
 	rm -rf _php-sdk
 
 	rm -rf twig 

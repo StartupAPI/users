@@ -15,7 +15,7 @@
  * under the License.
  */
 
-require_once dirname(__FILE__)."/php-sdk/src/base_facebook.php";
+require_once dirname(__FILE__)."/facebook-php-sdk/src/base_facebook.php";
 
 require_once(dirname(dirname(dirname(__FILE__))).'/global.php');
 
