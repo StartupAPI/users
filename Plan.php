@@ -17,18 +17,77 @@ class Plan {
 	 * @var string Plan name
 	 */
 	private $name;
+
+	/**
+	 * @var string Plan description
+	 */
 	private $description;
+
+	/**
+	 * @var int Base price to display for the plan (actual charges are managed by PaymentSchedule class)
+	 */
 	private $base_price;
+
+	/**
+	 * @var string Base plan price period to display for the plan (actual charge intervals managed by PaymentSchedule class)
+	 */
 	private $base_period;
+
+	/**
+	 * @var string Plan details page URL
+	 */
 	private $details_url;
+
+	/**
+	 * Capabilities supported by accounts that subscribe to this plan.
+	 *
+	 * You can test for those capabilities in your code.
+	 *
+	 * StartupAPI also supports following capabilities out of the box:
+	 * - individual: true / false (indicates that account only allows for one member)
+	 *
+	 * @var mixed[] Array of capabilities
+	 */
 	private $capabilities;
+
+	/**
+	 * @var string Slug of the plan to downgrade to when subscription ends or cancelled
+	 */
 	private $downgrade_to;
+
+	/**
+	 * @var int Amount of days to wait after due payment is not recieved before downgrading the account
+	 */
 	private $grace_period;
+
+	/**
+	 * @var PaymentSchedule[] Array of payment schedules available for a plan
+	 */
 	private $payment_schedules;
+
+	/**
+	 * @var callable Plan activation hook, called when plan is activated for account
+	 */
 	private $user_activate_hook;
+
+	/**
+	 * @var callable Plan deactivation hook, called when plan is deactivated for account
+	 */
 	private $user_deactivate_hook;
+
+	/**
+	 * @var Plan[] Array of currently registered plans in the system
+	 */
 	private static $Plans = array();
 
+	/**
+	 * Creates new plan
+	 *
+	 * @param string $slug Plan slug
+	 * @param mixed[] $a Array of plan options
+	 *
+	 * @throws Exception
+	 */
 	public function __construct($slug, $a) {
 
 		# Known parameters and their default values listed here:
@@ -95,12 +154,12 @@ class Plan {
 		}
 
 		# Check user hooks
-		if ($this->user_activate_hook != '' && !function_exists($this->user_activate_hook)) {
-			throw new Exception("Activate hook function " . $this->user_activate_hook . " is not defined");
+		if (!is_null($this->user_activate_hook) && !is_callable($this->user_activate_hook)) {
+			throw new Exception("Activate hook defined, but is not callable");
 		}
 
-		if ($this->user_deactivate_hook != '' && !function_exists($this->user_deactivate_hook)) {
-			throw new Exception("Deactivate hook function " . $this->user_deactivate_hook . " is not defined");
+		if (!is_null($this->user_deactivate_hook) && !is_callable($this->user_deactivate_hook)) {
+			throw new Exception("Deactivate hook defined, but is not callable");
 		}
 
 		self::$Plans[] = $this;
