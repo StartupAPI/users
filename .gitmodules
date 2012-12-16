@@ -4,9 +4,6 @@
 [submodule "admin/swfobject"]
 	path = admin/swfobject
 	url = git://github.com/swfobject/swfobject.git
-[submodule "modules/facebook/php-sdk"]
-	path = modules/facebook/php-sdk
-	url = git://github.com/facebook/php-sdk.git
 [submodule "dbupgrade"]
 	path = dbupgrade
 	url = git://github.com/sergeychernyshev/DBUpgrade.git
