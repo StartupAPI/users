@@ -10,3 +10,6 @@
 [submodule "phptidy"]
 	path = phptidy
 	url = git://github.com/sergeychernyshev/phptidy.git
+[submodule "modules/facebook/facebook-php-sdk"]
+	path = modules/facebook/facebook-php-sdk
+	url = git@github.com:facebook/facebook-php-sdk.git
