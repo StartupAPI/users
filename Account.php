@@ -776,9 +776,7 @@ class Account {
 	 *
 	 * @return boolean True if charge was successful
 	 *
-	 * @throws Exception
-	 *
-	 * @todo Use DBExceptions instead of generic Exceptions
+	 * @throws DBException
 	 */
 	public function paymentIsDue($refund = NULL) { // refund is almost the same, as general payment
 		if (is_null($this->schedule)) {
@@ -806,15 +804,15 @@ class Account {
 
 				if (!($stmt = $db->prepare('DELETE FROM ' . UserConfig::$mysql_prefix .
 						'account_charge WHERE account_id = ?'))) {
-					throw new Exception("Can't prepare statement: " . $db->error);
+					throw new DBPrepareStmtException($db);
 				}
 
 				if (!$stmt->bind_param('i', $this->id)) {
-					throw new Exception("Can't bind parameter" . $stmt->error);
+					throw new DBBindParamException($db, $stmt);
 				}
 
 				if (!$stmt->execute()) {
-					throw new Exception("Can't execute statement: " . $stmt->error);
+					throw new DBExecuteStmtException($db, $stmt);
 				}
 
 				$this->charges = array();
@@ -822,16 +820,17 @@ class Account {
 			} else { // We still owe to user
 				if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
 						'account_charge SET amount = ? WHERE account_id = ?'))) {
-					throw new Exception("Can't prepare statement: " . $db->error);
+					throw new DBPrepareStmtException($db);
 				}
 
 				$amt = $this->charges[$c]['amount'] - $charge_amount;
 				if (!$stmt->bind_param('di', $amt, $this->id)) {
-					throw new Exception("Can't bind parameter" . $stmt->error);
+					throw new DBBindParamException($db, $stmt);
 				}
 
 				if (!$stmt->execute()) {
-					throw new Exception("Can't execute statement: " . $stmt->error);
+					throw new DBExecuteStmtException($db, $stmt);
+
 				}
 
 				// Put into the object
@@ -853,15 +852,15 @@ class Account {
 
 			if (!($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix .
 					'account_charge (account_id, date_time, amount) VALUES (?, ?, ?)'))) {
-				throw new Exception("Can't prepare statement: " . $db->error);
+				throw new DBPrepareStmtException($db);
 			}
 
 			if (!$stmt->bind_param('isd', $this->id, $charge['datetime'], $charge['amount'])) {
-				throw new Exception("Can't bind parameter" . $stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 
 			if (!$stmt->execute()) {
-				throw new Exception("Can't execute statement: " . $stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
@@ -887,9 +886,7 @@ class Account {
 	 *
 	 * @return boolean True if payment was successfully applied
 	 *
-	 * @throws Exception
-	 *
-	 * @todo Use DBException instead of generic Exception
+	 * @throws DBException
 	 */
 	public function paymentReceived($amount) {
 
@@ -915,15 +912,15 @@ class Account {
 				if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
 						'account_charge SET amount = ? ' .
 						'WHERE account_id = ? and date_time = ?'))) {
-					throw new Exception("Can't prepare statement: " . $db->error);
+					throw new DBPrepareStmtException($db);
 				}
 
 				if (!$stmt->bind_param('dis', $this->charges[$k]['amount'], $this->id, $this->charges[$k]['datetime'])) {
-					throw new Exception("Can't bind parameter" . $stmt->error);
+					throw new DBBindParamException($db, $stmt);
 				}
 
 				if (!$stmt->execute()) {
-					throw new Exception("Can't execute statement: " . $stmt->error);
+					throw new DBExecuteStmtException($db, $stmt);
 				}
 
 				$amount = 0;
@@ -935,15 +932,15 @@ class Account {
 
 			if (!($stmt = $db->prepare('DELETE FROM ' . UserConfig::$mysql_prefix .
 					'account_charge WHERE account_id = ? and date_time = ?'))) {
-				throw new Exception("Can't prepare statement: " . $db->error);
+				throw new DBPrepareStmtException($db);
 			}
 
 			if (!$stmt->bind_param('is', $this->id, $k['datetime'])) {
-				throw new Exception("Can't bind parameter" . $stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 
 			if (!$stmt->execute()) {
-				throw new Exception("Can't execute statement: " . $stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
@@ -957,15 +954,15 @@ class Account {
 
 			if (!($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix .
 					'account_charge (account_id, date_time, amount) VALUES (?, ?, ?)'))) {
-				throw new Exception("Can't prepare statement: " . $db->error);
+				throw new DBPrepareStmtException($db);
 			}
 
 			if (!$stmt->bind_param('isd', $this->id, $charge['datetime'], $charge['amount'])) {
-				throw new Exception("Can't bind parameter" . $stmt->error);
+				throw new DBBindParamException($db, $stmt);
 			}
 
 			if (!$stmt->execute()) {
-				throw new Exception("Can't execute statement: " . $stmt->error);
+				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
@@ -991,9 +988,7 @@ class Account {
 	 *
 	 * @return boolean True if activation was successful
 	 *
-	 * @throws Exception
-	 *
-	 * @todo Use DBException instead of generic Exception
+	 * @throws DBException
 	 */
 	public function activatePlan($plan_slug, $schedule_slug = NULL) {
 
@@ -1037,15 +1032,15 @@ class Account {
 		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
 				'accounts SET plan_slug = ?, schedule_slug = ?, active = 1, next_charge = ?, ' .
 				'next_plan_slug = NULL, next_schedule_slug = NULL WHERE id = ?'))) {
-			throw new Exception("Can't prepare statement: " . $db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('sssi', $plan_slug, $schedule_slug, $this->nextCharge, $this->id)) {
-			throw new Exception("Can't bind parameter" . $stmt->error);
+			throw new DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new Exception("Can't execute statement: " . $stmt->error);
+			throw new DBExecuteStmtException($db, $stmt);
 		}
 
 		$this->paymentIsDue();
@@ -1086,9 +1081,7 @@ class Account {
 	 *
 	 * @return boolean True if successfully set the schedule
 	 *
-	 * @throws Exception
-	 *
-	 * @todo Use DBException instead of generic Exception
+	 * @throws DBException
 	 */
 	public function setPaymentSchedule($schedule_slug) {
 
@@ -1105,15 +1098,15 @@ class Account {
 		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
 				'accounts SET schedule_slug = ?, next_charge = ?, next_plan_slug = NULL, ' .
 				'next_schedule_slug = NULL WHERE id = ?'))) {
-			throw new Exception("Can't prepare statement: " . $db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('ssi', $schedule_slug, $this->nextCharge, $this->id)) {
-			throw new Exception("Can't bind parameters: " . $stmt->error);
+			throw new DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new Exception("Can't execute statement: " . $stmt->error);
+			throw new DBExecuteStmtException($db, $stmt);
 		}
 
 		// Bill user
@@ -1166,9 +1159,7 @@ class Account {
 	 *
 	 * @return boolean True if successfully updated payment engine
 	 *
-	 * @throws Exception
-	 *
-	 * @todo Use DBException instead of generic Exception
+	 * @throws DBException
 	 */
 	public function setPaymentEngine($engine_slug) {
 		if ($engine_slug == NULL) {
@@ -1183,15 +1174,15 @@ class Account {
 
 		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
 				'accounts SET engine_slug = ? WHERE id = ?'))) {
-			throw new Exception("Can't prepare statement: " . $db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('si', $engine_slug, $this->id)) {
-			throw new Exception("Can't bind parameters: " . $stmt->error);
+			throw new DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new Exception("Can't execute statement: " . $stmt->error);
+			throw new DBExecuteStmtException($db, $stmt);
 		}
 
 		$this->lastTransactionID =
@@ -1227,9 +1218,7 @@ class Account {
 	 *
 	 * @return boolean True if request was successful
 	 *
-	 * @throws Exception
-	 *
-	 * @todo Use DBException instead of generic Exception
+	 * @throws DBException
 	 */
 	public function planChangeRequest($plan_slug, $schedule_slug) {
 		// Sanity checks
@@ -1279,15 +1268,15 @@ class Account {
 
 		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
 				'accounts SET next_plan_slug = ?, next_schedule_slug = ? WHERE id = ?'))) {
-			throw new Exception("Can't prepare statement: " . $db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('ssi', $plan_slug, $schedule_slug, $this->id)) {
-			throw new Exception("Can't bind parameters: " . $stmt->error);
+			throw new DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new Exception("Can't execute statement: " . $stmt->error);
+			throw new DBExecuteStmtException($db, $stmt);
 		}
 
 		$this->lastTransactionID =
@@ -1303,9 +1292,7 @@ class Account {
 	 *
 	 * @return boolean True if request was successful
 	 *
-	 * @throws Exception
-	 *
- 	 * @todo Use DBException instead of generic Exception
+	 * @throws DBException
 	 */
 	public function scheduleChangeRequest($schedule_slug) {
 		if (!($schedule = $this->plan->getPaymentScheduleBySlug($schedule_slug))) {
@@ -1332,15 +1319,15 @@ class Account {
 
 		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
 				'accounts SET next_plan_slug = plan_slug, next_schedule_slug = ? WHERE id = ?'))) {
-			throw new Exception("Can't prepare statement: " . $db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('si', $schedule_slug, $this->id)) {
-			throw new Exception("Can't bind parameters: " . $stmt->error);
+			throw new DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new Exception("Can't execute statement: " . $stmt->error);
+			throw new DBExecuteStmtException($db, $stmt);
 		}
 
 		$this->lastTransactionID =
@@ -1353,9 +1340,7 @@ class Account {
 	 *
 	 * @return boolean True if suspension was successful
 	 *
-	 * @throws Exception
-	 *
-  	 * @todo Use DBException instead of generic Exception
+	 * @throws DBException
 	 */
 	public function suspend() {
 		$this->active = 0;
@@ -1364,15 +1349,15 @@ class Account {
 
 		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
 				'accounts SET active = 0 WHERE id = ?'))) {
-			throw new Exception("Can't prepare statement: " . $db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('i', $this->id)) {
-			throw new Exception("Can't bind parameters: " . $stmt->error);
+			throw new DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new Exception("Can't execute statement: " . $stmt->error);
+			throw new DBExecuteStmtException($db, $stmt);
 		}
 
 		return TRUE;
@@ -1383,9 +1368,7 @@ class Account {
 	 *
 	 * @return boolean True if activation was successful
 	 *
-	 * @throws Exception
-	 *
-  	 * @todo Use DBException instead of generic Exception
+	 * @throws DBException
 	 */
 	public function activate() {
 		$this->active = 1;
@@ -1394,15 +1377,15 @@ class Account {
 
 		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
 				'accounts SET active = 1 WHERE id = ?'))) {
-			throw new Exception("Can't prepare statement: " . $db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('i', $this->id)) {
-			throw new Exception("Can't bind parameters: " . $stmt->error);
+			throw new DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new Exception("Can't execute statement: " . $stmt->error);
+			throw new DBExecuteStmtException($db, $stmt);
 		}
 
 		return TRUE;
@@ -1422,9 +1405,7 @@ class Account {
 	 *
 	 * @return boolean True if cancellation was successful
 	 *
-	 * @throws Exception
-	 *
-   	 * @todo Use DBException instead of generic Exception
+	 * @throws DBException
 	 */
 	public function cancelChangeRequest() {
 
@@ -1435,15 +1416,15 @@ class Account {
 		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
 				'accounts SET next_plan_slug = NULL, next_schedule_slug = NULL ' .
 				'WHERE id = ?'))) {
-			throw new Exception("Can't prepare statement: " . $db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('i', $this->id)) {
-			throw new Exception("Can't bind parameters: " . $stmt->error);
+			throw new DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new Exception("Can't execute statement: " . $stmt->error);
+			throw new DBExecuteStmtException($db, $stmt);
 		}
 
 		$this->nextPlan = NULL;
