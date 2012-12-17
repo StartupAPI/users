@@ -70,9 +70,7 @@ class PaymentEngine_Manual extends PaymentEngine {
 	 *
 	 * @return boolean True if transaction details were successfully recorded
 	 *
-	 * @throws Exception
-	 *
-	 * @todo Replace generic Exceptions with DBExceptions
+	 * @throws DBException
 	 */
 	public function storeTransactionDetails($transaction_id, $details) {
 
@@ -90,15 +88,15 @@ class PaymentEngine_Manual extends PaymentEngine {
 		if (!($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix .
 				'transaction_details_' . $this->getSlug() .
 				' (transaction_id, operator_id, funds_source, comment) VALUES(?,?,?,?)'))) {
-			throw new Exception("Can't prepare statement: " . $db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('iiss', $transaction_id, $operator_id, $funds_source, $comment)) {
-			throw new Exception("Can't bind parameters: " . $stmt->error);
+			throw new DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new Exception("Can't execute statement: " . $stmt->error);
+			throw new DBExecuteStmtException($db, $stmt);
 		}
 
 		return TRUE;
@@ -111,7 +109,7 @@ class PaymentEngine_Manual extends PaymentEngine {
 	 *
 	 * @return mixed[]|false Retrieves array of transaction details or false if none available
 	 *
-	 * @throws Exception
+	 * @throws DBException
 	 */
 	public function expandTransactionDetails($transaction_id) {
 		if (is_null($transaction_id)) {
@@ -123,19 +121,19 @@ class PaymentEngine_Manual extends PaymentEngine {
 		if (!($stmt = $db->prepare('SELECT operator_id, funds_source, comment FROM ' .
 				UserConfig::$mysql_prefix . 'transaction_details_' . $this->getSlug() .
 				' WHERE transaction_id = ?'))) {
-			throw new Exception("Can't prepare statement: " . $db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('i', $transaction_id)) {
-			throw new Exception("Can't bind parameters: " . $stmt->error);
+			throw new DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new Exception("Can't execute statement: " . $stmt->error);
+			throw new DBExecuteStmtException($db, $stmt);
 		}
 
 		if (!$stmt->bind_result($operator_id, $funds_source, $comment)) {
-			throw new Exception("Can't bind result: " . $stmt->error);
+			throw new DBBindResultException($db, $stmt);
 		}
 
 		$details = array();

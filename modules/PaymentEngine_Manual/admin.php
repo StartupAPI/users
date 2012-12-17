@@ -134,20 +134,24 @@
       if (!($stmt = $db->prepare('SELECT id,name,plan_slug,schedule_slug,active,COALESCE(SUM(amount),0) AS balance FROM '.
         UserConfig::$mysql_prefix.'accounts AS a LEFT JOIN '.UserConfig::$mysql_prefix.'account_charge AS c '.
         'ON c.account_id = a.id WHERE engine_slug = "PaymentEngine_Manual" '.(is_null($search) ? '' : 'AND name like ? ').
-        'GROUP BY a.id ORDER BY '.$sortby.' LIMIT '.$perpage.' OFFSET '.$pagenumber * $perpage)))
-          throw new Exception("Can't prepare statement: ".$db->error);
+        'GROUP BY a.id ORDER BY '.$sortby.' LIMIT '.$perpage.' OFFSET '.$pagenumber * $perpage))) {
+			throw new DBPrepareStmtException($db);
+		}
 
       if(!is_null($search)) {
         $search_like = '%'.$search.'%';
-        if (!$stmt->bind_param('s',$search_like))
-          throw new Exception("Can't bind parameter".$stmt->error);
+        if (!$stmt->bind_param('s',$search_like)) {
+			throw new DBBindParamException($db, $stmt);
+		}
       }
 
-      if (!$stmt->execute())
-        throw new Exception("Can't execute statement: ".$stmt->error);
+      if (!$stmt->execute()) {
+		throw new DBExecuteStmtException($db, $stmt);
+	  }
 
-      if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $active, $balance))
-        throw new Exception("Can't bind result: ".$stmt->error);
+      if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $active, $balance)) {
+		throw new DBBindResultException($db, $stmt);
+	  }
 
       $accounts = array();
       while($stmt->fetch() === TRUE)

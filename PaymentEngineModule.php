@@ -138,9 +138,7 @@ abstract class PaymentEngine extends StartupAPIModule {
 	/**
 	 * This method is called daily to initiate payments and update accounts
 	 *
-	 * @todo Update to use DBExceptions instead of generic Exception class
-	 *
-	 * @throws Exception
+	 * @throws DBException
 	 */
 	public function cronHandler() {
 		$db = UserConfig::getDB();
@@ -150,23 +148,23 @@ abstract class PaymentEngine extends StartupAPIModule {
 
 		if (!($stmt = $db->prepare('SELECT a.id, UNIX_TIMESTAMP(MIN(ac.date_time)) FROM ' . UserConfig::$mysql_prefix . 'accounts a INNER JOIN ' .
 				UserConfig::$mysql_prefix . 'account_charge ac ON a.id = ac.account_id AND ac.amount > 0 AND engine_slug = ? GROUP BY a.id'))) {
-			throw new Exception("Can't prepare statement: " . $db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('s', $this->engineSlug)) {
-			throw new Exception("Can't bind parameter" . $stmt->error);
+			throw new DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new Exception("Can't execute statement: " . $stmt->error);
+			throw new DBExecuteStmtException($db, $stmt);
 		}
 
 		if (!$stmt->store_result()) {
-			throw new Exception("Can't store result: " . $stmt->error);
+			throw new DBException($db, $stmt, "Can't store result");
 		}
 
 		if (!$stmt->bind_result($account_id, $date_time)) {
-			throw new Exception("Can't bind result: " . $stmt->error);
+			throw new DBBindResultException($db, $stmt);
 		}
 
 		while ($stmt->fetch() === TRUE) {
@@ -188,23 +186,23 @@ abstract class PaymentEngine extends StartupAPIModule {
 
 		if (!($stmt = $db->prepare('SELECT id, plan_slug, next_plan_slug, schedule_slug, next_schedule_slug FROM ' .
 				UserConfig::$mysql_prefix . 'accounts WHERE engine_slug = ? AND active = 1 AND next_charge < ?'))) {
-			throw new Exception("Can't prepare statement: " . $db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('ss', $this->engineSlug, date('Y-m-d H:i:s'))) {
-			throw new Exception("Can't bind parameter" . $stmt->error);
+			throw new DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new Exception("Can't execute statement: " . $stmt->error);
+			throw new DBExecuteStmtException($db, $stmt);
 		}
 
 		if (!$stmt->store_result()) {
-			throw new Exception("Can't store result: " . $stmt->error);
+			throw new DBException($db, $stmt, "Can't store result");
 		}
 
 		if (!$stmt->bind_result($account_id, $plan_slug, $next_plan_slug, $schedule_slug, $next_schedule_slug)) {
-			throw new Exception("Can't bind result: " . $stmt->error);
+			throw new DBBindResultException($db, $stmt);
 		}
 
 		while ($stmt->fetch() === TRUE) {
@@ -247,15 +245,15 @@ abstract class PaymentEngine extends StartupAPIModule {
 					// Set new next_charge
 					if (!($stmt2 = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
 							'accounts SET next_charge = next_charge + INTERVAL ? DAY WHERE id = ?'))) {
-						throw new Exception("Can't prepare statement: " . $db->error);
+						throw new DBPrepareStmtException($db);
 					}
 
 					if (!$stmt2->bind_param('ii', $schedule->charge_period, $account->getID())) {
-						throw new Exception("Can't bind parameter" . $db->error);
+						throw new DBBindParamException($db, $stmt);
 					}
 
 					if (!$stmt2->execute()) {
-						throw new Exception("Can't execute statement: " . $stmt->error);
+						throw new DBExecuteStmtException($db, $stmt);
 					}
 
 					$stmt2->close();

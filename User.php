@@ -227,7 +227,7 @@ class User {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->bind_result($referer)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new DBBindResultException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);

@@ -570,11 +570,11 @@ class Account {
 
 
 		if (!$stmt->bind_param('ssss', $name, $plan_slug, $schedule_slug, $engine_slug)) {
-			throw new Exception("Can't bind parameter" . $stmt->error);
+			throw new DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new Exception("Can't execute statement: " . $stmt->error);
+			throw new DBExecuteStmtException($db, $stmt);
 		}
 
 		$id = $stmt->insert_id;
@@ -745,19 +745,19 @@ class Account {
 		if (!($stmt = $db->prepare('SELECT date_time, amount FROM ' .
 				UserConfig::$mysql_prefix . 'account_charge WHERE account_id = ? ' .
 				'ORDER BY date_time'))) {
-			throw new Exception("Can't prepare statement: " . $db->error);
+			throw new DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('i', $account_id)) {
-			throw new Exception("Can't bind parameter" . $stmt->error);
+			throw new DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new Exception("Can't execute statement: " . $stmt->error);
+			throw new DBExecuteStmtException($db, $stmt);
 		}
 
 		if (!$stmt->bind_result($datetime, $amount)) {
-			throw new Exception("Can't bind result: " . $stmt->error);
+			throw new DBBindResultException($db, $stmt);
 		}
 
 		$charges = array();
