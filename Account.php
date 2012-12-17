@@ -1,5 +1,4 @@
 <?php
-
 require_once(dirname(__FILE__) . '/Plan.php');
 
 /**
@@ -35,14 +34,50 @@ class Account {
 	 * @var Plan Subscription plan
 	 */
 	private $plan;
+
+	/**
+	 * @var PaymentSchedule Payment schedule
+	 */
 	private $schedule;
+
+	/**
+	 * @var mixed[] Array of charges (datetime, amount)
+	 */
 	private $charges;
+
+	/**
+	 * @var string Date/time of next charge
+	 */
 	private $nextCharge;
+
+	/**
+	 * @var Plan Next Plan object
+	 */
 	private $nextPlan;
+
+	/**
+	 * @var PaymentSchedule Next PaymentSchedule object
+	 */
 	private $nextSchedule;
+
+	/**
+	 * @var PaymentEngine Payment engine used by account
+	 */
 	private $paymentEngine;
+
+	/**
+	 * @var boolean True if account is individual
+	 */
 	private $isIndividual;
+
+	/**
+	 * @var boolean True if account is active and false if disabled
+	 */
 	private $active;
+
+	/**
+	 * @var int ID of last transaction
+	 */
 	private $lastTransactionID;
 
 	/**
@@ -250,10 +285,16 @@ class Account {
 	/**
 	 * Creates new Account object
 	 *
-	 * @param int $id
-	 * @param string $name
-	 * @param Plan $plan
-	 * @param int $role
+	 * @param int $id Account ID
+	 * @param string $name Name of the account
+	 * @param string $plan_slug Plan slug
+	 * @param string $schedule_slug Payment schedule slug
+	 * @param string $engine_slug Payment engine slug
+	 * @param array[] $charges Array of charges (datetime, amount)
+	 * @param boolean $active True if account is active
+	 * @param string $next_charge String representation of next charge
+	 * @param string $next_plan_slug Slug of next plan
+	 * @param string $next_schedule_slug Slug of next payment schedule
 	 */
 	private function __construct($id, $name, $plan_slug, $schedule_slug = NULL, $engine_slug = NULL, $charges = NULL, $active = TRUE, $next_charge = NULL, $next_plan_slug = NULL, $next_schedule_slug = NULL) {
 		$this->id = $id;
@@ -449,26 +490,56 @@ class Account {
 		return $this->plan;
 	}
 
+	/**
+	 * Returns account payment schedule
+	 *
+	 * @return PaymentSchedule Payment Schedule
+	 */
 	public function getSchedule() {
 		return $this->schedule;
 	}
 
+	/**
+	 * Returns account status
+	 *
+	 * @return boolean True if account is active
+	 */
 	public function isActive() {
 		return $this->active;
 	}
 
+	/**
+	 * Returns account charges
+	 *
+	 * @return array[] Account charges
+	 */
 	public function getCharges() {
 		return $this->charges;
 	}
 
+	/**
+	 * Returns date of next charge
+	 *
+	 * @return string Date of next charge
+	 */
 	public function getNextCharge() {
 		return $this->nextCharge;
 	}
 
+	/**
+	 * Returns next plan
+	 *
+	 * @return Plan Next plan
+	 */
 	public function getNextPlan() {
 		return $this->nextPlan;
 	}
 
+	/**
+	 * Returns next payment schedule
+	 *
+	 * @return PaymentSchedule Next payment schedule
+	 */
 	public function getNextSchedule() {
 		return $this->nextSchedule;
 	}
@@ -476,10 +547,12 @@ class Account {
 	/**
 	 * Creates new account and optionally adds a user to it
 	 *
-	 * @param string $name Account Name
-	 * @param Plan $plan Subscription Plan
+	 * @param string $name Account name
+	 * @param string $plan_slug Subscription plan slug
+	 * @param string $schedule_slug Payment schedule slug
 	 * @param User $user User to add to account
 	 * @param integer $role User's role in the account (either Account::ROLE_USER or Account::ROLE_ADMIN)
+	 * @param string $engine_slug Payment engine slug
 	 *
 	 * @return Account Newly created account
 	 *
@@ -655,6 +728,14 @@ class Account {
 	}
 
 	/**
+	 * Populates charges array from database
+	 *
+	 * @param int $account_id Account ID
+	 *
+	 * @return array[] Array of charges (datetime, amount(
+	 *
+	 * @throws Exception
+	 *
 	 * @todo rework to just be part of or called from constructor
 	 */
 	private static function fillCharges($account_id) {
@@ -688,6 +769,17 @@ class Account {
 		return $charges;
 	}
 
+	/**
+	 * Charges the account or applies a refund
+	 *
+	 * @param int $refund Regund to apply or null if regular charge
+	 *
+	 * @return boolean True if charge was successful
+	 *
+	 * @throws Exception
+	 *
+	 * @todo Use DBExceptions instead of generic Exceptions
+	 */
 	public function paymentIsDue($refund = NULL) { // refund is almost the same, as general payment
 		if (is_null($this->schedule)) {
 			return;
@@ -788,6 +880,17 @@ class Account {
 		return TRUE;
 	}
 
+	/**
+	 * This method is called when payment is recieved and should be applied to account
+	 *
+	 * @param int $amount Amount recieved
+	 *
+	 * @return boolean True if payment was successfully applied
+	 *
+	 * @throws Exception
+	 *
+	 * @todo Use DBException instead of generic Exception
+	 */
 	public function paymentReceived($amount) {
 
 		$cleared = array();
@@ -880,6 +983,18 @@ class Account {
 		return TRUE;
 	}
 
+	/**
+	 * Activates subscription plan for the account
+	 *
+	 * @param string $plan_slug Plan slug
+	 * @param string $schedule_slug Payment schedule slug
+	 *
+	 * @return boolean True if activation was successful
+	 *
+	 * @throws Exception
+	 *
+	 * @todo Use DBException instead of generic Exception
+	 */
 	public function activatePlan($plan_slug, $schedule_slug = NULL) {
 
 		$new_plan = Plan::getPlanBySlug($plan_slug);
@@ -939,6 +1054,12 @@ class Account {
 		return TRUE;
 	}
 
+	/**
+	 * Deactivates subscription plan and downgrades to plan defined in "downgrade_to"
+	 * or suspend the account
+	 *
+	 * @return boolean True if account is still active and false if suspended
+	 */
 	public function deactivatePlan() {
 		$this->plan->deactivate_hook($this->id, $this->downgrade_to, NULL);
 
@@ -958,6 +1079,17 @@ class Account {
 		}
 	}
 
+	/**
+	 * Sets payment schedule for the account
+	 *
+	 * @param string $schedule_slug Payment schedule slug
+	 *
+	 * @return boolean True if successfully set the schedule
+	 *
+	 * @throws Exception
+	 *
+	 * @todo Use DBException instead of generic Exception
+	 */
 	public function setPaymentSchedule($schedule_slug) {
 
 		if (!($schedule = $this->plan->getPaymentScheduleBySlug($schedule_slug))) {
@@ -991,22 +1123,53 @@ class Account {
 		return TRUE;
 	}
 
+	/**
+	 * Returns payment schedule slug for the account
+	 *
+	 * @return string Payment schedule slug
+	 */
 	public function getScheduleSlug() {
 		return $this->schedule ? $this->schedule->slug : NULL;
 	}
 
+	/**
+	 * Return subscription plan slug
+	 *
+	 * @return string Subscription plan slug
+	 */
 	public function getPlanSlug() {
 		return $this->plan->slug;
 	}
 
+	/**
+	 * Returns payment engine object used by this account
+	 *
+	 * @return PaymentEngine Payment engine object
+	 */
 	public function getPaymentEngine() {
 		return $this->paymentEngine;
 	}
 
+	/**
+	 * Returns true if account is supposed to have only one user
+	 *
+	 * @return boolean True if account is individual
+	 */
 	public function isIndividual() {
 		return $this->isIndividual;
 	}
 
+	/**
+	 * Sets payment engine for the account
+	 *
+	 * @param string $engine_slug Payment engine slug
+	 *
+	 * @return boolean True if successfully updated payment engine
+	 *
+	 * @throws Exception
+	 *
+	 * @todo Use DBException instead of generic Exception
+	 */
 	public function setPaymentEngine($engine_slug) {
 		if ($engine_slug == NULL) {
 			return FALSE;
@@ -1036,6 +1199,11 @@ class Account {
 		return TRUE;
 	}
 
+	/**
+	 * Returns account balance
+	 *
+	 * @return int Account balance
+	 */
 	public function getBalance() {
 
 		if (is_null($this->charges)) {
@@ -1050,6 +1218,19 @@ class Account {
 		return $balance;
 	}
 
+	/**
+	 * Request a change of subscription plan and schedule to be applied
+	 * at the end of current charge period
+	 *
+	 * @param string $plan_slug Slug of new plan
+	 * @param string $schedule_slug Slug of new payment schedule
+	 *
+	 * @return boolean True if request was successful
+	 *
+	 * @throws Exception
+	 *
+	 * @todo Use DBException instead of generic Exception
+	 */
 	public function planChangeRequest($plan_slug, $schedule_slug) {
 		// Sanity checks
 		$new_plan = Plan::getPlanBySlug($plan_slug);
@@ -1115,6 +1296,17 @@ class Account {
 		return TRUE;
 	}
 
+	/**
+	 * Request a change of payment schedule to be applied at the end of current charge period
+	 *
+	 * @param string $schedule_slug New payment schedule
+	 *
+	 * @return boolean True if request was successful
+	 *
+	 * @throws Exception
+	 *
+ 	 * @todo Use DBException instead of generic Exception
+	 */
 	public function scheduleChangeRequest($schedule_slug) {
 		if (!($schedule = $this->plan->getPaymentScheduleBySlug($schedule_slug))) {
 			return FALSE;
@@ -1156,6 +1348,15 @@ class Account {
 		return TRUE;
 	}
 
+	/**
+	 * Suspends the account
+	 *
+	 * @return boolean True if suspension was successful
+	 *
+	 * @throws Exception
+	 *
+  	 * @todo Use DBException instead of generic Exception
+	 */
 	public function suspend() {
 		$this->active = 0;
 
@@ -1177,6 +1378,15 @@ class Account {
 		return TRUE;
 	}
 
+	/**
+	 * Activates the account
+	 *
+	 * @return boolean True if activation was successful
+	 *
+	 * @throws Exception
+	 *
+  	 * @todo Use DBException instead of generic Exception
+	 */
 	public function activate() {
 		$this->active = 1;
 
@@ -1198,10 +1408,24 @@ class Account {
 		return TRUE;
 	}
 
+	/**
+	 * Returns last transaction ID
+	 *
+	 * @return int ID of last transaction
+	 */
 	public function getLastTransactionID() {
 		return $this->lastTransactionID;
 	}
 
+	/**
+	 * Cancels change request for new subscription plan and/or payment schedule
+	 *
+	 * @return boolean True if cancellation was successful
+	 *
+	 * @throws Exception
+	 *
+   	 * @todo Use DBException instead of generic Exception
+	 */
 	public function cancelChangeRequest() {
 
 		// Cancel any pending request to change plan and/or schedule.
