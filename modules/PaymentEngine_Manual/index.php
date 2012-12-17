@@ -16,20 +16,11 @@ class PaymentEngine_Manual extends PaymentEngine {
 
 	public function __construct() {
 
-		$this->engineSlug = 'PaymentEngine_Manual';
+		$this->slug = 'PaymentEngine_Manual';
 		if (!self::$loaded) {
 			parent::__construct();
 			self::$loaded = true;
 		}
-	}
-
-	/**
-	 * Returns payment engine slug
-	 * @return string Payment engine slug
-	 */
-	public function getSlug() {
-
-		return "PaymentEngine_Manual";
 	}
 
 	/**

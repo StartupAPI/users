@@ -1,9 +1,9 @@
 <?php
+
 /**
  * @package StartupAPI
  * @subpackage Subscriptions
  */
-
 require_once(dirname(__FILE__) . '/Account.php');
 require_once(dirname(__FILE__) . '/StartupAPIModule.php');
 
@@ -15,7 +15,7 @@ abstract class PaymentEngine extends StartupAPIModule {
 	/**
 	 * @var string Payment engine slug
 	 */
-	protected $engineSlug;
+	protected $slug;
 
 	/**
 	 * Creates pagement engine and registers it in the system
@@ -36,8 +36,12 @@ abstract class PaymentEngine extends StartupAPIModule {
 
 	/**
 	 * Returns engine slug
+	 *
+	 * @return string Engine slug
 	 */
-	public abstract function getSlug();
+	public function getSlug() {
+		return $this->slug;
+	}
 
 	/**
 	 * Records transaction details
@@ -129,7 +133,7 @@ abstract class PaymentEngine extends StartupAPIModule {
 	 *
 	 * @return string Payment engine slug
 	 *
-	 * @todo Rename to getSlug()
+	 * @todo Rename getID in StartupAPIModule to getSlug()
 	 */
 	public function getID() {
 		return $this->getSlug();
@@ -151,7 +155,7 @@ abstract class PaymentEngine extends StartupAPIModule {
 			throw new DBPrepareStmtException($db);
 		}
 
-		if (!$stmt->bind_param('s', $this->engineSlug)) {
+		if (!$stmt->bind_param('s', $this->slug)) {
 			throw new DBBindParamException($db, $stmt);
 		}
 
@@ -189,7 +193,7 @@ abstract class PaymentEngine extends StartupAPIModule {
 			throw new DBPrepareStmtException($db);
 		}
 
-		if (!$stmt->bind_param('ss', $this->engineSlug, date('Y-m-d H:i:s'))) {
+		if (!$stmt->bind_param('ss', $this->slug, date('Y-m-d H:i:s'))) {
 			throw new DBBindParamException($db, $stmt);
 		}
 

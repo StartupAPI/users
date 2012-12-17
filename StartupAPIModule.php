@@ -8,6 +8,8 @@ require_once(dirname(__FILE__).'/global.php');
  *
  * @package StartupAPI
  * @subpackage Extensions
+ *
+ * @todo Rename module IDs to module slugs throughout the application to confirm with coding standards
  */
 abstract class StartupAPIModule {
 	/**

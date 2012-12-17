@@ -18,14 +18,14 @@ if(isset($_SESSION['message'])) {
 
 $account = Account::getCurrentAccount($user);
 $current_engine = $account->getPaymentEngine();
-$current_engine = empty($current_engine) ? NULL : $current_engine->getID();
+$current_engine_slug = empty($current_engine) ? NULL : $current_engine->getSlug();
 
 $engines = array();
 foreach (UserConfig::$payment_modules as $mod) {
   $engine = array();
-  $engine['id'] = $mod->getID();
+  $engine['slug'] = $mod->getSlug();
   $engine['title'] = $mod->getTitle();
-  $engine['current'] = $engine['id'] == $current_engine;
+  $engine['current'] = ($engine['slug'] == $current_engine_slug);
 
   $engines[] = $engine;
 }

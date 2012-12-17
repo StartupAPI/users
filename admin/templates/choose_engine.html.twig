@@ -13,8 +13,8 @@
 				<input type="hidden" name="account_id" value="{{ account_id }}" />
 					{%for engine in engines %}
 						<p>
-							<label for="engine_radio_{{ engine.id }}" class="radio">
-							<input type="radio" name="engine" value="{{ engine.id }}" id="engine_radio_{{ engine.id }}"{%if engine.current %} checked{%endif%} />
+							<label for="engine_radio_{{ engine.slug }}" class="radio">
+							<input type="radio" name="engine" value="{{ engine.slug }}" id="engine_radio_{{ engine.slug }}"{%if engine.current %} checked{%endif%} />
 							{{ engine.title }}
 							</label>
 						</p>
