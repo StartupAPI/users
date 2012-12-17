@@ -30,37 +30,37 @@ $ADMIN_ROOT = UserConfig::$USERSROOTURL . '/admin';
 
 $features_num = count(Feature::getAll());
 
-$admin_menu = new adminMenu(array(
-			new menu('home', 'Home', $ADMIN_ROOT . '/', 'home'),
+$admin_menu = new AdminMenu(array(
+			new Menu('home', 'Home', $ADMIN_ROOT . '/', 'home'),
 			/*
 			  new menuSection('dashboards', 'Dashboards', array(
 			  new menu('basic', 'Basic Metrics', $ADMIN_ROOT . '/', 'signal')
 			  )),
 			 */
-			new menuSection('users', 'Users', null, array(
-				new menu('activity', 'Activity', $ADMIN_ROOT . '/activity.php', 'signal'),
-				new menu('accounts', 'Accounts', null, 'folder-open'),
-				new menu('plans', 'Plans', null, 'folder-open'),
-				new menu('registrations', 'Registered Users', $ADMIN_ROOT . '/users.php', 'user'),
-				new menu('cohorts', 'Cohort Analysis', $ADMIN_ROOT . '/cohorts.php', 'th'),
-				new menu('bymodule', 'Registrations By Module', $ADMIN_ROOT . '/bymodule.php', 'th-large'),
-				new menu('invitations', 'Invitations', $ADMIN_ROOT . '/invitations.php', 'envelope', UserConfig::$enableInvitations, 'Invitations are disabled in configuration'),
+			new MenuSection('users', 'Users', null, array(
+				new Menu('activity', 'Activity', $ADMIN_ROOT . '/activity.php', 'signal'),
+				new Menu('accounts', 'Accounts', null, 'folder-open'),
+				new Menu('plans', 'Plans', null, 'folder-open'),
+				new Menu('registrations', 'Registered Users', $ADMIN_ROOT . '/users.php', 'user'),
+				new Menu('cohorts', 'Cohort Analysis', $ADMIN_ROOT . '/cohorts.php', 'th'),
+				new Menu('bymodule', 'Registrations By Module', $ADMIN_ROOT . '/bymodule.php', 'th-large'),
+				new Menu('invitations', 'Invitations', $ADMIN_ROOT . '/invitations.php', 'envelope', UserConfig::$enableInvitations, 'Invitations are disabled in configuration'),
 			)),
-			new menuSection('money', 'Money', null, array(
-				new menu('outstanding', 'Outstanding charges', $ADMIN_ROOT . '/outstanding.php', 'certificate', UserConfig::$useSubscriptions, 'Subscriptions are disabled in configuration'),
-				new menu('transactions', 'Transactions', null, 'list', UserConfig::$useSubscriptions),
-				new menu('payment_method', 'Payment methods', null, 'th-large', UserConfig::$useSubscriptions)
+			new MenuSection('money', 'Money', null, array(
+				new Menu('outstanding', 'Outstanding charges', $ADMIN_ROOT . '/outstanding.php', 'certificate', UserConfig::$useSubscriptions, 'Subscriptions are disabled in configuration'),
+				new Menu('transactions', 'Transactions', null, 'list', UserConfig::$useSubscriptions),
+				new Menu('payment_method', 'Payment methods', null, 'th-large', UserConfig::$useSubscriptions)
 			), null, UserConfig::$useSubscriptions),
-			new menuSection('promotion', 'Promotion', null, array(
-				new menu('sources', 'Sources', $ADMIN_ROOT . '/sources.php', 'random'),
-				new menu('campaigns', 'Campaign management', $ADMIN_ROOT . '/campaigns.php', 'comment')
+			new MenuSection('promotion', 'Promotion', null, array(
+				new Menu('sources', 'Sources', $ADMIN_ROOT . '/sources.php', 'random'),
+				new Menu('campaigns', 'Campaign management', $ADMIN_ROOT . '/campaigns.php', 'comment')
 			)),
-			new menuSection('gamification', 'Gamification', null, array(
-				new menu('badges', 'Badges', $ADMIN_ROOT . '/badges.php', 'star')
+			new MenuSection('gamification', 'Gamification', null, array(
+				new Menu('badges', 'Badges', $ADMIN_ROOT . '/badges.php', 'star')
 			)),
-			new menuSection('settings', 'Settings', null, array(
-				new menu('features', 'Features', $ADMIN_ROOT . '/features.php', 'check', $features_num > 0, 'No features defined in this app'),
-				new menu('templates', 'Templates', $ADMIN_ROOT . '/templates.php', 'list-alt', false),
+			new MenuSection('settings', 'Settings', null, array(
+				new Menu('features', 'Features', $ADMIN_ROOT . '/features.php', 'check', $features_num > 0, 'No features defined in this app'),
+				new Menu('templates', 'Templates', $ADMIN_ROOT . '/templates.php', 'list-alt', false),
 			))
 		));
 

@@ -10,7 +10,7 @@
  *
  * @todo Add disabling sections of menus altogether
  */
-abstract class menuElement {
+abstract class MenuElement {
 
 	/**
 	 * @var string String that separates menu sections in the title of the page
@@ -33,7 +33,7 @@ abstract class menuElement {
 	protected $link;
 
 	/**
-	 * @var menuElement[] An array of child elements for elements that support children
+	 * @var MenuElement[] An array of child elements for elements that support children
 	 */
 	protected $sub_menus = array();
 
@@ -65,7 +65,7 @@ abstract class menuElement {
 	 * @param string $slug Slug
 	 * @param string $title Menu title
 	 * @param string $link Menu link
-	 * @param menuElement[] $sub_menus
+	 * @param MenuElement[] $sub_menus
 	 * @param string $icon Twitter Bootstrap icon slug
 	 * @param boolean $enabled Enabled / disabled
 	 * @param string $disabled_message Message to display in tooltip on disabled menu
@@ -174,12 +174,12 @@ abstract class menuElement {
  * @package StartupAPI
  * @subpackage Admin
  */
-class adminMenu extends menuElement {
+class AdminMenu extends MenuElement {
 
 	/**
 	 * Creates a root element for admin menu, accepts only array of subelements
 	 *
-	 * @param menuElement[] $sub_menus
+	 * @param MenuElement[] $sub_menus
 	 */
 	public function __construct($sub_menus = null) {
 		parent::__construct('admin', 'Admin', null, $sub_menus);
@@ -231,7 +231,7 @@ class adminMenu extends menuElement {
  * @package StartupAPI
  * @subpackage Admin
  */
-class menuSection extends menuElement {
+class MenuSection extends MenuElement {
 
 	protected function render() {
 		?><li class="nav-header"> <?php echo $this->title ?></li><?php
@@ -328,7 +328,7 @@ class menuSection extends menuElement {
  * @package StartupAPI
  * @subpackage Admin
  */
-class menu extends menuElement {
+class Menu extends MenuElement {
 
 	/**
 	 * Creates a leaf menu item
