@@ -50,6 +50,7 @@ class Invitation
 	 * @param string $code Invitation code
 	 * @param string $time_created Date/time when invitation code was created
 	 * @param int $issuedby ID of the user who created an invitation
+	 * @param boolean $is_admin_invite Is this an invitation from administrator
 	 * @param string $usagecomment Invitation comment (reminder to issuer why it was sent)
 	 * @param int $user ID of the User who got invited
 	 */
@@ -104,6 +105,8 @@ class Invitation
 
 	/**
 	 * Returns invitations that were sent, but not used for registration yet
+	 *
+	 * @param boolean $admin Pass true if you want only admin invitations
 	 *
 	 * @return array Array of Invitation objects
 	 *
@@ -180,6 +183,8 @@ class Invitation
 
 	/**
 	 * Returns invitations that were accepted
+	 *
+	 * @param boolean $admin Pass true if you want only admin invitations
 	 *
 	 * @return array Array of Invitation objects
 	 *

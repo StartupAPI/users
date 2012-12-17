@@ -11,6 +11,9 @@ require_once (dirname(__FILE__) . '/PaymentSchedule.php');
  */
 class Plan {
 
+	/**
+	 * @var string Plan slug
+	 */
 	private $slug;
 
 	/**
@@ -168,12 +171,21 @@ class Plan {
 	}
 
 	/**
-	 * Makes private variables visible, but read-only
+	 * Makes private properties visible, but read-only
+	 *
+	 * @param string $v Name of property to return
+	 *
+	 * @return mixed Value of property
 	 */
 	public function __get($v) {
 		return (!in_array($v, array('instance')) && isset($this->$v)) ? $this->$v : false;
 	}
 
+	/**
+	 * Returns and array of payment schedule slugs available for this plan
+	 *
+	 * @return string[]
+	 */
 	public function getPaymentScheduleSlugs() {
 		$slugs = array();
 
@@ -208,6 +220,11 @@ class Plan {
 		return NULL;
 	}
 
+	/**
+	 * Returns default payment schedule
+	 *
+	 * @return PaymentSchedule Default payment schedule
+	 */
 	public function getDefaultPaymentSchedule() {
 
 		if (is_array($this->payment_schedules))
@@ -220,6 +237,13 @@ class Plan {
 		return NULL;
 	}
 
+	/**
+	 * Calls account activation hooks registered for the plan
+	 *
+	 * @param int $account_id Account ID
+	 * @param string $plan_slug Plan slug
+	 * @param string $schedule_slug Payment schedule slug
+	 */
 	public function activate_hook($account_id, $plan_slug, $schedule_slug) {
 
 		if ($this->user_activate_hook == '') {
@@ -233,6 +257,13 @@ class Plan {
 		));
 	}
 
+	/**
+	 * Calls account activation hooks registered for the plan
+	 *
+	 * @param int $account_id Account ID
+	 * @param string $plan_slug Plan slug
+	 * @param string $schedule_slug Payment schedule slug
+	 */
 	public function deactivate_hook($account_id, $plan_slug, $schedule_slug) {
 
 		if ($this->user_deactivate_hook == '') {
@@ -246,19 +277,26 @@ class Plan {
 		));
 	}
 
-	public static function init($a) {
+	/**
+	 * Initializes all plans based on parameters array
+	 *
+	 * @param mixed[] $plan_parameters Array of parameters for all plans
+	 *
+	 * @throws Exception
+	 */
+	public static function init($plan_parameters) {
 
 //    if (count(self::$Plans))
 //      throw new Exception("Already initialized");
 
 		self::$Plans = array(); // Isn't it an init?
 
-		if (!is_array($a)) {
+		if (!is_array($plan_parameters)) {
 			throw new Exception("Parameter is not an array");
 		}
 
-		foreach ($a as $slug => $p) {
-			new self($slug, $p);
+		foreach ($plan_parameters as $slug => $param) {
+			new self($slug, $param);
 		}
 	}
 
@@ -285,6 +323,11 @@ class Plan {
 		return NULL;
 	}
 
+	/**
+	 * Returns an array of slugs for all plans in the system
+	 *
+	 * @return string[]|FALSE Array of slug strings for plans in the system or FALSE if no plans are registered
+	 */
 	public static function getPlanSlugs() {
 
 		if (!count(self::$Plans)) {
