@@ -138,15 +138,22 @@ if (UserConfig::$enableRegistration)
 		<?php
 			if (array_key_exists($id, $errors) && is_array($errors[$id]) && count($errors[$id]) > 0)
 			{
-				?><div class="startupapi-errorbox"><ul><?php
-				foreach ($errors[$id] as $field => $errorset)
-				{
-					foreach ($errorset as $error)
+				?>
+				<div class="alert alert-block alert-error fade-in">
+					<h4 style="margin-bottom: 0.5em">Form errors</h4>
+					<ul>
+					<?php
+					foreach ($errors[$id] as $field => $errorset)
 					{
-						?><li><?php echo $error?></li><?php
+						foreach ($errorset as $error)
+						{
+							?><li><label  style="cursor: pointer" for="startupapi-<?php echo $id ?>-registration-<?php echo $field ?>"><?php echo $error ?></label></li><?php
+						}
 					}
-				}
-				?></ul></div><?php
+					?>
+					</ul>
+				</div>
+				<?php
 			}
 
 			$module->renderRegistrationForm(true, "?module=$id&invite=".(is_null($invitation_used) ? '' : $invitation_used->getCode()), array_key_exists($id, $errors) ? $errors[$id] : array(), $_POST);

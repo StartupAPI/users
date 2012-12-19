@@ -16,7 +16,8 @@ if ($account->getUserRole($user) !== Account::ROLE_ADMIN) {
 	exit;
 }
 
-require_once(UserConfig::$header);
+$SECTION = 'manage_account';
+require_once(dirname(__FILE__) . '/sidebar_header.php');
 ?>
 <h2>Account: <?php echo $account->getName() ?></h2>
 
@@ -29,7 +30,7 @@ require_once(UserConfig::$header);
 <?php } ?>
 
 <div id="members">
-	<h2> Members</h2>
+	<h3>Members</h3>
 	<ul>
 		<?php
 		$users_and_roles = $account->getUsers();
@@ -38,12 +39,13 @@ require_once(UserConfig::$header);
 			$member = $user_and_role[0];
 			$role = $user_and_role[1];
 			?><li>
-			<?php echo $member->getName(); ?>
-			<?php if ($role == Account::ROLE_ADMIN) { ?>(<span class="badge badge-important">admin</span>)<?php } ?>
-			</li><?php
-	}
+				<?php echo $member->getName(); ?>
+				<?php if ($role == Account::ROLE_ADMIN) { ?><span class="label label-important">admin</span><?php } ?>
+			</li>
+			<?php
+		}
 		?>
 	</ul>
 </div>
 <?php
-require_once(UserConfig::$footer);
+require_once(dirname(__FILE__) . '/sidebar_footer.php');

@@ -1,7 +1,7 @@
 <?php
-require_once(dirname(__FILE__).'/global.php');
+require_once(dirname(__FILE__) . '/global.php');
 
-require_once(dirname(__FILE__).'/User.php');
+require_once(dirname(__FILE__) . '/User.php');
 
 UserConfig::$IGNORE_REQUIRED_EMAIL_VERIFICATION = true;
 
@@ -11,139 +11,116 @@ UserTools::preventCSRF();
 
 $errors = array();
 
-$module = UserConfig::$authentication_modules[0];
-if (array_key_exists('module', $_GET))
-{
-	foreach (UserConfig::$authentication_modules as $module)
-	{
-		if ($module->getID() == $_GET['module']) {
+$current_module = UserConfig::$authentication_modules[0];
+if (array_key_exists('module', $_GET)) {
+	foreach (UserConfig::$authentication_modules as $current_module) {
+		if ($current_module->getID() == $_GET['module']) {
 			break;
 		}
 	}
 }
 
-if (is_null($module))
-{
+$SECTION = 'login_' . $current_module->getID();
+
+if (is_null($current_module)) {
 	throw new StartupAPIException('Wrong module specified');
 }
 
-if (array_key_exists('save', $_POST))
-{
-	try
-	{
-		if ($module->processEditUser($user, $_POST))
-		{
-			header('Location: '.UserConfig::$USERSROOTURL.'/edit.php?module='.$_GET['module']);
-		}
-		else
-		{
-			header('Location: '.UserConfig::$USERSROOTURL.'/edit.php?module='.$_GET['module'].'&error=failed');
+if (array_key_exists('save', $_POST)) {
+	try {
+		if ($current_module->processEditUser($user, $_POST)) {
+			header('Location: ' . UserConfig::$USERSROOTURL . '/edit.php?module=' . $_GET['module']);
+		} else {
+			header('Location: ' . UserConfig::$USERSROOTURL . '/edit.php?module=' . $_GET['module'] . '&error=failed');
 		}
 
 		exit;
-	}
-	catch(InputValidationException $ex)
-	{
-		$errors[$module->getID()] = $ex->getErrors();
-	}
-	catch(ExistingUserException $ex)
-	{
+	} catch (InputValidationException $ex) {
+		$errors[$current_module->getID()] = $ex->getErrors();
+	} catch (ExistingUserException $ex) {
 		$user_exists = true;
-		$errors[$module->getID()] = $ex->getErrors();
+		$errors[$current_module->getID()] = $ex->getErrors();
 	}
 }
 
-require_once(UserConfig::$header);
-
+require_once(dirname(__FILE__) . '/sidebar_header.php');
 ?>
-<div id="startupapi-edit-info">
-<h2>Edit Your Information</h2>
-
-<div id="startupapi-edit-rightcol">
-<div id="startupapi-edit-account">
-<?php if (UserConfig::$useAccounts) { ?>
-	<h2>Current account:</h2>
-	<div>
-<?php
-	$account = Account::getCurrentAccount($user);
-	echo $account->getName()," ( ",$account->getPlan()->name," )";
-	if($account->getUserRole($user) == Account::ROLE_ADMIN)
-		echo " - <a href=\"",UserConfig::$USERSROOTURL."/manage_account.php\">manage</a>\n";
-?>
-	</div>
-<?php
+<div>
+	<?php
+	if (!is_null(UserConfig::$maillist) && file_exists(UserConfig::$maillist)) {
+		?>
+		<?php include(UserConfig::$maillist); ?>
+		<?php
 	}
-?>
+	?>
+</div>
+
+<div>
+	<?php
+	foreach (UserConfig::$authentication_modules as $module) {
+		$id = $module->getID();
+
+		if ($current_module->getID() != $id) {
+			continue;
+		}
+		?>
+		<div>
+			<?php
+			if (array_key_exists($id, $errors) && is_array($errors[$id]) && count($errors[$id]) > 0) {
+				?>
+				<div class="alert alert-block alert-error fade-in">
+					<h4 style="margin-bottom: 0.5em">Snap!</h4>
+
+					<ul>
+						<?php
+						foreach ($errors[$id] as $field => $errorset) {
+							foreach ($errorset as $error) {
+								?><li><label  style="cursor: pointer" for="startupapi-<?php echo $id ?>-edit-<?php echo $field ?>"><?php echo $error ?></label></li><?php
+			}
+		}
+						?>
+					</ul>
+				</div>
+				<?php
+			}
+
+			$module->renderEditUserForm("?module=$id", array_key_exists($id, $errors) ? $errors[$id] : array(), $user, $_POST);
+			?>
+		</div>
+		<?php
+	}
+	?>
 </div>
 
 <?php
 if (UserConfig::$enableGamification) {
 	$available_badges = Badge::getAvailableBadges();
 
-	if (count($available_badges) > 0) { ?>
-	<div id="startupapi-edit-badges">
-	<h2>Badges:</h2>
-	<?php
+	if (count($available_badges) > 0) {
+		?>
+		<div>
+			<h2>Badges:</h2>
+			<?php
+			$user_badges = $user->getBadges();
 
-		$user_badges = $user->getBadges();
+			foreach ($available_badges as $badge) {
 
-		foreach($available_badges as $badge) {
-
-			if (array_key_exists($badge->getID(), $user_badges)) {
-				$badge_level = $user_badges[$badge->getID()][1];
-
-				?><a href="<?php echo UserConfig::$USERSROOTURL.'/show_badge.php?name='.$badge->getSlug() ?>"><img class="startupapi-badge" src="<?php echo $badge->getImageURL(UserConfig::$badgeListingSize, $badge_level) ?>" title="<?php echo $badge->getTitle() ?>" width="<?php echo UserConfig::$badgeListingSize ?>" height="<?php echo UserConfig::$badgeListingSize ?>"/></a><?php
-			} else {
-				?><img class="startupapi-badge" src="<?php echo $badge->getPlaceholderImageURL(UserConfig::$badgeListingSize) ?>" title="Hint: <?php echo $badge->getHint() ?>" width="<?php echo UserConfig::$badgeListingSize ?>" height="<?php echo UserConfig::$badgeListingSize ?>"/><?php
+				if (array_key_exists($badge->getID(), $user_badges)) {
+					$badge_level = $user_badges[$badge->getID()][1];
+					?>
+					<a href="<?php echo UserConfig::$USERSROOTURL . '/show_badge.php?name=' . $badge->getSlug() ?>"><img class="startupapi-badge" src="<?php echo $badge->getImageURL(UserConfig::$badgeListingSize, $badge_level) ?>" title="<?php echo $badge->getTitle() ?>" width="<?php echo UserConfig::$badgeListingSize ?>" height="<?php echo UserConfig::$badgeListingSize ?>"/></a>
+					<?php
+				} else {
+					?>
+					<img class="startupapi-badge" src="<?php echo $badge->getPlaceholderImageURL(UserConfig::$badgeListingSize) ?>" title="Hint: <?php echo $badge->getHint() ?>" width="<?php echo UserConfig::$badgeListingSize ?>" height="<?php echo UserConfig::$badgeListingSize ?>"/>
+					<?php
+				}
 			}
-		}
-	?></div><?php
+			?>
+		</div>
+		<?php
 	}
-	?>
-	</div>
-<?php
-}
-
-if (!is_null(UserConfig::$maillist) && file_exists(UserConfig::$maillist))
-{
-?>
-<?php include(UserConfig::$maillist); ?>
-<?php
-}
-?></div>
-<div id="startupapi-authlist">
-<?php
-
-foreach (UserConfig::$authentication_modules as $module)
-{
-	$id = $module->getID();
-
-	?><div style="background: white; padding: 0 1em">
-	<h3 name="<?php echo $id?>"><?php echo $module->getTitle()?></h3>
-<?php
-	if (array_key_exists($id, $errors) && is_array($errors[$id]) && count($errors[$id]) > 0)
-	{
-		?><div class="startupapi-errorbox"><ul><?php
-		foreach ($errors[$id] as $field => $errorset)
-		{
-			foreach ($errorset as $error)
-			{
-				?><li><?php echo $error?></li><?php
-			}
-		}
-		?></ul></div><?php
-	}
-
-	$module->renderEditUserForm("?module=$id",
-		array_key_exists($id, $errors) ? $errors[$id] : array(),
-		$user,
-		$_POST);
-	?></div><?php
 }
 ?>
-</div>
-
-</div>
-<div style="clear: both"></div>
 <?php
-require_once(UserConfig::$footer);
+require_once(dirname(__FILE__) . '/sidebar_footer.php');

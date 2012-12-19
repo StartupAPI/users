@@ -67,8 +67,8 @@ class StartupAPI {
 	static function head() {
 		?>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/css/bootstrap.css" rel="stylesheet">
-		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
 		<script src="<?php echo UserConfig::$USERSROOTURL ?>/jquery-1.8.2.min.js"></script>
 		<script src="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/js/bootstrap.min.js"></script>
 
