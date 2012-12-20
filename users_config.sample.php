@@ -150,6 +150,15 @@ new UsernamePasswordAuthenticationModule();
 #UserConfig::loadModule('linkedin');
 #new LinkedInAuthenticationModule('...OAuth.key.goes.here...', '...OAuth.secret.goes.here...');
 
+/**
+ * Etsy Authentication configuration
+ * Register your app here: https://www.etsy.com/developers/register
+ * And then uncomment two lines below and copy API Key and App Secret
+ */
+#UserConfig::loadModule('etsy');
+#new EtsyAuthenticationModule('...OAuth.key.goes.here...', '...OAuth.secret.goes.here...');
+
+
 /* ========================================================================
  *
  * Subscriptions (experimental)
