@@ -6,6 +6,15 @@ if (!UserConfig::$useSubscriptions) {
 	exit;
 }
 
+$user = User::require_login();
+$account = Account::getCurrentAccount($user);
+
+if ($account->getUserRole($user) != Account::ROLE_ADMIN) {
+	header('Location: ' . UserConfig::$USERSROOTURL . '/edit.php');
+	exit;
+}
+
+
 include(dirname(__FILE__).'/view/engine/choose_engine.php');
 
 require_once(UserConfig::$header);
