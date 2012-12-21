@@ -690,10 +690,6 @@ class Account {
 		} else {
 			throw new DBPrepareStmtException($db, "Can't update user preferences (set current account)");
 		}
-
-		$this->lastTransactionID =
-				TransactionLogger::Log($this->id, is_null($this->paymentEngine) ?
-								NULL : $this->paymentEngine->getSlug(), 0, 'Account set as current');
 	}
 
 	/**
