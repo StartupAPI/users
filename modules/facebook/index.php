@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'/facebook.php');
+require_once(dirname(__FILE__) . '/facebook.php');
 
 /**
  * Facebook Authentication Module
@@ -7,8 +7,8 @@ require_once(dirname(__FILE__).'/facebook.php');
  * @package StartupAPI
  * @subpackage Authentication\Facebook
  */
-class FacebookAuthenticationModule extends AuthenticationModule
-{
+class FacebookAuthenticationModule extends AuthenticationModule {
+
 	/**
 	 * @var type Stores Facebook SDK object
 	 */
@@ -48,11 +48,10 @@ class FacebookAuthenticationModule extends AuthenticationModule
 	 * @param boolean $remember Remember user between browser sessions?
 	 * @param array $options Options array, set "facepile" key to true to enable Facepile
 	 */
-	public function __construct($appID, $secret, $permissions = array(), $remember = true, $options = null)
-	{
+	public function __construct($appID, $secret, $permissions = array(), $remember = true, $options = null) {
 		parent::__construct();
 
-		$this->appID= $appID;
+		$this->appID = $appID;
 		$this->secret = $secret;
 		$this->permissions = $permissions;
 
@@ -67,25 +66,22 @@ class FacebookAuthenticationModule extends AuthenticationModule
 		}
 
 		$config = array(
-			'appId'  => $this->appID,
+			'appId' => $this->appID,
 			'secret' => $this->secret
 		);
 
 		$this->sdk = new Facebook($config);
 	}
 
-	public function getID()
-	{
+	public function getID() {
 		return "facebook";
 	}
 
-	public function getLegendColor()
-	{
+	public function getLegendColor() {
 		return "3b5999";
 	}
 
-	public function getTitle()
-	{
+	public function getTitle() {
 		return "Facebook";
 	}
 
@@ -98,145 +94,121 @@ class FacebookAuthenticationModule extends AuthenticationModule
 	 *
 	 * @throws DBException
 	 */
-	public function getUserCredentials($user)
-	{
+	public function getUserCredentials($user) {
 		$db = UserConfig::getDB();
 
 		$userid = $user->getID();
 
-		if ($stmt = $db->prepare('SELECT fb_id FROM '.UserConfig::$mysql_prefix.'users WHERE id = ?'))
-		{
-			if (!$stmt->bind_param('i', $userid))
-			{
+		if ($stmt = $db->prepare('SELECT fb_id FROM ' . UserConfig::$mysql_prefix . 'users WHERE id = ?')) {
+			if (!$stmt->bind_param('i', $userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($fb_id))
-			{
+			if (!$stmt->bind_result($fb_id)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
 			$stmt->close();
 
-			if (!is_null($fb_id))
-			{
+			if (!is_null($fb_id)) {
 				return new FacebookUserCredentials($fb_id);
 			}
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
 		return null;
 	}
 
-	public function getTotalConnectedUsers()
-	{
+	public function getTotalConnectedUsers() {
 		$db = UserConfig::getDB();
 
 		$conns = 0;
 
-		if ($stmt = $db->prepare('SELECT count(*) AS conns FROM '.UserConfig::$mysql_prefix.'users WHERE fb_id IS NOT NULL'))
-		{
-			if (!$stmt->execute())
-			{
+		if ($stmt = $db->prepare('SELECT count(*) AS conns FROM ' . UserConfig::$mysql_prefix . 'users WHERE fb_id IS NOT NULL')) {
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($conns))
-			{
+			if (!$stmt->bind_result($conns)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
 		return $conns;
 	}
 
-	public function getDailyRegistrations()
-	{
+	public function getDailyRegistrations() {
 		$db = UserConfig::getDB();
 
 		$dailyregs = array();
 
-		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, count(*) AS regs FROM '.UserConfig::$mysql_prefix.'users WHERE fb_id IS NOT NULL GROUP BY regdate'))
-		{
-			if (!$stmt->execute())
-			{
+		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, count(*) AS regs FROM ' . UserConfig::$mysql_prefix . 'users WHERE fb_id IS NOT NULL GROUP BY regdate')) {
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($regdate, $regs))
-			{
+			if (!$stmt->bind_result($regdate, $regs)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while($stmt->fetch() === TRUE)
-			{
+			while ($stmt->fetch() === TRUE) {
 				$dailyregs[] = array('regdate' => $regdate, 'regs' => $regs);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
 		return $dailyregs;
 	}
 
-	public function renderLoginForm($action)
-	{
-		if (is_null($action))
-		{
-			$action = UserConfig::$USERSROOTURL.'/login.php?module='.$this->getID();
+	public function renderLoginForm($action) {
+		if (is_null($action)) {
+			$action = UserConfig::$USERSROOTURL . '/login.php?module=' . $this->getID();
 		}
 
 		$this->renderForm($action, 'login');
 	}
 
-	public function renderAutoLogoutForm()
-	{
-?><html>
-<head><title>Logging out from Facebook...</title></head>
-<body>
-<div id="fb-root"></div>
-<script src="http://connect.facebook.net/en_US/all.js"></script>
-<script>
-FB.init({
-	appId  : '<?php echo $this->appID?>',
-	status : true, // check login status
-	cookie : true, // enable cookies to allow the server to access the session
-	channelURL : '<?php echo UserConfig::$USERSROOTFULLURL; ?>/modules/facebook/channel.php', // channel file
-	oauth  : true // enable OAuth 2.0
-});
-FB.getLoginStatus(function(response) {
-  if (response.authResponse) {
-	FB.logout(function(response) {
-		window.location.href = "<?php echo UserConfig::$USERSROOTFULLURL; ?>/logout.php?autologgedout=<?php echo $this->getID(); ?>";
-	});
-  } else {
-	window.location.href = "<?php echo UserConfig::$USERSROOTFULLURL; ?>/logout.php?autologgedout=<?php echo $this->getID(); ?>";
-  }
-});
+	public function renderAutoLogoutForm() {
+		?><html>
+			<head><title>Logging out from Facebook...</title></head>
+			<body>
+				<div id="fb-root"></div>
+				<script src="http://connect.facebook.net/en_US/all.js"></script>
+				<script>
+					FB.init({
+						appId  : '<?php echo $this->appID ?>',
+						status : true, // check login status
+						cookie : true, // enable cookies to allow the server to access the session
+						channelURL : '<?php echo UserConfig::$USERSROOTFULLURL; ?>/modules/facebook/channel.php', // channel file
+						oauth  : true // enable OAuth 2.0
+					});
+					FB.getLoginStatus(function(response) {
+						if (response.authResponse) {
+							FB.logout(function(response) {
+								window.location.href = "<?php echo UserConfig::$USERSROOTFULLURL; ?>/logout.php?autologgedout=<?php echo $this->getID(); ?>";
+							});
+						} else {
+							window.location.href = "<?php echo UserConfig::$USERSROOTFULLURL; ?>/logout.php?autologgedout=<?php echo $this->getID(); ?>";
+						}
+					});
 
-// force logout sequence after a long timeout of 15 seconds
-setTimeout('window.location.href = "<?php echo UserConfig::$USERSROOTFULLURL; ?>/logout.php?autologgedout=<?php echo $this->getID(); ?>"', 15000);
-</script>
-Logging out from Facebook...
-</body>
-</html>
-<?php
+					// force logout sequence after a long timeout of 15 seconds
+					setTimeout('window.location.href = "<?php echo UserConfig::$USERSROOTFULLURL; ?>/logout.php?autologgedout=<?php echo $this->getID(); ?>"', 15000);
+				</script>
+				Logging out from Facebook...
+			</body>
+		</html>
+		<?php
 	}
 
 	/**
@@ -247,8 +219,7 @@ Logging out from Facebook...
 	 * @param string $action Submit URL to be used by the form
 	 * @param string $form ID strgin of the form to be rendered
 	 */
-	private function renderForm($action, $form)
-	{
+	private function renderForm($action, $form) {
 		if ($form == 'login') {
 			$formsubmit = 'login';
 			$buttonspritestyle = 'background-position: 0px -22px; width: 198px; height: 22px;';
@@ -262,14 +233,13 @@ Logging out from Facebook...
 			$buttonspritestyle = 'background-position: 0px -44px; width: 230px; height: 22px;';
 			$buttontitle = 'Connect to your Facebook Account';
 		}
-
 		?><div id="fb-root"></div>
 
 		<?php if ($this->show_facepile && $form == 'register') { ?>
-		<fb:facepile width="450" size="large" max-rows="1"></fb:facepile>
+			<fb:facepile width="450" size="large" max-rows="1"></fb:facepile>
 		<?php } ?>
-		<form action="<?php echo $action?>" method="POST" name="facebookconnectform">
-		<input type="hidden" name="<?php echo $formsubmit ?>" value="Connect &gt;&gt;&gt;"/>
+		<form style="margin: 0" action="<?php echo $action ?>" method="POST" name="facebookconnectform">
+			<input type="hidden" name="<?php echo $formsubmit ?>" value="Connect &gt;&gt;&gt;"/>
 		<?php UserTools::renderCSRFNonce(); ?>
 		</form>
 		<?php
@@ -280,123 +250,117 @@ Logging out from Facebook...
 		<a class="startupapi-fb-connect" href="#" onclick="UserBaseFBConnectButtonClicked(); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); <?php echo $buttonspritestyle ?> display: block; cursor: hand; margin-top: 0.3em" title="<?php echo $buttontitle ?>"></span></a>
 
 		<script>
-		var UserBaseFBFormType = <?php echo json_encode($form) ?>;
+			var UserBaseFBFormType = <?php echo json_encode($form) ?>;
 
-		var UserBaseFBConnectButtonClicked = function() {
-			// FB is not loaded yet
-		};
+			var UserBaseFBConnectButtonClicked = function() {
+				// FB is not loaded yet
+			};
 
-		window.fbAsyncInit = function() {
-			// permissions required by this instance of UserBase
-			var required_perms = <?php echo json_encode($this->permissions); ?>;
-			var required_perms_string = <?php echo json_encode(implode(',', $this->permissions)); ?>;
+			window.fbAsyncInit = function() {
+				// permissions required by this instance of UserBase
+				var required_perms = <?php echo json_encode($this->permissions); ?>;
+				var required_perms_string = <?php echo json_encode(implode(',', $this->permissions)); ?>;
 
-			FB.init({
-				appId  : '<?php echo $this->appID?>',
-				status : true, // check login status
-				cookie : true, // enable cookies to allow the server to access the session
-				oauth  : true, // enable OAuth 2.0
-				xfbml  : true, // parse XFBML
-				channelURL : '<?php echo UserConfig::$USERSROOTFULLURL; ?>/modules/facebook/channel.php' // channel file
-			});
+				FB.init({
+					appId  : '<?php echo $this->appID ?>',
+					status : true, // check login status
+					cookie : true, // enable cookies to allow the server to access the session
+					oauth  : true, // enable OAuth 2.0
+					xfbml  : true, // parse XFBML
+					channelURL : '<?php echo UserConfig::$USERSROOTFULLURL; ?>/modules/facebook/channel.php' // channel file
+				});
 
-			// Auto-login if user is connected already
-			FB.getLoginStatus(function(r) {
-				if(r.status === 'connected') {
-					// if permissions are nor required, submit the form now
-					if (required_perms.length === 0) {
-						document.facebookconnectform.submit();
-						return;
-					}
-
-					FB.api('/me/permissions', function(response) {
-						if (response && response.data && response.data.length > 0) {
-							var perms = response.data[0];
-
-							var i = required_perms.length;
-							while (i--) {
-								// do not submit form if at least one
-								// required permission is not found
-								if (perms[required_perms[i]] !== 1) {
-									return;
-								}
-							}
-
+				// Auto-login if user is connected already
+				FB.getLoginStatus(function(r) {
+					if(r.status === 'connected') {
+						// if permissions are nor required, submit the form now
+						if (required_perms.length === 0) {
 							document.facebookconnectform.submit();
 							return;
 						}
-					});
 
-				}
-			});
+						FB.api('/me/permissions', function(response) {
+							if (response && response.data && response.data.length > 0) {
+								var perms = response.data[0];
 
-			// when button is clicked popu-up a dialog
-			UserBaseFBConnectButtonClicked = function() {
-				// it will only have 'connected' status if permissions match
-				FB.login(function(response) {
-					if (response.status === 'connected') {
-						document.facebookconnectform.submit();
-						return;
+								var i = required_perms.length;
+								while (i--) {
+									// do not submit form if at least one
+									// required permission is not found
+									if (perms[required_perms[i]] !== 1) {
+										return;
+									}
+								}
+
+								document.facebookconnectform.submit();
+								return;
+							}
+						});
+
 					}
-				}, {scope: required_perms_string});
-			};
-		};
+				});
 
-		(function() {
-			var e = document.createElement('script');
-			e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
-			e.async = true;
-			document.getElementById('fb-root').appendChild(e);
-		}());
+				// when button is clicked popu-up a dialog
+				UserBaseFBConnectButtonClicked = function() {
+					// it will only have 'connected' status if permissions match
+					FB.login(function(response) {
+						if (response.status === 'connected') {
+							document.facebookconnectform.submit();
+							return;
+						}
+					}, {scope: required_perms_string});
+				};
+			};
+
+			(function() {
+				var e = document.createElement('script');
+				e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+				e.async = true;
+				document.getElementById('fb-root').appendChild(e);
+			}());
 
 		</script>
 		<?php
 	}
 
-	public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null)
-	{
-		if (is_null($action))
-		{
-			$action = UserConfig::$USERSROOTURL.'/register.php?module='.$this->getID();
+	public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null) {
+		if (is_null($action)) {
+			$action = UserConfig::$USERSROOTURL . '/register.php?module=' . $this->getID();
 		}
 
 		$this->renderForm($action, 'register');
 	}
 
-	public function renderEditUserForm($action, $errors, $user, $data)
-	{
+	public function renderEditUserForm($action, $errors, $user, $data) {
 		$fb_id = $user->getFacebookID();
 
 		if (is_null($fb_id)) {
 			$this->renderForm($action, 'connect');
-		}
-		else
-		{
+		} else {
 			try {
-				$me = $this->api('/'.$fb_id.'?fields=id,name,email,link');
+				$me = $this->api('/' . $fb_id . '?fields=id,name,email,link');
 			} catch (FacebookApiException $e) {
 				UserTools::debug("Can't get /me API data");
 				return;
 			}
 			?>
 			<table><tr>
-			<td rowspan="2"><a href="<?php echo UserTools::escape($me['link']) ?>" target="_blank"><img src="http://graph.facebook.com/<?php echo $fb_id ?>/picture" style="border: 0; max-width: 100px; max-height: 100px" title="<?php echo UserTools::escape($me['name']) ?>"></a></td>
-			<td><a href="<?php echo UserTools::escape($me['link']) ?>" target="_blank"><?php echo UserTools::escape($me['name']) ?></a></td>
-			</tr><tr>
-			<td>
-			<form action="<?php echo $action?>" method="POST" name="facebookusereditform">
-			<input type="hidden" name="save" value="Save &gt;&gt;&gt;"/>
-			<input type="submit" name="remove" value="remove" style="font-size: xx-small"/>
+					<td rowspan="2"><a href="<?php echo UserTools::escape($me['link']) ?>" target="_blank"><img src="http://graph.facebook.com/<?php echo $fb_id ?>/picture" style="border: 0; max-width: 100px; max-height: 100px" title="<?php echo UserTools::escape($me['name']) ?>"></a></td>
+					<td><a href="<?php echo UserTools::escape($me['link']) ?>" target="_blank"><?php echo UserTools::escape($me['name']) ?></a></td>
+				</tr><tr>
+					<td>
+						<form style="margin: 0" action="<?php echo $action ?>" method="POST" name="facebookusereditform">
+							<input type="hidden" name="save" value="Save &gt;&gt;&gt;"/>
+							<input type="submit" name="remove" value="remove" style="font-size: xx-small"/>
 			<?php UserTools::renderCSRFNonce(); ?>
-			</form>
-			</td>
-			</tr></table>
-		<?php
+						</form>
+					</td>
+				</tr></table>
+			<?php
 		}
 	}
 
-	public function processAutoLogin()
-	{
+	public function processAutoLogin() {
 		UserTools::debug('Automatic login start');
 
 		$remember = false;
@@ -405,7 +369,7 @@ Logging out from Facebook...
 	}
 
 	public function getAutoLogoutURL($return) {
-		return UserConfig::$USERSROOTFULLURL.'/modules/facebook/logout.php';
+		return UserConfig::$USERSROOTFULLURL . '/modules/facebook/logout.php';
 	}
 
 	/**
@@ -421,8 +385,7 @@ Logging out from Facebook...
 	 *
 	 * @throws InputValidationException
 	 */
-	public function processLogin($post_data, &$remember, $auto = false)
-	{
+	public function processLogin($post_data, &$remember, $auto = false) {
 		UserTools::debug('processLogin start');
 		$remember = $this->remember;
 
@@ -433,7 +396,7 @@ Logging out from Facebook...
 			return null;
 		}
 
-		UserTools::debug('Facebook user id: '.$fbuser);
+		UserTools::debug('Facebook user id: ' . $fbuser);
 
 		if ($fbuser == 0) {
 			// if we're trying to auto-login, just return null
@@ -446,7 +409,7 @@ Logging out from Facebook...
 		}
 
 		$permissions = $this->api('/me/permissions');
-		UserTools::debug('User permissions: '.var_export($permissions, true));
+		UserTools::debug('User permissions: ' . var_export($permissions, true));
 		foreach ($this->permissions as $perm) {
 			if (!array_key_exists($perm, $permissions['data'][0]) || $permissions['data'][0][$perm] !== 1) {
 				// looks like not all required permissions were granted
@@ -469,8 +432,7 @@ Logging out from Facebook...
 		}
 	}
 
-	public function processRegistration($post_data, &$remember)
-	{
+	public function processRegistration($post_data, &$remember) {
 		UserTools::debug('processRegistration start');
 		$remember = $this->remember;
 
@@ -489,9 +451,8 @@ Logging out from Facebook...
 
 		// checking if user with this Facebook ID already exists and if so, then logs them in
 		$existing_user = User::getUserByFacebookID($fbuser);
-		if (!is_null($existing_user))
-		{
-			UserTools::debug('processRegistration - existing user: '.$existing_user->getID());
+		if (!is_null($existing_user)) {
+			UserTools::debug('processRegistration - existing user: ' . $existing_user->getID());
 			$existing_user->recordActivity(USERBASE_ACTIVITY_LOGIN_FB);
 			return $existing_user;
 		}
@@ -503,12 +464,9 @@ Logging out from Facebook...
 			return null;
 		}
 
-		if (array_key_exists('name', $me))
-		{
+		if (array_key_exists('name', $me)) {
 			$name = $me['name'];
-		}
-		else
-		{
+		} else {
 			$errors['username'][] = "User doesn't have a name";
 		}
 
@@ -519,8 +477,7 @@ Logging out from Facebook...
 			$errors[$e->getField()][] = $e->getMessage();
 		}
 
-		if (count($errors) > 0)
-		{
+		if (count($errors) > 0) {
 			throw new ExistingUserException('User already exists', 0, $errors);
 		}
 
@@ -528,15 +485,14 @@ Logging out from Facebook...
 		return $user;
 	}
 
-	public function processEditUser($user, $data)
-	{
+	public function processEditUser($user, $data) {
 		if (array_key_exists('remove', $data)) {
 			$user->setFacebookID(null);
 			$user->save();
 
 			$user->recordActivity(USERBASE_ACTIVITY_REMOVED_FB);
 
-			$this->sdk->api('/me/permissions','DELETE');
+			$this->sdk->api('/me/permissions', 'DELETE');
 
 			return true;
 		}
@@ -554,13 +510,11 @@ Logging out from Facebook...
 			throw new InputValidationException('No facebook user id', 0, $errors);
 		}
 
-		if (!is_null(User::getUserByFacebookID($fbuser)))
-		{
+		if (!is_null(User::getUserByFacebookID($fbuser))) {
 			$errors['fbuserid'][] = 'Another user is already associated with your Facebook account.';
 		}
 
-		if (count($errors) > 0)
-		{
+		if (count($errors) > 0) {
 			throw new InputValidationException('Validation failed', 0, $errors);
 		}
 
@@ -575,8 +529,7 @@ Logging out from Facebook...
 				return null;
 			}
 
-			if (array_key_exists('email', $me))
-			{
+			if (array_key_exists('email', $me)) {
 				$user->setEmail($me['email']);
 			}
 		}
@@ -606,15 +559,15 @@ Logging out from Facebook...
 			$message = $fb_ex->getMessage();
 
 			if (strpos($message, 'An active access token must be used') !== false ||
-				strpos($message, 'Session has expired at unix time') !== false
+					strpos($message, 'Session has expired at unix time') !== false
 			) {
 				UserTools::debug('Facebook access token has expired, redirecting to login');
 
 				// looks like we have a problem with token, let's redirect to login
 				$url = $this->sdk->getLoginUrl(array(
 					'scope' => $this->permissions
-				));
-				header('Location: '.$url);
+						));
+				header('Location: ' . $url);
 				exit;
 			}
 
@@ -623,6 +576,16 @@ Logging out from Facebook...
 
 		return $result;
 	}
+
+	/**
+	 * Facebook forms (buttons) have very small footprint
+	 *
+	 * @return boolean Always returns true
+	 */
+	public function isCompact() {
+		return true;
+	}
+
 }
 
 /**
@@ -632,6 +595,7 @@ Logging out from Facebook...
  * @subpackage Authentication\Facebook
  */
 class FacebookUserCredentials extends UserCredentials {
+
 	/**
 	 * @var int Facebook user id
 	 */
@@ -658,4 +622,5 @@ class FacebookUserCredentials extends UserCredentials {
 	public function getHTML() {
 		return "<a href=\"http://www.facebook.com/profile.php?id=$this->fb_id\">$this->fb_id</a>";
 	}
+
 }

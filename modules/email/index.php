@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Email authentication module (UNFINISHED)
  *
@@ -10,20 +11,17 @@
  * @package StartupAPI
  * @subpackage Authentication\Email
  */
-class EmailAuthenticationModule extends AuthenticationModule
-{
-	public function getID()
-	{
+class EmailAuthenticationModule extends AuthenticationModule {
+
+	public function getID() {
 		return "email";
 	}
 
-	public function getLegendColor()
-	{
+	public function getLegendColor() {
 		return "f7dc67";
 	}
 
-	public function getTitle()
-	{
+	public function getTitle() {
 		return "Email";
 	}
 
@@ -36,37 +34,29 @@ class EmailAuthenticationModule extends AuthenticationModule
 	 *
 	 * @throws DBException
 	 */
-	public function getUserCredentials($user)
-	{
+	public function getUserCredentials($user) {
 		$db = UserConfig::getDB();
 
 		$userid = $user->getID();
 
-		if ($stmt = $db->prepare('SELECT email FROM '.UserConfig::$mysql_prefix.'users WHERE id = ?'))
-		{
-			if (!$stmt->bind_param('i', $userid))
-			{
+		if ($stmt = $db->prepare('SELECT email FROM ' . UserConfig::$mysql_prefix . 'users WHERE id = ?')) {
+			if (!$stmt->bind_param('i', $userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($email))
-			{
+			if (!$stmt->bind_result($email)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
 			$stmt->close();
 
-			if (!is_null($email))
-			{
+			if (!is_null($email)) {
 				return new EmailUserCredentials($email);
 			}
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -80,67 +70,95 @@ class EmailAuthenticationModule extends AuthenticationModule
 	 *
 	 * @throws DBException
 	 */
-	public function getTotalConnectedUsers()
-	{
+	public function getTotalConnectedUsers() {
 		$db = UserConfig::getDB();
 
 		$conns = 0;
 
-		if ($stmt = $db->prepare('SELECT count(*) AS conns FROM '.UserConfig::$mysql_prefix.'users WHERE email IS NOT NULL'))
-		{
-			if (!$stmt->execute())
-			{
+		if ($stmt = $db->prepare('SELECT count(*) AS conns FROM ' . UserConfig::$mysql_prefix . 'users WHERE email IS NOT NULL')) {
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($conns))
-			{
+			if (!$stmt->bind_result($conns)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
 		return $conns;
 	}
 
-	public function renderLoginForm($action)
-	{
+	public function renderLoginForm($action) {
+		$slug = $this->getID();
 		?>
-		<form id="startupapi-email-login-form" action="<?php echo $action?>" method="POST">
-		<fieldset>
-		<legend>Enter your email address to re-send login link</legend>
-		<ul>
-		<li><label for="startupapi-email-login-email">Email</label><input id="startupapi-email-login-email" name="email" type="email" size="40"/><?php echo array_key_exists('email', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</abbr>' : ''?></li>
-		<li><button id="startupapi-email-login-button" type="submit" name="login">Re-send login link</button><?php if (UserConfig::$enableRegistration) {?> <a href="<?php echo UserConfig::$USERSROOTURL?>/register.php">or register</a><?php } ?></li>
-		</ul>
-		</fieldset>
+		<form action="<?php echo $action ?>" method="POST">
+			<fieldset>
+				<legend>Enter your email address to re-send login link</legend>
+
+				<div class="control-group<?php if (array_key_exists('email', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['email'])) ?><?php } ?>">
+					<div class="controls">
+						<input class="input-xlarge" id="startupapi-<?php echo $slug ?>-login-email" name="email" type="email" maxlength="25" placeholder="john@example.com"/>
+					</div>
+				</div>
+
+				<div class="control-group">
+					<div class="controls">
+						<button class="btn btn-primary" type="submit" name="login">Re-send login link</button>
+						<?php if (UserConfig::$enableRegistration) { ?><a class="btn" href="<?php echo UserConfig::$USERSROOTURL ?>/register.php">or sign up here</a><?php } ?>
+					</div>
+				</div>
+			</fieldset>
 		</form>
 		<?php
-
 	}
 
-	public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null)
-	{
+	public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null) {
+		$slug = $this->getID();
 		?>
-		<form id="startupapi-email-signup-form" action="<?php echo $action?>" method="POST">
-		<fieldset>
-		<legend>Enter your name and email address to sign up</legend>
-		<ul>
-		<li><label for="startupapi-email-register-name">Name</label><input id="startupapi-email-register-name" name="name" type="test" size="40" value="<?php echo array_key_exists('name', $data) ? UserTools::escape($data['name']) : ''?>"/><?php echo array_key_exists('name', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['name'])).'">*</abbr>' : ''?></li>
-		<li><label for="startupapi-email-signup-email">Email</label><input id="startupapi-email-signup-email" name="email" type="text" size="40"/><?php echo array_key_exists('email', $errors) ? ' <abbr title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</abbr>' : ''?></li>
-		<li><?php
-		if (!is_null(UserConfig::$currentTOSVersion) && is_callable(UserConfig::$onRenderTOSLinks)) {
-			call_user_func(UserConfig::$onRenderTOSLinks);
-		}
-		?></li>
-		<li><button id="startupapi-email-signup-button" type="submit" name="register">Sign up</button> <a href="<?php echo UserConfig::$USERSROOTURL?>/login.php">or re-send login link</a></li>
-		</ul>
-		</fieldset>
+		<form class="form-horizontal" action="<?php echo $action ?>" method="POST">
+			<fieldset>
+				<legend>Enter your name and email address to sign up</legend>
+
+				<div class="control-group<?php if (array_key_exists('name', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['name'])) ?><?php } ?>">
+					<label class="control-label" for="startupapi-<?php echo $slug ?>-registration-name">Name</label>
+					<div class="controls">
+						<input class="input-xlarge" id="startupapi-<?php echo $slug ?>-registration-name" name="name" type="text" value="<?php echo UserTools::escape(array_key_exists('name', $data) ? $data['name'] : '') ?>"/>
+					</div>
+				</div>
+
+				<div class="control-group<?php if (array_key_exists('email', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['email'])) ?><?php } ?>">
+					<label class="control-label" for="startupapi-<?php echo $slug ?>-registration-email">Email</label>
+					<div class="controls">
+						<input class="input-xlarge" id="startupapi-<?php echo $slug ?>-registration-email" name="email" type="email" maxlength="25" placeholder="john@example.com"/>
+					</div>
+				</div>
+
+				<?php
+				if (!is_null(UserConfig::$currentTOSVersion) && is_callable(UserConfig::$onRenderTOSLinks)) {
+					?>
+					<div style="margin-bottom: 0" class="control-group">
+						<div class="controls">
+						<?php
+						call_user_func(UserConfig::$onRenderTOSLinks);
+						?>
+						</div>
+					</div>
+					<?php
+				}
+				?>
+
+				<div class="control-group">
+					<div class="controls">
+						<button class="btn btn-primary" type="submit" name="register">Sign up</button>
+						<?php if (UserConfig::$enableRegistration) { ?><a class="btn" href="<?php echo UserConfig::$USERSROOTURL ?>/login.php">or re-send login link</a><?php } ?>
+					</div>
+				</div>
+
+			</fieldset>
 		</form>
 		<?php
 	}
@@ -154,22 +172,36 @@ class EmailAuthenticationModule extends AuthenticationModule
 	 * $user - user object for current user that is being edited
 	 * $data - data submitted to the form
 	 */
-	public function renderEditUserForm($action, $errors, $user, $data)
-	{
+
+	public function renderEditUserForm($action, $errors, $user, $data) {
+		$slug = $this->getID();
 		?>
-		<form id="startupapi-email-edit-form" action="<?php echo $action?>" method="POST">
-		<fieldset>
-		<legend>Update your name and email</legend>
-		<ul>
-		<li class="startupapi-email-edit-section">Name and email</li>
-		<li><label>Name</label><input name="name" type="test" size="40" value="<?php echo UserTools::escape(array_key_exists('name', $data) ? $data['name'] : $user->getName())?>"/><?php echo array_key_exists('name', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['name'])).'">*</span>' : ''?></li>
-		<li><label>E-mail</label><input name="email" type="text" size="40" value="<?php echo UserTools::escape(array_key_exists('email', $data) ? $data['email'] : $user->getEmail())?>"/><?php echo array_key_exists('email', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape(implode("\n", $errors['email'])).'">*</span>' : ''?>
-			<?php if (!$user->isEmailVerified()) { ?><a id="startupapi-email-edit-verify-email" href="<?php echo UserConfig::$USERSROOTURL ?>/verify_email.php">Email address not verified yet, click here to verify</a><?php } ?>
-		</li>
-		<li><button id="startupapi-email-edit-button" type="submit" name="save">Save</button></li>
-		</ul>
-		</fieldset>
-		<?php UserTools::renderCSRFNonce(); ?>
+		<form class="form-horizontal" action="<?php echo $action ?>" method="POST">
+			<fieldset>
+				<legend>Update your name and email</legend>
+
+				<div class="control-group<?php if (array_key_exists('name', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['name'])) ?><?php } ?>">
+					<label class="control-label" for="startupapi-<?php echo $slug ?>-edit-name">Name</label>
+					<div class="controls">
+						<input class="input-xlarge" id="startupapi-<?php echo $slug ?>-edit-name" name="name" type="text" value="<?php echo UserTools::escape(array_key_exists('name', $data) ? $data['name'] : $user->getName()) ?>"/>
+					</div>
+				</div>
+
+				<div class="control-group<?php if (array_key_exists('email', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['email'])) ?><?php } ?>">
+					<label class="control-label" for="startupapi-<?php echo $slug ?>-edit-email">Email</label>
+					<div class="controls">
+						<input class="input-xlarge" id="startupapi-<?php echo $slug ?>-edit-email" name="email" type="email" value="<?php echo UserTools::escape(array_key_exists('email', $data) ? $data['email'] : $user->getEmail()) ?>"/>
+						<?php if ($user->getEmail() && !$user->isEmailVerified()) { ?><a id="startupapi-<?php echo $slug ?>-edit-verify-email" href="<?php echo UserConfig::$USERSROOTURL ?>/verify_email.php">Email address is not verified yet, click here to verify</a><?php } ?>
+					</div>
+				</div>
+
+				<div class="control-group">
+					<div class="controls">
+						<button class="btn btn-primary" type="submit" name="save">Save</button>
+					</div>
+				</div>
+			</fieldset>
+			<?php UserTools::renderCSRFNonce(); ?>
 		</form>
 		<?php
 	}
@@ -184,12 +216,11 @@ class EmailAuthenticationModule extends AuthenticationModule
 	 *
 	 * @todo implement actual email sending
 	 */
-	public function processLogin($data, &$remember)
-	{
+	public function processLogin($data, &$remember) {
 		$user = User::getUsersByEmailOrUsername($data['email']);
 //		$user->sendConfirmationEmail();
 
-		header('Location: '.UserConfig::$USERSROOTURL.'/modules/email/login.php?module=email&message=linksent');
+		header('Location: ' . UserConfig::$USERSROOTURL . '/modules/email/login.php?module=email&message=linksent');
 		exit;
 
 		return null; // kind-of pointless after redirect, but indicates that you can' just login using email
@@ -207,25 +238,19 @@ class EmailAuthenticationModule extends AuthenticationModule
 	 *
 	 * @todo Finish implementation
 	 */
-	public function processLoginLink($email, $code)
-	{
+	public function processLoginLink($email, $code) {
 		$errors = array();
 
-		if ($email)
-		{
+		if ($email) {
 			$email = trim(mb_convert_encoding($email, 'UTF-8'));
-			if (filter_var($email, FILTER_VALIDATE_EMAIL) === FALSE)
-			{
+			if (filter_var($email, FILTER_VALIDATE_EMAIL) === FALSE) {
 				$errors['email'][] = 'Invalid email address';
 			}
-		}
-		else
-		{
+		} else {
 			$errors['email'][] = 'No email specified';
 		}
 
-		if (count($errors) > 0)
-		{
+		if (count($errors) > 0) {
 			throw new InputValidationException('Validation failed', 0, $errors);
 		}
 
@@ -244,47 +269,36 @@ class EmailAuthenticationModule extends AuthenticationModule
 	 * @throws InputValidationException
 	 * @throws ExistingUserException
 	 */
-	public function processRegistration($data, &$remember)
-	{
+	public function processRegistration($data, &$remember) {
 		$errors = array();
 
-		if (array_key_exists('name', $data))
-		{
+		if (array_key_exists('name', $data)) {
 			$name = trim(mb_convert_encoding($data['name'], 'UTF-8'));
-			if ($name == '')
-			{
+			if ($name == '') {
 				$errors['name'][] = "Name can't be empty";
 			}
-		}
-		else
-		{
+		} else {
 			$errors['name'][] = 'No name specified';
 		}
 
-		if (array_key_exists('email', $data))
-		{
+		if (array_key_exists('email', $data)) {
 			$email = trim(mb_convert_encoding($data['email'], 'UTF-8'));
-			if (filter_var($email, FILTER_VALIDATE_EMAIL) === FALSE)
-			{
+			if (filter_var($email, FILTER_VALIDATE_EMAIL) === FALSE) {
 				$errors['email'][] = 'Invalid email address';
 			}
-		}
-		else
-		{
+		} else {
 			$errors['email'][] = 'No email specified';
 		}
 
-		if (count($errors) > 0)
-		{
+		if (count($errors) > 0) {
 			throw new InputValidationException('Validation failed', 0, $errors);
 		}
 
-		if (count(User::getUsersByEmailOrUsername($email)) > 0 ) {
+		if (count(User::getUsersByEmailOrUsername($email)) > 0) {
 			$errors['email'][] = "This email is already used by another user, please enter another email address.";
 		}
 
-		if (count($errors) > 0)
-		{
+		if (count($errors) > 0) {
 			throw new ExistingUserException('User already exists', 0, $errors);
 		}
 
@@ -311,35 +325,39 @@ class EmailAuthenticationModule extends AuthenticationModule
 	 *
 	 * @todo ACtually implement checking if email is real
 	 */
-	public function processEditUser($user, $data)
-	{
+	public function processEditUser($user, $data) {
 		$errors = array();
 
-		if (array_key_exists('email', $data))
-		{
+		if (array_key_exists('name', $data)) {
+			$name = trim(mb_convert_encoding($data['name'], 'UTF-8'));
+			if ($name == '') {
+				$errors['name'][] = "Name can't be empty";
+			}
+		} else {
+			$errors['name'][] = 'No name specified';
+		}
+
+		if (array_key_exists('email', $data)) {
 			$email = trim(mb_convert_encoding($data['email'], 'UTF-8'));
-			if (filter_var($email, FILTER_VALIDATE_EMAIL) === FALSE)
-			{
+			if (filter_var($email, FILTER_VALIDATE_EMAIL) === FALSE) {
 				$errors['email'][] = 'Invalid email address';
 			}
-		}
-		else
-		{
+		} else {
 			$errors['email'][] = 'No email specified';
 		}
 
 		$existing_users = User::getUsersByEmailOrUsername($email);
 		if (!array_key_exists('email', $errors) &&
-			(count($existing_users) > 0 && !$existing_users[0]->isTheSameAs($user))
+				(count($existing_users) > 0 && !$existing_users[0]->isTheSameAs($user))
 		) {
 			$errors['email'][] = "This email is already used by another user, please enter another email address.";
 		}
 
-		if (count($errors) > 0)
-		{
+		if (count($errors) > 0) {
 			throw new InputValidationException('Validation failed', 0, $errors);
 		}
 
+		$user->setName($name);
 		$user->setEmail($email);
 //		$user->sendConfirmationEmail();
 		$user->save();
@@ -348,6 +366,7 @@ class EmailAuthenticationModule extends AuthenticationModule
 
 		return true;
 	}
+
 }
 
 /**
@@ -357,6 +376,7 @@ class EmailAuthenticationModule extends AuthenticationModule
  * @subpackage Authentication\Email
  */
 class EmailUserCredentials extends UserCredentials {
+
 	/**
 	 * @var string User's email address
 	 */
@@ -383,4 +403,5 @@ class EmailUserCredentials extends UserCredentials {
 	public function getHTML() {
 		return $this->email;
 	}
+
 }

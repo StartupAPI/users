@@ -64,7 +64,7 @@ foreach($log as $k => $l) {
   if(array_key_exists($l['engine_slug'],$mods))
     $log[$k]['engine_slug'] = $mods[$l['engine_slug']];
   else
-    $log[$k]['engine_slug'] = 'Unknown';
+    $log[$k]['engine_slug'] = '';
 }
 
 $template_data['log'] = $log;

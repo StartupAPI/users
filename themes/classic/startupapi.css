@@ -382,9 +382,7 @@
 }
 
 #startupapi-usernamepass-login-forgotpass {
-	margin-left: 130px;
 	cursor: pointer;
-	font-size: 0.6em;
 	display: block;
 }
 
@@ -872,7 +870,6 @@
 #startupapi-email-edit-verify-email {
 	font-size: small;
 	display: block;
-	margin-left: 5em;
 }
 
 /* from modules/email/index.php edit info form */
@@ -1177,5 +1174,4 @@
 #startupapi-verifyemail-resend {
 	font-size: small;
 	display: block;
-	margin-left: 5em;
 }

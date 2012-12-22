@@ -29,7 +29,9 @@ if (!$user_has_this_badge) {
 	exit;
 }
 
-require_once(UserConfig::$header);
+$SECTION = 'badges';
+
+require_once(dirname(__FILE__) . '/sidebar_header.php');
 
 $slug = $badge->getSlug() . ($badge_level > 1 ? '_' . $badge_level : '');
 ?>
@@ -39,6 +41,5 @@ $slug = $badge->getSlug() . ($badge_level > 1 ? '_' . $badge_level : '');
 <p><?php echo $badge->getDescription(); ?></p>
 <p class="startupapi-badge-call-to-action"><?php echo $badge->getCallToAction($badge_level); ?></p>
 
-<div style="clear: both"></div>
 <?php
-require_once(UserConfig::$footer);
+require_once(dirname(__FILE__) . '/sidebar_footer.php');

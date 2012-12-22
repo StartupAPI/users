@@ -13,8 +13,9 @@ if ($account->getUserRole($user) !== Account::ROLE_ADMIN) {
 	exit;
 }
 
-require_once(UserConfig::$header);
+$SECTION = 'manage_account';
+require_once(dirname(__FILE__) . '/sidebar_header.php');
 
 StartupAPI::$template->display('account/subscription_details.html.twig', $template_data);
 
-require_once(UserConfig::$footer);
+require_once(dirname(__FILE__) . '/sidebar_footer.php');

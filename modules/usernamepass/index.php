@@ -131,17 +131,45 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 
 	public function renderLoginForm($action)
 	{
+		$slug = $this->getID();
 		?>
-		<form id="startupapi-usernamepass-login-form" action="<?php echo $action?>" method="POST">
-		<fieldset>
-		<legend>Enter your username and password to log in</legend>
-		<ul>
-		<li><label for="startupapi-usernamepass-login-username">Username</label><input id="startupapi-usernamepass-login-username" name="username" type="text" size="25" maxlength="25"/></li>
-		<li><label for="startupapi-usernamepass-login-password">Password</label><input id="startupapi-usernamepass-login-password" name="pass" type="password" size="25" autocomplete="off"/><a id="startupapi-usernamepass-login-forgotpass" href="<?php echo UserConfig::$USERSROOTURL?>/modules/usernamepass/forgotpassword.php">Forgot password?</a></li>
-		<?php if (UserConfig::$allowRememberMe) {?><li class="remember"><label for="remember"><input type="checkbox" name="remember" value="yes" id="remember"<?php if (UserConfig::$rememberMeDefault) {?> checked<?php }?>/>remember me</label></li> <?php }?>
-		<li><button id="startupapi-usernamepass-login-button" type="submit" name="login">Log in</button><?php if (UserConfig::$enableRegistration) {?> <a href="<?php echo UserConfig::$USERSROOTURL?>/register.php">or register</a><?php } ?></li>
-		</ul>
-		</fieldset>
+		<form class="form-horizontal" action="<?php echo $action; ?>" method="POST">
+			<fieldset>
+				<legend>Enter your username and password to log in</legend>
+
+				<div class="control-group<?php if (array_key_exists('username', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['username'])) ?><?php } ?>">
+					<label class="control-label" for="startupapi-<?php echo $slug ?>-login-username">Username</label>
+					<div class="controls">
+						<input id="startupapi-<?php echo $slug ?>-login-username" name="username" type="text" size="25" maxlength="25"/>
+					</div>
+				</div>
+
+				<div<?php if (UserConfig::$allowRememberMe) {?> style="margin-bottom: 0.5em"<?php } ?> class="control-group<?php if (array_key_exists('pass', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['pass'])) ?><?php } ?>">
+					<label class="control-label" for="startupapi-<?php echo $slug ?>-login-pass">Password</label>
+					<div class="controls">
+						<input id="startupapi-<?php echo $slug ?>-login-pass" name="pass" type="password" autocomplete="off"/>
+						<a id="startupapi-usernamepass-login-forgotpass" href="<?php echo UserConfig::$USERSROOTURL?>/modules/usernamepass/forgotpassword.php">Forgot password?</a></li>
+					</div>
+				</div>
+
+				<?php if (UserConfig::$allowRememberMe) {?>
+				<div style="margin-bottom: 0.5em" class="control-group">
+					<div class="controls">
+						<label class="checkbox">
+							<input type="checkbox" name="remember" value="yes"<?php if (UserConfig::$rememberMeDefault) {?> checked<?php }?>/>
+							remember me
+						</label>
+					</div>
+				</div>
+				<?php }?>
+
+				<div class="control-group">
+					<div class="controls">
+						<button class="btn btn-primary" type="submit" name="login">Login</button>
+						<?php if (UserConfig::$enableRegistration) {?><a class="btn" href="<?php echo UserConfig::$USERSROOTURL?>/register.php">or sign up here</a><?php } ?>
+					</div>
+				</div>
+			</fieldset>
 		</form>
 		<?php
 	}
@@ -192,7 +220,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 				<?php
 				if (!is_null(UserConfig::$currentTOSVersion) && is_callable(UserConfig::$onRenderTOSLinks)) {
 					?>
-					<div class="control-group">
+					<div  style="margin-bottom: 0" class="control-group">
 						<div class="controls">
 						<?php
 						call_user_func(UserConfig::$onRenderTOSLinks);
@@ -205,7 +233,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 
 				<div class="control-group">
 					<div class="controls">
-						<button class="btn btn-primary" type="submit" name="register">Register</button> <a href="<?php echo UserConfig::$USERSROOTURL ?>/login.php">or login here</a>
+						<button class="btn btn-primary" type="submit" name="register">Register</button> <a class="btn" href="<?php echo UserConfig::$USERSROOTURL ?>/login.php">or login here</a>
 					</div>
 				</div>
 			</fieldset>
@@ -249,7 +277,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 						<label class="control-label" for="startupapi-<?php echo $slug ?>-edit-email">Email</label>
 						<div class="controls">
 							<input id="startupapi-<?php echo $slug ?>-edit-email" name="email" type="email" value="<?php echo UserTools::escape(array_key_exists('email', $data) ? $data['email'] : $user->getEmail()) ?>"/>
-							<?php if (!$user->isEmailVerified()) { ?><a id="startupapi-usernamepass-edit-verify-email" href="<?php echo UserConfig::$USERSROOTURL ?>/verify_email.php">Email address is not verified yet, click here to verify</a><?php } ?>
+							<?php if ($user->getEmail() && !$user->isEmailVerified()) { ?><a id="startupapi-usernamepass-edit-verify-email" href="<?php echo UserConfig::$USERSROOTURL ?>/verify_email.php">Email address is not verified yet, click here to verify</a><?php } ?>
 						</div>
 					</div>
 
@@ -405,57 +433,6 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 
 		$has_username = !is_null($user->getUsername());
 
-		// don't change password if username was already set and no password fields are edited
-		$changepass = false;
-
-		// Force password setup when user sets username for the first time
-		if (!$has_username)
-		{
-			$changepass = true;
-		}
-		else if (array_key_exists('currentpass', $data) &&
-			array_key_exists('pass', $data) &&
-			array_key_exists('repeatpass', $data) &&
-			($data['currentpass'] != '' || $data['pass'] != '' || $data['repeatpass'] != ''))
-		{
-			$changepass = true;
-
-			if (!$user->checkPass($data['currentpass']))
-			{
-				$errors['currentpass'][] = 'You entered wrong current password';
-			}
-		}
-
-		if ($changepass)
-		{
-			// both passwords must be passed and non-empty
-			if (array_key_exists('pass', $data) && array_key_exists('repeatpass', $data) &&
-					($data['pass'] != '' || $data['repeatpass'] != '')
-				)
-			{
-				if (strlen($data['pass']) < 6)
-				{
-					$errors['pass'][] = 'Passwords must be at least 6 characters long';
-				}
-
-				if ($data['pass'] !== $data['repeatpass'])
-				{
-					$errors['repeatpass'][] = 'Passwords don\'t match';
-				}
-			}
-			else
-			{
-				if ($has_username)
-				{
-					$errors['pass'][] = 'You must specify new password';
-				}
-				else
-				{
-					$errors['pass'][] = 'You must set password when setting username and email';
-				}
-			}
-		}
-
 		// only validate username if user didn't specify it yet
 		if (!$has_username)
 		{
@@ -525,6 +502,57 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 			(count($existing_users) > 0 && !$existing_users[0]->isTheSameAs($user))
 		) {
 			$errors['email'][] = "This email is already used by another user, please enter another email address.";
+		}
+
+		// don't change password if username was already set and no password fields are edited
+		$changepass = false;
+
+		// Force password setup when user sets username for the first time
+		if (!$has_username)
+		{
+			$changepass = true;
+		}
+		else if (array_key_exists('currentpass', $data) &&
+			array_key_exists('pass', $data) &&
+			array_key_exists('repeatpass', $data) &&
+			($data['currentpass'] != '' || $data['pass'] != '' || $data['repeatpass'] != ''))
+		{
+			$changepass = true;
+
+			if (!$user->checkPass($data['currentpass']))
+			{
+				$errors['currentpass'][] = 'You entered wrong current password';
+			}
+		}
+
+		if ($changepass)
+		{
+			// both passwords must be passed and non-empty
+			if (array_key_exists('pass', $data) && array_key_exists('repeatpass', $data) &&
+					($data['pass'] != '' || $data['repeatpass'] != '')
+				)
+			{
+				if (strlen($data['pass']) < 6)
+				{
+					$errors['pass'][] = 'Passwords must be at least 6 characters long';
+				}
+
+				if ($data['pass'] !== $data['repeatpass'])
+				{
+					$errors['repeatpass'][] = 'Passwords don\'t match';
+				}
+			}
+			else
+			{
+				if ($has_username)
+				{
+					$errors['pass'][] = 'You must specify new password';
+				}
+				else
+				{
+					$errors['pass'][] = 'You must set password when setting username and email';
+				}
+			}
 		}
 
 		if (count($errors) > 0)

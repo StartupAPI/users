@@ -1,6 +1,5 @@
 <?php
 require_once(dirname(__FILE__) . '/global.php');
-
 require_once(dirname(__FILE__) . '/User.php');
 
 UserConfig::$IGNORE_REQUIRED_EMAIL_VERIFICATION = true;
@@ -19,6 +18,8 @@ if (array_key_exists('module', $_GET)) {
 		}
 	}
 }
+
+$compact_page = $current_module->isCompact();
 
 $SECTION = 'login_' . $current_module->getID();
 
@@ -46,25 +47,20 @@ if (array_key_exists('save', $_POST)) {
 require_once(dirname(__FILE__) . '/sidebar_header.php');
 ?>
 <div>
-	<?php
-	if (!is_null(UserConfig::$maillist) && file_exists(UserConfig::$maillist)) {
-		?>
-		<?php include(UserConfig::$maillist); ?>
+	<?php if ($compact_page) { ?>
+		<legend>Connect other accounts</legend>
 		<?php
 	}
-	?>
-</div>
-
-<div>
-	<?php
 	foreach (UserConfig::$authentication_modules as $module) {
 		$id = $module->getID();
 
-		if ($current_module->getID() != $id) {
+		if (($compact_page && !$module->isCompact())
+				|| (!$compact_page && $current_module->getID() != $id)) {
 			continue;
 		}
 		?>
 		<div>
+			<a name="<?php echo $id ?>"></a>
 			<?php
 			if (array_key_exists($id, $errors) && is_array($errors[$id]) && count($errors[$id]) > 0) {
 				?>
@@ -83,44 +79,17 @@ require_once(dirname(__FILE__) . '/sidebar_header.php');
 				</div>
 				<?php
 			}
-
-			$module->renderEditUserForm("?module=$id", array_key_exists($id, $errors) ? $errors[$id] : array(), $user, $_POST);
 			?>
+			<div style="margin-bottom: 2em">
+				<?php
+				$module->renderEditUserForm("?module=$id", array_key_exists($id, $errors) ? $errors[$id] : array(), $user, $_POST);
+				?>
+			</div>
 		</div>
 		<?php
 	}
 	?>
 </div>
 
-<?php
-if (UserConfig::$enableGamification) {
-	$available_badges = Badge::getAvailableBadges();
-
-	if (count($available_badges) > 0) {
-		?>
-		<div>
-			<h2>Badges:</h2>
-			<?php
-			$user_badges = $user->getBadges();
-
-			foreach ($available_badges as $badge) {
-
-				if (array_key_exists($badge->getID(), $user_badges)) {
-					$badge_level = $user_badges[$badge->getID()][1];
-					?>
-					<a href="<?php echo UserConfig::$USERSROOTURL . '/show_badge.php?name=' . $badge->getSlug() ?>"><img class="startupapi-badge" src="<?php echo $badge->getImageURL(UserConfig::$badgeListingSize, $badge_level) ?>" title="<?php echo $badge->getTitle() ?>" width="<?php echo UserConfig::$badgeListingSize ?>" height="<?php echo UserConfig::$badgeListingSize ?>"/></a>
-					<?php
-				} else {
-					?>
-					<img class="startupapi-badge" src="<?php echo $badge->getPlaceholderImageURL(UserConfig::$badgeListingSize) ?>" title="Hint: <?php echo $badge->getHint() ?>" width="<?php echo UserConfig::$badgeListingSize ?>" height="<?php echo UserConfig::$badgeListingSize ?>"/>
-					<?php
-				}
-			}
-			?>
-		</div>
-		<?php
-	}
-}
-?>
 <?php
 require_once(dirname(__FILE__) . '/sidebar_footer.php');

@@ -522,7 +522,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 	{
 		?>
 		<p>Sign in using your existing account with <b><?php echo UserTools::escape($this->serviceName)?></b>.</p>
-		<form action="<?php echo $action?>" method="POST">
+		<form class="form-inline" action="<?php echo $action?>" method="POST">
 		<input type="hidden" name="login" value="login"/>
 		<?php if (is_null($this->logInButtonURL)) { ?>
 		<input type="submit" value="Log in using <?php echo UserTools::escape($this->serviceName)?>"/>
@@ -561,7 +561,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 			call_user_func(UserConfig::$onRenderTOSLinks);
 		}
 		?>
-		<form action="<?php echo $action?>" method="POST">
+		<form class="form-inline" action="<?php echo $action?>" method="POST">
 		<input type="hidden" name="register" value="register"/>
 		<?php if (is_null($this->signUpButtonURL)) { ?>
 		<input type="submit" value="Register using <?php echo UserTools::escape($this->serviceName)?>"/>
@@ -618,7 +618,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		}
 
 		?>
-		<form action="<?php echo $action?>" method="POST">
+		<form style="margin-bottom: 0" action="<?php echo $action?>" method="POST">
 		<?php
 		if (is_null($oauth_user_id)) {
 			if (is_null($this->connectButtonURL)) {
@@ -863,6 +863,15 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		}
 
 		return $conns;
+	}
+
+	/**
+	 * All OAuth-based systems have very small footprint
+	 *
+	 * @return boolean Always returns true
+	 */
+	public function isCompact() {
+		return true;
 	}
 }
 

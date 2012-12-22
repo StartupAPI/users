@@ -23,9 +23,9 @@ require_once(dirname(__FILE__) . '/sidebar_header.php');
 
 <?php if (UserConfig::$useSubscriptions) { ?>
 	<div id="plan">
-		<p>Subscription plan: <b><?php echo $account->getPlan()->name ?></b> -
-			<a href="<?php echo UserConfig::$USERSROOTURL ?>/subscription_details.php">[ details ]</a>
-			<a href="<?php echo UserConfig::$USERSROOTURL ?>/plans.php">[ change ]</a>
+		<p>Subscription plan: <b><?php echo $account->getPlan()->name ?></b>
+			<a class="btn btn-mini" href="<?php echo UserConfig::$USERSROOTURL ?>/subscription_details.php"><i class="icon-search"></i> Details</a>
+			<a class="btn btn-mini" href="<?php echo UserConfig::$USERSROOTURL ?>/plans.php">Change</a>
 	</div>
 <?php } ?>
 

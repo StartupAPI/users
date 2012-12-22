@@ -1,19 +1,24 @@
-{%if message %}
-    {%for msg in message %}
-		<h2>{{ msg }}</h2>
-    {%endfor%}
-{%endif%}
-{%if not fatal %}
+<div class="container-fluid" style="margin-top: 1em">
+	<div class="row-fluid">
+		<div class="span12">
+			{% if message %}
+				{% for msg in message %}
+					<div class="alert">{{ msg }}</div>
+				{% endfor %}
+			{% endif %}
+
+			{% if not fatal %}
 	<div>
-		<p>Account Name: <b>{{ account_name }}</b></p>
+		<h2>{{ account_name }}</h2>
 		<p>Account Status: <b>{%if account_isActive %}Active{%else%}Suspended{%endif%}</b></p>
 		<p>Payment Engine used: <b>{{ account_engine }}</b></p>
 	</div>
 
 	<div>
-		<p>Plan Name: <b>{{ plan_name }}</b> <a href="{{ USERSROOTURL }}/plans.php">[ change ]</a></p>
-		<p>Plan Description: {{ plan_description }}</p>
-		<p>Plan Details: <a href="{{ plan_details_url }}">{{ plan_details_url }}</a></p>
+		<h3>Plan</h3>
+		<p>Name: <b>{{ plan_name }}</b> <a class="btn btn-mini" href="{{ USERSROOTURL }}/plans.php">Change</a></p>
+		<p>Description: {{ plan_description }}</p>
+		<p>Details: <a href="{{ plan_details_url }}">{{ plan_details_url }}</a></p>
 		{%if plan_downgrade_to %}
 			<p>Plan automatically downgrades to: <b>{{ plan_downgrade_to }}</b>
 				if payment is due more than {{ plan_grace_period }} day(s)</p>
@@ -26,8 +31,9 @@
 		{%endif%}
 	</div>
 	<div>
+		<h3>Payments</h3>
 		{%if charges|length > 0 or balance < 0 %}
-			<p>Account Debts</p>
+			<p>Account charges</p>
 			<ul>
 				{% set total = 0 %}
 				{% for c in charges %}
@@ -69,12 +75,16 @@
 	{%endif%}
 	{%if payment_engine %}
 	<div>
-		<p>Payments processed by: {{ payment_engine }}
-			<a href="{{ USERSROOTURL }}/choose_engine.php" >[ change ]</a>
+		<p>Payments processed by: <b>{{ payment_engine }}</b>
+			<a class="btn btn-mini" href="{{ USERSROOTURL }}/choose_engine.php" >Change</a>
 		</p>
 	</div>
 	{%endif%}
 	<div>
+		<i class="icon-list-alt"></i>
 		<a href="{{ USERSROOTURL }}/transaction_log.php" >View account transactions</a>
 	</div>
-{%endif%}
+			{% endif %}
+		</div>
+	</div>
+</div>

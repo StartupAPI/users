@@ -1,81 +1,106 @@
-{%if message %}
-    {% for msg in message %}
-		<h2>{{ msg }}</h2>
-    {% endfor %}
-{% endif %}
-{%if not fatal %}
-	<link rel="stylesheet" type="text/css" href="{{ USERSROOTURL }}/calendarview/stylesheets/calendarview.css" />
-	<style>
-		.calendarButton {
-			margin: 0em;
-			padding: 1px 6px;
-			letter-spacing: normal;
-			word-spacing: normal;
-			line-height: normal;
-			text-transform: none;
-			text-indent: 0px;
-			text-shadow: none;
-			display: inline-block;
-			border: 1px solid black;
-			cursor: pointer;
-		}
-		div.calendar.popup {
-			margin-left: 0px;
-			margin-top: 30px;
-		}
-	</style>
+<div class="container-fluid" style="margin-top: 1em">
+	<div class="row-fluid">
+		<div class="span12">
+			{% if message %}
+				{% for msg in message %}
+					<div class="alert">{{ msg }}</div>
+				{% endfor %}
+			{% endif %}
 
-	<script type="text/javascript" src="{{ USERSROOTURL }}/calendarview/javascripts/prototype.js"></script>
-	<script type="text/javascript" src="{{ USERSROOTURL }}/calendarview/javascripts/calendarview.js"></script>
-	<script type="text/javascript">
-		window.onload = function() {
-			Calendar.setup({
-				dateField      : 'from',
-				triggerElement : 'from'
-			});
-			Calendar.setup({
-				dateField      : 'to',
-				triggerElement : 'to'
-			});
-		}
-	</script>
-	<div>
-		<form action="" method="GET">
-			<p>From: <input type="text" name="from" id="from" value="{{ from }}"/><!--<span class="calendarButton" id="fromButton" >..</span>-->
-				To: <input type="text" name="to" id="to" value="{{ to }}" /><!--<span class="calendarButton" id="toButton" >..</span>-->
-				<input type="submit" value="Show" /></p>
-		</form>
-		<table cellpaddng="5" cellspacing="0" border="1">
-			<tr><th>Date and time</th><th>Transaction Amount</th><th>Transaction Details</th><th>Via</th></tr>
-			<tr><td colspan="4">
-					{%if log|length == perpage %}
-						<a style="float: right" href="?page={$page+1}{$from_to}">next &gt;&gt;&gt;</a>
-					{% else %}
-						<span style="color: silver; float: right">next &gt;&gt;&gt;</span>
-					{% endif %}
-					{%if page > 0 %}
-						<a style="float: left" href="?page={{ page - 1 }}{{ from_to }}">&lt;&lt;&lt;prev</a>
-					{% else %}
-						<span style="color: silver; float: left">&lt;&lt;&lt;prev</span>
-					{% endif %}
-					<span style="float: left; margin: 0 2em 0 1em;">Page {{ page + 1 }}</span>
-				</td></tr>
-			{% for tr in log %}
-				<tr valign="top"><td>{{ tr.date_time }}</td><td align="center">{%if tr.amount < 0 %}-{%endif%}${{ "%.2f"|format(tr.amount|abs)}}</td><td>{{ tr.message }}</td><td>{{ tr.engine_slug }}</td></tr>
-			{% endfor %}
-			<tr><td colspan="4">
-					{%if log|length == perpage %}
-						<a style="float: right" href="?page={$page+1}{$from_to}">next &gt;&gt;&gt;</a>
-					{% else %}
-						<span style="color: silver; float: right">next &gt;&gt;&gt;</span>
-					{% endif %}
-					{%if page > 0 %}
-						<a style="float: left" href="?page={$page-1}{$from_to}">&lt;&lt;&lt;prev</a>
-					{% else %}
-						<span style="color: silver; float: left">&lt;&lt;&lt;prev</span>
-					{% endif %}
-					<span style="float: left; margin: 0 2em 0 1em;">Page {{ page + 1 }}</span>
-				</td></tr>
-		</table>
+			{% if not fatal %}
+				<link rel="stylesheet" type="text/css" href="{{ USERSROOTURL }}/calendarview/stylesheets/calendarview.css" />
+				<style>
+					.calendarButton {
+						margin: 0em;
+						padding: 1px 6px;
+						letter-spacing: normal;
+						word-spacing: normal;
+						line-height: normal;
+						text-transform: none;
+						text-indent: 0px;
+						text-shadow: none;
+						display: inline-block;
+						border: 1px solid black;
+						cursor: pointer;
+					}
+					div.calendar.popup {
+						margin-left: 0px;
+						margin-top: 30px;
+					}
+				</style>
+
+				<script type="text/javascript" src="{{ USERSROOTURL }}/calendarview/javascripts/prototype.js"></script>
+				<script type="text/javascript" src="{{ USERSROOTURL }}/calendarview/javascripts/calendarview.js"></script>
+				<script type="text/javascript">
+					window.onload = function() {
+						Calendar.setup({
+							dateField      : 'from',
+							triggerElement : 'from'
+						});
+						Calendar.setup({
+							dateField      : 'to',
+							triggerElement : 'to'
+						});
+					}
+				</script>
+				<div>
+					<form action="" method="GET" class="form-inline">
+						<input type="hidden" name="account_id" value="{{ account_id }}" />
+						<input class="input-small" placeholder="Start date" type="text" name="from" id="from" value="{{ from }}"/><!--<span class="calendarButton" id="fromButton" >..</span>-->
+						<input class="input-small" placeholder="End date" type="text" name="to" id="to" value="{{ to }}" /><!--<span class="calendarButton" id="toButton" >..</span>-->
+						<input class="btn" type="submit" value="Filter" />
+						<a href="?account_id={{ account_id }}" class="btn{%if from %} btn-primary{%endif%}">Reset</a>
+					</form>
+
+					<ul class="pager">
+						<li class="previous{%if page == 0 %} disabled{%endif%}">
+							{%if page > 0 %}
+								<a href="?page={{ page - 1 }}{{ from_to }}">&larr; Previous</a>
+							{%else%}
+								<a href="javascript:false">&larr; Previous</a>
+							{%endif%}
+						</li>
+						<li>Page {{ page + 1 }}</li>
+						<li class="next{%if log|length < perpage %} disabled{%endif%}">
+							{%if log|length == perpage %}
+								<a href="?page={{ page + 1 }}{{ from_to }}">Next &rarr;</a>
+							{%else%}
+								<a href="javascript:false">Next &rarr;</a>
+							{%endif%}
+						</li>
+					</ul>
+
+					<table class="table table-striped table-condensed">
+						<thead>
+							<tr><th>Date and time</th><th>Transaction Amount</th><th>Transaction Details</th><th>Via</th></tr>
+						</thead>
+
+						{%for tr in log %}
+						<tr valign="top">
+							<td>{{ tr.date_time }}</td><td align="center">{%if tr.amount < 0 %}-{%endif%}${{ "%.2f"|format(tr.amount|abs)}}</td>
+							<td>{{ tr.message }}</td><td>{{ tr.engine_slug }}</td></tr>
+						{%endfor%}
+					</table>
+
+					<ul class="pager">
+						<li class="previous{%if page == 0 %} disabled{%endif%}">
+							{%if page > 0 %}
+								<a href="?page={{ page - 1 }}{{ from_to }}">&larr; Previous</a>
+							{%else%}
+								<a href="javascript:false">&larr; Previous</a>
+							{%endif%}
+						</li>
+						<li>Page {{ page + 1 }}</li>
+						<li class="next{%if log|length < perpage %} disabled{%endif%}">
+							{%if log|length == perpage %}
+								<a href="?page={{ page + 1 }}{{ from_to }}">Next &rarr;</a>
+							{%else%}
+								<a href="javascript:false">Next &rarr;</a>
+							{%endif%}
+						</li>
+					</ul>
+				</div>
+			{% endif %}
+		</div>
 	</div>
-{% endif %}
+</div>

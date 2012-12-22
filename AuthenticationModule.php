@@ -217,6 +217,16 @@ abstract class AuthenticationModule extends StartupAPIModule {
 
 		return $dailyregs;
 	}
+
+	/**
+	 * Returns true if sign-up, login and registration forms are compact and
+	 * can be combined on one page.
+	 *
+	 * @return boolean True if compact
+	 */
+	public function isCompact() {
+		return false;
+	}
 }
 
 /**

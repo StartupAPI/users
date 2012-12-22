@@ -15,7 +15,9 @@ require_once(UserConfig::$header);
 					foreach (UserConfig::$authentication_modules as $module) {
 						?>
 						<li<?php if ($SECTION == 'login_' . $module->getID()) { ?> class="active"<?php } ?>>
-							<a href="<?php echo UserConfig::$USERSROOTURL ?>/edit.php?module=<?php echo $module->getID() ?>"><?php echo $module->getTitle() ?></a>
+							<a href="<?php echo UserConfig::$USERSROOTURL ?>/edit.php?module=<?php echo $module->getID() ?>">
+								<?php echo $module->getTitle() ?>
+							</a>
 						</li>
 						<?php
 					}
@@ -34,6 +36,24 @@ require_once(UserConfig::$header);
 							</li>
 							<?php
 						}
+					}
+
+					if (UserConfig::$enableGamification) {
+						?>
+						<li class="nav-header">My achievements</li>
+						<li<?php if ($SECTION == 'badges') { ?> class="active"<?php } ?>>
+							<a href="<?php echo UserConfig::$USERSROOTURL ?>/badges.php">Badges</a>
+						</li>
+						<?php
+					}
+
+					if (!is_null(UserConfig::$maillist) && file_exists(UserConfig::$maillist)) {
+						?>
+						<li class="nav-header">Mail preferences</li>
+						<li<?php if ($SECTION == 'maillist') { ?> class="active"<?php } ?>>
+							<a href="<?php echo UserConfig::$USERSROOTURL ?>/maillist.php">Mail preferences</a>
+						</li>
+						<?php
 					}
 					?>
 				</ul>
