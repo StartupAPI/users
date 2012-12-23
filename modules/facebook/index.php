@@ -351,7 +351,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 					<td>
 						<form style="margin: 0" action="<?php echo $action ?>" method="POST" name="facebookusereditform">
 							<input type="hidden" name="save" value="Save &gt;&gt;&gt;"/>
-							<input type="submit" name="remove" value="remove" style="font-size: xx-small"/>
+							<input class="btn btn-mini" type="submit" name="remove" value="remove" style="font-size: xx-small"/>
 			<?php UserTools::renderCSRFNonce(); ?>
 						</form>
 					</td>

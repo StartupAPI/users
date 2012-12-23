@@ -631,7 +631,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 			?>
 			<div><?php $this->renderUserInfo($serialized_userinfo) ?></div>
 			<input type="hidden" name="oauth_user_id" value="<?php echo htmlentities($oauth_user_id) ?>"/>
-			<input type="submit" name="remove" value="remove" style="font-size: xx-small"/>
+			<input class="btn btn-mini" type="submit" name="remove" value="remove" style="font-size: xx-small"/>
 			<?php
 		}
 		?>
