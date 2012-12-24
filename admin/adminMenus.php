@@ -210,8 +210,7 @@ class AdminMenu extends MenuElement {
 		}
 
 		if (!is_null($extra)) {
-			?><span class="divider">/</span></li><?php
-			?><li class="active"><?php echo $extra ?></li><?php
+			?><li class="active"><span class="divider"> / </span><?php echo $extra ?></li><?php
 		}
 	}
 
