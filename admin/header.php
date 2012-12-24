@@ -96,8 +96,6 @@ if (!isset($BREADCRUMB_EXTRA)) {
 			.footer {
 				padding: 70px 0;
 				margin-top: 70px;
-				border-top: 1px solid #E5E5E5;
-				background-color: whiteSmoke;
 			}
 		</style>
 	</head>

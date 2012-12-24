@@ -1,7 +1,7 @@
 <!-- admin footer starts -->
 			</div>
 		</div>
-		<footer class="footer">
+		<footer class="footer navbar-inner">
 			<div class="container">
 				<div class="pull-right"><a href="http://www.startupapi.com/" target="_blank"><img src="<?php echo UserConfig::$USERSROOTURL ?>/images/powered_by_logo.png" width="149" height="67"/></a></div>
 				<p>Powered by <a href="http://www.startupapi.com/" target="_blank">Startup API v<?php echo StartupAPI::getVersion() ?></a>. Code licensed under the <a href="https://github.com/sergeychernyshev/users/blob/master/LICENSE" target="_blank">MIT License</a>.</p>

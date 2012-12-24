@@ -151,7 +151,7 @@ foreach ($users as $user)
 	<td><?php
 	$points = $user->getPoints();
 	if ($points > 0) {
-		?><a class="label label-info" href="./activity.php?userid=<?php echo $userid ?>"><?php echo $points ?></a><?php
+		?><a class="badge badge-info" href="./activity.php?userid=<?php echo $userid ?>"><?php echo $points ?></a><?php
 	}
 	?>
 	</td>

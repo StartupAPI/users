@@ -40,7 +40,7 @@ require_once(dirname(__FILE__) . '/sidebar_header.php');
 			$role = $user_and_role[1];
 			?><li>
 				<?php echo $member->getName(); ?>
-				<?php if ($role == Account::ROLE_ADMIN) { ?><span class="label label-important">admin</span><?php } ?>
+				<?php if ($role == Account::ROLE_ADMIN) { ?><span class="badge badge-important">admin</span><?php } ?>
 			</li>
 			<?php
 		}

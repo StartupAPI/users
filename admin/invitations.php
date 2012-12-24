@@ -97,7 +97,7 @@ else
 	{
 		$code = $invitation->getCode();
 		?><tr>
-		<td><span class="label"><?php echo UserTools::escape($code)?></span></td>
+		<td><span class="badge badge-info"><?php echo UserTools::escape($code)?></span></td>
 		<td><input name="code_<?php echo UserTools::escape($invitation->getCode())?>" value="" style="width: 100%"></td><?php
 
 		if (!is_null(UserConfig::$onRenderUserInvitationAction))
@@ -140,7 +140,7 @@ if (count($invitations) > 0)
 		$comment = $invitation->getComment();
 
 		?><tr>
-		<td><span class="label label-warning"><?php echo UserTools::escape($code)?></span></td>
+		<td><span class="badge badge-important"><?php echo UserTools::escape($code)?></span></td>
 		<td><?php echo UserTools::escape(is_null($issuer) ? '' : $issuer->getName()) ?></td>
 		<td><?php echo UserTools::escape($comment)?></td><?php
 
@@ -179,7 +179,7 @@ if (count($invitations) > 0)
 		$invited_user = $invitation->getUser();
 
 		?><tr>
-		<td><span class="label label-success"><?php echo UserTools::escape($invitation->getCode())?></span></td>
+		<td><span class="badge badge-success"><?php echo UserTools::escape($invitation->getCode())?></span></td>
 		<td><?php echo UserTools::escape(is_null($issuer) ? '' : $issuer->getName()) ?></td>
 		<td><?php echo UserTools::escape($invitation->getComment())?></td>
 		<td>

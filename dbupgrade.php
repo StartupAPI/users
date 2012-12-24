@@ -22,6 +22,13 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 26
+ * Adding basic key-based API support for accounts
+*/
+$versions[26]['up'][] = "";
+$versions[26]['down'][] = "";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 25
  * Adding transaciton details table for PaymentEngine_Manual
 */
