@@ -24,7 +24,7 @@ require_once(dirname(__FILE__) . '/header.php');
 	<h2><?php echo UserTools::escape($plan->name); ?></h2>
 	<p>
 		<?php if (isset($plan->capabilities['individual']) && $plan->capabilities['individual']) { ?>
-			<span class="label">individual</span>
+			<span class="badge">individual</span>
 		<?php } ?>
 	</p>
 	<p>

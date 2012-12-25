@@ -57,7 +57,7 @@ require_once(dirname(__FILE__) . '/header.php');
 		<h2>
 			<?php echo UserTools::escape($user->getName()); ?>
 			<?php if ($user->isAdmin()) { ?>
-				<span class="label label-important">system admin</span>
+				<span class="badge badge-important">system admin</span>
 			<?php } ?>
 			<div class="pull-right">
 				<?php
@@ -170,10 +170,10 @@ require_once(dirname(__FILE__) . '/header.php');
 					<a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/account.php?id=<?php echo $user_account->getID() ?>">
 						<?php echo UserTools::escape($user_account->getName()); ?>
 					</a>
-					<a style="margin: 0 0.3em" class="label" href="<?php echo UserConfig::$USERSROOTURL ?>/admin/plan.php?slug=<?php echo UserTools::escape($plan->slug); ?>"><?php echo UserTools::escape($plan->name); ?></a>
+					<a style="margin: 0 0.3em" class="badge" href="<?php echo UserConfig::$USERSROOTURL ?>/admin/plan.php?slug=<?php echo UserTools::escape($plan->slug); ?>"><?php echo UserTools::escape($plan->name); ?></a>
 
 					<?php if ($role == Account::ROLE_ADMIN) { ?>
-						<span class = "label label-important">admin</span>
+						<span class = "badge badge-important">admin</span>
 					<?php } ?>
 				</li>
 			<?php } ?>
