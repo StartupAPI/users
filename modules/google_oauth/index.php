@@ -74,7 +74,7 @@ class GoogleOAuthAuthenticationModule extends OAuthAuthenticationModule
 
 	public function getIdentity($oauth_user_id) {
 		// get meetup user id
-		$request = new OAuthRequester('https://www.google.com/m8/feeds/groups/default/full', 'GET');
+		$request = new OAuthRequester('https://www.google.com/m8/feeds/groups/default/thin', 'GET');
 		$result = $request->doRequest($oauth_user_id);
 
 		$self_url = null;
