@@ -242,18 +242,21 @@ class DBException extends StartupAPIException {
 	function __construct(mysqli $db = null, $stmt = null, $message = null, $code = null, $previous = null) {
 		$exception_message = $message;
 
+		$class = get_class($this);
+
 		if (is_null($db)) {
-			$exception_message = "[DB] Can't connect to database, \$db object is null";
+			$exception_message = "[$class] Can't connect to database, \$db object is null";
 		} else if ($db->connect_error) {
-			$exception_message = "[DB] Can't connect to database: (" . $db->connect_errno . ") " . $db->connect_error;
+			$exception_message = "[$class] Can't connect to database: (" . $db->connect_errno . ") " .
+					$db->connect_error;
 		} else if ($db->error) {
-			$exception_message = "[DB] DB Error: " . $db->error;
+			$exception_message = "[$class] DB Error: " . $db->error;
 		} else if (!$stmt) {
-			$exception_message = '[DB]' .
+			$exception_message = "[$class]" .
 					' $db->error: ' . $db->error .
 					' with message: ' . $message;
 		} else {
-			$exception_message = '[DB]' .
+			$exception_message = "[$class]" .
 					' $stmt->error: ' . $stmt->error .
 					' with message: ' . $message;
 		}
