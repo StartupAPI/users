@@ -734,7 +734,7 @@ class User {
 		}
 
 		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . 'users (name, email, regmodule, tos_version) VALUES (?, ?, ?, ?)')) {
-			if (!$stmt->bind_param('sss', $name, $email, $module_id, UserConfig::$currentTOSVersion)) {
+			if (!$stmt->bind_param('sssi', $name, $email, $module_id, UserConfig::$currentTOSVersion)) {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
