@@ -14,7 +14,7 @@
 		<directory>.</directory>
 		<ignore>CookieStorage.php</ignore>
 		<ignore>oauth-php/*</ignore>
-		<ignore>modules/facebook/php-sdk/*</ignore>
+		<ignore>modules/facebook/facebook-php-sdk/*</ignore>
 		<ignore>dbupgrade/*</ignore>
 		<ignore>admin/swfobject/*</ignore>
 		<ignore>docs/*</ignore>

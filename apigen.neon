@@ -4,7 +4,7 @@ destination: docs/apigen
 
 exclude:
 	- */oauth-php/*
-	- */modules/facebook/php-sdk/*
+	- */modules/facebook/facebook-php-sdk/*
 	- */dbupgrade/*
 	- */admin/swfobject/*
 	- */docs/*
