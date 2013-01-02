@@ -768,7 +768,7 @@ class Account {
 	/**
 	 * Charges the account or applies a refund
 	 *
-	 * @param int $refund Regund to apply or null if regular charge
+	 * @param int $refund Refund to apply or null if regular charge
 	 *
 	 * @return boolean True if charge was successful
 	 *
