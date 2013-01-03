@@ -18,7 +18,7 @@ require_once(dirname(__FILE__) . '/header.php');
 			<?php
 			$counts = $badge->getUserCounts();
 
-			$max_level = max(array_keys($counts));
+			$max_level = count($counts) > 0 ? max(array_keys($counts)) : 0;
 
 			for ($level = 1; $level <= $max_level; $level++) {
 				?>
