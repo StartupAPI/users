@@ -138,7 +138,7 @@ abstract class MenuElement {
 	/**
 	 * Renders top navigation bar element for this menu item
 	 */
-	protected function renderTopNav() {
+	public function renderTopNav() {
 
 	}
 
@@ -238,7 +238,7 @@ class MenuSection extends MenuElement {
 		?><li class="divider"></li><?php
 	}
 
-	protected function renderTopNav() {
+	public function renderTopNav() {
 		$enabled = false;
 		foreach ($this->sub_menus as $menu) {
 			if ($menu->enabled) {
@@ -368,7 +368,7 @@ class Menu extends MenuElement {
 		}
 	}
 
-	protected function renderTopNav() {
+	public function renderTopNav() {
 		if (!$this->enabled) {
 			return;
 		}
