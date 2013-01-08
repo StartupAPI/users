@@ -331,6 +331,10 @@ class UserConfig {
 	public static $theme = 'classic';
 
 	/**
+	 * If specified, StartupAPI::head() will include this Twitter Bootstrap CSS instead of default one
+	 */
+	public static $bootstrapCSS = null;
+	/**
 	 * @var mixed[] Array of Twig environment options
 	 */
 	public static $twig_options = array();
