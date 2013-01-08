@@ -16,3 +16,6 @@
 [submodule "twig"]
 	path = twig
 	url = git://github.com/fabpot/Twig.git
+[submodule "modules/facebook/facebook-php-sdk"]
+	path = modules/facebook/facebook-php-sdk
+	url = git://github.com/facebook/facebook-php-sdk.git
