@@ -21,7 +21,9 @@ $smallBadgeSize = 57;
 	<?php
 	$calls_to_ation = $badge->getCallsToAction();
 
-	$max_level_existing_badges = max(array_keys($badge->getUserCounts()));
+	$counts = $badge->getUserCounts();
+
+	$max_level_existing_badges = count($counts) > 0 ? max(array_keys($counts)) : 0;
 	$max_level_calls_to_action = count($calls_to_ation);
 
 	$max_level = max($max_level_calls_to_action, $max_level_existing_badges);
@@ -30,7 +32,7 @@ $smallBadgeSize = 57;
 		?>
 		<div>
 			<h4>Level <?php echo $level ?></h4>
-			<?php if (array_key_exists($level - 1, $calls_to_ation)) { ?>
+			<?php if (is_array($calls_to_ation) && array_key_exists($level - 1, $calls_to_ation)) { ?>
 				<p><?php echo $calls_to_ation[$level - 1] ?></p>
 			<?php } ?>
 			<?php

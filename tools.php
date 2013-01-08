@@ -42,7 +42,6 @@ class UserTools
 		 * Preventing CSRFs in all POST requests by double-posting cookies
 		 */
 		$passed_nonces = explode(' ', $storage->fetch(UserConfig::$csrf_nonce_key));
-		UserTools::debug('Current nonces: '.implode(' ', $passed_nonces));
 
 		// rolling array to keep a few nonces
 		$unused_nonces = array();
