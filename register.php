@@ -91,7 +91,7 @@ if (UserConfig::$enableRegistration)
 
 	if (UserConfig::$enableInvitations)
 	{
-		$message = UserConfig::$invitationRequiredMessage;
+		$message = null;
 
 		$show_registration_form = false;
 
@@ -113,13 +113,18 @@ if (UserConfig::$enableRegistration)
 
 		if (!$show_registration_form) {
 			?>
-			<form id="startupapi-invitation-form" action="" method="GET">
+			<form id="form" action="" method="GET">
 			<fieldset>
-			<legend><?php echo $message?></legend>
-			<p>
-			<input id="startupapi-invite-code" name="invite" size="30" value="<?php echo UserTools::escape(array_key_exists('invite', $_GET) ? $_GET['invite'] : '')?>"/>
-			<button id="startupapi-invitation-button" type="submit">&gt;&gt;</button>
-			</p>
+			<legend><?php echo UserConfig::$invitationRequiredMessage?></legend>
+			<?php
+			if (!is_null($message)) {
+				?>
+				<div class="alert alert-error"><?php echo $message?></div>
+				<?php
+			}
+			?>
+			<input name="invite" class="input input-xlarge" value="<?php echo UserTools::escape(array_key_exists('invite', $_GET) ? $_GET['invite'] : '')?>"/>
+			<button class="btn btn-primary" type="submit">Continue &rarr;</button>
 			</fieldset>
 			</form>
 			<?php
