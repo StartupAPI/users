@@ -1,6 +1,6 @@
 <?php
-include_once(dirname(__FILE__).'/oauth-php/library/OAuthStore.php');
-include_once(dirname(__FILE__).'/oauth-php/library/OAuthRequester.php');
+include_once(dirname(__DIR__).'/oauth-php/library/OAuthStore.php');
+include_once(dirname(__DIR__).'/oauth-php/library/OAuthRequester.php');
 
 /**
  * Abstract class, implements OAuth flow and data storage for specific modules to subclass

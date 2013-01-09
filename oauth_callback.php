@@ -3,7 +3,7 @@
  * OAuth callback script used by all modules that subclass OAuthModule
  */
 require_once(dirname(__FILE__).'/global.php');
-require_once(dirname(__FILE__).'/User.php');
+require_once(dirname(__FILE__).'/classes/User.php');
 
 $current_user = User::get();
 

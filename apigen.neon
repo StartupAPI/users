@@ -11,7 +11,7 @@ exclude:
 	- */twig/*
 	- */phptidy/*
 	- */apigen-docs/*
-	- */CookieStorage.php
+	- */classes/CookieStorage.php
 
 php: no
 

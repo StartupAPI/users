@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . '/global.php');
 
-require_once(dirname(__FILE__) . '/User.php');
+require_once(dirname(__FILE__) . '/classes/User.php');
 
 if (!UserConfig::$enableGamification || !array_key_exists('name', $_GET)) {
 	header("HTTP/1.0 404 Not Found");

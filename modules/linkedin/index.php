@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(dirname(__FILE__))).'/OAuthModule.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/classes/OAuthModule.php');
 
 /**
  * LinkedIn authorization modlue

@@ -1,6 +1,6 @@
 <?php
 require_once(dirname(dirname(__FILE__)) . '/global.php');
-require_once(dirname(dirname(__FILE__)) . '/User.php');
+require_once(dirname(dirname(__FILE__)) . '/classes/User.php');
 require_once(dirname(__FILE__) . '/adminMenus.php');
 
 $current_user = User::require_login(false);

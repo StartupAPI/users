@@ -6,13 +6,12 @@
 */
 require_once(dirname(__FILE__).'/global.php');
 
-require_once(dirname(__FILE__).'/User.php');
-require_once(dirname(__FILE__).'/Plan.php');
-require_once(dirname(__FILE__).'/Account.php');
-require_once(dirname(__FILE__).'/Cohort.php');
-require_once(dirname(__FILE__).'/Feature.php');
-
-require_once(dirname(__FILE__).'/CampaignTracker.php');
+require_once(dirname(__FILE__).'/classes/User.php');
+require_once(dirname(__FILE__).'/classes/Plan.php');
+require_once(dirname(__FILE__).'/classes/Account.php');
+require_once(dirname(__FILE__).'/classes/Cohort.php');
+require_once(dirname(__FILE__).'/classes/Feature.php');
+require_once(dirname(__FILE__).'/classes/CampaignTracker.php');
 
 // do this on each page view (where user.php is included)
 CampaignTracker::preserveReferer();

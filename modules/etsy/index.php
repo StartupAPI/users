@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(dirname(__FILE__))).'/OAuthModule.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/classes/OAuthModule.php');
 
 /**
  * Authenticates users using Etsy (etsy.com) and providers access to their API using OAuth

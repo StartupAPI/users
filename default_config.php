@@ -2,12 +2,12 @@
 /**
  * @package StartupAPI
  */
-require_once(dirname(__FILE__) . '/Plan.php');
-require_once(dirname(__FILE__) . '/TransactionLogger.php');
-require_once(dirname(__FILE__) . '/Cohort.php');
-require_once(dirname(__FILE__) . '/Feature.php');
-require_once(dirname(__FILE__) . '/Badge.php');
-require_once(dirname(__FILE__) . '/StartupAPIModule.php');
+require_once(dirname(__FILE__) . '/classes/Plan.php');
+require_once(dirname(__FILE__) . '/classes/TransactionLogger.php');
+require_once(dirname(__FILE__) . '/classes/Cohort.php');
+require_once(dirname(__FILE__) . '/classes/Feature.php');
+require_once(dirname(__FILE__) . '/classes/Badge.php');
+require_once(dirname(__FILE__) . '/classes/StartupAPIModule.php');
 require_once(dirname(__FILE__) . '/tools.php');
 
 /**

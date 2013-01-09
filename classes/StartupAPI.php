@@ -2,7 +2,7 @@
 require_once(dirname(__FILE__) . '/User.php');
 require_once(dirname(__FILE__) . '/Plan.php');
 
-require_once(dirname(__FILE__) . '/twig/lib/Twig/Autoloader.php');
+require_once(dirname(__DIR__) . '/twig/lib/Twig/Autoloader.php');
 Twig_Autoloader::register();
 
 /**
@@ -195,8 +195,8 @@ class StartupAPI {
 		Plan::init(UserConfig::$PLANS);
 
 		// Configuring the templating
-		$loader = new Twig_Loader_Filesystem(dirname(__FILE__) . '/templates/');
-		$loader->addPath(dirname(__FILE__) . '/admin/templates', 'admin');
+		$loader = new Twig_Loader_Filesystem(dirname(__DIR__) . '/templates/');
+		$loader->addPath(dirname(__DIR__) . '/admin/templates', 'admin');
 
 		self::$template = new Twig_Environment($loader, UserConfig::$twig_options);
 	}
