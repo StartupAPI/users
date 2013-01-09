@@ -65,9 +65,13 @@ class StartupAPI {
 	 * styles, scripts and potentially meta-tags into the head of the pages on the site
 	 */
 	static function head() {
+		$bootstrapCSS = UserConfig::$USERSROOTURL . '/bootstrap/css/bootstrap.min.css';
+		if (!is_null(UserConfig::$bootstrapCSS)) {
+			$bootstrapCSS = UserConfig::$bootstrapCSS;
+		}
 		?>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="<?php echo $bootstrapCSS ?>" rel="stylesheet">
 		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
 		<script src="<?php echo UserConfig::$USERSROOTURL ?>/jquery-1.8.2.min.js"></script>
 		<script src="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/js/bootstrap.min.js"></script>
