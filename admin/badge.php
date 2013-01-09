@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . '/admin.php');
+require_once(__DIR__ . '/admin.php');
 
 if (!array_key_exists('id', $_GET) || is_null($badge = Badge::getByID($_GET['id']))) {
 	header("HTTP/1.0 404 Not Found");
@@ -8,7 +8,7 @@ if (!array_key_exists('id', $_GET) || is_null($badge = Badge::getByID($_GET['id'
 
 $ADMIN_SECTION = 'badges';
 $BREADCRUMB_EXTRA = $badge->getTitle();
-require_once(dirname(__FILE__) . '/header.php');
+require_once(__DIR__ . '/header.php');
 
 $largeBadgeSize = 300;
 $smallBadgeSize = 57;
@@ -58,4 +58,4 @@ $smallBadgeSize = 57;
 	?>
 </div>
 <?php
-require_once(dirname(__FILE__) . '/footer.php');
+require_once(__DIR__ . '/footer.php');

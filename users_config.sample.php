@@ -61,8 +61,8 @@ UserConfig::$admins = array(
 /**
  * Set these to point at your header and footer or leave them commented out to use default ones
  */
-#UserConfig::$header = dirname(__FILE__).'/header.php';
-#UserConfig::$footer = dirname(__FILE__).'/footer.php';
+#UserConfig::$header = __DIR__.'/header.php';
+#UserConfig::$footer = __DIR__.'/footer.php';
 
 /**
  * Username and password registration configuration

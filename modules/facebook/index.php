@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . '/facebook.php');
+require_once(__DIR__ . '/facebook.php');
 
 /**
  * Facebook Authentication Module

@@ -1,8 +1,8 @@
 <?php
-require_once(dirname(__FILE__).'/admin.php');
+require_once(__DIR__.'/admin.php');
 
 $ADMIN_SECTION = 'registrations';
-require_once(dirname(__FILE__).'/header.php');
+require_once(__DIR__.'/header.php');
 
 $dailyregs = User::getDailyRegistrations();
 
@@ -184,4 +184,4 @@ else
 
 </div>
 <?php
-require_once(dirname(__FILE__).'/footer.php');
+require_once(__DIR__.'/footer.php');

@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . '/admin.php');
+require_once(__DIR__ . '/admin.php');
 
 if (!array_key_exists('slug', $_GET)) {
 	header("HTTP/1.0 400 Plan slug is not specified");
@@ -18,7 +18,7 @@ if (is_null($plan)) {
 
 $ADMIN_SECTION = 'plans';
 $BREADCRUMB_EXTRA = $plan->name;
-require_once(dirname(__FILE__) . '/header.php');
+require_once(__DIR__ . '/header.php');
 ?>
 <div class="span9">
 	<h2><?php echo UserTools::escape($plan->name); ?></h2>
@@ -54,4 +54,4 @@ require_once(dirname(__FILE__) . '/header.php');
 </div>
 
 <?php
-require_once(dirname(__FILE__) . '/footer.php');
+require_once(__DIR__ . '/footer.php');

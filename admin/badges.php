@@ -1,8 +1,8 @@
 <?php
-require_once(dirname(__FILE__) . '/admin.php');
+require_once(__DIR__ . '/admin.php');
 
 $ADMIN_SECTION = 'badges';
-require_once(dirname(__FILE__) . '/header.php');
+require_once(__DIR__ . '/header.php');
 ?>
 <div class="span9">
 	<h2>Badges</h2>
@@ -32,4 +32,4 @@ require_once(dirname(__FILE__) . '/header.php');
 	?>
 </div>
 <?php
-require_once(dirname(__FILE__) . '/footer.php');
+require_once(__DIR__ . '/footer.php');

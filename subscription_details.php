@@ -1,12 +1,12 @@
 <?php
-require_once(dirname(__FILE__).'/global.php');
+require_once(__DIR__.'/global.php');
 
 if (!UserConfig::$useSubscriptions) {
 	header('Location: '.UserConfig::$DEFAULTLOGOUTRETURN);
 	exit;
 }
 
-include(dirname(__FILE__).'/view/account/subscription_details.php');
+include(__DIR__.'/view/account/subscription_details.php');
 
 if ($account->getUserRole($user) !== Account::ROLE_ADMIN) {
 	header('Location: '.UserConfig::$DEFAULTLOGOUTRETURN);
@@ -14,8 +14,8 @@ if ($account->getUserRole($user) !== Account::ROLE_ADMIN) {
 }
 
 $SECTION = 'manage_account';
-require_once(dirname(__FILE__) . '/sidebar_header.php');
+require_once(__DIR__ . '/sidebar_header.php');
 
 StartupAPI::$template->display('account/subscription_details.html.twig', $template_data);
 
-require_once(dirname(__FILE__) . '/sidebar_footer.php');
+require_once(__DIR__ . '/sidebar_footer.php');

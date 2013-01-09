@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . '/Plan.php');
+require_once(__DIR__ . '/Plan.php');
 
 /**
  * Account class represents accounts in the system.

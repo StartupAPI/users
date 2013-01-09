@@ -1,12 +1,12 @@
 <?php
-require_once(dirname(__FILE__).'/admin.php');
+require_once(__DIR__.'/admin.php');
 
 $ADMIN_SECTION = 'outstanding';
 
-include(dirname(__FILE__).'/view/outstanding.php');
+include(__DIR__.'/view/outstanding.php');
 
-require_once(dirname(__FILE__).'/header.php');
+require_once(__DIR__.'/header.php');
 
 StartupAPI::$template->display('@admin/outstanding.html.twig', $template_data);
 
-require_once(dirname(__FILE__).'/footer.php');
+require_once(__DIR__.'/footer.php');

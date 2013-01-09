@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(dirname(__FILE__))).'/classes/User.php');
+require_once(dirname(dirname(__DIR__)).'/classes/User.php');
 
 $user = User::require_login();
 $account = Account::getCurrentAccount($user);

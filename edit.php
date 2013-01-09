@@ -1,6 +1,6 @@
 <?php
-require_once(dirname(__FILE__) . '/global.php');
-require_once(dirname(__FILE__) . '/classes/User.php');
+require_once(__DIR__ . '/global.php');
+require_once(__DIR__ . '/classes/User.php');
 
 UserConfig::$IGNORE_REQUIRED_EMAIL_VERIFICATION = true;
 
@@ -44,7 +44,7 @@ if (array_key_exists('save', $_POST)) {
 	}
 }
 
-require_once(dirname(__FILE__) . '/sidebar_header.php');
+require_once(__DIR__ . '/sidebar_header.php');
 ?>
 <div>
 	<?php if ($compact_page) { ?>
@@ -92,4 +92,4 @@ require_once(dirname(__FILE__) . '/sidebar_header.php');
 </div>
 
 <?php
-require_once(dirname(__FILE__) . '/sidebar_footer.php');
+require_once(__DIR__ . '/sidebar_footer.php');

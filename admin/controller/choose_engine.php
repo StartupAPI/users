@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__FILE__)).'/admin.php');
+require_once(dirname(__DIR__).'/admin.php');
 
 $engine = htmlspecialchars($_REQUEST['engine']);
 $account_id = htmlspecialchars($_REQUEST['account_id']);

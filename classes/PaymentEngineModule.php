@@ -4,8 +4,8 @@
  * @package StartupAPI
  * @subpackage Subscriptions
  */
-require_once(dirname(__FILE__) . '/Account.php');
-require_once(dirname(__FILE__) . '/StartupAPIModule.php');
+require_once(__DIR__ . '/Account.php');
+require_once(__DIR__ . '/StartupAPIModule.php');
 
 /**
  * Abstract class representing payment engines users can use to pay for subscription

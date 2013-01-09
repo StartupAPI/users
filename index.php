@@ -1,3 +1,3 @@
 <?php
-include(dirname(__FILE__).'/login.php');
+include(__DIR__.'/login.php');
 

@@ -1,9 +1,9 @@
 <?php
 
-require_once(dirname(dirname(dirname(__FILE__))).'/simpletest/autorun.php');
+require_once(dirname(dirname(__DIR__)).'/simpletest/autorun.php');
 
-require_once(dirname(dirname(__FILE__)).'/users.php');
-require_once(dirname(dirname(__FILE__)).'/classes/Clock.php');
+require_once(dirname(__DIR__).'/users.php');
+require_once(dirname(__DIR__).'/classes/Clock.php');
 
 class TestClock extends UnitTestCase {
 

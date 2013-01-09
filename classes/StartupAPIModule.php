@@ -52,7 +52,7 @@ abstract class StartupAPIModule {
 	}
 }
 
-require_once(dirname(__FILE__).'/AuthenticationModule.php');
-require_once(dirname(__FILE__).'/EmailModule.php');
-require_once(dirname(__FILE__).'/PaymentEngineModule.php');
+require_once(__DIR__.'/AuthenticationModule.php');
+require_once(__DIR__.'/EmailModule.php');
+require_once(__DIR__.'/PaymentEngineModule.php');
 

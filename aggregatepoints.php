@@ -9,7 +9,7 @@
  * Also if you change activity point values, totals must be recalculated,
  * just run this script.
  */
-require_once(dirname(__FILE__).'/global.php');
+require_once(__DIR__.'/global.php');
 
 /**
  * Aggregates activity points for users, can be ran as cron job

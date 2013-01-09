@@ -1,8 +1,8 @@
 <?php
-require_once(dirname(__FILE__) . '/admin.php');
+require_once(__DIR__ . '/admin.php');
 
 $ADMIN_SECTION = 'campaigns';
-require_once(dirname(__FILE__) . '/header.php');
+require_once(__DIR__ . '/header.php');
 
 $days = 0;
 if (array_key_exists('days', $_GET)) {
@@ -70,4 +70,4 @@ if (count($campaigns) > 0) {
 	</div>
 	<?php
 }
-require_once(dirname(__FILE__) . '/footer.php');
+require_once(__DIR__ . '/footer.php');

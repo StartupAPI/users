@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(dirname(__FILE__))).'/global.php');
+require_once(dirname(dirname(__DIR__)).'/global.php');
 
 $user = User::require_login();
 

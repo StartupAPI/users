@@ -2,13 +2,13 @@
 /**
  * @package StartupAPI
  */
-require_once(dirname(__FILE__) . '/classes/Plan.php');
-require_once(dirname(__FILE__) . '/classes/TransactionLogger.php');
-require_once(dirname(__FILE__) . '/classes/Cohort.php');
-require_once(dirname(__FILE__) . '/classes/Feature.php');
-require_once(dirname(__FILE__) . '/classes/Badge.php');
-require_once(dirname(__FILE__) . '/classes/StartupAPIModule.php');
-require_once(dirname(__FILE__) . '/tools.php');
+require_once(__DIR__ . '/classes/Plan.php');
+require_once(__DIR__ . '/classes/TransactionLogger.php');
+require_once(__DIR__ . '/classes/Cohort.php');
+require_once(__DIR__ . '/classes/Feature.php');
+require_once(__DIR__ . '/classes/Badge.php');
+require_once(__DIR__ . '/classes/StartupAPIModule.php');
+require_once(__DIR__ . '/tools.php');
 
 /**
  * This class contains a bunch of static variables defining how Startup API instance
@@ -861,10 +861,10 @@ EOD;
 	 * @throws StartupAPIException
 	 */
 	public static function loadModule($modulename) {
-		if (is_dir(dirname(__FILE__) . '/modules/' . $modulename)) {
-			require_once(dirname(__FILE__) . '/modules/' . $modulename . '/index.php');
+		if (is_dir(__DIR__ . '/modules/' . $modulename)) {
+			require_once(__DIR__ . '/modules/' . $modulename . '/index.php');
 		} else {
-			throw new StartupAPIException('Module ' . $modulename . ' does not exist in ' . dirname(__FILE__) . '/modules/ folder');
+			throw new StartupAPIException('Module ' . $modulename . ' does not exist in ' . __DIR__ . '/modules/ folder');
 		}
 	}
 
@@ -875,7 +875,7 @@ EOD;
 	 * you have toput them into config.php
 	 */
 	public static function init() {
-		UserConfig::$ROOTPATH = dirname(__FILE__);
+		UserConfig::$ROOTPATH = __DIR__;
 
 		// Chopping of trailing slash which is not supposed to be there in Apache config
 		// See: http://httpd.apache.org/docs/2.0/mod/core.html#documentroot
@@ -917,11 +917,11 @@ EOD;
 			UserConfig::$supportEmailXMailer = UserConfig::$appName . ' using ' . UserConfig::$appName;
 		}
 
-		UserConfig::$header = dirname(__FILE__) . '/header.php';
-		UserConfig::$footer = dirname(__FILE__) . '/footer.php';
+		UserConfig::$header = __DIR__ . '/header.php';
+		UserConfig::$footer = __DIR__ . '/footer.php';
 
-		UserConfig::$admin_header = dirname(__FILE__) . '/header.php';
-		UserConfig::$admin_footer = dirname(__FILE__) . '/footer.php';
+		UserConfig::$admin_header = __DIR__ . '/header.php';
+		UserConfig::$admin_footer = __DIR__ . '/footer.php';
 
 		// Built in activities
 

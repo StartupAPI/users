@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'/admin.php');
+require_once(__DIR__.'/admin.php');
 
 $ADMIN_SECTION = 'activity';
 
@@ -56,7 +56,7 @@ if (array_key_exists('activityid', $_REQUEST) && is_numeric($_REQUEST['activityi
 
 $total = 0;
 
-require_once(dirname(__FILE__).'/header.php');
+require_once(__DIR__.'/header.php');
 ?>
 <script type='text/javascript' src='swfobject/swfobject/swfobject.js'></script>
 <script type='text/javascript' src='http://www.google.com/jsapi'></script>
@@ -295,4 +295,4 @@ foreach ($activities as $activity)
 
 </div>
 <?php
-require_once(dirname(__FILE__).'/footer.php');
+require_once(__DIR__.'/footer.php');

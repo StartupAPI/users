@@ -1,7 +1,7 @@
 <?php
-require_once(dirname(__FILE__) . '/global.php');
+require_once(__DIR__ . '/global.php');
 
-require_once(dirname(__FILE__) . '/classes/User.php');
+require_once(__DIR__ . '/classes/User.php');
 
 if (!UserConfig::$useAccounts) {
 	header('Location: ' . UserConfig::$DEFAULTLOGOUTRETURN);
@@ -17,7 +17,7 @@ if ($account->getUserRole($user) !== Account::ROLE_ADMIN) {
 }
 
 $SECTION = 'manage_account';
-require_once(dirname(__FILE__) . '/sidebar_header.php');
+require_once(__DIR__ . '/sidebar_header.php');
 ?>
 <h2>Account: <?php echo $account->getName() ?></h2>
 
@@ -48,4 +48,4 @@ require_once(dirname(__FILE__) . '/sidebar_header.php');
 	</ul>
 </div>
 <?php
-require_once(dirname(__FILE__) . '/sidebar_footer.php');
+require_once(__DIR__ . '/sidebar_footer.php');

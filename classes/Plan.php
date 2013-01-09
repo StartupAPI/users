@@ -4,7 +4,7 @@
  * @package StartupAPI
  * @subpackage Subscriptions
  */
-require_once (dirname(__FILE__) . '/PaymentSchedule.php');
+require_once (__DIR__ . '/PaymentSchedule.php');
 
 /**
  * Every account is associated with existing Plan using Plan Slug and PaymentSchedule using PaymentSchedule Slug.

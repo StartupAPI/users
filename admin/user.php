@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . '/admin.php');
+require_once(__DIR__ . '/admin.php');
 
 if (!array_key_exists('id', $_GET) || !$_GET['id']) {
 	header("HTTP/1.0 400 User ID is not specified");
@@ -49,7 +49,7 @@ if (array_key_exists("deactivate", $_POST)) {
 
 $ADMIN_SECTION = 'registrations';
 $BREADCRUMB_EXTRA = $user->getName();
-require_once(dirname(__FILE__) . '/header.php');
+require_once(__DIR__ . '/header.php');
 ?>
 <div class="span9">
 
@@ -250,4 +250,4 @@ if (count($features) > 0) {
 
 </div>
 <?php
-require_once(dirname(__FILE__) . '/footer.php');
+require_once(__DIR__ . '/footer.php');

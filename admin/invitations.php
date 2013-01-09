@@ -1,14 +1,14 @@
 <?php
-require_once(dirname(__FILE__).'/admin.php');
+require_once(__DIR__.'/admin.php');
 
 $user = User::require_login();
 
 if (!$user->isAdmin()) {
-	require_once(dirname(__FILE__).'/admin_access_only.php');
+	require_once(__DIR__.'/admin_access_only.php');
 	exit;
 }
 
-require_once(dirname(dirname(__FILE__)).'/Invitation.php');
+require_once(dirname(__DIR__).'/Invitation.php');
 
 if (array_key_exists('save', $_POST))
 {
@@ -53,7 +53,7 @@ foreach (array_keys($_POST) as $key) {
 
 $ADMIN_SECTION = 'invitations';
 
-require_once(dirname(__FILE__) . '/header.php');
+require_once(__DIR__ . '/header.php');
 ?>
 <script>
 $(document).ready(function() {
@@ -196,4 +196,4 @@ if (count($invitations) > 0)
 
 </div>
 <?php
-require_once(dirname(__FILE__) . '/footer.php');
+require_once(__DIR__ . '/footer.php');

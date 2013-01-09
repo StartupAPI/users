@@ -1,8 +1,8 @@
 <?php
 
-require_once(dirname(dirname(dirname(__FILE__))).'/simpletest/autorun.php');
+require_once(dirname(dirname(__DIR__)).'/simpletest/autorun.php');
 
-require_once(dirname(dirname(__FILE__)).'/users.php');
+require_once(dirname(__DIR__).'/users.php');
 
 class TestPaymentEngine extends UnitTestCase {
   private $user = null;

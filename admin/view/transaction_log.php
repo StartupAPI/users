@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(dirname(__FILE__)) . '/admin.php');
+require_once(dirname(__DIR__) . '/admin.php');
 
 $account_id = htmlspecialchars($_REQUEST['account_id']);
 if (is_null($account = Account::getByID($account_id))) {

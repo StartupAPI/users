@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(dirname(__FILE__)) . '/admin.php');
+require_once(dirname(__DIR__) . '/admin.php');
 
 # Getting users one by one is quite ineffective, so building query to do this
 $db = UserConfig::getDB();

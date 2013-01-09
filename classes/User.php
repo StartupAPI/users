@@ -1,10 +1,10 @@
 <?php
 
 require_once(dirname(__DIR__) . '/global.php');
-require_once(dirname(__FILE__) . '/Account.php');
-require_once(dirname(__FILE__) . '/Badge.php');
-require_once(dirname(__FILE__) . '/CookieStorage.php');
-require_once(dirname(__FILE__) . '/CampaignTracker.php');
+require_once(__DIR__ . '/Account.php');
+require_once(__DIR__ . '/Badge.php');
+require_once(__DIR__ . '/CookieStorage.php');
+require_once(__DIR__ . '/CampaignTracker.php');
 
 /**
  * This class represents a registerd user in the system

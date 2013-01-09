@@ -1,7 +1,7 @@
 <?php
-require_once(dirname(dirname(dirname(__FILE__))).'/global.php');
+require_once(dirname(dirname(__DIR__)).'/global.php');
 
-require_once(dirname(dirname(dirname(__FILE__))).'/classes/User.php');
+require_once(dirname(dirname(__DIR__)).'/classes/User.php');
 
 $module = AuthenticationModule::get('facebook');
 

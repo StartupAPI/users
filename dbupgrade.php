@@ -6,8 +6,8 @@
  * Note: this script should be versioned in your code repository so it always reflects current code's
  *       requirements for the database structure.
 */
-require_once(dirname(__FILE__).'/global.php');
-require_once(dirname(__FILE__).'/dbupgrade/lib.php');
+require_once(__DIR__.'/global.php');
+require_once(__DIR__.'/dbupgrade/lib.php');
 
 $versions = array();
 // Add new migrations on top, right below this line.
@@ -716,4 +716,4 @@ $versions[1]['down'][] = "DROP TABLE `".UserConfig::$mysql_prefix."user_preferen
 // using 'UserBase' namespace to make sure we don't conflict with parent project's dbupgrade
 $dbupgrade = new DBUpgrade(UserConfig::getDB(),	$versions, 'UserBase');
 
-require_once(dirname(__FILE__).'/dbupgrade/client.php');
+require_once(__DIR__.'/dbupgrade/client.php');

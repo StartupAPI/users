@@ -1,8 +1,8 @@
 <?php
-require_once(dirname(__FILE__).'/admin.php');
+require_once(__DIR__.'/admin.php');
 
 $ADMIN_SECTION = 'features';
-require_once(dirname(__FILE__).'/header.php');
+require_once(__DIR__.'/header.php');
 ?>
 <style>
 tr.disabled td{
@@ -120,4 +120,4 @@ foreach (Feature::getAll() as $feature) {
 ?>
 </div>
 <?php
-require_once(dirname(__FILE__).'/footer.php');
+require_once(__DIR__.'/footer.php');

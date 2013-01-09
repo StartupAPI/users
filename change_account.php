@@ -1,7 +1,7 @@
 <?php
-require_once(dirname(__FILE__).'/global.php');
-require_once(dirname(__FILE__).'/classes/User.php');
-require_once(dirname(__FILE__).'/classes/Account.php');
+require_once(__DIR__.'/global.php');
+require_once(__DIR__.'/classes/User.php');
+require_once(__DIR__.'/classes/Account.php');
 
 $user = User::require_login();
 

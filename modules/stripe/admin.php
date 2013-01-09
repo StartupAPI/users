@@ -1,11 +1,11 @@
 <?php
 
   # Ensure we are serving admin
-  require_once(dirname(dirname(dirname(__FILE__))).'/admin/admin.php');
+  require_once(dirname(dirname(__DIR__)).'/admin/admin.php');
 
   $ADMIN_SECTION = 'payment_method';
   $BREADCRUMB_EXTRA = 'Stripe';
-  require_once(dirname(dirname(dirname(__FILE__))).'/admin/header.php');
+  require_once(dirname(dirname(__DIR__)).'/admin/header.php');
 
   $action = isset($_REQUEST['action']) ? htmlspecialchars($_REQUEST['action']) : '';
   switch($action) {
@@ -233,4 +233,4 @@
 
   if($action != '')
     echo "<p><a href=\"".UserConfig::$USERSROOTURL."/modules/PaymentEngine_Manual/admin.php\">Back to list</a></p>\n";
-  require_once(dirname(dirname(dirname(__FILE__))).'/admin/footer.php');
+  require_once(dirname(dirname(__DIR__)).'/admin/footer.php');

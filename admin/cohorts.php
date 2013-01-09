@@ -3,7 +3,7 @@
  * @package StartupAPI
  * @subpackage Analytics\CohortAnalysis
  */
-require_once(dirname(__FILE__) . '/admin.php');
+require_once(__DIR__ . '/admin.php');
 
 $selectedactivityid = null;
 
@@ -17,7 +17,7 @@ $BREADCRUMB_EXTRA = null;
 if (array_key_exists($selectedactivityid, UserConfig::$activities)) {
 	$BREADCRUMB_EXTRA = UserConfig::$activities[$selectedactivityid][0];
 }
-require_once(dirname(__FILE__) . '/header.php');
+require_once(__DIR__ . '/header.php');
 ?>
 <div class="span9">
 
@@ -299,5 +299,5 @@ require_once(dirname(__FILE__) . '/header.php');
 
 </div>
 <?php
-require_once(dirname(__FILE__) . '/footer.php');
+require_once(__DIR__ . '/footer.php');
 

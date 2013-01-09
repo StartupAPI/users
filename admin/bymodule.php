@@ -1,8 +1,8 @@
 <?php
-require_once(dirname(__FILE__).'/admin.php');
+require_once(__DIR__.'/admin.php');
 
 $ADMIN_SECTION = 'bymodule';
-require_once(dirname(__FILE__).'/header.php');
+require_once(__DIR__.'/header.php');
 ?>
 <script type='text/javascript' src='swfobject/swfobject/swfobject.js'></script>
 <script type='text/javascript' src='http://www.google.com/jsapi'></script>
@@ -83,4 +83,4 @@ google.setOnLoadCallback(function() {
 
 </div>
 <?php
-require_once(dirname(__FILE__).'/footer.php');
+require_once(__DIR__.'/footer.php');

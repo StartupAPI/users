@@ -1,6 +1,6 @@
 <?php
-require_once(dirname(__FILE__) . '/User.php');
-require_once(dirname(__FILE__) . '/Plan.php');
+require_once(__DIR__ . '/User.php');
+require_once(__DIR__ . '/Plan.php');
 
 require_once(dirname(__DIR__) . '/twig/lib/Twig/Autoloader.php');
 Twig_Autoloader::register();

@@ -2,7 +2,7 @@
 
 error_reporting(E_ALL);
 
-require_once(dirname(dirname(dirname(__FILE__))).'/simpletest/autorun.php');
+require_once(dirname(dirname(__DIR__)).'/simpletest/autorun.php');
 
 class AllTests extends TestSuite {
   function AllTests()

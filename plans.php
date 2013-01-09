@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'/global.php');
+require_once(__DIR__.'/global.php');
 
 if (!UserConfig::$useSubscriptions) {
 	header('Location: '.UserConfig::$DEFAULTLOGOUTRETURN);
@@ -14,7 +14,7 @@ if ($account->getUserRole($user) !== Account::ROLE_ADMIN) {
 	exit;
 }
 
-include(dirname(__FILE__).'/view/plan/plans.php');
+include(__DIR__.'/view/plan/plans.php');
 
 require_once(UserConfig::$header);
 

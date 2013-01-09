@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . '/global.php');
+require_once(__DIR__ . '/global.php');
 
 if (!UserConfig::$enableGamification) {
 	header("HTTP/1.0 404 Not Found");
@@ -10,7 +10,7 @@ $user = User::require_login();
 
 $SECTION = 'badges';
 
-require_once(dirname(__FILE__) . '/sidebar_header.php');
+require_once(__DIR__ . '/sidebar_header.php');
 $available_badges = Badge::getAvailableBadges();
 
 if (count($available_badges) > 0) {
@@ -37,4 +37,4 @@ if (count($available_badges) > 0) {
 	</div>
 	<?php
 }
-require_once(dirname(__FILE__) . '/sidebar_footer.php');
+require_once(__DIR__ . '/sidebar_footer.php');

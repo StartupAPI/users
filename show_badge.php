@@ -1,7 +1,7 @@
 <?php
-require_once(dirname(__FILE__) . '/global.php');
+require_once(__DIR__ . '/global.php');
 
-require_once(dirname(__FILE__) . '/classes/User.php');
+require_once(__DIR__ . '/classes/User.php');
 
 if (!UserConfig::$enableGamification || !array_key_exists('name', $_GET)) {
 	header("HTTP/1.0 404 Not Found");
@@ -31,7 +31,7 @@ if (!$user_has_this_badge) {
 
 $SECTION = 'badges';
 
-require_once(dirname(__FILE__) . '/sidebar_header.php');
+require_once(__DIR__ . '/sidebar_header.php');
 
 $slug = $badge->getSlug() . ($badge_level > 1 ? '_' . $badge_level : '');
 ?>
@@ -42,4 +42,4 @@ $slug = $badge->getSlug() . ($badge_level > 1 ? '_' . $badge_level : '');
 <p class="startupapi-badge-call-to-action"><?php echo $badge->getCallToAction($badge_level); ?></p>
 
 <?php
-require_once(dirname(__FILE__) . '/sidebar_footer.php');
+require_once(__DIR__ . '/sidebar_footer.php');

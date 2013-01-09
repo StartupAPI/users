@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(dirname(__FILE__))).'/classes/OAuthModule.php');
+require_once(dirname(dirname(__DIR__)).'/classes/OAuthModule.php');
 
 /**
  * Google OAuth (v1) authentication module

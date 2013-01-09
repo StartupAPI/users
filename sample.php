@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'/users/users.php');
+require_once(__DIR__.'/users/users.php');
 
 // get user if logged in or require user to login
 $user = User::get();

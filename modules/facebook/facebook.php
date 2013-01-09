@@ -15,9 +15,9 @@
  * under the License.
  */
 
-require_once dirname(__FILE__)."/facebook-php-sdk/src/base_facebook.php";
+require_once __DIR__."/facebook-php-sdk/src/base_facebook.php";
 
-require_once(dirname(dirname(dirname(__FILE__))).'/global.php');
+require_once(dirname(dirname(__DIR__)).'/global.php');
 
 /**
  * Extends the BaseFacebook class with the intent of using
