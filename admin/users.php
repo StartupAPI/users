@@ -164,7 +164,7 @@ foreach ($users as $user)
 <ul class="pager">
 <?php
 if ($pagenumber > 0) {
-	?><li class="previous"><a href="?page=<?php echo $pagenumber-1; echo is_null($search) ? '' : '&q='.urlencode($search) ?>">&larr; prev</a></li><?php
+	?><li class="previous"><a href="?page=<?php echo $pagenumber-1; echo is_null($search) ? '' : '&q='.urlencode($search); echo $sortby == 'activity' ? '&sort=activity' : ''; ?>">&larr; prev</a></li><?php
 }
 else
 {
@@ -174,7 +174,7 @@ else
 <li>Page <?php echo $pagenumber+1?></li>
 <?php
 if (count($users) >= $perpage) {
-	?><li class="next"><a href="?page=<?php echo $pagenumber+1; echo is_null($search) ? '' : '&q='.urlencode($search)?>">next &rarr;</a></li><?php
+	?><li class="next"><a href="?page=<?php echo $pagenumber+1; echo is_null($search) ? '' : '&q='.urlencode($search); echo $sortby == 'activity' ? '&sort=activity' : ''; ?>">next &rarr;</a></li><?php
 }
 else
 {
