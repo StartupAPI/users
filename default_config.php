@@ -223,7 +223,7 @@ class UserConfig {
 	 * ===================================================================== */
 
 	/**
-	 * Array of integer IDs for instance administrators (who have access to adin UI).
+	 * Array of integer IDs for site administrators (who have access to adin UI).
 	 *
 	 * Usually first user with ID of 1 is administrator, but defining it without
 	 * having this user in the system might be dangerous if IDs didnt generate
@@ -299,7 +299,7 @@ class UserConfig {
 	public static $header;
 
 	/**
-	 * @var string File system path to header HTML file.
+	 * @var string File system path to footer HTML file.
 	 */
 	public static $footer;
 
@@ -321,7 +321,7 @@ class UserConfig {
 	public static $admin_footer;
 
 	/**
-	 * @var array Array of available theme slugs
+	 * @var array[] Array of available theme slugs
 	 */
 	public static $available_themes = array('classic');
 
@@ -331,11 +331,12 @@ class UserConfig {
 	public static $theme = 'classic';
 
 	/**
-	 * If specified, StartupAPI::head() will include this Twitter Bootstrap CSS instead of default one
+	 * @var string If specified, StartupAPI::head() will include this Twitter Bootstrap CSS instead of default one
 	 */
 	public static $bootstrapCSS = null;
+
 	/**
-	 * @var mixed[] Array of Twig environment options
+	 * @var array Associative array of Twig environment options
 	 */
 	public static $twig_options = array();
 
@@ -359,7 +360,7 @@ class UserConfig {
 	public static $adminActiveOnlyWithPoints = false;
 
 	/**
-	 * @var array An array of cohort providers (CohortProvider objects) for cohort analysis
+	 * @var CohortProvider[] An array of cohort providers (CohortProvider objects) for cohort analysis
 	 */
 	public static $cohort_providers = array();
 
@@ -395,7 +396,7 @@ class UserConfig {
 	 * An array of user IDs to exclude from activity listing in admin UI.
 	 * Try not to use it unless absolutely necessary - transparency is very important for operations.
 	 *
-	 * @var array
+	 * @var int[]
 	 */
 	public static $dont_display_activity_for = array();
 
@@ -898,12 +899,6 @@ EOD;
 		UserConfig::$DEFAULTUPDATEPASSWORDRETURN = UserConfig::$SITEROOTURL;
 		UserConfig::$DEFAULT_EMAIL_VERIFIED_RETURN = UserConfig::$SITEROOTURL;
 
-		// Default locations for terms of service and privacy policy documents
-		UserConfig::$termsOfServiceURL = UserConfig::$SITEROOTURL . 'terms_of_service.php';
-		UserConfig::$termsOfServiceFullURL = UserConfig::$SITEROOTFULLURL . 'terms_of_service.php';
-		UserConfig::$privacyPolicyURL = UserConfig::$SITEROOTURL . 'privacy_policy.php';
-		UserConfig::$privacyPolicyFullURL = UserConfig::$SITEROOTFULLURL . 'privacy_policy.php';
-
 		if (array_key_exists('HTTP_HOST', $_SERVER)) {
 			$host = $_SERVER['HTTP_HOST'];
 		} else {
@@ -915,6 +910,12 @@ EOD;
 
 		UserConfig::$SITEROOTFULLURL = 'http://' . $host . UserConfig::$SITEROOTURL;
 		UserConfig::$USERSROOTFULLURL = 'http://' . $host . substr(UserConfig::$ROOTPATH, $docrootlength);
+
+		// Default locations for terms of service and privacy policy documents
+		UserConfig::$termsOfServiceURL = UserConfig::$SITEROOTURL . 'terms_of_service.php';
+		UserConfig::$termsOfServiceFullURL = UserConfig::$SITEROOTFULLURL . 'terms_of_service.php';
+		UserConfig::$privacyPolicyURL = UserConfig::$SITEROOTURL . 'privacy_policy.php';
+		UserConfig::$privacyPolicyFullURL = UserConfig::$SITEROOTFULLURL . 'privacy_policy.php';
 
 		UserConfig::$supportEmailXMailer = 'Startup API (PHP/' . phpversion() . ')';
 		if (is_null(UserConfig::$appName)) {
