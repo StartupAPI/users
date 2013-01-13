@@ -59,8 +59,8 @@ $admin_menu = new AdminMenu(array(
 				new Menu('badges', 'Badges', $ADMIN_ROOT . '/badges.php', 'star')
 			)),
 			new MenuSection('settings', 'Settings', null, array(
-				new Menu('features', 'Features', $ADMIN_ROOT . '/features.php', 'check', $features_num > 0, 'No features defined in this app'),
-				new Menu('templates', 'Templates', $ADMIN_ROOT . '/templates.php', 'list-alt', false),
+				new Menu('systemsettings', 'System Settings', $ADMIN_ROOT . '/settings.php', 'wrench'),
+				new Menu('features', 'Features', $ADMIN_ROOT . '/features.php', 'check', $features_num > 0, 'No features defined in this app')
 			))
 		));
 
@@ -80,6 +80,8 @@ if (!isset($BREADCRUMB_EXTRA)) {
 		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
 		<script src="<?php echo UserConfig::$USERSROOTURL ?>/jquery-1.8.2.min.js"></script>
 		<script src="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/js/bootstrap.min.js"></script>
+		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="<?php echo UserConfig::$USERSROOTURL ?>/themes/<?php echo UserConfig::$theme ?>/startupapi.css">
 		<style>
 			.startupapi-sidebar.affix {
 				top: 4em;

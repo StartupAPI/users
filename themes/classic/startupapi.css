@@ -1175,3 +1175,74 @@
 	font-size: small;
 	display: block;
 }
+
+/* ********* Admin settings panel styles ********* */
+
+.startupapi-admin-setting .variable-name {
+	font-family: 'courier';
+}
+
+.startupapi-admin-setting + tr {
+	display: none;
+	border-bottom: 0;
+}
+.startupapi-admin-setting + tr td {
+	border-top: 0;
+}
+
+.startupapi-admin-setting .btn {
+	margin-right: 0.5em;
+}
+
+/* Settings values */
+.startupapi-admin-setting-value {
+	font-weight: bold;
+	color: #51a351;
+}
+
+.startupapi-admin-setting-value.seconds {
+	font-family: 'courier';
+	font-size: medium;
+}
+
+.startupapi-admin-setting-value.minutes {
+	font-family: 'courier';
+	font-size: medium;
+}
+
+.startupapi-admin-setting-value.path {
+	color: black;
+	font-family: 'courier';
+	border: 1px solid silver;
+	padding: 0.1em 0.2em;
+}
+
+.startupapi-admin-setting-value.url {
+	color: #759ff9;
+	font-family: 'courier';
+	text-decoration: underline;
+}
+
+.startupapi-admin-setting-value.secret {
+	color: silver;
+	font-family: 'courier';
+	font-style: italic;
+}
+
+.startupapi-admin-setting-value.null {
+	color: black;
+}
+.startupapi-admin-setting-value.unknown {
+	font-family: 'courier';
+	color: silver;
+}
+
+/* Values within the code */
+.startupapi-admin-code-value {
+	font-weight: bold;
+	color: #0044cc;
+}
+
+.startupapi-admin-code-value.secret {
+	color: silver;
+}

@@ -19,3 +19,6 @@
 [submodule "modules/facebook/facebook-php-sdk"]
 	path = modules/facebook/facebook-php-sdk
 	url = git://github.com/facebook/facebook-php-sdk.git
+[submodule "trunk8"]
+	path = trunk8
+	url = git://github.com/rviscomi/trunk8.git
