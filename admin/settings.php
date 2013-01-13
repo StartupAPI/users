@@ -123,6 +123,8 @@ $BREADCRUMB_EXTRA = $plan->name;
 require_once(__DIR__ . '/header.php');
 ?>
 <div class="span9">
+	<p>All available Startup API settings and their current values of are shown below.</p>
+	<p>To make changes to your configuration, click "code" button and copy the code show to <tt>users_config.php</tt> file in your application folder.</p>
 	<?php
 	foreach ($config_variables as $section) {
 		?>
