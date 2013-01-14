@@ -234,7 +234,12 @@ $config_variables = array(
 						'description' => 'Message to be displayed on registration page if person came without an invitation',
 						'type' => 'string',
 						'name' => 'invitationRequiredMessage'
-					),
+					)
+				)
+			),
+			array(
+				'description' => 'You can set URLs of Terms of service and Privacy policy documents and track TOS version for each user by defining current TOS version',
+				'settings' => array(
 					array(
 						'description' => 'URL of Terms of Service Document',
 						'type' => 'url',
