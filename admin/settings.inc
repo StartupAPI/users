@@ -7,9 +7,9 @@
 $config_variables = array(
 	array(
 		'name' => 'DB connectivity',
+		'id' => 'database',
 		'groups' => array(
 			array(
-				'id' => 'db',
 				'settings' => array(
 					array(
 						'description' => 'MySQL host',
@@ -52,6 +52,7 @@ $config_variables = array(
 	),
 	array(
 		'name' => 'Admin UI and access',
+		'id' => 'adminui',
 		'groups' => array(
 			array(
 				'settings' => array(
@@ -66,6 +67,7 @@ $config_variables = array(
 	),
 	array(
 		'name' => 'Debugging',
+		'id' => 'debugging',
 		'groups' => array(
 			array(
 				'settings' => array(
@@ -81,6 +83,7 @@ $config_variables = array(
 	),
 	array(
 		'name' => 'Headers, footers and look and feel',
+		'id' => 'lookandfeel',
 		'groups' => array(
 			array(
 				'settings' => array(
@@ -140,6 +143,7 @@ $config_variables = array(
 	),
 	array(
 		'name' => 'Paths and URLs',
+		'id' => 'pathsandurls',
 		'groups' => array(
 			array(
 				'description' => 'These paths are set automatically, so you might not want to modify them',
@@ -205,6 +209,7 @@ $config_variables = array(
 	),
 	array(
 		'name' => 'Startup API functionality switches',
+		'id' => 'startupapifunctionality',
 		'groups' => array(
 			array(
 				'settings' => array(
@@ -220,7 +225,7 @@ $config_variables = array(
 						'name' => 'registrationDisabledMessage'
 					),
 					array(
-						'description' => 'Require invitations by administrators',
+						'description' => 'Require invitations by administrators before users can register',
 						'type' => 'boolean',
 						'name' => 'enableInvitations',
 						'options' => array('true_string' => 'enabled', 'false_string' => 'disabled')
@@ -260,7 +265,8 @@ $config_variables = array(
 		)
 	),
 	array(
-		'name' => 'System emails settings',
+		'name' => 'System email settings',
+		'id' => 'systememail',
 		'groups' => array(
 			array(
 				'settings' => array(
@@ -305,6 +311,7 @@ $config_variables = array(
 	),
 	array(
 		'name' => 'Sessions and cookies',
+		'id' => 'sessionsandcookies',
 		'groups' => array(
 			array(
 				'settings' => array(
@@ -388,6 +395,7 @@ $config_variables = array(
 	),
 	array(
 		'name' => 'Activity tracking and analytics',
+		'id' => 'activity',
 		'groups' => array(
 			array(
 				'settings' => array(
@@ -427,6 +435,7 @@ $config_variables = array(
 	),
 	array(
 		'name' => 'Gamification',
+		'id' => 'gamification',
 		'groups' => array(
 			array(
 				'settings' => array(
@@ -452,6 +461,7 @@ $config_variables = array(
 	),
 	array(
 		'name' => 'Accounts',
+		'id' => 'accounts',
 		'groups' => array(
 			array(
 				'settings' => array(
@@ -466,6 +476,7 @@ $config_variables = array(
 	),
 	array(
 		'name' => 'OAuth client configuration',
+		'id' => 'oauthclient',
 		'groups' => array(
 			array(
 				'settings' => array(
@@ -480,6 +491,7 @@ $config_variables = array(
 	),
 	array(
 		'name' => 'Hooks',
+		'id' => 'hooks',
 		'groups' => array(
 			array(
 				'settings' => array(
@@ -542,6 +554,7 @@ $config_variables = array(
 	),
 	array(
 		'name' => 'Subscriptions',
+		'id' => 'subscription',
 		'groups' => array(
 			array(
 				'settings' => array(
