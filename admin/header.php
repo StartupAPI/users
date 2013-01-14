@@ -87,10 +87,6 @@ if (!isset($BREADCRUMB_EXTRA)) {
 				top: 4em;
 			}
 
-			body {
-				padding-top: 40px;
-			}
-
 			.logo {
 				margin-right: 0.5em;
 			}
@@ -103,7 +99,7 @@ if (!isset($BREADCRUMB_EXTRA)) {
 	</head>
 	<body>
 		<div class="navbar">
-			<div class="navbar-inner navbar-fixed-top">
+			<div class="navbar-inner">
 				<span class="brand"><a href="<?php echo UserConfig::$SITEROOTURL ?>"><img class="logo" width="20" height="20" src="<?php echo UserConfig::$USERSROOTURL ?>/images/header_icon.png"/><?php echo is_null(UserConfig::$appName) ? '' : UserConfig::$appName; ?></a></span>
 
 				<span></span>
