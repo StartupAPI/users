@@ -79,12 +79,12 @@ function codeValue($type, $value, $options = array()) {
 		if (is_string($value)) {
 			?>'<span class="startupapi-admin-code-value callable"><?php echo UserTools::escape($value) ?></span>'<?php
 		} else if (is_array($value)) {
-			?><span class="startupapi-admin-code-value callable">array('<?php echo UserTools::escape($value[0])?>', '<?php echo UserTools::escape($value[1])?>')</span><?php
+			?><span class="startupapi-admin-code-value callable">array('<?php echo UserTools::escape($value[0]) ?>', '<?php echo UserTools::escape($value[1]) ?>')</span><?php
 		} else if (get_class($value) == 'Closure') {
 			$arguments = is_array($options) && array_key_exists('arguments', $options) ? $options['arguments'] : array();
 			$var_names = array_map(function($argument) {
-				return '$'.$argument;
-			}, $arguments);
+						return '$' . $argument;
+					}, $arguments);
 			?><span class="startupapi-admin-code-value callable">function(<?php echo join(', ', $var_names) ?>) { &hellip; }</span><?php
 		}
 	} else {
@@ -128,12 +128,12 @@ function value($type, $value, $options = array()) {
 	} else if ($type == 'callable') {
 		$arguments = is_array($options) && array_key_exists('arguments', $options) ? $options['arguments'] : array();
 		$var_names = array_map(function($argument) {
-			return '$'.$argument;
-		}, $arguments);
+					return '$' . $argument;
+				}, $arguments);
 		if (is_string($value)) {
 			?><span class="startupapi-admin-setting-value callable"><?php echo UserTools::escape($value) ?>(<?php echo join(', ', $var_names) ?>)</span><?php
 		} else if (is_array($value)) {
-			?><span class="startupapi-admin-setting-value callable"><?php echo UserTools::escape($value[0])?>::<?php echo UserTools::escape($value[1])?>(<?php echo join(', ', $var_names) ?>)</span><?php
+			?><span class="startupapi-admin-setting-value callable"><?php echo UserTools::escape($value[0]) ?>::<?php echo UserTools::escape($value[1]) ?>(<?php echo join(', ', $var_names) ?>)</span><?php
 		} else if (get_class($value) == 'Closure') {
 			?><span class="startupapi-admin-setting-value callable">function(<?php echo join(', ', $var_names) ?>) { &hellip; }</span><?php
 		}
@@ -154,85 +154,95 @@ require_once(__DIR__ . '/header.php');
 <div class="span9">
 	<p>All available Startup API settings and their current values of are shown below.</p>
 	<p>To make changes to your configuration, click "code" button and copy the code show to <tt>users_config.php</tt> file in your application folder.</p>
-	<?php
-	foreach ($config_variables as $section) {
+
+<ul>
+	<?php foreach ($config_variables as $section) {
 		?>
-		<h2><?php echo $section['name'] ?></h2>
-		<p><?php echo $section['description']; ?></p>
+		<li><a href="#<?php echo $section['id'] ?>"><?php echo $section['name'] ?></a></li>
 		<?php
-		foreach ($section['groups'] as $group) {
-			if (array_key_exists('description', $group)) {
-				?>
-				<p><?php echo $group['description'] ?></p>
-				<?php
-			}
+	}
+	?>
+</ul>
 
-			$id_html = '';
-			if (array_key_exists('id', $group)) {
-				$id_html = ' id="' . $group['id'] . '"';
-			}
+<?php
+foreach ($config_variables as $section) {
+	?>
+	<h2 id="<?php echo $section['id'] ?>"><?php echo $section['name'] ?> <a href="#" title="go to top of the page"><i class="icon-th-list"></i></a></h2>
+	<p><?php echo $section['description']; ?></p>
+	<?php
+	foreach ($section['groups'] as $group) {
+		if (array_key_exists('description', $group)) {
 			?>
-			<table<?php echo $id_html ?> class="table">
-				<tr>
-					<th>Setting description</th>
-					<th>Current Value(s)</th>
-				</tr>
-				<?php
-				foreach ($group['settings'] as $setting) {
-					$var_name = $setting['name'];
+			<p><?php echo $group['description'] ?></p>
+			<?php
+		}
 
-					$code = "";
-					?>
-					<tr class="startupapi-admin-setting">
-						<td>
-							<p><?php echo $setting['description'] ?></p>
-							<p>
-								<span class="btn btn-mini">
-									<i class="icon-cog"></i>
-									<span class="calltoaction">code</span>
-								</span>
-								<span class="variable-name">UserConfig::$<?php echo $setting['name'] ?> (<?php echo phpType($setting['type']) ?>)</span>
-							</p>
-						</td>
+		$id_html = '';
+		if (array_key_exists('id', $group)) {
+			$id_html = ' id="' . $group['id'] . '"';
+		}
+		?>
+		<table<?php echo $id_html ?> class="table">
+			<tr>
+				<th>Setting description</th>
+				<th>Current Value(s)</th>
+			</tr>
+			<?php
+			foreach ($group['settings'] as $setting) {
+				$var_name = $setting['name'];
 
-						<td>
-							<?php
-							if (substr($setting['type'], -2) == '[]' && is_array(UserConfig::$$var_name)) {
-								if (count(UserConfig::$$var_name) == 0) {
-									?><span class="startupapi-admin-setting-value null">&mdash;</span><?php
-								}
-								foreach (UserConfig::$$var_name as $value) {
-									?>
-									<div>
-										<?php
-										value(substr($setting['type'], 0, -2), $value, $setting['options']);
-										?>
-									</div>
+				$code = "";
+				?>
+				<tr class="startupapi-admin-setting">
+					<td>
+						<p><?php echo $setting['description'] ?></p>
+						<p>
+							<span class="btn btn-mini">
+								<i class="icon-cog"></i>
+								<span class="calltoaction">code</span>
+							</span>
+							<span class="variable-name">UserConfig::$<?php echo $setting['name'] ?> (<?php echo phpType($setting['type']) ?>)</span>
+						</p>
+					</td>
+
+					<td>
+						<?php
+						if (substr($setting['type'], -2) == '[]' && is_array(UserConfig::$$var_name)) {
+							if (count(UserConfig::$$var_name) == 0) {
+								?><span class="startupapi-admin-setting-value null">&mdash;</span><?php
+				}
+				foreach (UserConfig::$$var_name as $value) {
+								?>
+								<div>
 									<?php
-								}
-							} else {
-								value($setting['type'], UserConfig::$$var_name, $setting['options']);
+									value(substr($setting['type'], 0, -2), $value, $setting['options']);
+									?>
+								</div>
+								<?php
 							}
-							?>
-						</td>
-					</tr>
-					<tr>
-						<td colspan="2">
-							<pre>
+						} else {
+							value($setting['type'], UserConfig::$$var_name, $setting['options']);
+						}
+						?>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<pre>
 /**
  * @var <?php echo phpType($setting['type']) ?> <?php echo $setting['description'] ?>.
  */
 UserConfig::$<?php echo $setting['name'] ?> = <?php codeValue($setting['type'], UserConfig::$$var_name, $setting['options']) ?>;</pre>
-						</td>
-					</tr>
-					<?php
-				}
-				?>
-			</table>
-			<?php
-		}
+					</td>
+				</tr>
+				<?php
+			}
+			?>
+		</table>
+		<?php
 	}
-	?>
+}
+?>
 </div>
 <script src="<?php echo UserConfig::$USERSROOTURL ?>/trunk8/trunk8.js"></script>
 
