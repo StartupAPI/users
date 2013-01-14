@@ -230,7 +230,9 @@ foreach ($config_variables as $section) {
 					<td colspan="2">
 						<pre>
 /**
- * @var <?php echo phpType($setting['type']) ?> <?php echo $setting['description'] ?>.
+ * <?php echo $setting['description'] . "\n" ?>
+ *
+ * @var <?php echo phpType($setting['type']) . "\n" ?>
  */
 UserConfig::$<?php echo $setting['name'] ?> = <?php codeValue($setting['type'], UserConfig::$$var_name, $setting['options']) ?>;</pre>
 					</td>
