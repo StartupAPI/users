@@ -195,6 +195,10 @@ class StartupAPI {
 	 * This function should be called after all configuration is loaded to initialize the system.
 	 */
 	static function _init() {
+		if (!is_null(UserConfig::$appName)) {
+			UserConfig::$supportEmailXMailer = UserConfig::$appName . ' using ' . UserConfig::$supportEmailXMailer;
+		}
+
 		// Initializing more structures based on user configurations
 		Plan::init(UserConfig::$PLANS);
 

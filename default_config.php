@@ -663,7 +663,6 @@ class UserConfig {
 	 */
 	public static $plan_free = 'PLAN_FREE';
 
-	// subscription plans list, MUST have free plan index
 	/**
 	 * Plan configuration array with plan slugs as keys and config parameters as details
 	 *
@@ -918,9 +917,6 @@ EOD;
 		UserConfig::$privacyPolicyFullURL = UserConfig::$SITEROOTFULLURL . 'privacy_policy.php';
 
 		UserConfig::$supportEmailXMailer = 'Startup API (PHP/' . phpversion() . ')';
-		if (is_null(UserConfig::$appName)) {
-			UserConfig::$supportEmailXMailer = UserConfig::$appName . ' using ' . UserConfig::$appName;
-		}
 
 		UserConfig::$header = __DIR__ . '/header.php';
 		UserConfig::$footer = __DIR__ . '/footer.php';
