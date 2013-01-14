@@ -22,6 +22,9 @@ function phpType($type) {
 	if ($type == 'minutes') {
 		return 'int';
 	}
+	if ($type == 'days') {
+		return 'int';
+	}
 	if ($type == 'path') {
 		return 'string';
 	}
@@ -47,7 +50,7 @@ function phpType($type) {
  * @param string $type PHP variable type: 'boolean', 'int', 'string' and special type 'secret' for variables to not be shown in UI
  * @param mixed $value Value of the variable
  */
-function codeValue($type, $value) {
+function codeValue($type, $value, $options = array()) {
 	if (substr($type, -2) == '[]' && is_array($value)) {
 		?>array(<?php
 		$first = true;
@@ -72,6 +75,18 @@ function codeValue($type, $value) {
 		?>'<span class="startupapi-admin-code-value secret" title="Actual value is not shown for security reasons">****************</span>'<?php
 	} else if ($type == 'string' || $type == 'path' || $type == 'url' || $type == 'cookie-key') {
 		?>'<span class="startupapi-admin-code-value string"><?php echo UserTools::escape($value) ?></span>'<?php
+	} else if ($type == 'callable') {
+		if (is_string($value)) {
+			?>'<span class="startupapi-admin-code-value callable"><?php echo UserTools::escape($value) ?></span>'<?php
+		} else if (is_array($value)) {
+			?><span class="startupapi-admin-code-value callable">array('<?php echo UserTools::escape($value[0])?>', '<?php echo UserTools::escape($value[1])?>')</span><?php
+		} else if (get_class($value) == 'Closure') {
+			$arguments = is_array($options) && array_key_exists('arguments', $options) ? $options['arguments'] : array();
+			$var_names = array_map(function($argument) {
+				return '$'.$argument;
+			}, $arguments);
+			?><span class="startupapi-admin-code-value callable">function(<?php echo join(', ', $var_names) ?>) { &hellip; }</span><?php
+		}
 	} else {
 		?><span class="startupapi-admin-code-value unknown"><?php echo UserTools::escape(var_export($value, true)) ?></span><?php
 	}
@@ -96,6 +111,8 @@ function value($type, $value, $options = array()) {
 		(<?php echo UserTools::escape(intval($value / 60 / 60 / 24)) ?> days)<?php
 	} else if ($type == 'minutes') {
 		?><span class="startupapi-admin-setting-value minutes"><?php echo UserTools::escape($value) ?></span> minutes<?php
+	} else if ($type == 'days') {
+		?><span class="startupapi-admin-setting-value days"><?php echo UserTools::escape($value) ?></span> days<?php
 	} else if ($type == 'path') {
 		?><span class="startupapi-admin-setting-value path"><?php echo UserTools::escape($value) ?></span><?php
 	} else if ($type == 'url') {
@@ -108,6 +125,18 @@ function value($type, $value, $options = array()) {
 		?><span class="startupapi-admin-setting-value int"><?php echo UserTools::escape($value) ?></span><?php
 	} else if ($type == 'string') {
 		?>'<span class="startupapi-admin-setting-value string"><?php echo UserTools::escape($value) ?></span>'<?php
+	} else if ($type == 'callable') {
+		$arguments = is_array($options) && array_key_exists('arguments', $options) ? $options['arguments'] : array();
+		$var_names = array_map(function($argument) {
+			return '$'.$argument;
+		}, $arguments);
+		if (is_string($value)) {
+			?><span class="startupapi-admin-setting-value callable"><?php echo UserTools::escape($value) ?>(<?php echo join(', ', $var_names) ?>)</span><?php
+		} else if (is_array($value)) {
+			?><span class="startupapi-admin-setting-value callable"><?php echo UserTools::escape($value[0])?>::<?php echo UserTools::escape($value[1])?>(<?php echo join(', ', $var_names) ?>)</span><?php
+		} else if (get_class($value) == 'Closure') {
+			?><span class="startupapi-admin-setting-value callable">function(<?php echo join(', ', $var_names) ?>) { &hellip; }</span><?php
+		}
 	} else if ($type == 'user-id') {
 		?><a href="user.php?id=<?php echo $value ?>"><i class="icon-user"></i> <?php echo UserTools::escape(User::getUser($value)->getName()) ?></a><?php
 	} else {
@@ -193,7 +222,7 @@ require_once(__DIR__ . '/header.php');
 /**
  * @var <?php echo phpType($setting['type']) ?> <?php echo $setting['description'] ?>.
  */
-UserConfig::$<?php echo $setting['name'] ?> = <?php codeValue($setting['type'], UserConfig::$$var_name) ?>;</pre>
+UserConfig::$<?php echo $setting['name'] ?> = <?php codeValue($setting['type'], UserConfig::$$var_name, $setting['options']) ?>;</pre>
 						</td>
 					</tr>
 					<?php

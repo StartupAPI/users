@@ -395,5 +395,174 @@ $config_variables = array(
 				)
 			)
 		)
-	)
+	),
+	array(
+		'name' => 'System emails settings',
+		'groups' => array(
+			array(
+				'settings' => array(
+					array(
+						'description' => "Name and email to send invitations from (e.g. 'User Support <support@example.com>')",
+						'type' => 'string',
+						'name' => 'supportEmailFrom'
+					),
+					array(
+						'description' => 'Reply-To email address for return emails',
+						'type' => 'string',
+						'name' => 'supportEmailReplyTo'
+					),
+					array(
+						'description' => 'Email agent header (X-Mailer)',
+						'type' => 'string',
+						'name' => 'supportEmailXMailer'
+					),
+					array(
+						'description' => 'Password recovery email subject line',
+						'type' => 'string',
+						'name' => 'passwordRecoveryEmailSubject'
+					),
+					array(
+						'description' => 'Email verification message subject line',
+						'type' => 'string',
+						'name' => 'emailVerificationSubject'
+					),
+					array(
+						'description' => 'Require users to verify their email addresses before they can log in.',
+						'type' => 'boolean',
+						'name' => 'requireVerifiedEmail'
+					),
+					array(
+						'description' => 'Amount of days email verification code is valid for',
+						'type' => 'days',
+						'name' => 'emailVerificationCodeExpiresInDays'
+					)
+				)
+			)
+		)
+	),
+	array(
+		'name' => 'Accounts',
+		'groups' => array(
+			array(
+				'settings' => array(
+					array(
+						'description' => 'Destination URL used when account is switched (current page by default, if null)',
+						'type' => 'url',
+						'name' => 'accountSwitchDestination'
+					)
+				)
+			)
+		)
+	),
+	array(
+		'name' => 'OAuth client configuration',
+		'groups' => array(
+			array(
+				'settings' => array(
+					array(
+						'description' => 'OAuth application name, not sent if not defined (default) - apps use registered name most of the time anyway',
+						'type' => 'string',
+						'name' => 'OAuthAppName'
+					)
+				)
+			)
+		)
+	),
+	array(
+		'name' => 'Hooks',
+		'groups' => array(
+			array(
+				'settings' => array(
+					array(
+						'description' => 'Hook for rendering invitation action UI in admin interface',
+						'type' => 'callable',
+						'name' => 'onRenderUserInvitationAction',
+						'options' => array(
+							'arguments' => array('invitation_code')
+						)
+					),
+					array(
+						'description' => 'Hook for rendering invitation followup action UI in admin interface',
+						'type' => 'callable',
+						'name' => 'onRenderUserInvitationFollowUpAction',
+						'options' => array(
+							'arguments' => array('invitation_code')
+						)
+					),
+					array(
+						'description' => 'Formatter for password recovery email',
+						'type' => 'callable',
+						'name' => 'onRenderTemporaryPasswordEmail',
+						'options' => array(
+							'arguments' => array('baseurl', 'username', 'temppass')
+						)
+					),
+					array(
+						'description' => 'Formatter for email verification message',
+						'type' => 'callable',
+						'name' => 'onRenderVerificationCodeEmail',
+						'options' => array(
+							'arguments' => array('verification_link', 'verification_code')
+						)
+					),
+					array(
+						'description' => 'Handler to be called when new user is created, newly created user object is passed in',
+						'type' => 'callable',
+						'name' => 'onCreate',
+						'options' => array(
+							'arguments' => array('user')
+						)
+					),
+					array(
+						'description' => 'Hook for rendering extra links on power strip',
+						'type' => 'callable',
+						'name' => 'onLoginStripLinks',
+						'options' => array(
+							'arguments' => array('current_user', 'current_account')
+						)
+					),
+					array(
+						'description' => 'Hook for rendering Terms of Service and Privacy Policy verbiage on signup forms',
+						'type' => 'callable',
+						'name' => 'onRenderTOSLinks',
+					)
+				)
+			),
+		)
+	),
+	array(
+		'name' => 'Subscriptions',
+		'groups' => array(
+			array(
+				'settings' => array(
+					array(
+						'description' => 'Enables subscription plans and payments management',
+						'type' => 'boolean',
+						'name' => 'useSubscriptions'
+					),
+					array(
+						'description' => 'Free plan slug which is set to the user when they register without payment',
+						'type' => 'string',
+						'name' => 'plan_free'
+					),
+					array(
+						'description' => 'Plan configuration array with plan slugs as keys and config parameters as details',
+						'type' => 'array',
+						'name' => 'PLANS'
+					),
+					array(
+						'description' => 'The slug of the plan that gets assigned to the user by default',
+						'type' => 'string',
+						'name' => 'default_plan_slug'
+					),
+					array(
+						'description' => 'The slug of the payment schedule that gets assigned to the user by default',
+						'type' => 'string',
+						'name' => 'default_schedule_slug'
+					)
+				)
+			)
+		)
+	),
+
 );

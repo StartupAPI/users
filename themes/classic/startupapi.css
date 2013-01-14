@@ -1210,11 +1210,21 @@
 	font-size: medium;
 }
 
+.startupapi-admin-setting-value.days {
+	font-family: 'courier';
+	font-size: medium;
+}
+
 .startupapi-admin-setting-value.path {
 	color: black;
 	font-family: 'courier';
 	border: 1px solid silver;
 	padding: 0.1em 0.2em;
+}
+
+.startupapi-admin-setting-value.callable {
+	color: silver;
+	font-family: 'courier';
 }
 
 .startupapi-admin-setting-value.url {
