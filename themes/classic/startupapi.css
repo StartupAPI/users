@@ -1176,6 +1176,10 @@
 	display: block;
 }
 
+.startupapi-admin-user-id {
+	color: silver
+}
+
 /* ********* Admin settings panel styles ********* */
 
 .startupapi-admin-setting .variable-name {

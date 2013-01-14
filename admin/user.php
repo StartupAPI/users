@@ -56,6 +56,7 @@ require_once(__DIR__ . '/header.php');
 	<form action="" method="POST">
 		<h2>
 			<?php echo UserTools::escape($user->getName()); ?>
+			<span class="startupapi-admin-user-id">(ID: <?php echo $user->getID() ?>)</span>
 			<?php if ($user->isAdmin()) { ?>
 				<span class="badge badge-important">system admin</span>
 			<?php } ?>
