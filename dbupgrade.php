@@ -22,6 +22,19 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 26
+ * Removing deprecated Google Friend Connect module
+*/
+$versions[26]['up'][] = "DROP TABLE `".UserConfig::$mysql_prefix."googlefriendconnect`";
+$versions[26]['down'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."googlefriendconnect` (
+  `user_id` int(10) unsigned NOT NULL COMMENT 'User ID',
+  `google_id` varchar(255) NOT NULL COMMENT 'Google Friend Connect ID',
+  `userpic` text NOT NULL COMMENT 'Google Friend Connect User picture',
+  PRIMARY KEY (`user_id`,`google_id`),
+  CONSTRAINT `gfc_user` FOREIGN KEY (`user_id`) REFERENCES `".UserConfig::$mysql_prefix."users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 25
  * Adding transaciton details table for PaymentEngine_Manual
 */

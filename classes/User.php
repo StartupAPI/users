@@ -614,45 +614,7 @@ class User {
 	 * @deprecated
 	 */
 	public static function createNewGoogleFriendConnectUser($name, $googleid, $userpic) {
-		$name = mb_convert_encoding($name, 'UTF-8');
-
-		$db = UserConfig::getDB();
-
-		$user = null;
-
-		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . "users (name, regmodule, tos_version) VALUES (?, 'google', ?)")) {
-			if (!$stmt->bind_param('si', $name, UserConfig::$currentTOSVersion)) {
-				throw new DBBindParamException($db, $stmt);
-			}
-			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
-			}
-			$id = $stmt->insert_id;
-
-			$stmt->close();
-		} else {
-			throw new DBPrepareStmtException($db);
-		}
-
-		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . 'googlefriendconnect (user_id, google_id, userpic) VALUES (?, ?, ?)')) {
-			if (!$stmt->bind_param('iss', $id, $googleid, $userpic)) {
-				throw new DBBindParamException($db, $stmt);
-			}
-			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
-			}
-
-			$stmt->close();
-		} else {
-			throw new DBPrepareStmtException($db);
-		}
-
-		$user = self::getUser($id);
-		$user->setReferer();
-		$user->setRegCampaign();
-		$user->init();
-
-		return $user;
+		throw StartupAPIDeprecatedException('Google Friend Connect support is deprecated');
 	}
 
 	/**
@@ -1844,21 +1806,7 @@ class User {
 	 * @deprecated
 	 */
 	public function removeGoogleFriendConnectAssociation($google_id) {
-		$db = UserConfig::getDB();
-
-		if ($stmt = $db->prepare('DELETE FROM ' . UserConfig::$mysql_prefix . 'googlefriendconnect WHERE user_id = ? AND google_id = ?')) {
-			if (!$stmt->bind_param('is', $this->userid, $google_id)) {
-				throw new DBBindParamException($db, $stmt);
-			}
-			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
-			}
-
-			$stmt->close();
-		} else {
-			throw new DBPrepareStmtException($db);
-		}
-		$this->recordActivity(USERBASE_ACTIVITY_REMOVED_GFC);
+		throw StartupAPIDeprecatedException('Google Friend Connect support is deprecated');
 	}
 
 	/**
@@ -1872,22 +1820,7 @@ class User {
 	 * @deprecated
 	 */
 	public function addGoogleFriendConnectAssociation($google_id, $userpic) {
-		$db = UserConfig::getDB();
-
-		if ($stmt = $db->prepare('INSERT IGNORE INTO ' . UserConfig::$mysql_prefix . 'googlefriendconnect (user_id, google_id, userpic) VALUES (?, ?, ?)')) {
-			if (!$stmt->bind_param('iss', $this->userid, $google_id, $userpic)) {
-				throw new DBBindParamException($db, $stmt);
-			}
-			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
-			}
-
-			$stmt->close();
-		} else {
-			throw new DBPrepareStmtException($db);
-		}
-
-		$this->recordActivity(USERBASE_ACTIVITY_ADDED_GFC);
+		throw StartupAPIDeprecatedException('Google Friend Connect support is deprecated');
 	}
 
 	/**
@@ -1900,31 +1833,7 @@ class User {
 	 * @deprecated
 	 */
 	public function getGoogleFriendsConnectAssociations() {
-		$db = UserConfig::getDB();
-
-		$associations = array();
-
-		if ($stmt = $db->prepare('SELECT google_id, userpic FROM ' . UserConfig::$mysql_prefix . 'users u INNER JOIN ' . UserConfig::$mysql_prefix . 'googlefriendconnect g ON u.id = g.user_id WHERE u.id = ?')) {
-			if (!$stmt->bind_param('i', $this->userid)) {
-				throw new DBBindParamException($db, $stmt);
-			}
-			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
-			}
-			if (!$stmt->bind_result($google_id, $userpic)) {
-				throw new DBBindResultException($db, $stmt);
-			}
-
-			while ($stmt->fetch() === TRUE) {
-				$associations[] = array('google_id' => $google_id, 'userpic' => $userpic);
-			}
-
-			$stmt->close();
-		} else {
-			throw new DBPrepareStmtException($db);
-		}
-
-		return $associations;
+		throw StartupAPIDeprecatedException('Google Friend Connect support is deprecated');
 	}
 
 	/**
@@ -2026,31 +1935,7 @@ class User {
 	 * @deprecated
 	 */
 	public static function getUserByGoogleFriendConnectID($googleid) {
-		$db = UserConfig::getDB();
-
-		$user = null;
-
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users u INNER JOIN ' . UserConfig::$mysql_prefix . 'googlefriendconnect g ON u.id = g.user_id WHERE g.google_id = ?')) {
-			if (!$stmt->bind_param('s', $googleid)) {
-				throw new DBBindParamException($db, $stmt);
-			}
-			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
-			}
-			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
-				throw new DBBindResultException($db, $stmt);
-			}
-
-			if ($stmt->fetch() === TRUE) {
-				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
-			}
-
-			$stmt->close();
-		} else {
-			throw new DBPrepareStmtException($db);
-		}
-
-		return $user;
+		throw StartupAPIDeprecatedException('Google Friend Connect support is deprecated');
 	}
 
 	/*
