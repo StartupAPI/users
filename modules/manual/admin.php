@@ -30,7 +30,7 @@
         $engine = $account->getPaymentEngine();
         if(is_null($engine)) {
         ?>
-        <p>Can't find Payment Engine for account <?php echo $account_id ?>. Should be 'PaymentEngine_Manual'.</p>
+        <p>Can't find Payment Engine for account <?php echo $account_id ?>. Should be 'manual'.</p>
         <?php
           break;
         } else {
@@ -133,7 +133,7 @@
 
       if (!($stmt = $db->prepare('SELECT id,name,plan_slug,schedule_slug,active,COALESCE(SUM(amount),0) AS balance FROM '.
         UserConfig::$mysql_prefix.'accounts AS a LEFT JOIN '.UserConfig::$mysql_prefix.'account_charge AS c '.
-        'ON c.account_id = a.id WHERE engine_slug = "PaymentEngine_Manual" '.(is_null($search) ? '' : 'AND name like ? ').
+        'ON c.account_id = a.id WHERE engine_slug = "manual" '.(is_null($search) ? '' : 'AND name like ? ').
         'GROUP BY a.id ORDER BY '.$sortby.' LIMIT '.$perpage.' OFFSET '.$pagenumber * $perpage))) {
 			throw new DBPrepareStmtException($db);
 		}
@@ -232,5 +232,5 @@
   }
 
   if($action != '')
-    echo "<p><a href=\"".UserConfig::$USERSROOTURL."/modules/PaymentEngine_Manual/admin.php\">Back to list</a></p>\n";
+    echo "<p><a href=\"".UserConfig::$USERSROOTURL."/modules/manual/admin.php\">Back to list</a></p>\n";
   require_once(dirname(dirname(__DIR__)).'/admin/footer.php');

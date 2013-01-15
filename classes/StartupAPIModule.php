@@ -36,16 +36,16 @@ abstract class StartupAPIModule {
 	abstract public function getTitle();
 
 	/**
-	 * Returns module by ID
+	 * Returns module by slug
 	 *
-	 * @param string $id ID of the module
+	 * @param string $slug Module slug
 	 *
 	 * @return StartupAPIModule StartupAPIModule object
 	 */
-	public static function get($id) {
+	public static function get($slug) {
 		foreach (UserConfig::$all_modules as $module)
 		{
-			if ($module->getID() == $id) {
+			if ($module->getID() == $slug) {
 				return $module;
 			}
 		}
@@ -54,5 +54,5 @@ abstract class StartupAPIModule {
 
 require_once(__DIR__.'/AuthenticationModule.php');
 require_once(__DIR__.'/EmailModule.php');
-require_once(__DIR__.'/PaymentEngineModule.php');
+require_once(__DIR__.'/PaymentEngine.php');
 

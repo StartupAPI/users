@@ -313,8 +313,7 @@ class Account {
 				NULL : $this->nextPlan->getPaymentScheduleBySlug($next_schedule_slug);
 
 		if ($engine_slug !== NULL) {
-			UserConfig::loadModule($engine_slug);
-			$this->paymentEngine = new $engine_slug;
+			$this->paymentEngine = StartupAPIModule::get($engine_slug);
 		}
 
 		$this->charges = is_null($charges) ? array() : $charges;
@@ -1162,8 +1161,7 @@ class Account {
 			return FALSE;
 		}
 
-		UserConfig::loadModule($engine_slug);
-		$this->paymentEngine = new $engine_slug;
+		$this->paymentEngine = StartupAPIModule::get($engine_slug);
 
 		// Update db
 		$db = UserConfig::getDB();

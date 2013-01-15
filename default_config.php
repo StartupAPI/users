@@ -46,13 +46,13 @@ class UserConfig {
 	 *
 	 * Imitialize your like the following:
 	 * <code>
-	 * UserConfig::loadModule('PaymentEngine_Manual');
-	 * new PaymentEngine_Manual();
+	 * UserConfig::loadModule('manual');
+	 * new ManualPaymentEngine();
 	 * </code>
 	 *
 	 * Only used when $useSubscriptions is set
 	 *
-	 * @var PaymentEngineModule[]
+	 * @var PaymentEngine[]
 	 */
 	public static $payment_modules = array();
 

@@ -7,7 +7,7 @@
 /**
  * Manual payment engine used for consierge subscription
  */
-class PaymentEngine_Manual extends PaymentEngine {
+class ManualPaymentEngine extends PaymentEngine {
 
 	/**
 	 * @var boolean Singleton flag
@@ -16,7 +16,7 @@ class PaymentEngine_Manual extends PaymentEngine {
 
 	public function __construct() {
 
-		$this->slug = 'PaymentEngine_Manual';
+		$this->slug = 'manual';
 		if (!self::$loaded) {
 			parent::__construct();
 			self::$loaded = true;

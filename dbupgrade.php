@@ -22,6 +22,23 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 27
+ * Renaming Manual Payment engine
+*/
+$versions[27]['up'][] = "RENAME TABLE `".UserConfig::$mysql_prefix."transaction_details_PaymentEngine_Manual`
+	TO `".UserConfig::$mysql_prefix."transaction_details_manual`";
+$versions[27]['up'][] = "UPDATE `".UserConfig::$mysql_prefix."accounts`
+	SET engine_slug = 'manual'
+	WHERE engine_slug = 'PaymentEngine_Manual'";
+
+$versions[27]['down'][] = "UPDATE `".UserConfig::$mysql_prefix."accounts`
+	SET engine_slug = 'PaymentEngine_Manual'
+	WHERE engine_slug = 'manual'";
+$versions[27]['down'][] = "RENAME TABLE `".UserConfig::$mysql_prefix."transaction_details_manual`
+	TO `".UserConfig::$mysql_prefix."transaction_details_PaymentEngine_Manual`";
+
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 26
  * Removing deprecated Google Friend Connect module
 */

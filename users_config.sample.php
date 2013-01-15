@@ -177,8 +177,8 @@ new UsernamePasswordAuthenticationModule();
  *
  * More modules to come (e.g. PayPal, Amazon & etc)
  */
-#UserConfig::loadModule('PaymentEngine_Manual');
-#new PaymentEngine_Manual();
+#UserConfig::loadModule('manual');
+#new ManualPaymentEngine();
 
 /**
  * Configure your subscription plans  and payment schedules in addition to a default free subscription
