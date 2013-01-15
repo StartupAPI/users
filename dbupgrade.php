@@ -55,8 +55,10 @@ $versions[24]['up'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
 */
 $plan_slugs = array_keys(UserConfig::$PLANS);
 foreach ($plan_slugs as $slug) {
-	$versions[24]['up'][] = sprintf('UPDATE '.UserConfig::$mysql_prefix."accounts SET plan_slug = '%s'".
+	if (array_key_exists('id', UserConfig::$PLANS[$slug])) {
+		$versions[24]['up'][] = sprintf('UPDATE '.UserConfig::$mysql_prefix."accounts SET plan_slug = '%s'".
 			" WHERE plan_slug = '%d'", $slug, UserConfig::$PLANS[$slug]['id']);
+	}
 }
 $versions[24]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."transaction_log (
   `transaction_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -86,8 +88,10 @@ $versions[24]['up'][] = "CREATE TABLE ".UserConfig::$mysql_prefix."account_charg
 */
 $plan_slugs = array_keys(UserConfig::$PLANS);
 foreach ($plan_slugs as $slug) {
-	$versions[24]['down'][] = sprintf('UPDATE '.UserConfig::$mysql_prefix."accounts SET plan_slug = '%d'".
+	if (array_key_exists('id', UserConfig::$PLANS[$slug])) {
+		$versions[24]['down'][] = sprintf('UPDATE '.UserConfig::$mysql_prefix."accounts SET plan_slug = '%d'".
 			" WHERE plan_slug = '%s'", UserConfig::$PLANS[$slug]['id'], $slug);
+	}
 }
 $versions[24]['down'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
   CHANGE COLUMN plan_slug plan tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'Payment plan ID',
