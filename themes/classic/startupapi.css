@@ -32,7 +32,6 @@
 
 #startupapi_header {
 	padding: 0.5em;
-	font-size: small;
 	border-bottom: 1px solid #c6c6c6;
 }
 
@@ -40,22 +39,6 @@
 	border: 0;
 	vertical-align: bottom;
 	margin: 0.4em 0.3em 0.2em 0.3em;
-}
-
-#startupapi_navbox {
-	color: #c6c6c6;
-	float: right;
-	margin-right: 0.5em;
-}
-
-#startupapi_navbox a {
-	color: #666666;
-	text-shadow: #EEE 0px 1px 0px;
-	text-decoration: none;
-}
-
-#startupapi_navbox a:hover {
-	color: #69818d;
 }
 
 #startupapi_main {
@@ -1259,4 +1242,35 @@
 
 .startupapi-admin-code-value.secret {
 	color: silver;
+}
+
+/* header footer styles */
+.startupapi-logo {
+	margin-right: 0.5em;
+}
+
+.startupapi-footer {
+	border-top: 1px dotted silver;
+	padding: 2em 0;
+	margin-top: 1em;
+}
+
+.startupapi-admin-footer {
+	padding: 3em 0;
+	margin-top: 1em;
+}
+
+.startupapi-header-appname {
+	padding: 0 0.4em;
+}
+.startupapi-header-appname:hover {
+	text-decoration: none;
+}
+
+.startupapi-header {
+		border-bottom: 1px dotted silver;
+}
+
+.startupapi-header-strip {
+	padding: 0.3em;
 }

@@ -340,6 +340,25 @@ class UserConfig {
 	 */
 	public static $twig_options = array();
 
+	/**
+	 * @var boolean Put power strip in a navbar (disable if you have your own navbar going)
+	 */
+	public static $powerStripShowNavbar = true;
+
+	/**
+	 * @var boolean Invert power strip styles
+	 */
+	public static $powerStripInvertedNavbar = false;
+
+	/**
+	 * @var boolean Show power strip as Bootstrap nav pills instead of navbar
+	 */
+	public static $powerStripNavPills = true;
+
+	/**
+	 * @var boolean Align power strip to the right
+	 */
+	public static $powerStripPullRight = true;
 
 	/* ========================================================================
 	 *

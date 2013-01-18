@@ -83,7 +83,7 @@ class StartupAPI {
 	/**
 	 * This finction renders the power strip (navigation bar at the top right corner)
 	 */
-	static function power_strip() {
+	static function power_strip($nav_pills = null, $show_navbar = null, $inverted_navbar = null, $pull_right = null) {
 		$current_user = User::get();
 		$current_account = null;
 
@@ -93,69 +93,152 @@ class StartupAPI {
 
 			$current_account = Account::getCurrentAccount($current_user);
 		}
-		?>
-		<div id="startupapi-navbox">
-			<?php
-			if (!is_null($current_user)) {
-				if ($current_user->isImpersonated()) {
-					?><b id="startupapi-navbox-impersonating"><a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/stopimpersonation.php" title="Impersonated by <?php echo UserTools::escape($current_user->getImpersonator()->getName()) ?>">Stop Impersonation</a></b> | <?php
-			}
 
-			if ($current_user->isAdmin()) {
-					?><b id="startupapi-navbox-admin"><a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/">Admin</a></b> | <?php
-			}
+		/**
+		 * Setting instance defaults
+		 */
+		if (is_null($nav_pills)) {
+			$nav_pills = UserConfig::$powerStripNavPills;
+		}
 
-			if (count($accounts) > 1) {
-				$destination = "'+encodeURIComponent(document.location)+'";
-				if (!is_null(UserConfig::$accountSwitchDestination)) {
-					$destination = UserConfig::$accountSwitchDestination;
-				}
-					?><select id="startupapi-navbox-account-picker" name="account" onchange="document.location.href='<?php echo UserConfig::$USERSROOTURL ?>/change_account.php?return=<?php echo $destination ?>&account='+this.value"><?php
-				foreach ($accounts as $account) {
-						?><option value="<?php echo $account->getID() ?>"<?php
-					if ($current_account->isTheSameAs($account)) {
-						echo ' selected';
-					}
-						?>><?php echo UserTools::escape($account->getName()) ?></option><?php
-				}
-					?></select>
+		if (is_null($show_navbar)) {
+			$show_navbar = UserConfig::$powerStripShowNavbar;
+		}
+
+		if (is_null($inverted_navbar)) {
+			$inverted_navbar = UserConfig::$powerStripInvertedNavbar;
+		}
+
+		if (is_null($pull_right)) {
+			$pull_right = UserConfig::$powerStripPullRight;
+		}
+
+		if (!$nav_pills && $show_navbar) {
+			?>
+			<div class="navbar<?php if ($inverted_navbar) { ?> navbar-inverse<?php } ?> <?php if ($pull_right) { ?> pull-right<?php } ?>">
+				<div class="navbar-inner">
 					<?php
 				}
-
-				if (!is_null(UserConfig::$onLoginStripLinks)) {
-					$links = call_user_func_array(
-							UserConfig::$onLoginStripLinks, array($current_user, $current_account)
-					);
-
-					foreach ($links as $link) {
-						?><span<?php
-					if (array_key_exists('id', $link)) {
-							?> id="<?php echo $link['id'] ?>"<?php
-					}
-						?>><a href="<?php echo $link['url'] ?>"<?php
-					if (array_key_exists('title', $link)) {
-							?> title="<?php echo $link['title'] ?>"<?php
-					}
-					if (array_key_exists('target', $link)) {
-							?> target="<?php echo $link['target'] ?>"<?php
-					}
-						?>><?php echo $link['text'] ?></a></span> | <?php
-				}
-			}
 				?>
+				<ul class="nav<?php if ($nav_pills) { ?> nav-pills<?php } ?>  <?php if ($pull_right) { ?> pull-right<?php } ?>">
+					<?php
+					if (!is_null($current_user)) {
+						if ($current_user->isImpersonated()) {
+							?>
+							<li><span><a class="btn btn-danger" id="startupapi-navbox-impersonating" href="<?php echo UserConfig::$USERSROOTURL ?>/admin/stopimpersonation.php" title="Impersonated by <?php echo UserTools::escape($current_user->getImpersonator()->getName()) ?>">Stop Impersonation</a></span></li>
+							<?php
+						}
 
-				<span id="startupapi-navbox-username"><a href="<?php echo UserConfig::$USERSROOTURL ?>/edit.php" title="<?php echo UserTools::escape($current_user->getName()) ?>'s user information"><?php echo UserTools::escape($current_user->getName()) ?></a></span> |
-				<span id="startupapi-navbox-logout"><a href="<?php echo UserConfig::$USERSROOTURL ?>/logout.php">logout</a></span>
+						if ($current_user->isAdmin()) {
+							?>
+							<li><a id="startupapi-navbox-admin" href="<?php echo UserConfig::$USERSROOTURL ?>/admin/">Admin</a></li>
+							<?php
+						}
+
+						if (count($accounts) > 1) {
+							$destination = "'+encodeURIComponent(document.location)+'";
+							if (!is_null(UserConfig::$accountSwitchDestination)) {
+								$destination = UserConfig::$accountSwitchDestination;
+							}
+							?>
+							<li class="dropdown">
+								<a href="#" title="Change account" class="dropdown-toggle" data-toggle="dropdown"><?php echo UserTools::escape($current_account->getName()) ?><b class="caret"></b></a>
+								<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" id="startupapi-account-switcher">
+									<?php
+									foreach ($accounts as $account) {
+										$is_current = $current_account->isTheSameAs($account);
+
+										if ($is_current) {
+											continue;
+										}
+										?>
+										<li>
+											<a tabindex="-1" href="#"
+											<?php
+											if (!$is_current) {
+												?>
+												   data-account-swtich-to="<?php echo $account->getID() ?>"
+												   <?php
+											   }
+											   ?>
+											   >
+												   <?php
+												   echo UserTools::escape($account->getName());
+												   ?>
+											</a>
+										</li>
+										<?php
+									}
+									?>
+								</ul>
+								<script>
+									$('#startupapi-account-switcher').click(function(e) {
+										var account_swtich_to = $(e.target).data('account-swtich-to');
+
+										if (typeof(account_swtich_to) !== 'undefined') {
+											document.location.href = '<?php echo UserConfig::$USERSROOTURL ?>/change_account.php?return=<?php echo $destination ?>&account='+account_swtich_to;
+										}
+
+										return false;
+									});
+								</script>
+							</li>
+							<?php
+						}
+
+						if (!is_null(UserConfig::$onLoginStripLinks)) {
+							$links = call_user_func_array(
+									UserConfig::$onLoginStripLinks, array($current_user, $current_account)
+							);
+
+							foreach ($links as $link) {
+								?>
+								<li
+								<?php
+								if (array_key_exists('id', $link)) {
+									?>
+										id="<?php echo $link['id'] ?>"
+										<?php
+									}
+									?>
+									><a href="<?php echo $link['url'] ?>"
+										<?php
+										if (array_key_exists('title', $link)) {
+											?>
+										title="<?php echo $link['title'] ?>"
+										<?php
+									}
+									if (array_key_exists('target', $link)) {
+										?>
+										target="<?php echo $link['target'] ?>"
+										<?php
+									}
+									?>
+									><?php echo $link['text'] ?></a>
+								</li>
+								<?php
+							}
+						}
+						?>
+
+						<li id="startupapi-navbox-username"><a href="<?php echo UserConfig::$USERSROOTURL ?>/edit.php" title="<?php echo UserTools::escape($current_user->getName()) ?>'s user information"><?php echo UserTools::escape($current_user->getName()) ?></a></li>
+						<li id="startupapi-navbox-logout"><a href="<?php echo UserConfig::$USERSROOTURL ?>/logout.php">Logout</a></li>
+						<?php
+					} else {
+						?>
+						<li id="startupapi-navbox-signup"><a href="<?php echo UserConfig::$USERSROOTURL ?>/register.php">Sign Up Now!</a></li>
+						<li id="startupapi-navbox-login"><a href="<?php echo UserConfig::$USERSROOTURL ?>/login.php">Log in</a></li>
+						<?php
+					}
+					?>
+				</ul>
 				<?php
-			} else {
-				?>
-				<span id="startupapi-navbox-signup"><a href="<?php echo UserConfig::$USERSROOTURL ?>/register.php">Sign Up Now!</a></span> |
-				<span id="startupapi-navbox-login"><a href="<?php echo UserConfig::$USERSROOTURL ?>/login.php">log in</a></span>
-				<?php
-			}
-			?>
-		</div>
-		<?php
+				if (!$nav_pills && $show_navbar) {
+					?>
+				</div>
+			</div>
+			<?php
+		}
 	}
 
 	/**

@@ -118,16 +118,6 @@ $config_variables = array(
 						'name' => 'admin_footer'
 					),
 					array(
-						'description' => 'Array of available theme slugs',
-						'type' => 'string[]',
-						'name' => 'available_themes'
-					),
-					array(
-						'description' => 'Theme slug for current theme',
-						'type' => 'string',
-						'name' => 'theme'
-					),
-					array(
 						'description' => 'If specified, StartupAPI::head() will include this Twitter Bootstrap CSS instead of default one',
 						'type' => 'url',
 						'name' => 'bootstrapCSS'
@@ -136,6 +126,46 @@ $config_variables = array(
 						'description' => 'Associative array of Twig environment options',
 						'type' => 'array',
 						'name' => 'twig_options'
+					),
+				),
+			),
+			array(
+				'description' => 'Power strip menu options',
+				'settings' => array(
+					array(
+						'description' => 'Put power strip in a navbar (disable if you have your own navbar going)',
+						'type' => 'boolean',
+						'name' => 'powerStripShowNavbar'
+					),
+					array(
+						'description' => 'Invert power strip styles',
+						'type' => 'boolean',
+						'name' => 'powerStripInvertedNavbar'
+					),
+					array(
+						'description' => 'Show power strip as Bootstrap nav pills instead of navbar',
+						'type' => 'boolean',
+						'name' => 'powerStripNavPills'
+					),
+					array(
+						'description' => 'Align power strip to the right',
+						'type' => 'boolean',
+						'name' => 'powerStripPullRight'
+					)
+				)
+			),
+			array(
+				'description' => 'Themes (under development)',
+				'settings' => array(
+					array(
+						'description' => 'Array of available theme slugs',
+						'type' => 'string[]',
+						'name' => 'available_themes'
+					),
+					array(
+						'description' => 'Theme slug for current theme',
+						'type' => 'string',
+						'name' => 'theme'
 					)
 				)
 			)

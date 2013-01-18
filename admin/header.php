@@ -50,7 +50,7 @@ $admin_menu = new AdminMenu(array(
 				new Menu('outstanding', 'Outstanding charges', $ADMIN_ROOT . '/outstanding.php', 'certificate', UserConfig::$useSubscriptions, 'Subscriptions are disabled in configuration'),
 				new Menu('transactions', 'Transactions', null, 'list', UserConfig::$useSubscriptions),
 				new Menu('payment_method', 'Payment methods', null, 'th-large', UserConfig::$useSubscriptions)
-			), null, UserConfig::$useSubscriptions),
+					), null, UserConfig::$useSubscriptions),
 			new MenuSection('promotion', 'Promotion', null, array(
 				new Menu('sources', 'Sources', $ADMIN_ROOT . '/sources.php', 'random'),
 				new Menu('campaigns', 'Campaign management', $ADMIN_ROOT . '/campaigns.php', 'comment')
@@ -86,28 +86,23 @@ if (!isset($BREADCRUMB_EXTRA)) {
 			.startupapi-sidebar.affix {
 				top: 4em;
 			}
-
-			.logo {
-				margin-right: 0.5em;
-			}
-
-			.footer {
-				padding: 70px 0;
-				margin-top: 70px;
-			}
 		</style>
 	</head>
 	<body>
 		<div class="navbar">
 			<div class="navbar-inner">
-				<span class="brand"><a href="<?php echo UserConfig::$SITEROOTURL ?>"><img class="logo" width="20" height="20" src="<?php echo UserConfig::$USERSROOTURL ?>/images/header_icon.png"/><?php echo is_null(UserConfig::$appName) ? '' : UserConfig::$appName; ?></a></span>
+				<span class="brand">
+					<img class="startupapi-logo" width="20" height="20" src="<?php echo UserConfig::$USERSROOTURL ?>/images/header_icon.png"/>
+					<a href="<?php echo UserConfig::$SITEROOTURL ?>"><?php echo is_null(UserConfig::$appName) ? '' : UserConfig::$appName; ?></a>
+					&middot; Admin Panel
+				</span>
 
 				<span></span>
 
 				<?php $admin_menu->renderTopNav() ?>
 
 				<ul class="nav pull-right">
-					<li class="navbar-text"><?php echo $current_user->getName() ?></li>
+					<li><a href="<?php echo UserConfig::$USERSROOTURL ?>/edit.php" title="<?php echo UserTools::escape($current_user->getName()) ?>'s user information"><?php echo $current_user->getName() ?></a></li>
 					<li><a href="<?php echo UserConfig::$USERSROOTURL ?>/logout.php">Logout</a></li>
 				</ul>
 			</div>
