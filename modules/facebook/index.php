@@ -185,6 +185,9 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 				<div id="fb-root"></div>
 				<script src="http://connect.facebook.net/en_US/all.js"></script>
 				<script>
+					// force logout sequence after a long timeout of 5 seconds
+					setTimeout('window.location.href = "<?php echo UserConfig::$USERSROOTFULLURL; ?>/logout.php?autologgedout=<?php echo $this->getID(); ?>"', 5000);
+
 					FB.init({
 						appId  : '<?php echo $this->appID ?>',
 						status : true, // check login status
@@ -201,9 +204,6 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 							window.location.href = "<?php echo UserConfig::$USERSROOTFULLURL; ?>/logout.php?autologgedout=<?php echo $this->getID(); ?>";
 						}
 					});
-
-					// force logout sequence after a long timeout of 15 seconds
-					setTimeout('window.location.href = "<?php echo UserConfig::$USERSROOTFULLURL; ?>/logout.php?autologgedout=<?php echo $this->getID(); ?>"', 15000);
 				</script>
 				Logging out from Facebook...
 			</body>
