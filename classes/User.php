@@ -1271,7 +1271,7 @@ class User {
 	 *
 	 * @internal Used in admin dashboard to show users
 	 */
-	public static function getUsers($pagenumber = 0, $perpage = 20, $sort = 'registration', $date_from = null, $date_to = null) {
+	public static function getUsers($pagenumber = 0, $perpage = 20, $sort = 'registration', $date_from = null, $date_to = null, $sort_order = false) {
 		$db = UserConfig::getDB();
 
 		$users = array();
@@ -1301,7 +1301,7 @@ class User {
 		$query = 'SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified
 			FROM ' . UserConfig::$mysql_prefix . 'users ' .
 			$where . '
-			ORDER BY ' . $orderby . ' DESC
+			ORDER BY ' . $orderby . ' ' . ($sort_order ? 'ASC' : 'DESC') . '
 			LIMIT ?, ?';
 
 		if ($stmt = $db->prepare($query)) {
