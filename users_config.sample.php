@@ -19,9 +19,7 @@ UserConfig::$mysql_password = '...password...';
 /**
  * User IDs of admins for this instance (to be able to access dashboard at /users/admin/)
  */
-UserConfig::$admins = array(
-#	1, // usually first user has ID of 1
-);
+#UserConfig::$admins[] = 1; // usually first user has ID of 1
 
 /*
  * Name of your application to be used in UI and emails to users
