@@ -524,21 +524,30 @@ if ($code_ready && $dependencies_ready && $config_ready && $database_ready && $a
 								</tr>
 								<tr>
 									<td>
-										<?php if (is_null($config_exception)) { ?>
-											<span class="label label-success"><i class="icon-ok icon-white"></i></span>
+										<?php if ($config_file_ready) { ?>
+											<?php if (is_null($config_exception)) { ?>
+												<span class="label label-success"><i class="icon-ok icon-white"></i></span>
+											<?php } else { ?>
+												<span class="label label-important"><i class="icon-remove icon-white"></i></span>
+											<?php } ?>
 										<?php } else { ?>
-											<span class="label label-important"><i class="icon-remove icon-white"></i></span>
+											<span class="label"><i class="icon-minus icon-white"></i></span>
 										<?php } ?>
 									</td>
 									<td>
-										<?php if (is_null($config_exception)) { ?>
-											<p class="startupapi-dep-title">Configuration successful!</p>
+										<p class="startupapi-dep-title">Basic configuration test</p>
+										<?php if ($config_file_ready) { ?>
+											<?php if (is_null($config_exception)) { ?>
+												<p class="startupapi-dep-title">Configuration successful!</p>
+											<?php } else { ?>
+												<p class="startupapi-dep-title">Configuration problem</p>
+												<div class="alert alert-error">
+													<p><?php echo $config_exception->getMessage() ?> (Code: <?php echo $config_exception->getCode() ?>)</p>
+													<pre>Stack trace:<?php echo "\n" . $config_exception->getTraceAsString() ?></pre>
+												</div>
+											<?php } ?>
 										<?php } else { ?>
-											<p class="startupapi-dep-title">Configuration problem</p>
-											<div class="alert alert-error">
-												<p><?php echo $config_exception->getMessage() ?> (Code: <?php echo $config_exception->getCode() ?>)</p>
-												<pre>Stack trace:<?php echo "\n" . $config_exception->getTraceAsString() ?></pre>
-											</div>
+											<p>You need to create configuration file before it can be tested.</p>
 										<?php } ?>
 									</td>
 								</tr>
