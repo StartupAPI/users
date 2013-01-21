@@ -538,9 +538,9 @@ if ($code_ready && $dependencies_ready && $config_ready && $database_ready && $a
 										<p class="startupapi-dep-title">Basic configuration test</p>
 										<?php if ($config_file_ready) { ?>
 											<?php if (is_null($config_exception)) { ?>
-												<p class="startupapi-dep-title">Configuration successful!</p>
+												<p>Configuration successful!</p>
 											<?php } else { ?>
-												<p class="startupapi-dep-title">Configuration problem</p>
+												<p>Configuration problem:</p>
 												<div class="alert alert-error">
 													<p><?php echo $config_exception->getMessage() ?> (Code: <?php echo $config_exception->getCode() ?>)</p>
 													<pre>Stack trace:<?php echo "\n" . $config_exception->getTraceAsString() ?></pre>
