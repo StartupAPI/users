@@ -14,6 +14,7 @@ UserConfig::$mysql_user = '...username...';
 UserConfig::$mysql_password = '...password...';
 #UserConfig::$mysql_host = 'localhost';
 #UserConfig::$mysql_port = 3306;
+#UserConfig::$mysql_socket = '/tmp/mysql.sock'; // in case you are using socket to connect
 
 /**
  * User IDs of admins for this instance (to be able to access dashboard at /users/admin/)
