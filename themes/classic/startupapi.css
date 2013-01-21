@@ -1274,3 +1274,12 @@
 .startupapi-header-strip {
 	padding: 0.3em;
 }
+
+/* Installation wizard */
+.startupapi-dep-title {
+	font-weight: bold;
+}
+
+.startupapi-file-path {
+	font-family: 'courier';
+}
