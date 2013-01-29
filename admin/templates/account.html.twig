@@ -8,7 +8,10 @@
 		<h2>Account: {{ account_name }} <a href="edit_account.php?id={{ account_id }}" class="btn btn-mini"><i class="icon-pencil"></i> edit</a></h2>
 		{%if account_isIndividual %}
 			<p>
-				Individual accout for <i class="icon-user"></i> <a href="{{ USERSROOTURL }}/admin/user.php?id={{ user.id }}">{{ user.name }}</a>
+				Individual accout
+				{%if user %}
+					for <i class="icon-user"></i> <a href="{{ USERSROOTURL }}/admin/user.php?id={{ user.id }}">{{ user.name }}</a>
+				{%endif%}
 			</p>
 		{%endif%}
 		<p>Status: {%if account_isActive %}<b class="badge badge-success">Active</b>{%else%}<b class="badge badge-important">Suspended</b>{%endif%}</p>
