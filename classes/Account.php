@@ -1,4 +1,5 @@
 <?php
+
 require_once(__DIR__ . '/Plan.php');
 
 /**
@@ -64,11 +65,6 @@ class Account {
 	 * @var PaymentEngine Payment engine used by account
 	 */
 	private $paymentEngine;
-
-	/**
-	 * @var boolean True if account is individual
-	 */
-	private $isIndividual;
 
 	/**
 	 * @var boolean True if account is active and false if disabled
@@ -141,7 +137,7 @@ class Account {
 	 *
 	 * @param User $user User we need accounts for
 	 *
-	 * @return array Array of user accounts
+	 * @return Account[] Array of user accounts
 	 *
 	 * @throws DBException
 	 * @throws StartupAPIException
@@ -189,6 +185,105 @@ class Account {
 			// there must be at least one personal account for each user
 			throw new StartupAPIException("No accounts are set for the user");
 		}
+
+		return $accounts;
+	}
+
+	/**
+	 * Gets paged list of accounts in the system
+	 *
+	 * @return Account[] Array of user accounts
+	 *
+	 * @throws DBException
+	 * @throws StartupAPIException
+	 */
+	public static function getAccounts($pagenumber = 0, $perpage = 20) {
+		$db = UserConfig::getDB();
+		$accounts = array();
+
+		$first = $perpage * $pagenumber;
+
+		if (!($stmt = $db->prepare(
+				'SELECT id, name, plan_slug, schedule_slug, engine_slug, active,
+					next_charge, next_plan_slug, next_schedule_slug
+					FROM ' . UserConfig::$mysql_prefix . 'accounts
+					LIMIT ?, ?'
+				))) {
+			throw new DBPrepareStmtException($db);
+		}
+
+		if (!$stmt->bind_param('ii', $first, $perpage)) {
+			throw new DBBindParamException($db, $stmt);
+		}
+
+		if (!$stmt->execute()) {
+			throw new DBExecuteStmtException($db, $stmt);
+		}
+
+		if (!$stmt->store_result()) {
+			throw new DBException($db, $stmt, "Can't store result");
+		}
+
+		if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $next_plan_slug, $next_schedule_slug)) {
+			throw new DBBindResultException($db, $stmt);
+		}
+
+		while ($stmt->fetch() === TRUE) {
+			$accounts[] = new self($id, $name, $plan_slug, $schedule_slug, $engine_slug,
+							null, $active, $next_charge, $next_plan_slug, $next_schedule_slug);
+		}
+
+		$stmt->close();
+
+		return $accounts;
+	}
+
+	/**
+	 * Gets paged list of accounts in the system
+	 *
+	 * @return Account[] Array of user accounts
+	 *
+	 * @throws DBException
+	 * @throws StartupAPIException
+	 */
+	public static function searchAccounts($search, $pagenumber = 0, $perpage = 20) {
+		$db = UserConfig::getDB();
+		$accounts = array();
+
+		$first = $perpage * $pagenumber;
+
+		if (!($stmt = $db->prepare(
+				'SELECT id, name, plan_slug, schedule_slug, engine_slug, active,
+					next_charge, next_plan_slug, next_schedule_slug
+					FROM ' . UserConfig::$mysql_prefix . 'accounts
+					WHERE INSTR(name, ?) > 0
+					LIMIT ?, ?'
+				))) {
+			throw new DBPrepareStmtException($db);
+		}
+
+		if (!$stmt->bind_param('sii', $search, $first, $perpage)) {
+			throw new DBBindParamException($db, $stmt);
+		}
+
+		if (!$stmt->execute()) {
+			throw new DBExecuteStmtException($db, $stmt);
+		}
+
+		if (!$stmt->store_result()) {
+			throw new DBException($db, $stmt, "Can't store result");
+		}
+
+		if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $next_plan_slug, $next_schedule_slug)) {
+			throw new DBBindResultException($db, $stmt);
+		}
+
+		while ($stmt->fetch() === TRUE) {
+			$accounts[] = new self($id, $name, $plan_slug, $schedule_slug, $engine_slug,
+							null, $active, $next_charge, $next_plan_slug, $next_schedule_slug);
+		}
+
+		$stmt->close();
 
 		return $accounts;
 	}
@@ -344,6 +439,32 @@ class Account {
 	}
 
 	/**
+	 * Updates account name
+	 *
+	 * @param string $name Account name
+	 */
+	public function setName($name) {
+		$this->name = $name;
+
+		$db = UserConfig::getDB();
+
+		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'accounts
+			SET name = ? WHERE id = ?'))) {
+			throw new DBPrepareStmtException($db);
+		}
+
+		if (!$stmt->bind_param('si', $this->name, $this->id)) {
+			throw new DBBindParamException($db, $stmt);
+		}
+
+		if (!$stmt->execute()) {
+			throw new DBExecuteStmtException($db, $stmt);
+		}
+
+		$stmt->close();
+	}
+
+	/**
 	 * Returns a list of account users
 	 *
 	 * @return array Array of User, role pairs
@@ -387,7 +508,6 @@ class Account {
 		return $users_and_roles;
 	}
 
-
 	/**
 	 * Returns user's role for this account
 	 *
@@ -425,7 +545,6 @@ class Account {
 
 		return $role;
 	}
-
 
 	/**
 	 * Adds a user to account
@@ -513,6 +632,10 @@ class Account {
 	 * @return array[] Account charges
 	 */
 	public function getCharges() {
+		if (is_null($this->charges)) {
+			$this->charges = self::fillCharges($this->id);
+		}
+
 		return $this->charges;
 	}
 
@@ -825,7 +948,6 @@ class Account {
 
 				if (!$stmt->execute()) {
 					throw new DBExecuteStmtException($db, $stmt);
-
 				}
 
 				// Put into the object
@@ -992,56 +1114,81 @@ class Account {
 			return FALSE;
 		}
 
-		if (!is_null($schedule_slug)) {
-			$new_schedule = $new_plan->getPaymentScheduleBySlug($schedule_slug);
-			if (is_null($new_schedule)) {
-				$new_schedule = $new_plan->getDefaultPaymentSchedule();
-			}
-		} else {
-			$new_schedule = NULL;
-		}
-
-		/* if no schedule specified and no default schedule found
-		  and new plan has at least one schedule, fail */
-		if (count($new_plan->getPaymentScheduleSlugs()) && is_null($new_schedule)) {
-			return FALSE;
-		}
-
-		$old_plan_slug = $this->plan->slug;
-		$old_schedule_slug = is_null($this->schedule) ? NULL : $this->schedule->slug;
-		$this->plan->deactivate_hook($this->id, $plan_slug, $schedule_slug);
-		$this->plan = $new_plan;
-		$this->schedule = $new_schedule;
-		$this->plan->activate_hook($this->id, $old_plan_slug, $old_schedule_slug);
-		$this->active = 1;
-		$this->nextCharge = is_null($this->schedule) ?
-				NULL : date('Y-m-d H:i:s', time() + $this->schedule->charge_period * 86400);
-
-		/*
-		 * @TODO
-		 * Update db There is a risk that this query fail. If so, object state
-		 * will differ from db state. Should be addressed in further releases.
+		/**
+		 * If subscriptions are not used, then just change plan, otherwise require a schedule
 		 */
 		$db = UserConfig::getDB();
 
-		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
-				'accounts SET plan_slug = ?, schedule_slug = ?, active = 1, next_charge = ?, ' .
-				'next_plan_slug = NULL, next_schedule_slug = NULL WHERE id = ?'))) {
-			throw new DBPrepareStmtException($db);
-		}
+		if (!UserConfig::$useSubscriptions) {
+			if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
+					'accounts SET plan_slug = ?, schedule_slug = NULL, active = 1, next_charge = NULL, ' .
+					'next_plan_slug = NULL, next_schedule_slug = NULL WHERE id = ?'))) {
+				throw new DBPrepareStmtException($db);
+			}
 
-		if (!$stmt->bind_param('sssi', $plan_slug, $schedule_slug, $this->nextCharge, $this->id)) {
-			throw new DBBindParamException($db, $stmt);
-		}
+			if (!$stmt->bind_param('si', $plan_slug, $this->id)) {
+				throw new DBBindParamException($db, $stmt);
+			}
 
-		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
-		}
+			if (!$stmt->execute()) {
+				throw new DBExecuteStmtException($db, $stmt);
+			}
 
-		$this->paymentIsDue();
-		$this->lastTransactionID =
-				TransactionLogger::Log($this->id, is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(), 0, 'Plan "' . $this->plan->name . '" activated');
-		return TRUE;
+			$this->plan = $new_plan;
+			$this->active = 1;
+			$this->nextCharge = NULL;
+
+			return TRUE;
+		} else {
+			if (!is_null($schedule_slug)) {
+				$new_schedule = $new_plan->getPaymentScheduleBySlug($schedule_slug);
+				if (is_null($new_schedule)) {
+					$new_schedule = $new_plan->getDefaultPaymentSchedule();
+				}
+			} else {
+				$new_schedule = NULL;
+			}
+
+			/* if no schedule specified and no default schedule found
+			  and new plan has at least one schedule, fail */
+			if (count($new_plan->getPaymentScheduleSlugs()) && is_null($new_schedule)) {
+				return FALSE;
+			}
+
+			$old_plan_slug = $this->plan->slug;
+			$old_schedule_slug = is_null($this->schedule) ? NULL : $this->schedule->slug;
+			$this->plan->deactivate_hook($this->id, $plan_slug, $schedule_slug);
+			$this->plan = $new_plan;
+			$this->schedule = $new_schedule;
+			$this->plan->activate_hook($this->id, $old_plan_slug, $old_schedule_slug);
+			$this->active = 1;
+			$this->nextCharge = is_null($this->schedule) ?
+					NULL : date('Y-m-d H:i:s', time() + $this->schedule->charge_period * 86400);
+
+			/*
+			 * @TODO
+			 * Update db There is a risk that this query fail. If so, object state
+			 * will differ from db state. Should be addressed in further releases.
+			 */
+			if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
+					'accounts SET plan_slug = ?, schedule_slug = ?, active = 1, next_charge = ?, ' .
+					'next_plan_slug = NULL, next_schedule_slug = NULL WHERE id = ?'))) {
+				throw new DBPrepareStmtException($db);
+			}
+
+			if (!$stmt->bind_param('sssi', $plan_slug, $schedule_slug, $this->nextCharge, $this->id)) {
+				throw new DBBindParamException($db, $stmt);
+			}
+
+			if (!$stmt->execute()) {
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+
+			$this->paymentIsDue();
+			$this->lastTransactionID =
+					TransactionLogger::Log($this->id, is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(), 0, 'Plan "' . $this->plan->name . '" activated');
+			return TRUE;
+		}
 	}
 
 	/**
@@ -1144,7 +1291,19 @@ class Account {
 	 * @return boolean True if account is individual
 	 */
 	public function isIndividual() {
-		return $this->isIndividual;
+		$plan = $this->getPlan();
+
+		// in case for whatever reason, we don't have a plan assigned to account
+		if (is_null($plan)) {
+			$plan = Plan::getPlanBySlug(UserConfig::$default_plan_slug);
+		}
+
+		if (array_key_exists('individual', $plan->capabilities)) {
+			return $plan->capabilities['individual'] ? true : false;
+		}
+
+		// if nothing worked, default to multi-user accounts
+		return false;
 	}
 
 	/**

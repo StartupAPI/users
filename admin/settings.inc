@@ -123,6 +123,11 @@ $config_variables = array(
 						'name' => 'bootstrapCSS'
 					),
 					array(
+						'description' => 'If specified, Admin UI will include this Twitter Bootstrap CSS instead of default one',
+						'type' => 'url',
+						'name' => 'bootstrapAdminCSS'
+					),
+					array(
 						'description' => 'Associative array of Twig environment options',
 						'type' => 'array',
 						'name' => 'twig_options'

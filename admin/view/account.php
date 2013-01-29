@@ -1,4 +1,5 @@
 <?php
+
 $account_id = htmlspecialchars($_REQUEST['id']);
 if (is_null($account = Account::getByID($account_id))) {
 	$template_data['message'] = array("Can't find account with id $account_id");
@@ -20,6 +21,23 @@ $template_data['account_id'] = $account_id;
 
 $template_data['account_name'] = $account->getName();
 $template_data['account_isActive'] = $account->isActive();
+
+$account_users = $account->getUsers();
+if ($account->isIndividual()) {
+	$template_data['account_isIndividual'] = true;
+
+	if (count($account_users) > 0) {
+		$user = $account_users[0][0];
+		$is_admin = $account_users[0][1];
+
+		$template_data['user']['id'] = $user->getID();
+		$template_data['user']['admin'] = $is_admin;
+		$template_data['user']['name'] = $user->getName();
+	}
+} else {
+	$template_data['account_isIndividual'] = false;
+}
+
 $template_data['account_engine'] = is_null($account->getPaymentEngine()) ? 'None' : $account->getPaymentEngine()->getTitle();
 
 $next_charge = $account->getNextCharge();
@@ -27,13 +45,13 @@ if (!is_null($next_charge)) {
 	$template_data['account_next_charge'] = preg_replace("/ .*/", "", $next_charge);
 }
 
+$plan = $account->getPlan();
+
+foreach ($plan_data as $d) {
+	$template_data['plan_' . $d] = $plan->$d;
+}
+
 if (UserConfig::$useSubscriptions) {
-	$plan = $account->getPlan();
-
-	foreach ($plan_data as $d) {
-		$template_data['plan_' . $d] =  $plan->$d;
-	}
-
 	$downgrade = Plan::getPlanBySlug($plan->downgrade_to);
 	if ($downgrade) {
 		$template_data['plan_downgrade_to'] = $downgrade->name;
@@ -65,10 +83,8 @@ if (UserConfig::$useSubscriptions) {
 	$template_data['balance'] = $account->getBalance();
 }
 
-$acctount_users = $account->getUsers();
 $users = array();
-
-uasort($acctount_users, function($a, $b) {
+uasort($account_users, function($a, $b) {
 			// sort by role first
 			if ($a[1] !== $b[1]) {
 				return $b[1] - $a[1];
@@ -78,7 +94,7 @@ uasort($acctount_users, function($a, $b) {
 			return strcmp($a[0]->getName(), $b[0]->getName());
 		});
 
-foreach ($acctount_users as $user_and_role) {
+foreach ($account_users as $user_and_role) {
 	$user = $user_and_role[0];
 	$role = $user_and_role[1];
 
@@ -86,3 +102,5 @@ foreach ($acctount_users as $user_and_role) {
 }
 $template_data['users'] = $users;
 $template_data['USERSROOTURL'] = UserConfig::$USERSROOTURL;
+
+$template_data['show_user_list'] = $template_data['account_isIndividual'] ? count($users) > 1 : TRUE;

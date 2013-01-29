@@ -5,25 +5,29 @@
 		{%endfor%}
 	{%endif%}
 	{%if  not fatal %}
-		<h2>Account: {{ account_name }}</h2>
+		<h2>Account: {{ account_name }} <a href="edit_account.php?id={{ account_id }}" class="btn btn-mini"><i class="icon-pencil"></i> edit</a></h2>
+		{%if account_isIndividual %}
+			<p>
+				Individual accout for <i class="icon-user"></i> <a href="{{ USERSROOTURL }}/admin/user.php?id={{ user.id }}">{{ user.name }}</a>
+			</p>
+		{%endif%}
 		<p>Status: {%if account_isActive %}<b class="badge badge-success">Active</b>{%else%}<b class="badge badge-important">Suspended</b>{%endif%}</p>
+		<p>Plan: <a class="badge badge-info" href="plan.php?slug={{ plan_slug }}"><i class="icon-briefcase icon-white"></i> {{ plan_name }}</a></p>
 
 		{%if useSubscriptions %}
 			<h3>Subscription</h3>
-
-			<h4>Plan</h4>
-			<p>Name: <a class="label" href="plan.php?slug={{ plan_slug }}">{{ plan_name }}</a></p>
-			<p>{{ plan_description }}</p>
-			<p>Details: <a href="{{ plan_details_url }}">{{ plan_details_url }}</a></p>
 			{%if plan_downgrade_to %}
 				<p>Plan automatically downgrades to: <a class="label" href="plan.php?slug={{ plan_downgrade_to_slug }}">{{ plan_downgrade_to }}</a>
 					if payment is due more than {{ plan_grace_period }} day(s)</p>
 			{%endif%}
-				<h4>Payment Schedule</h4>
+
+			<h4>Payment Schedule</h4>
 			{%if schedule_name %}
 				<p>Payment Schedule: <b>{{ schedule_name }}</b> ({{ schedule_description }})</p>
 				<p>Charge Amount: <b>${{ schedule_charge_amount }}</b></p>
 				<p>Charge Period: <b>{{ schedule_charge_period }}</b> days</p>
+			{%else%}
+				<i>Payment schedule is not defined</i>
 			{%endif%}
 
 			<h4>Payments</h4>
@@ -75,11 +79,15 @@
 			</div>
 		{%endif%}
 
-		<h3>Account Users:</h3>
-		<ul>
+		{%if show_user_list %}
+			<h3>Account Users:</h3>
+			{%if account_isIndividual %}
+				<p class="alert alert-error">Attention, multiple users are defined for an individual account</p>
+			{%endif%}
+
 			{%for user in users %}
-				<li><a href="{{ USERSROOTURL }}/admin/user.php?id={{ user.id }}">{{ user.name }}</a>{%if user.admin %} <span class="badge badge-important">admin</span>{%endif%}</li>
+				<div><i class="icon-user"></i> <a href="{{ USERSROOTURL }}/admin/user.php?id={{ user.id }}">{{ user.name }}</a>{%if user.admin %} <span class="badge badge-important">admin</span>{%endif%}</div>
 			{%endfor%}
-		</ul>
-	{%endif%}
+		{%endif%}
+{%endif%}
 </div>

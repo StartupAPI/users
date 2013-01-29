@@ -91,7 +91,7 @@ require_once(__DIR__ . '/header.php');
 
 		if ($email) {
 			?>
-			<a href="mailto:<?php echo urlencode(UserTools::escape($email)) ?>">
+			<a href="mailto:<?php echo urlencode(UserTools::escape($email)) ?>" target="_blank">
 				<i class="icon-envelope"></i> <?php echo UserTools::escape($email) ?>
 			</a>
 			<?php
@@ -171,7 +171,7 @@ require_once(__DIR__ . '/header.php');
 					<a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/account.php?id=<?php echo $user_account->getID() ?>">
 						<?php echo UserTools::escape($user_account->getName()); ?>
 					</a>
-					<a style="margin: 0 0.3em" class="badge" href="<?php echo UserConfig::$USERSROOTURL ?>/admin/plan.php?slug=<?php echo UserTools::escape($plan->slug); ?>"><?php echo UserTools::escape($plan->name); ?></a>
+					<a class="badge badge-info" href="<?php echo UserConfig::$USERSROOTURL ?>/admin/plan.php?slug=<?php echo UserTools::escape($plan->slug); ?>"><i class="icon-briefcase icon-white"></i> <?php echo UserTools::escape($plan->name); ?></a>
 
 					<?php if ($role == Account::ROLE_ADMIN) { ?>
 						<span class = "badge badge-important">admin</span>

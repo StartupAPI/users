@@ -336,6 +336,11 @@ class UserConfig {
 	public static $bootstrapCSS = null;
 
 	/**
+	 * @var string If specified, Admin UI will include this Twitter Bootstrap CSS instead of default one
+	 */
+	public static $bootstrapAdminCSS = null;
+
+	/**
 	 * @var array Associative array of Twig environment options
 	 */
 	public static $twig_options = array();
