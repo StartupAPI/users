@@ -85,7 +85,7 @@ new UsernamePasswordAuthenticationModule();
  * And then uncomment two lines below and copy API Key and App Secret
  */
 #UserConfig::loadModule('twitter');
-#UserConfig::$modules[] = new TwitterAuthenticationModule('...api.key.goes.here...', '...api.secret.goes.here...');
+#new TwitterAuthenticationModule('...api.key.goes.here...', '...api.secret.goes.here...');
 
 /**
  * Status.Net Authentication configuration
