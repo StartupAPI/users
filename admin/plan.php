@@ -33,6 +33,16 @@ require_once(__DIR__ . '/header.php');
 	</p>
 	<?php
 	if (UserConfig::$useSubscriptions) {
+		$downgrade_to = Plan::getPlanBySlug($plan->downgrade_to);
+		if (!is_null($downgrade_to)) {
+			?>
+			<p>
+				Downgrades to:
+				<a class="badge badge-info" href="plan.php?slug=<?php echo $downgrade_to->slug ?>"><i class="icon-briefcase icon-white"></i> <?php echo $downgrade_to->name ?></a>
+			</p>
+			<?php
+		}
+
 		$schedule_slugs = $plan->getPaymentScheduleSlugs(); # Iterate over all schedules of this plan
 
 		if (count($schedule_slugs) > 0) {
