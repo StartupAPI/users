@@ -32,25 +32,31 @@ require_once(__DIR__ . '/header.php');
 		<?php if ($plan->details_url) { ?><i>Details page: <a target="_blank" href="<?php echo UserTools::escape($plan->details_url); ?>"><?php echo UserTools::escape($plan->details_url); ?></a></i><?php } ?>
 	</p>
 	<?php
-	$schedule_slugs = $plan->getPaymentScheduleSlugs(); # Iterate over all schedules of this plan
+	if (UserConfig::$useSubscriptions) {
+		$schedule_slugs = $plan->getPaymentScheduleSlugs(); # Iterate over all schedules of this plan
 
-	if (count($schedule_slugs) > 0) {
-		?>
-		<h3>Payment Schedules</h3>
-		<ul>
-			<?php
-			foreach ($schedule_slugs as $s) {
-				$schedule = $plan->getPaymentScheduleBySlug($s);
-				?><li>
-					<b><?php echo $schedule->name ?></b><?php if ($schedule->is_default) { ?> (default)<?php } ?>
-					<p><b>$<?php echo $schedule->charge_amount ?></b>
-						every <b><?php echo $schedule->charge_period ?></b> days</p>
-					<p><?php echo $schedule->description ?></p>
-				</li><?php
-	}
+		if (count($schedule_slugs) > 0) {
 			?>
-		</ul>
-	<?php } ?>
+			<h3>Payment Schedules</h3>
+			<ul>
+				<?php
+				foreach ($schedule_slugs as $s) {
+					$schedule = $plan->getPaymentScheduleBySlug($s);
+					?>
+					<li>
+						<b><?php echo $schedule->name ?></b><?php if ($schedule->is_default) { ?> (default)<?php } ?>
+						<p><b>$<?php echo $schedule->charge_amount ?></b>
+							every <b><?php echo $schedule->charge_period ?></b> days</p>
+						<p><?php echo $schedule->description ?></p>
+					</li>
+					<?php
+				}
+				?>
+			</ul>
+			<?php
+		}
+	}
+	?>
 </div>
 
 <?php
