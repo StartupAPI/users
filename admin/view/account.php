@@ -84,8 +84,14 @@ $admins = array();
 foreach ($account_users as $user_and_role) {
 	$user = $user_and_role[0];
 	$role = $user_and_role[1];
+	$disabled = $user->isDisabled();
 
-	$user_role = array('id' => $user->getID(), 'name' => $user->getName(), 'admin' => $role ? true : false);
+	$user_role = array(
+		'id' => $user->getID(),
+		'name' => $user->getName(),
+		'admin' => $role ? true : false,
+		'disabled' => $disabled
+	);
 	$users[] = $user_role;
 
 	if ($role) {
@@ -100,13 +106,18 @@ if ($account->isIndividual()) {
 	$template_data['account_isIndividual'] = true;
 
 	if (count($admins) > 0) {
-		$user = $admins[0];
-
-		$template_data['user']['id'] = $user['id'];
-		$template_data['user']['name'] = $user['name'];
+		$template_data['user'] = $admins[0];
 	}
 } else {
 	$template_data['account_isIndividual'] = false;
 }
 
-$template_data['show_user_list'] = $template_data['account_isIndividual'] ? count($users) > 1 : TRUE;
+$template_data['individual_no_admins'] = false;
+if ($template_data['account_isIndividual'] && count($admins) == 0) {
+	$template_data['individual_no_admins'] = true;
+}
+
+$template_data['show_user_list'] = TRUE;
+if ($template_data['account_isIndividual'] && count($admins) == 1 && count($users) == 1) {
+	$template_data['show_user_list'] = FALSE;
+};

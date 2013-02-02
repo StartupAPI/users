@@ -10,7 +10,9 @@
 			<p>
 				Individual accout
 				{%if user %}
-					for <i class="icon-user"></i> <a href="{{ USERSROOTURL }}/admin/user.php?id={{ user.id }}">{{ user.name }}</a>
+					for <i class="icon-user"></i> <a href="{{ USERSROOTURL }}/admin/user.php?id={{ user.id }}"{%if user.disabled %} style="color: silver; text-decoration: line-through"{%endif%}>{{ user.name }}</a>
+				{%else%}
+					<a class="btn btn-mini btn-danger" href="add_account_users.php?account_id={{ account_id }}"><i class="icon-plus icon-white"></i> <i class="icon-user icon-white"></i> Set Admin</a>
 				{%endif%}
 			</p>
 		{%endif%}
@@ -85,12 +87,26 @@
 		{%if show_user_list %}
 			<h3>Account Users:</h3>
 			{%if account_isIndividual %}
-				<p class="alert alert-error">Attention, multiple users are defined for an individual account</p>
+				{%if individual_no_admins %}
+					<p class="alert alert-error">Attention, individual account has no admin user set</p>
+				{%else%}
+					<p class="alert alert-error">Attention, multiple users are defined for an individual account</p>
+				{%endif%}
 			{%endif%}
 
+			<p>
 			{%for user in users %}
-				<div><i class="icon-user"></i> <a href="{{ USERSROOTURL }}/admin/user.php?id={{ user.id }}">{{ user.name }}</a>{%if user.admin %} <span class="badge badge-important">admin</span>{%endif%}</div>
+				<div>
+					<i class="icon-user"></i>
+					<a href="{{ USERSROOTURL }}/admin/user.php?id={{ user.id }}"{%if user.disabled %} style="color: silver; text-decoration: line-through"{%endif%}>{{ user.name }}</a>
+					{%if user.admin %}<span class="badge badge-important">admin</span>{%endif%}
+				</div>
 			{%endfor%}
+			</p>
+
+			{%if not account_isIndividual %}
+				<p><a class="btn btn-mini" href="add_account_users.php?account_id={{ account_id }}"><i class="icon-plus"></i><i class="icon-user"></i> Add Users</a></p>
+			{%endif%}
 		{%endif%}
 {%endif%}
 </div>
