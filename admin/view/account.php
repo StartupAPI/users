@@ -7,7 +7,7 @@ if (is_null($account = Account::getByID($account_id))) {
 	return;
 }
 
-// UserTools::debug("Account: " . var_export($account, true));
+$template_data['CSRF_NONCE'] = UserTools::$CSRF_NONCE;
 
 $plan_data = array('slug', 'name', 'description', 'base_price', 'base_period', 'details_url', 'grace_period');
 
@@ -121,3 +121,4 @@ $template_data['show_user_list'] = TRUE;
 if ($template_data['account_isIndividual'] && count($admins) == 1 && count($users) == 1) {
 	$template_data['show_user_list'] = FALSE;
 };
+

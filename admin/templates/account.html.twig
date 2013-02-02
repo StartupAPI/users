@@ -8,16 +8,22 @@
 		<h2>Account: {{ account_name }} <a href="edit_account.php?id={{ account_id }}" class="btn btn-mini"><i class="icon-pencil"></i> edit</a></h2>
 		{%if account_isIndividual %}
 			<p>
-				Individual accout
-				{%if user %}
-					for <i class="icon-user"></i> <a href="{{ USERSROOTURL }}/admin/user.php?id={{ user.id }}"{%if user.disabled %} style="color: silver; text-decoration: line-through"{%endif%}>{{ user.name }}</a>
-				{%else%}
-					<a class="btn btn-mini btn-danger" href="add_account_users.php?account_id={{ account_id }}"><i class="icon-plus icon-white"></i> <i class="icon-user icon-white"></i> Set Admin</a>
-				{%endif%}
+				<form action="{{ USERSROOTURL }}/admin/controller/account.php?id={{ account_id }}" method="POST">
+					<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
+					Individual accout
+					{%if user %}
+						for <i class="icon-user"></i> <a href="{{ USERSROOTURL }}/admin/user.php?id={{ user.id }}"{%if user.disabled %} style="color: silver; text-decoration: line-through"{%endif%}>{{ user.name }}</a>
+						<button class="btn btn-mini" name="remove_user" value="{{ user.id }}"><i class="icon-remove"></i></button>
+					{%else%}
+						<a class="btn btn-mini btn-danger" href="add_account_users.php?account_id={{ account_id }}&action=set_admin"><i class="icon-plus icon-white"></i> <i class="icon-user icon-white"></i> Set Admin</a>
+					{%endif%}
+				</form>
 			</p>
 		{%endif%}
-		<p>Status: {%if account_isActive %}<b class="badge badge-success">Active</b>{%else%}<b class="badge badge-important">Suspended</b>{%endif%}</p>
-		<p>Plan: <a class="badge badge-info" href="plan.php?slug={{ plan_slug }}"><i class="icon-briefcase icon-white"></i> {{ plan_name }}</a></p>
+		<p>
+			Status: {%if account_isActive %}<b class="badge badge-success">Active</b>{%else%}<b class="badge badge-important">Suspended</b>{%endif%}
+			Plan: <a class="badge badge-info" href="plan.php?slug={{ plan_slug }}"><i class="icon-briefcase icon-white"></i> {{ plan_name }}</a>
+		</p>
 
 		{%if useSubscriptions %}
 			<h3>Subscription</h3>
@@ -94,15 +100,39 @@
 				{%endif%}
 			{%endif%}
 
-			<p>
-			{%for user in users %}
-				<div>
-					<i class="icon-user"></i>
-					<a href="{{ USERSROOTURL }}/admin/user.php?id={{ user.id }}"{%if user.disabled %} style="color: silver; text-decoration: line-through"{%endif%}>{{ user.name }}</a>
-					{%if user.admin %}<span class="badge badge-important">admin</span>{%endif%}
-				</div>
-			{%endfor%}
-			</p>
+			<form action="{{ USERSROOTURL }}/admin/controller/account.php?id={{ account_id }}" method="POST">
+				<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
+
+				<table class="table table-condensed">
+				{%for user in users %}
+					<tr>
+						<td>
+							<i class="icon-user"></i>
+							<a href="{{ USERSROOTURL }}/admin/user.php?id={{ user.id }}"{%if user.disabled %} style="color: silver; text-decoration: line-through"{%endif%}>{{ user.name }}</a>
+						</td>
+						<td>
+							{%if user.admin %}
+								<span class="badge badge-important pull-right">admin</span>
+							{%else%}
+								<span class="badge pull-right">user</span>
+							{%endif%}
+							</td>
+						<td>
+							{%if user.admin %}
+								<button class="btn btn-mini btn-danger" name="demote_user" value="{{ user.id }}">
+									<i class="icon-chevron-down icon-white"></i> Demote
+								</button>
+							{%else%}
+								<button class="btn btn-mini" name="promote_user" value="{{ user.id }}">
+									<i class="icon-chevron-up"></i> Promote
+								</button>
+							{%endif%}
+						</td>
+						<td><button class="btn btn-mini pull-right" name="remove_user" value="{{ user.id }}"><i class="icon-remove"></i></button></td>
+					</tr>
+				{%endfor%}
+				</table>
+			</form>
 
 			{%if not account_isIndividual %}
 				<p><a class="btn btn-mini" href="add_account_users.php?account_id={{ account_id }}"><i class="icon-plus"></i><i class="icon-user"></i> Add Users</a></p>

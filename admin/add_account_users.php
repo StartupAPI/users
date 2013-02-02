@@ -38,7 +38,11 @@ if (array_key_exists('user_id', $_POST)) {
 	}
 }
 
-$ADMIN_SECTION = 'registrations';
+$set_admin_mode = array_key_exists('action', $_GET) && $_GET['action'] == 'set_admin';
+
+$ADMIN_SECTION = 'accounts';
+$BREADCRUMB_EXTRA = ($set_admin_mode ? 'Setting admin' : 'Adding user') . ' for ' . $account->getName();
+
 require_once(__DIR__ . '/header.php');
 
 $total = 0;
@@ -128,7 +132,19 @@ if (is_null($search)) {
 				$userid = $user->getID();
 				?>
 				<tr valign="top">
-					<td><button name="user_id" value="<?php echo $userid ?>" class="btn btn-mini btn-success"><i class="icon-plus icon-white"></i> add</button></td>
+					<td>
+						<?php
+						if ($set_admin_mode) {
+							?>
+							<button name="user_id" value="<?php echo $userid ?>" class="btn btn-mini btn-danger"><i class="icon-plus icon-white"></i> Set Admin</button>
+							<?php
+						} else {
+							?>
+							<button name="user_id" value="<?php echo $userid ?>" class="btn btn-mini btn-success"><i class="icon-plus icon-white"></i> Add</button>
+							<?php
+						}
+						?>
+					</td>
 					<td><i class="icon-user"></i>
 						<a href="user.php?id=<?php echo $userid ?>"<?php if ($user->isDisabled()) { ?> style="color: silver; text-decoration: line-through"<?php } ?>>
 							<?php echo UserTools::escape($user->getName()) ?>

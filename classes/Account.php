@@ -547,6 +547,36 @@ class Account {
 	}
 
 	/**
+	 * Sets user's role for this account
+	 *
+	 * @param User User
+	 * @param boolean $admin Set to true if you want to promote user to admin false if demote to regular user of the account
+	 *
+	 * @throws DBException
+	 */
+	public function setUserRole($user, $admin) {
+		$db = UserConfig::getDB();
+		$role_num = $admin ? 1 : 0;
+
+		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'account_users
+					SET role = ?
+					WHERE account_id = ? AND user_id = ?'
+				))) {
+			throw new DBPrepareStmtException($db);
+		}
+
+		$user_id = $user->getID();
+
+		if (!$stmt->bind_param('iii', $role_num, $this->id, $user_id)) {
+			throw new DBBindParamException($db, $stmt);
+		}
+
+		if (!$stmt->execute()) {
+			throw new DBExecuteStmtException($db, $stmt);
+		}
+	}
+
+	/**
 	 * Adds a user to account
 	 *
 	 * @param User $user User to add
