@@ -164,15 +164,22 @@ foreach ($required_extensions as $extension) {
 $config_file_ready = file_exists(dirname(__DIR__) . '/users_config.php');
 
 $config_exception = null;
+$session_secret_ready = null;
 if ($code_ready && $dependencies_ready && $config_file_ready) {
 	try {
 		require_once __DIR__ . '/global.php';
 	} catch (Exception $ex) {
 		$config_exception = $ex;
 	}
+
+	/**
+	 * Check if UserConfig::$SESSION_SECRET was modified from it's default value
+	 * in sample config file
+	 */
+	$session_secret_ready = UserConfig::$SESSION_SECRET != '...type.some.random.characters.here...';
 }
 
-$config_ready = $config_file_ready && is_null($config_exception);
+$config_ready = $config_file_ready && is_null($config_exception) && $session_secret_ready;
 
 /**
  * Checking if database configuration is set and database schema matches the code
@@ -548,6 +555,31 @@ if ($code_ready && $dependencies_ready && $config_ready && $database_ready && $a
 											<?php } ?>
 										<?php } else { ?>
 											<p>You need to create configuration file before it can be tested.</p>
+										<?php } ?>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<?php if ($config_file_ready) { ?>
+											<?php if ($session_secret_ready) { ?>
+												<span class="label label-success"><i class="icon-ok icon-white"></i></span>
+											<?php } else { ?>
+												<span class="label label-important"><i class="icon-remove icon-white"></i></span>
+											<?php } ?>
+										<?php } else { ?>
+											<span class="label"><i class="icon-minus icon-white"></i></span>
+										<?php } ?>
+									</td>
+									<td>
+										<p class="startupapi-dep-title">Set <tt>UserConfig::$SESSION_SECRET</tt> variable to a long random string</p>
+										<?php if ($config_file_ready) { ?>
+											<?php if ($session_secret_ready) { ?>
+												<p>Session secret is set</p>
+											<?php } else { ?>
+												<p>Session secret is still set to a sample value, change it to some random value</p>
+											<?php } ?>
+										<?php } else { ?>
+											<p>You need to create configuration file and set <tt>UserConfig::$SESSION_SECRET</tt> variable to some random value.</p>
 										<?php } ?>
 									</td>
 								</tr>
