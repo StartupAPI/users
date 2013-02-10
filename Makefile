@@ -1,7 +1,10 @@
-all:	updatecode depcheck updatedb
+all:	updatecode depcheck updatedb success
 
 depcheck:
 	php depcheck.php
+
+success:
+	@echo "[*** SUCCESS ***] Installation and upgrade of Startup API completed successfully"
 
 updatecode:
 ifneq "$(wildcard .svn )" ""
