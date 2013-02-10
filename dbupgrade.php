@@ -748,7 +748,10 @@ $versions[1]['down'][] = "DROP TABLE `".UserConfig::$mysql_prefix."user_preferen
 
 // creating DBUpgrade object with your database credentials and $versions defined above
 // using 'UserBase' namespace to make sure we don't conflict with parent project's dbupgrade
-$dbupgrade = new DBUpgrade(UserConfig::getDB(),	$versions, 'UserBase');
+$dbupgrade = new DBUpgrade(UserConfig::getDB(),	$versions, array(
+	'namespace' => 'UserBase',
+	'prefix' => UserConfig::$mysql_prefix
+));
 
 if (!isset($dbupgrade_interactive) || $dbupgrade_interactive) {
 	require_once(__DIR__.'/dbupgrade/client.php');
