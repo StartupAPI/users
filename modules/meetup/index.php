@@ -58,15 +58,23 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 		return "Meetup";
 	}
 
-	public function getDescription() {
+	public static function getModulesDescription() {
 		return "<p>Meetup authentication module</p>
 				 <p>Provides authentication using Meetup.com accounts and API access using OAuth</p>";
 	}
 
-	public function getLogo($size = 100) {
+	public function getDescription() {
+		return self::getModulesDescription();
+	}
+
+	public static function getModulesLogo($size = 100) {
 		if ($size == 100) {
 			return UserConfig::$USERSROOTURL . '/modules/meetup/images/logo_100x.png';
 		}
+	}
+
+	public static function getSignupURL() {
+		return 'http://www.meetup.com/meetup_api/oauth_consumers/';
 	}
 
 	public function getIdentity($oauth_user_id) {

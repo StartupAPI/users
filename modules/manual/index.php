@@ -28,8 +28,12 @@ class ManualPaymentEngine extends PaymentEngine {
 		return "Manual Payment Processing";
 	}
 
-	public function getDescription() {
+	public static function getModulesDescription() {
 		return "<p>Manual payment engine used for invoicing or consierge service subscriptions</p>";
+	}
+
+	public function getDescription() {
+		return self::getModulesDescription();
 	}
 
 	/**

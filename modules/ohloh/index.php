@@ -83,10 +83,18 @@ class OhlohAuthenticationModule extends OAuthAuthenticationModule {
 EOF;
 	}
 
+	public function getDescription() {
+		return self::getModulesDescription();
+	}
+
 	public static function getModulesLogo($size = 100) {
 		if ($size == 100) {
 			return UserConfig::$USERSROOTURL . '/modules/ohloh/images/logo_100x.png';
 		}
+	}
+
+	public static function getSignupURL() {
+		return 'https://www.ohloh.net/accounts/me/api_keys/new';
 	}
 
 	protected function renderUserInfo($serialized_userinfo) {

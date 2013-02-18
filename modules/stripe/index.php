@@ -38,6 +38,12 @@ EOF;
 		return self::getModulesDescription();
 	}
 
+	public static function getModulesLogo($size = 100) {
+		if ($size == 100) {
+			return UserConfig::$USERSROOTURL . '/modules/stripe/images/logo_100x.png';
+		}
+	}
+
 	public static function getSignupURL() {
 		return "https://stripe.com/";
 	}

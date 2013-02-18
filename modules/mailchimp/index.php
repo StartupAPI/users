@@ -35,15 +35,23 @@ class MailChimpModule extends EmailModule
 		return "MailChimp";
 	}
 
-	public function getDescription() {
+	public static function getModulesDescription() {
 		return "<p>MailChip mailing list integration module (UNFINISHED)</p>
 				<p>Syncronizes user information with MailChimp mailing list.</p>";
 	}
 
-	public function getLogo($size = 100) {
+	public function getDescription() {
+		return self::getModulesDescription();
+	}
+
+	public static function getModulesLogo($size = 100) {
 		if ($size == 100) {
 			return UserConfig::$USERSROOTURL . '/modules/mailchimp/images/logo_100x.png';
 		}
+	}
+
+	public static function getSignupURL() {
+		return 'http://connect.mailchimp.com/';
 	}
 
 	/**
