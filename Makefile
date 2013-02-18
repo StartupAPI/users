@@ -7,42 +7,9 @@ success:
 	@echo "[*** SUCCESS ***] Installation and upgrade of Startup API completed successfully"
 
 updatecode:
-ifneq "$(wildcard .svn )" ""
-	rm -rf dbupgrade oauth-php admin/swfobject modules/facebook/facebook-php-sdk
-	svn update
-
-	mkdir dbupgrade/
-	svn export http://svn.github.com/sergeychernyshev/DBUpgrade.git _dbupgrade
-	mv _dbupgrade/* dbupgrade/
-	rm -rf _dbupgrade
-
-	mkdir oauth-php
-	svn export http://svn.github.com/sergeychernyshev/oauth-php.git _oauth-php
-	mv _oauth-php/* oauth-php
-	rm -rf _oauth-php
-
-	mkdir admin/swfobject
-	svn export http://svn.github.com/swfobject/swfobject.git _swfobject
-	mv _swfobject/* admin/swfobject
-	rm -rf _swfobject
-
-	rm -rf _php-sdk
-	mkdir modules/facebook/facebook-php-sdk
-	git clone git://github.com/facebook/facebook-php-sdk.git _php-sdk
-	( cd _php-sdk; git archive HEAD | tar -x -C ../modules/facebook/facebook-php-sdk )
-	rm -rf _php-sdk
-
-	rm -rf twig 
-	mkdir twig 
-	svn export git://github.com/fabpot/Twig.git _twig
-	mv _twig/* twig/
-	rm -rf _twig
-endif
-ifneq "$(wildcard .git )" ""
 	git pull origin master
 	git submodule init
 	git submodule update
-endif
 
 checkconfig:
 ifeq ($(wildcard ../users_config.php),)
