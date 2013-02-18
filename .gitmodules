@@ -22,3 +22,6 @@
 [submodule "trunk8"]
 	path = trunk8
 	url = git://github.com/rviscomi/trunk8.git
+[submodule "masonry"]
+	path = masonry
+	url = git://github.com/desandro/masonry.git

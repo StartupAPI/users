@@ -1268,7 +1268,7 @@
 }
 
 .startupapi-header {
-		border-bottom: 1px dotted silver;
+	border-bottom: 1px dotted silver;
 }
 
 .startupapi-header-strip {
@@ -1282,4 +1282,32 @@
 
 .startupapi-file-path {
 	font-family: 'courier';
+}
+
+/* Modules Admin UI */
+.startupapi-module {
+	min-height: 100px;
+	width: 45%;
+	min-width: 30em;
+}
+
+.startupapi-module-not-installed {
+	color: silver;
+}
+
+.startupapi-module-not-installed a {
+	color: grey;
+}
+
+.startupapi-module-title {
+	font-size: x-large;
+	font-weight: bold;
+}
+
+.startupapi-module-logo {
+	width: 100px;
+	height: 100px;
+
+	margin-left: 1em;
+	margin-bottom: 1em;
 }

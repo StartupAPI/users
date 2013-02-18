@@ -1,5 +1,6 @@
 <?php
-require_once(dirname(dirname(__DIR__)).'/classes/OAuthModule.php');
+
+require_once(dirname(dirname(__DIR__)) . '/classes/OAuthModule.php');
 
 /**
  * Google OAuth (v1) authentication module
@@ -13,8 +14,8 @@ require_once(dirname(dirname(__DIR__)).'/classes/OAuthModule.php');
  * @package StartupAPI
  * @subpackage Authentication\Google
  */
-class GoogleOAuthAuthenticationModule extends OAuthAuthenticationModule
-{
+class GoogleOAuthAuthenticationModule extends OAuthAuthenticationModule {
+
 	protected $userCredentialsClass = 'GoogleOAuthUserCredentials';
 
 	/**
@@ -22,11 +23,9 @@ class GoogleOAuthAuthenticationModule extends OAuthAuthenticationModule
 	 * @param string $oAuthConsumerKey OAuth Consumer Key
 	 * @param string $oAuthConsumerSecret OAuth Consumer Secret
 	 * @param array $GoogleAPIScopes (optional) Array of Google API Scopes
-	 *		See full list here: http://code.google.com/apis/gdata/faq.html#AuthScopes
+	 * 		See full list here: http://code.google.com/apis/gdata/faq.html#AuthScopes
 	 */
-	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret,
-		$GoogleAPIScopes = null)
-	{
+	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret, $GoogleAPIScopes = null) {
 		// default scope needed for identity verification
 		// TODO rewrite using hybrid OpenID + OAuth implementation
 		$scopes = array('https://www.google.com/m8/feeds/');
@@ -36,40 +35,53 @@ class GoogleOAuthAuthenticationModule extends OAuthAuthenticationModule
 		}
 
 		parent::__construct(
-			'Google',
-			'https://www.google.com/',
-			$oAuthConsumerKey,
-			$oAuthConsumerSecret,
+			'Google', 'https://www.google.com/',
+			$oAuthConsumerKey, $oAuthConsumerSecret,
 			'https://www.google.com/accounts/OAuthGetRequestToken',
 			'https://www.google.com/accounts/OAuthGetAccessToken',
 			'https://www.google.com/accounts/OAuthAuthorizeToken',
 			array('HMAC-SHA1'),
 			implode(' ', $scopes),
-			UserConfig::$USERSROOTURL.'/modules/google_oauth/login-button.png',
-			UserConfig::$USERSROOTURL.'/modules/google_oauth/login-button.png',
-			UserConfig::$USERSROOTURL.'/modules/google_oauth/login-button.png',
+			UserConfig::$USERSROOTURL . '/modules/google_oauth/login-button.png',
+			UserConfig::$USERSROOTURL . '/modules/google_oauth/login-button.png',
+			UserConfig::$USERSROOTURL . '/modules/google_oauth/login-button.png',
 			array(
 				array(3001, "Logged in using Google account", 1),
 				array(3002, "Added Google account", 1),
 				array(3003, "Removed Google account", 0),
-				array(3004, "Registered using Google account", 1),
+				array(3004, "Registered using Google account", 1)
 			)
 		);
 	}
 
-	public function getID()
-	{
+	public function getID() {
 		return "google-oauth";
 	}
 
-	public function getLegendColor()
-	{
+	public function getLegendColor() {
 		return "e51837";
 	}
 
-	public function getTitle()
-	{
+	public static function getModulesTitle() {
 		return "Google";
+	}
+
+	public static function getModulesDescription() {
+		return <<<EOF
+			<p>Google OAuth (v1) authentication module provides authentication
+				using Google accounts and API access using OAuth</p>
+			<p>Note that Google deprecated OAuth v1 support for new APIs and will be converting
+				all APIs to OAuth v2. Authentication and old APIs are still functional per
+				<a target="_blank" href="https://developers.google.com/accounts/terms">Google's deprecation policy</a></p>
+EOF;
+	}
+
+	public function getDescription() {
+		return self::getModulesDescription();
+	}
+
+	public static function getSignupURL() {
+		return 'https://www.google.com/accounts/ManageDomains';
 	}
 
 	public function getIdentity($oauth_user_id) {
@@ -84,15 +96,15 @@ class GoogleOAuthAuthenticationModule extends OAuthAuthenticationModule
 			$xml = new SimpleXMLElement($raw_xml);
 
 			return array(
-				'id' => (string)$xml->id,
-				'name' => (string)$xml->author->name,
-				'email' => (string)$xml->author->email
+				'id' => (string) $xml->id,
+				'name' => (string) $xml->author->name,
+				'email' => (string) $xml->author->email
 			);
 		}
 
-
 		return null;
 	}
+
 }
 
 /**
@@ -102,4 +114,5 @@ class GoogleOAuthAuthenticationModule extends OAuthAuthenticationModule
  * @subpackage Authentication\Google
  */
 class GoogleOAuthUserCredentials extends OAuthUserCredentials {
+
 }

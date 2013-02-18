@@ -54,9 +54,19 @@ class TwitterAuthenticationModule extends OAuthAuthenticationModule
 		return "60bddc";
 	}
 
-	public function getTitle()
-	{
+	public static function getModulesTitle() {
 		return "Twitter";
+	}
+
+	public function getDescription() {
+		return "<p>Twitter authentication module</p>
+				 <p>Provides authentication using Twitter accounts and API access using OAuth</p>";
+	}
+
+	public function getLogo($size = 100) {
+		if ($size == 100) {
+			return UserConfig::$USERSROOTURL . '/modules/twitter/images/logo_100x.png';
+		}
 	}
 
 	public function getIdentity($oauth_user_id) {

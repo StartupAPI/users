@@ -83,14 +83,20 @@ class EtsyAuthenticationModule extends OAuthAuthenticationModule
 		return "d55f15";
 	}
 
-	/**
-	 * Returns mogue title
-	 *
-	 * @return string Always returns "Etsy"
-	 */
-	public function getTitle()
-	{
+	public static function getModulesTitle() {
 		return "Etsy";
+	}
+
+	public static function getModulesDescription() {
+		return "<p>Authenticates users using Etsy (etsy.com) and providers access to their API using OAuth</p>";
+	}
+
+	public function getDescription() {
+		return self::getModulesDescription();
+	}
+
+	public static function getSignupURL() {
+		return 'https://www.etsy.com/developers/register';
 	}
 
 	/**

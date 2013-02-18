@@ -31,9 +31,19 @@ class MailChimpModule extends EmailModule
 		return "mailchimp";
 	}
 
-	public function getTitle()
-	{
+	public static function getModulesTitle() {
 		return "MailChimp";
+	}
+
+	public function getDescription() {
+		return "<p>MailChip mailing list integration module (UNFINISHED)</p>
+				<p>Syncronizes user information with MailChimp mailing list.</p>";
+	}
+
+	public function getLogo($size = 100) {
+		if ($size == 100) {
+			return UserConfig::$USERSROOTURL . '/modules/mailchimp/images/logo_100x.png';
+		}
 	}
 
 	/**
@@ -124,4 +134,4 @@ class MailChimpModule extends EmailModule
  * @package StartupAPI
  * @subpackage Email\MailChimp
  */
-class MailChimpException extends Exception { }
+class MailChimpException extends StartupAPIException { }

@@ -60,6 +60,7 @@ $admin_menu = new AdminMenu(array(
 			)),
 			new MenuSection('settings', 'Settings', null, array(
 				new Menu('systemsettings', 'System Settings', $ADMIN_ROOT . '/settings.php', 'wrench'),
+				new Menu('modules', 'Modules', $ADMIN_ROOT . '/modules.php', 'th-large'),
 				new Menu('features', 'Features', $ADMIN_ROOT . '/features.php', 'check', $features_num > 0, 'No features defined in this app')
 			))
 		));

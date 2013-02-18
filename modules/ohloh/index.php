@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__DIR__)).'/classes/OAuthModule.php');
+require_once(dirname(dirname(__DIR__)) . '/classes/OAuthModule.php');
 
 /**
  * Ohloh authentication module
@@ -9,8 +9,8 @@ require_once(dirname(dirname(__DIR__)).'/classes/OAuthModule.php');
  * @package StartupAPI
  * @subpackage Authentication\Ohloh
  */
-class OhlohAuthenticationModule extends OAuthAuthenticationModule
-{
+class OhlohAuthenticationModule extends OAuthAuthenticationModule {
+
 	protected $userCredentialsClass = 'OhlohUserCredentials';
 
 	/**
@@ -19,8 +19,7 @@ class OhlohAuthenticationModule extends OAuthAuthenticationModule
 	 * @param string $oAuthConsumerKey OAuth Consumer Key
 	 * @param string $oAuthConsumerSecret OAuth Consumer Secret
 	 */
-	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret)
-	{
+	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret) {
 		parent::__construct(
 			'Ohloh',
 			'http://www.ohloh.com',
@@ -46,18 +45,15 @@ class OhlohAuthenticationModule extends OAuthAuthenticationModule
 		);
 	}
 
-	public function getID()
-	{
+	public function getID() {
 		return "ohloh";
 	}
 
-	public function getLegendColor()
-	{
+	public function getLegendColor() {
 		return "868686";
 	}
 
-	public function getTitle()
-	{
+	public static function getModulesTitle() {
 		return "Ohloh";
 	}
 
@@ -72,12 +68,19 @@ class OhlohAuthenticationModule extends OAuthAuthenticationModule
 
 			// todo add more fields
 			return array(
-				'id' => (string)$xml->id,
-				'name' => (string)$xml->name
+				'id' => (string) $xml->id,
+				'name' => (string) $xml->name
 			);
 		}
 
 		return null;
+	}
+
+	public static function getModulesDescription() {
+		return <<<EOF
+			<p>Ohloh authentication module</p>
+			<p>Provides authentication using Ohloh.com accounts and API access using OAuth</p>
+EOF;
 	}
 
 	protected function renderUserInfo($serialized_userinfo) {
@@ -85,6 +88,7 @@ class OhlohAuthenticationModule extends OAuthAuthenticationModule
 		?><a href="http://www.ohloh.net/accounts/<?php echo UserTools::escape($user_info['id']); ?>" target="_blank"><?php echo UserTools::escape($user_info['name']); ?></a>
 		<?php
 	}
+
 }
 
 /**
@@ -94,7 +98,9 @@ class OhlohAuthenticationModule extends OAuthAuthenticationModule
  * @subpackage Authentication\Ohloh
  */
 class OhlohUserCredentials extends OAuthUserCredentials {
+
 	public function getHTML() {
-		return '<a href="http://www.ohloh.net/accounts/'.UserTools::escape($user_info['id']).'" target="_blank">@'.$this->userinfo['name'].'</a>';
+		return '<a href="http://www.ohloh.net/accounts/' . UserTools::escape($user_info['id']) . '" target="_blank">@' . $this->userinfo['name'] . '</a>';
 	}
+
 }

@@ -87,9 +87,35 @@ class StatusNetAuthenticationModule extends OAuthAuthenticationModule
 		return "91a93b";
 	}
 
+	public static function getModulesTitle() {
+		return 'StatusNet';
+	}
+
 	public function getTitle()
 	{
 		return $this->title;
+	}
+
+	public static function getModulesDescription() {
+		return <<<EOF
+<p>StatusNet authentication module</p>
+
+<p>Provides authentication using StatusNet open source microblogging platform
+that powers http://identi.ca and other public and private sites.</p>
+
+<p>Provides access to Twitter-based and other APIs using OAuth</p>
+EOF;
+	}
+
+	public function getDescription() {
+		return "<p>" . $this->title . <<<EOF
+authentication module</p>
+
+<p>Provides authentication using StatusNet open source microblogging platform
+that powers http://identi.ca and other public and private sites.</p>
+
+<p>Provides access to Twitter-based and other APIs using OAuth</p>
+EOF;
 	}
 
 	public function getIdentity($oauth_user_id) {

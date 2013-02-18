@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__DIR__)).'/classes/OAuthModule.php');
+require_once(dirname(dirname(__DIR__)) . '/classes/OAuthModule.php');
 
 /**
  * LinkedIn authorization modlue
@@ -10,8 +10,8 @@ require_once(dirname(dirname(__DIR__)).'/classes/OAuthModule.php');
  * @package StartupAPI
  * @subpackage Authentication\Linkedin
  */
-class LinkedInAuthenticationModule extends OAuthAuthenticationModule
-{
+class LinkedInAuthenticationModule extends OAuthAuthenticationModule {
+
 	protected $userCredentialsClass = 'LinkedInUserCredentials';
 
 	/**
@@ -21,11 +21,10 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule
 	 * @param string $oAuthConsumerSecret OAuth Consumer Secret
 	 * @param string $oAuthScope Requested permission scopes (zero or more scope strings, usually URLs, separated by spaces)
 	 */
-	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret, $oAuthScope = 'basic')
-	{
+	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret, $oAuthScope = 'basic') {
 		parent::__construct(
-			'LinkedIn',
-			'https://api.linkedin.com',
+			'LinkedIn','
+			https://api.linkedin.com',
 			$oAuthConsumerKey,
 			$oAuthConsumerSecret,
 			'https://api.linkedin.com/uas/oauth/requestToken',
@@ -33,25 +32,41 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule
 			'https://www.linkedin.com/uas/oauth/authenticate',
 			array('HMAC-SHA1', 'PLAINTEXT'),
 			$oAuthScope,
-			UserConfig::$USERSROOTURL.'/modules/linkedin/linkedin-small.png',
-			UserConfig::$USERSROOTURL.'/modules/linkedin/linkedin-small.png',
-			UserConfig::$USERSROOTURL.'/modules/linkedin/linkedin-small.png'
+			UserConfig::$USERSROOTURL . '/modules/linkedin/linkedin-small.png',
+			UserConfig::$USERSROOTURL . '/modules/linkedin/linkedin-small.png',
+			UserConfig::$USERSROOTURL . '/modules/linkedin/linkedin-small.png'
 		);
 	}
 
-	public function getID()
-	{
+	public function getID() {
 		return "linkedin";
 	}
 
-	public function getLegendColor()
-	{
+	public function getLegendColor() {
 		return "4291ba";
 	}
 
-	public function getTitle()
-	{
+	public static function getModulesTitle() {
 		return "LinkedIn";
+	}
+
+	public static function getModulesDescription() {
+		return "<p>LinkedIn authentication module</p>
+				 <p>Provides authentication using LinkedIn accounts and API access using OAuth</p>";
+	}
+
+	public function getDescription() {
+		return self::getModulesDescription();
+	}
+
+	public static function getSignupURL() {
+		return 'https://www.linkedin.com/secure/developer';
+	}
+
+	public static function getModulesLogo($size = 100) {
+		if ($size == 100) {
+			return UserConfig::$USERSROOTURL . '/modules/linkedin/images/logo_100x.png';
+		}
 	}
 
 	public function getIdentity($oauth_user_id) {
@@ -75,8 +90,9 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule
 		$user_info = unserialize($serialized_userinfo);
 		?><script src="//platform.linkedin.com/in.js" type="text/javascript"></script>
 		<script type="IN/MemberProfile" data-id="<?php echo UserTools::escape($user_info['publicProfileUrl']); ?>" data-format="hover" data-text="<?php echo UserTools::escape($user_info['name']); ?>" data-related="false"></script>
-<?php
+		<?php
 	}
+
 }
 
 /**
@@ -86,7 +102,9 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule
  * @subpackage Authentication\Linkedin
  */
 class LinkedInUserCredentials extends OAuthUserCredentials {
+
 	public function getHTML() {
-		return '<a href="'.UserTools::escape($this->userinfo['publicProfileUrl']).'" target="_blank">'.$this->userinfo['name'].'</a>';
+		return '<a href="' . UserTools::escape($this->userinfo['publicProfileUrl']) . '" target="_blank">' . $this->userinfo['name'] . '</a>';
 	}
+
 }

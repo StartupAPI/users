@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package StartupAPI
  * @subpackage Subscriptions/Stripe
@@ -23,14 +24,22 @@ class StripePaymentEngine extends PaymentEngine {
 		}
 	}
 
-	/**
-	 * Returns payment engine title
-	 *
-	 * @return string Payment engine title
-	 */
-	public function getTitle() {
-
+	public static function getModulesTitle() {
 		return "Stripe.com Payment Processing";
+	}
+
+	public static function getModulesDescription() {
+		return <<<EOF
+			<p>Payment module using Stripe.com service</p>
+EOF;
+	}
+
+	public function getDescription() {
+		return self::getModulesDescription();
+	}
+
+	public static function getSignupURL() {
+		return "https://stripe.com/";
 	}
 
 	/**
@@ -70,22 +79,22 @@ class StripePaymentEngine extends PaymentEngine {
 		}
 
 		/* No transaction details yet
-		$db = UserConfig::getDB();
+		  $db = UserConfig::getDB();
 
-		if (!($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix .
-				'transaction_details_' . $this->getSlug() .
-				' (transaction_id, funds_source, comment) VALUES(?,?,?,?)'))) {
-			throw new DBPrepareStmtException($db);
-		}
+		  if (!($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix .
+		  'transaction_details_' . $this->getSlug() .
+		  ' (transaction_id, funds_source, comment) VALUES(?,?,?,?)'))) {
+		  throw new DBPrepareStmtException($db);
+		  }
 
-		if (!$stmt->bind_param('iiss', $transaction_id, $operator_id, $funds_source, $comment)) {
-			throw new DBBindParamException($db, $stmt);
-		}
+		  if (!$stmt->bind_param('iiss', $transaction_id, $operator_id, $funds_source, $comment)) {
+		  throw new DBBindParamException($db, $stmt);
+		  }
 
-		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
-		}
-		*/
+		  if (!$stmt->execute()) {
+		  throw new DBExecuteStmtException($db, $stmt);
+		  }
+		 */
 
 		return TRUE;
 	}
@@ -107,34 +116,34 @@ class StripePaymentEngine extends PaymentEngine {
 		return array();
 
 		/* no transaction details yet
-		$db = UserConfig::getDB();
+		  $db = UserConfig::getDB();
 
-		if (!($stmt = $db->prepare('SELECT operator_id, funds_source, comment FROM ' .
-				UserConfig::$mysql_prefix . 'transaction_details_' . $this->getSlug() .
-				' WHERE transaction_id = ?'))) {
-			throw new DBPrepareStmtException($db);
-		}
+		  if (!($stmt = $db->prepare('SELECT operator_id, funds_source, comment FROM ' .
+		  UserConfig::$mysql_prefix . 'transaction_details_' . $this->getSlug() .
+		  ' WHERE transaction_id = ?'))) {
+		  throw new DBPrepareStmtException($db);
+		  }
 
-		if (!$stmt->bind_param('i', $transaction_id)) {
-			throw new DBBindParamException($db, $stmt);
-		}
+		  if (!$stmt->bind_param('i', $transaction_id)) {
+		  throw new DBBindParamException($db, $stmt);
+		  }
 
-		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
-		}
+		  if (!$stmt->execute()) {
+		  throw new DBExecuteStmtException($db, $stmt);
+		  }
 
-		if (!$stmt->bind_result($operator_id, $funds_source, $comment)) {
-			throw new DBBindResultException($db, $stmt);
-		}
+		  if (!$stmt->bind_result($operator_id, $funds_source, $comment)) {
+		  throw new DBBindResultException($db, $stmt);
+		  }
 
-		$details = array();
-		if ($stmt->fetch() === TRUE) {
-			foreach (array('operator_id', 'funds_source', 'comment') as $i) {
-				$details[$i] = stripslashes($$i);
-			}
-			return $details;
-		}
-		*/
+		  $details = array();
+		  if ($stmt->fetch() === TRUE) {
+		  foreach (array('operator_id', 'funds_source', 'comment') as $i) {
+		  $details[$i] = stripslashes($$i);
+		  }
+		  return $details;
+		  }
+		 */
 
 		return FALSE;
 	}

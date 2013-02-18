@@ -21,8 +21,19 @@ class EmailAuthenticationModule extends AuthenticationModule {
 		return "f7dc67";
 	}
 
-	public function getTitle() {
+	public static function getModulesTitle() {
 		return "Email";
+	}
+
+	public static function getModulesDescription() {
+		return "<p>Email authentication module (UNFINISHED)</p>
+				<p>This module is used for authenticating users using just an email address.</p>
+				<p>It is useful for signing up people for future newsletter
+					notifications of for an early beta program.</p>";
+	}
+
+	public function getDescription() {
+		return self::getModulesDescription();
 	}
 
 	/**

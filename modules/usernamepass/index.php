@@ -22,9 +22,22 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		return "a3a3a3";
 	}
 
-	public function getTitle()
+	public static function getModulesTitle()
 	{
 		return "Username / Password";
+	}
+
+	public function getDescription() {
+		return "<p>Basic authentication module using username and password</p>
+				 <p>Registers users with their username, password, name and email address</p>
+				 <p>This is the module that is enabled by default in user_config.sample.php
+					because it requires not configuration.</p>";
+	}
+
+	public function getLogo($size = 100) {
+		if ($size == 100) {
+			return UserConfig::$USERSROOTURL . '/modules/usernamepass/images/logo_100x.png';
+		}
 	}
 
 	public function getUserCredentials($user)

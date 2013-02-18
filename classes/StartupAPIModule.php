@@ -1,5 +1,6 @@
 <?php
-require_once(dirname(__DIR__).'/global.php');
+
+require_once(dirname(__DIR__) . '/global.php');
 
 /**
  * StartupAPI module class
@@ -12,6 +13,7 @@ require_once(dirname(__DIR__).'/global.php');
  * @todo Rename module IDs to module slugs throughout the application to confirm with coding standards
  */
 abstract class StartupAPIModule {
+
 	/**
 	 * Creates new module and registers it with the system
 	 */
@@ -29,11 +31,83 @@ abstract class StartupAPIModule {
 	abstract public function getID();
 
 	/**
-	 * Returns human readable module name
+	 * Returns human readable module name for a class of modules
 	 *
 	 * @return string Module name
 	 */
-	abstract public function getTitle();
+	abstract public static function getModulesTitle();
+
+	/**
+	 * Returns human readable module name
+	 *
+	 * Default implementation assumes title of instances is the same
+	 * as title of the class of modules, override if not singleton
+	 *
+	 * @return string Module name
+	 */
+	public function getTitle() {
+		$class = get_class($this);
+		return $class::getModulesTitle();
+	}
+
+	/**
+	 * Returns description HTML for a class of modules
+	 *
+	 * Usually different from module description, used when no modules are
+	 * instantiated to entice people to install and instruct how to do so
+	 *
+	 * @return string Module description
+	 */
+	public static function getModulesDescription() {
+		return null;
+	}
+
+	/**
+	 * Returns module description HTML
+	 *
+	 * Usually different from description for a class of modules,
+	 * used to describe installed and instantiated module (and how to use it)
+	 *
+	 * @return string Module description
+	 */
+	public function getDescription() {
+		return null;
+	}
+
+	/**
+	 * Returns URL of signup page for modules that use external providers
+	 *
+	 * @return string Signup page URL
+	 */
+	public static function getSignupURL() {
+		return null;
+	}
+
+	/**
+	 * Returns logo URL for a class of modules (if specified size of logo is available)
+	 *
+	 * @param int $size Size of the logo
+	 *
+	 * @return string Logo URL
+	 */
+	public static function getModulesLogo($size = 100) {
+		return null;
+	}
+
+	/**
+	 * Returns a logo URL for particular module
+	 *
+	 * Override it if you want custom logos per instance of module
+	 * (rare, you will most likely not need it)
+	 *
+	 * @param int $size Size of the logo
+	 *
+	 * @return string Logo URL
+	 */
+	public function getLogo($size = 100) {
+		$class = get_class($this);
+		$class::getModulesLogo($size);
+	}
 
 	/**
 	 * Returns module by slug
@@ -43,16 +117,16 @@ abstract class StartupAPIModule {
 	 * @return StartupAPIModule StartupAPIModule object
 	 */
 	public static function get($slug) {
-		foreach (UserConfig::$all_modules as $module)
-		{
+		foreach (UserConfig::$all_modules as $module) {
 			if ($module->getID() == $slug) {
 				return $module;
 			}
 		}
 	}
+
 }
 
-require_once(__DIR__.'/AuthenticationModule.php');
-require_once(__DIR__.'/EmailModule.php');
-require_once(__DIR__.'/PaymentEngine.php');
+require_once(__DIR__ . '/AuthenticationModule.php');
+require_once(__DIR__ . '/EmailModule.php');
+require_once(__DIR__ . '/PaymentEngine.php');
 

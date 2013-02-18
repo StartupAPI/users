@@ -81,8 +81,26 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		return "3b5999";
 	}
 
-	public function getTitle() {
+	public static function getModulesTitle() {
 		return "Facebook";
+	}
+
+	public static function getModulesDescription() {
+		return '<p>Facebook Connect and API access module</p>';
+	}
+
+	public function getDescription() {
+		return self::getModulesDescription();
+	}
+
+	public static function getSignupURL() {
+		return 'https://developers.facebook.com/apps';
+	}
+
+	public function getLogo($size = 100) {
+		if ($size == 100) {
+			return UserConfig::$USERSROOTURL . '/modules/facebook/images/logo_100x.png';
+		}
 	}
 
 	/**

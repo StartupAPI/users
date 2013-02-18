@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package StartupAPI
  * @subpackage Subscriptions
@@ -23,14 +24,12 @@ class ManualPaymentEngine extends PaymentEngine {
 		}
 	}
 
-	/**
-	 * Returns payment engine title
-	 *
-	 * @return string Payment engine title
-	 */
-	public function getTitle() {
-
+	public static function getModulesTitle() {
 		return "Manual Payment Processing";
+	}
+
+	public function getDescription() {
+		return "<p>Manual payment engine used for invoicing or consierge service subscriptions</p>";
 	}
 
 	/**
