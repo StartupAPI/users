@@ -431,11 +431,21 @@ class User {
 			while ($stmt->fetch() === TRUE) {
 				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
 
-				$campaigns['cmp_name'][$cmp_name][] = $user;
-				$campaigns['cmp_content'][$cmp_content][] = $user;
-				$campaigns['cmp_keywords'][$cmp_keywords][] = $user;
-				$campaigns['cmp_medium'][$cmp_medium][] = $user;
-				$campaigns['cmp_source'][$cmp_source][] = $user;
+				if (!is_null($cmp_name)) {
+					$campaigns['cmp_name'][$cmp_name][] = $user;
+				}
+				if (!is_null($cmp_content)) {
+					$campaigns['cmp_content'][$cmp_content][] = $user;
+				}
+				if (!is_null($cmp_keywords)) {
+					$campaigns['cmp_keywords'][$cmp_keywords][] = $user;
+				}
+				if (!is_null($cmp_medium)) {
+					$campaigns['cmp_medium'][$cmp_medium][] = $user;
+				}
+				if (!is_null($cmp_source)) {
+					$campaigns['cmp_source'][$cmp_source][] = $user;
+				}
 			}
 
 			$stmt->close();
