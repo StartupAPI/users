@@ -83,6 +83,12 @@ class OhlohAuthenticationModule extends OAuthAuthenticationModule {
 EOF;
 	}
 
+	public static function getModulesLogo($size = 100) {
+		if ($size == 100) {
+			return UserConfig::$USERSROOTURL . '/modules/ohloh/images/logo_100x.png';
+		}
+	}
+
 	protected function renderUserInfo($serialized_userinfo) {
 		$user_info = unserialize($serialized_userinfo);
 		?><a href="http://www.ohloh.net/accounts/<?php echo UserTools::escape($user_info['id']); ?>" target="_blank"><?php echo UserTools::escape($user_info['name']); ?></a>

@@ -80,6 +80,12 @@ EOF;
 		return self::getModulesDescription();
 	}
 
+	public static function getModulesLogo($size = 100) {
+		if ($size == 100) {
+			return UserConfig::$USERSROOTURL . '/modules/google_oauth/images/logo_100x.png';
+		}
+	}
+
 	public static function getSignupURL() {
 		return 'https://www.google.com/accounts/ManageDomains';
 	}

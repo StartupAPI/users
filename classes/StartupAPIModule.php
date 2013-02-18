@@ -106,7 +106,7 @@ abstract class StartupAPIModule {
 	 */
 	public function getLogo($size = 100) {
 		$class = get_class($this);
-		$class::getModulesLogo($size);
+		return $class::getModulesLogo($size);
 	}
 
 	/**

@@ -118,6 +118,12 @@ that powers http://identi.ca and other public and private sites.</p>
 EOF;
 	}
 
+	public static function getModulesLogo($size = 100) {
+		if ($size == 100) {
+			return UserConfig::$USERSROOTURL . '/modules/statusnet/images/logo_100x.png';
+		}
+	}
+
 	public function getIdentity($oauth_user_id) {
 		// get twitter handle
 		$request = new OAuthRequester($this->APIRootURL.'account/verify_credentials.json', 'GET');

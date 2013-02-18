@@ -97,7 +97,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		return 'https://developers.facebook.com/apps';
 	}
 
-	public function getLogo($size = 100) {
+	public static function getModulesLogo($size = 100) {
 		if ($size == 100) {
 			return UserConfig::$USERSROOTURL . '/modules/facebook/images/logo_100x.png';
 		}

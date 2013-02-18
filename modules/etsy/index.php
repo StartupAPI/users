@@ -95,6 +95,12 @@ class EtsyAuthenticationModule extends OAuthAuthenticationModule
 		return self::getModulesDescription();
 	}
 
+	public static function getModulesLogo($size = 100) {
+		if ($size == 100) {
+			return UserConfig::$USERSROOTURL . '/modules/etsy/images/logo_100x.png';
+		}
+	}
+
 	public static function getSignupURL() {
 		return 'https://www.etsy.com/developers/register';
 	}
