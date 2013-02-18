@@ -3,7 +3,6 @@ require_once(__DIR__ . '/admin.php');
 
 // @todo still show experimental modules that ARE installed now
 // @todo show installed modules first
-
 // temporary switch to make it easy to see experimental modules
 $show_experimental = true;
 
@@ -20,8 +19,8 @@ $module_categories = array(
 );
 
 $builtin_modules = array(
-	'facebook' => array(
-		'class' => 'FacebookAuthenticationModule',
+	'usernamepass' => array(
+		'class' => 'UsernamePasswordAuthenticationModule',
 		'category_slug' => 'auth'
 	),
 	'email' => array(
@@ -29,8 +28,12 @@ $builtin_modules = array(
 		'experimental' => true,
 		'category_slug' => 'auth'
 	),
-	'etsy' => array(
-		'class' => 'EtsyAuthenticationModule',
+	'facebook' => array(
+		'class' => 'FacebookAuthenticationModule',
+		'category_slug' => 'auth'
+	),
+	'twitter' => array(
+		'class' => 'TwitterAuthenticationModule',
 		'category_slug' => 'auth'
 	),
 	'google_oauth' => array(
@@ -39,6 +42,22 @@ $builtin_modules = array(
 	),
 	'linkedin' => array(
 		'class' => 'LinkedInAuthenticationModule',
+		'category_slug' => 'auth'
+	),
+	'meetup' => array(
+		'class' => 'MeetupAuthenticationModule',
+		'category_slug' => 'auth'
+	),
+	'etsy' => array(
+		'class' => 'EtsyAuthenticationModule',
+		'category_slug' => 'auth'
+	),
+	'ohloh' => array(
+		'class' => 'OhlohAuthenticationModule',
+		'category_slug' => 'auth'
+	),
+	'statusnet' => array(
+		'class' => 'StatusNetAuthenticationModule',
 		'category_slug' => 'auth'
 	),
 	'mailchimp' => array(
@@ -51,30 +70,10 @@ $builtin_modules = array(
 		'experimental' => true,
 		'category_slug' => 'payment'
 	),
-	'meetup' => array(
-		'class' => 'MeetupAuthenticationModule',
-		'category_slug' => 'auth'
-	),
-	'ohloh' => array(
-		'class' => 'OhlohAuthenticationModule',
-		'category_slug' => 'auth'
-	),
-	'statusnet' => array(
-		'class' => 'StatusNetAuthenticationModule',
-		'category_slug' => 'auth'
-	),
 	'stripe' => array(
 		'class' => 'StripePaymentEngine',
 		'experimental' => true,
 		'category_slug' => 'payment'
-	),
-	'twitter' => array(
-		'class' => 'TwitterAuthenticationModule',
-		'category_slug' => 'auth'
-	),
-	'usernamepass' => array(
-		'class' => 'UsernamePasswordAuthenticationModule',
-		'category_slug' => 'auth'
 	),
 );
 
@@ -94,6 +93,33 @@ require_once(__DIR__ . '/header.php');
 				$category_modules[$module_slug] = $module;
 			}
 		}
+
+		/*
+		 * Order installed modules first
+		 */
+		$installed_modules = array();
+		$not_installed_modules = array();
+		foreach ($category_modules as $module_slug => $module) {
+			$instances = array();
+			foreach (UserConfig::$all_modules as $installed_module) {
+				if (get_class($installed_module) == $module['class']) {
+					$instances[] = $installed_module;
+				}
+			}
+
+			if (count($instances) > 0) {
+				$installed_modules[$module_slug] = $module;
+			} else {
+				/*
+				 * Ignore experimental modules that are not installed
+				 */
+				if (!array_key_exists('experimental', $module) || !$module['experimental']) {
+					$not_installed_modules[$module_slug] = $module;
+				}
+			}
+		}
+
+		$category_modules = array_merge($installed_modules, $not_installed_modules);
 
 		/*
 		 * Don't show empty categories
