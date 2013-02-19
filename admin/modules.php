@@ -1,8 +1,6 @@
 <?php
 require_once(__DIR__ . '/admin.php');
 
-// @todo still show experimental modules that ARE installed now
-// @todo show installed modules first
 // temporary switch to make it easy to see experimental modules
 $show_experimental = true;
 
