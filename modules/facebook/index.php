@@ -510,7 +510,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 
 			$user->recordActivity(USERBASE_ACTIVITY_REMOVED_FB);
 
-			$this->sdk->api('/me/permissions', 'DELETE');
+			$this->api('/me/permissions', 'DELETE');
 
 			return true;
 		}
