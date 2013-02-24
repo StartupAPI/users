@@ -22,3 +22,6 @@
 [submodule "masonry"]
 	path = masonry
 	url = git://github.com/desandro/masonry.git
+[submodule "calendarview"]
+	path = calendarview
+	url = git://github.com/jsmecham/CalendarView.git
