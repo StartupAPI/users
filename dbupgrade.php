@@ -22,6 +22,42 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 28
+ * Added OAuth connectivity data from oauth-php and linking table
+*/
+$versions[28]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."oauth2_clients` (
+	oauth2_client_id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'OAuth2 user ID',
+	module_slug VARCHAR( 64 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'Module slug/id',
+	identity VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL
+		COMMENT 'String uniquely identifying user on the oauth server',
+	userinfo TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL
+		COMMENT 'Serialized user information to be used for rendering',
+	access_token VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'OAuth2 access token',
+	access_token_expires DATETIME NULL COMMENT 'OAuth2 access token expiration time',
+	refresh_token VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'OAuth2 refresh token',
+	PRIMARY KEY (oauth2_client_id),
+	UNIQUE unique_idenity (module_slug, identity)
+) ENGINE = INNODB DEFAULT CHARSET=utf8
+	COMMENT = 'OAuth2 clients with their identities and access/refresh tokens';
+";
+
+$versions[28]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."user_oauth2_identity` (
+	user_id INT(10) UNSIGNED NOT NULL COMMENT  'Startup API user id',
+	oauth2_client_id INT(10) UNSIGNED NOT NULL COMMENT 'OAuth2 client ID',
+	PRIMARY KEY (user_id, oauth2_client_id),
+	CONSTRAINT oauth2_identity_user_id FOREIGN KEY (user_id)
+		REFERENCES `".UserConfig::$mysql_prefix."users` (id)
+		ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT oauth2_identity_oauth2_client_id FOREIGN KEY (oauth2_client_id)
+		REFERENCES `".UserConfig::$mysql_prefix."oauth2_clients` (oauth2_client_id)
+		ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = INNODB DEFAULT CHARSET=utf8
+	COMMENT = 'Table that links Startup API users and oauth2 users and their access tokens';
+";
+
+$versions[28]['down'][] = 'DROP TABLE '.UserConfig::$mysql_prefix.'user_oauth2_identity';
+$versions[28]['down'][] = 'DROP TABLE '.UserConfig::$mysql_prefix.'oauth2_clients';
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 27
  * Renaming Manual Payment engine
 */
