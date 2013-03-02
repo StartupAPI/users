@@ -75,6 +75,11 @@ class UserConfig {
 	 */
 	public static $DEBUG = false;
 
+	/**
+	 * @var boolean Show function arguments in debug messages
+	 */
+	public static $DEBUG_SHOW_ARGS = false;
+
 	/* ========================================================================
 	 *
 	 * Paths and URLs

@@ -108,12 +108,21 @@ class UserTools
 		if (UserConfig::$DEBUG) {
 			$trace = debug_backtrace();
 
-			error_log('[DEBUG] ' . $message .
-				' (' . $trace[1]['function'] .
-				'(' . var_export($trace[1]['args'], true) . ')' .
-				' on line ' . $trace[0]['line'] .
-				' in ' . $trace[0]['file'] .
-			')');
+			if (is_array($message)) {
+				$message = implode(' | ', $message);
+			}
+
+			$message = preg_replace('/\s+/', ' ', $message);
+
+			$log_message = '[DEBUG] ' . $message . ' (' . $trace[1]['function'];
+
+			if (UserConfig::$DEBUG_SHOW_ARGS) {
+				$log_message .= '(' . var_export($trace[1]['args'], true) . ')';
+			}
+
+			$log_message .= ' on line ' . $trace[0]['line'] . ' in ' . $trace[0]['file'] . ')';
+
+			error_log($log_message);
 		}
 	}
 }
