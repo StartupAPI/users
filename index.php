@@ -217,7 +217,8 @@ if ($code_ready && $dependencies_ready && $config_ready && $database_ready) {
 	$num_users = User::getTotalUsers();
 
 	if (count(UserConfig::$admins) > 0) {
-		$admin_user_ready = !is_null(User::get(UserConfig::$admins[0]));
+		$admin = User::getUser(UserConfig::$admins[0]);
+		$admin_user_ready = !is_null($admin);
 	}
 }
 
