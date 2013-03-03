@@ -41,11 +41,29 @@ class GithubAuthenticationModule extends OAuth2AuthenticationModule
 
 	public function getLegendColor()
 	{
-		return "60bddc";
+		return "000000";
 	}
 
 	public static function getModulesTitle() {
 		return "Github";
+	}
+
+	public static function getModulesDescription() {
+		return '<p>Github login and API access module.</p>';
+	}
+
+	public function getDescription() {
+		return self::getModulesDescription();
+	}
+
+	public static function getSignupURL() {
+		return 'https://github.com/settings/applications/new';
+	}
+
+	public static function getModulesLogo($size = 100) {
+		if ($size == 100) {
+			return UserConfig::$USERSROOTURL . '/modules/github/images/octocat_100x.png';
+		}
 	}
 
 	// YODO make actual github calls, not twitter

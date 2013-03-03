@@ -53,6 +53,24 @@ class FoursquareAuthenticationModule extends OAuth2AuthenticationModule
 		return "Foursquare";
 	}
 
+	public static function getModulesDescription() {
+		return '<p>Foursquare login and API access module.</p>';
+	}
+
+	public function getDescription() {
+		return self::getModulesDescription();
+	}
+
+	public static function getSignupURL() {
+		return 'https://foursquare.com/developers/apps';
+	}
+
+	public static function getModulesLogo($size = 100) {
+		if ($size == 100) {
+			return UserConfig::$USERSROOTURL . '/modules/foursquare/images/logo_100x.png';
+		}
+	}
+
 	// YODO make actual foursquare calls, not twitter
 	public function getIdentity($oauth2_client_id) {
 		$credentials = $this->getOAuth2Credentials($oauth2_client_id); 

@@ -50,6 +50,14 @@ $builtin_modules = array(
 		'class' => 'EtsyAuthenticationModule',
 		'category_slug' => 'auth'
 	),
+	'foursquare' => array(
+		'class' => 'FoursquareAuthenticationModule',
+		'category_slug' => 'auth'
+	),
+	'github' => array(
+		'class' => 'GithubAuthenticationModule',
+		'category_slug' => 'auth'
+	),
 	'ohloh' => array(
 		'class' => 'OhlohAuthenticationModule',
 		'category_slug' => 'auth'
