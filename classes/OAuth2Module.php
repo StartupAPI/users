@@ -659,9 +659,11 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 
 		$oauth2_client_id = null;
 		$serialized_userinfo = null;
+
 		if ($stmt = $db->prepare('SELECT c.oauth2_client_id, c.userinfo
 			FROM '.UserConfig::$mysql_prefix.'user_oauth2_identity i
 			INNER JOIN '.UserConfig::$mysql_prefix.'oauth2_clients c
+				ON i.oauth2_client_id = c.oauth2_client_id
 			WHERE i.user_id = ? AND c.module_slug = ?'))
 		{
 			if (!$stmt->bind_param('is', $user_id, $module_slug))
@@ -781,6 +783,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 			c.access_token, c.access_token_expires, c.refresh_token
 			FROM '.UserConfig::$mysql_prefix.'user_oauth2_identity i
 			INNER JOIN '.UserConfig::$mysql_prefix.'oauth2_clients c
+				on i.oauth2_client_id = c.oauth2_client_id
 			WHERE i.user_id = ? AND c.module_slug = ?'))
 		{
 			if (!$stmt->bind_param('is', $user_id, $module_slug))
