@@ -3,6 +3,28 @@
 require_once(dirname(__DIR__) . '/global.php');
 
 /**
+ * Adding an interface to allow defining unimplemented static methods
+ */
+interface iStartupAPIModule {
+
+	/**
+	 * Returns module ID string
+	 *
+	 * Each module must implement this method and use unique ID
+	 *
+	 * @return string Unique module ID
+	 */
+	public function getID();
+
+	/**
+	 * Returns human readable module name for a class of modules
+	 *
+	 * @return string Module name
+	 */
+	public static function getModulesTitle();
+}
+
+/**
  * StartupAPI module class
  *
  * Subclass it if you want to add a module/extension
@@ -12,7 +34,7 @@ require_once(dirname(__DIR__) . '/global.php');
  *
  * @todo Rename module IDs to module slugs throughout the application to confirm with coding standards
  */
-abstract class StartupAPIModule {
+abstract class StartupAPIModule implements iStartupAPIModule {
 
 	/**
 	 * Creates new module and registers it with the system
@@ -20,22 +42,6 @@ abstract class StartupAPIModule {
 	public function __construct() {
 		UserConfig::$all_modules[] = $this;
 	}
-
-	/**
-	 * Returns module ID string
-	 *
-	 * Each module must implement this method and use unique ID
-	 *
-	 * @return string Unique module ID
-	 */
-	abstract public function getID();
-
-	/**
-	 * Returns human readable module name for a class of modules
-	 *
-	 * @return string Module name
-	 */
-	abstract public static function getModulesTitle();
 
 	/**
 	 * Returns human readable module name
