@@ -86,12 +86,12 @@ abstract class MenuElement {
 	 * Implementations should render their own tags and call submenu's
 	 * renderChildren() function where supported
 	 */
-	abstract protected function render();
+	abstract public function render();
 
 	/**
 	 * Renders children elements
 	 */
-	protected function renderChildren() {
+	public function renderChildren() {
 		foreach ($this->sub_menus as $menu) {
 			$menu->render();
 		}
@@ -131,7 +131,7 @@ abstract class MenuElement {
 	 *
 	 * @return boolean Returns true if slugs match
 	 */
-	protected function matchSlug($slug) {
+	public function matchSlug($slug) {
 		return $this->slug == $slug;
 	}
 
@@ -147,14 +147,14 @@ abstract class MenuElement {
 	 *
 	 * @param string $extra Extra string to attach to the end of breadcrumbs
 	 */
-	abstract protected function renderBreadCrumbs($extra = null);
+	abstract public function renderBreadCrumbs($extra = null);
 
 	/**
 	 * Renders portion of page title for this menu element
 	 *
 	 * @param string $extra Extra item to be appended at the end
 	 */
-	protected function renderTitle($extra = null) {
+	public function renderTitle($extra = null) {
 		if ($this->active) {
 			echo self::$titleSeparator . $this->title;
 		}
@@ -191,7 +191,7 @@ class AdminMenu extends MenuElement {
 		?></ul><?php
 	}
 
-	protected function matchSlug($slug) {
+	public function matchSlug($slug) {
 		return false;
 	}
 
@@ -232,7 +232,7 @@ class AdminMenu extends MenuElement {
  */
 class MenuSection extends MenuElement {
 
-	protected function render() {
+	public function render() {
 		?><li class="nav-header"> <?php echo $this->title ?></li><?php
 		$this->renderChildren();
 		?><li class="divider"></li><?php
@@ -283,7 +283,7 @@ class MenuSection extends MenuElement {
 		}
 	}
 
-	protected function renderBreadCrumbs($extra = null) {
+	public function renderBreadCrumbs($extra = null) {
 		if ($this->active) {
 			if (is_null($this->sub_menus)) {
 				$link = $this->link;
@@ -343,7 +343,7 @@ class Menu extends MenuElement {
 		parent::__construct($slug, $title, $link, null, $icon, $enabled, $disabled_message);
 	}
 
-	protected function render() {
+	public function render() {
 		if (is_null($this->link)) {
 			return;
 		}
@@ -381,7 +381,7 @@ class Menu extends MenuElement {
 		<?php
 	}
 
-	protected function renderBreadCrumbs($extra = null) {
+	public function renderBreadCrumbs($extra = null) {
 		if ($this->active) {
 			if (is_null($extra)) {
 				?><li class="active"><?php echo $this->title ?></li><?php
