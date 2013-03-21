@@ -432,10 +432,11 @@ class Account {
 	public function getName() {
 		if ($this->isIndividual()) {
 			$users = $this->getUsers();
-			return $users[0][0]->getName();
-		} else {
-			return $this->name;
+			if (count($users) > 0) {
+				return $users[0][0]->getName();
+			}
 		}
+		return $this->name;
 	}
 
 	/**
