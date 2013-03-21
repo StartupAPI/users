@@ -425,7 +425,7 @@ class Account {
 	}
 
 	/**
-	 * Returns Accoutn name
+	 * Returns Account name
 	 *
 	 * @return string Account Name
 	 */
