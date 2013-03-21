@@ -253,7 +253,7 @@ class Badge {
 	}
 
 	/**
-	 * Returns a list of badges user
+	 * Returns a list of badges for the user
 	 *
 	 * @param User $user User object
 	 *
@@ -261,7 +261,7 @@ class Badge {
 	 *
 	 * @throws DBException
 	 */
-	public function getUserBadges($user) {
+	public static function getUserBadges($user) {
 		$db = UserConfig::getDB();
 
 		$user_badges = array();
@@ -355,10 +355,12 @@ class Badge {
 		}
 
 		if ($stmt = $db->prepare($query)) {
+			$start = $pagenumber * $perpage;
+
 			if (is_null($level)) {
-				$result = $stmt->bind_param('iii', $this->id, $start = $pagenumber * $perpage, $perpage);
+				$result = $stmt->bind_param('iii', $this->id, $start, $perpage);
 			} else {
-				$result = $stmt->bind_param('iiii', $this->id, $level, $start = $pagenumber * $perpage, $perpage);
+				$result = $stmt->bind_param('iiii', $this->id, $level, $start, $perpage);
 			}
 			if (!$result) {
 				throw new DBBindParamException($db, $stmt);
