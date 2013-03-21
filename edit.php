@@ -60,7 +60,7 @@ if (array_key_exists('save', $_POST)) {
 	if (array_key_exists('module', $_GET)) {
 		try {
 			if ($current_module->processEditUser($user, $_POST)) {
-				header('Location: ' . UserConfig::$USERSROOTURL . '/edit.php?module=' . $_GET['module']);
+				header('Location: ' . UserConfig::$USERSROOTURL . '/edit.php?module=' . $_GET['module'] . '#saved');
 			} else {
 				header('Location: ' . UserConfig::$USERSROOTURL . '/edit.php?module=' . $_GET['module'] . '&error=failed');
 			}

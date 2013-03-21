@@ -264,7 +264,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		?>
 			<form class="form-horizontal" action="<?php echo $action; ?>" method="POST">
 				<fieldset>
-					<legend>Update your name, email and password</legend>
+					<legend>Update your username and password</legend>
 					<div class="control-group<?php if (array_key_exists('username', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['username'])) ?><?php } ?>">
 						<label class="control-label" for="startupapi-<?php echo $slug ?>-edit-username">Username</label>
 						<div class="controls">
@@ -279,22 +279,6 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 								?>
 								<input disabled="disabled" title="Sorry, you can't change your username" value="<?php echo UserTools::escape($username) ?>"/>
 							<?php } ?>
-						</div>
-					</div>
-					<legend>Name and email</legend>
-
-					<div class="control-group<?php if (array_key_exists('name', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['name'])) ?><?php } ?>">
-						<label class="control-label" for="startupapi-<?php echo $slug ?>-edit-name">Name</label>
-						<div class="controls">
-							<input id="startupapi-<?php echo $slug ?>-edit-name" name="name" type="text" value="<?php echo UserTools::escape(array_key_exists('name', $data) ? $data['name'] : $user->getName()) ?>"/>
-						</div>
-					</div>
-
-					<div class="control-group<?php if (array_key_exists('email', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['email'])) ?><?php } ?>">
-						<label class="control-label" for="startupapi-<?php echo $slug ?>-edit-email">Email</label>
-						<div class="controls">
-							<input id="startupapi-<?php echo $slug ?>-edit-email" name="email" type="email" value="<?php echo UserTools::escape(array_key_exists('email', $data) ? $data['email'] : $user->getEmail()) ?>"/>
-							<?php if ($user->getEmail() && !$user->isEmailVerified()) { ?><a id="startupapi-usernamepass-edit-verify-email" href="<?php echo UserConfig::$USERSROOTURL ?>/verify_email.php">Email address is not verified yet, click here to verify</a><?php } ?>
 						</div>
 					</div>
 
@@ -478,32 +462,6 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 			}
 		}
 
-		if (array_key_exists('name', $data))
-		{
-			$name = trim(mb_convert_encoding($data['name'], 'UTF-8'));
-			if ($name == '')
-			{
-				$errors['name'][] = "Name can't be empty";
-			}
-		}
-		else
-		{
-			$errors['name'][] = 'No name specified';
-		}
-
-		if (array_key_exists('email', $data))
-		{
-			$email = trim(mb_convert_encoding($data['email'], 'UTF-8'));
-			if (filter_var($email, FILTER_VALIDATE_EMAIL) === FALSE)
-			{
-				$errors['email'][] = 'Invalid email address';
-			}
-		}
-		else
-		{
-			$errors['email'][] = 'No email specified';
-		}
-
 		if (!$has_username)
 		{
 			$existing_users = User::getUsersByEmailOrUsername($username);
@@ -512,13 +470,6 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 			) {
 				$errors['username'][] = "This username is already used, please pick another one";
 			}
-		}
-
-		$existing_users = User::getUsersByEmailOrUsername($email);
-		if (!array_key_exists('email', $errors) &&
-			(count($existing_users) > 0 && !$existing_users[0]->isTheSameAs($user))
-		) {
-			$errors['email'][] = "This email is already used by another user, please enter another email address.";
 		}
 
 		// don't change password if username was already set and no password fields are edited
@@ -591,8 +542,6 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 			$user->recordActivity(USERBASE_ACTIVITY_ADDED_UPASS);
 		}
 
-		$user->setName($name);
-		$user->setEmail($email);
 		$user->save();
 
 		$user->recordActivity(USERBASE_ACTIVITY_UPDATEUSERINFO);
