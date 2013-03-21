@@ -323,7 +323,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 
 					<div class="control-group">
 						<div class="controls">
-							<button class="btn" type="submit" name="save">Save changes</button>
+							<button class="btn btn-primary" type="submit" name="save">Save changes</button>
 						</div>
 					</div>
 				</fieldset>

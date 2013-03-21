@@ -10,6 +10,9 @@ require_once(UserConfig::$header);
 		<div class="span3">
 			<div class="well sidebar-nav startupapi-sidebar">
 				<ul class="nav nav-list">
+					<li<?php if ($SECTION == 'profile_info') { ?> class="active"<?php } ?>>
+						<a href="<?php echo UserConfig::$USERSROOTURL ?>/edit.php">Profile Information</a>
+					</li>
 					<li class="nav-header">Login</li>
 					<?php
 					foreach (UserConfig::$authentication_modules as $module) {
