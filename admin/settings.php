@@ -148,7 +148,6 @@ function value($type, $value, $options = array()) {
 require_once(__DIR__ . '/settings.inc');
 
 $ADMIN_SECTION = 'systemsettings';
-$BREADCRUMB_EXTRA = $plan->name;
 require_once(__DIR__ . '/header.php');
 ?>
 <div class="span9">
