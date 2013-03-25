@@ -167,7 +167,9 @@ require_once(__DIR__ . '/header.php');
 foreach ($config_variables as $section) {
 	?>
 	<h2 id="<?php echo $section['id'] ?>"><?php echo $section['name'] ?> <a href="#" title="go to top of the page"><i class="icon-th-list"></i></a></h2>
-	<p><?php echo $section['description']; ?></p>
+	<?php if (isset($section['description'])) { ?>
+		<p><?php echo $section['description']; ?></p>
+	<?php } ?>
 	<?php
 	foreach ($section['groups'] as $group) {
 		if (array_key_exists('description', $group)) {
@@ -206,21 +208,25 @@ foreach ($config_variables as $section) {
 
 					<td>
 						<?php
+						$options = array_key_exists('options', $setting) ? $setting['options'] : array();
+
 						if (substr($setting['type'], -2) == '[]' && is_array(UserConfig::$$var_name)) {
 							if (count(UserConfig::$$var_name) == 0) {
-								?><span class="startupapi-admin-setting-value null">&mdash;</span><?php
-				}
-				foreach (UserConfig::$$var_name as $value) {
+								?>
+								<span class="startupapi-admin-setting-value null">&mdash;</span>
+								<?php
+							}
+							foreach (UserConfig::$$var_name as $value) {
 								?>
 								<div>
 									<?php
-									value(substr($setting['type'], 0, -2), $value, $setting['options']);
+									value(substr($setting['type'], 0, -2), $value, $options);
 									?>
 								</div>
 								<?php
 							}
 						} else {
-							value($setting['type'], UserConfig::$$var_name, $setting['options']);
+							value($setting['type'], UserConfig::$$var_name, $options);
 						}
 						?>
 					</td>
@@ -228,12 +234,12 @@ foreach ($config_variables as $section) {
 				<tr>
 					<td colspan="2">
 						<pre>
-/**
- * <?php echo $setting['description'] . "\n" ?>
- *
- * @var <?php echo phpType($setting['type']) . "\n" ?>
- */
-UserConfig::$<?php echo $setting['name'] ?> = <?php codeValue($setting['type'], UserConfig::$$var_name, $setting['options']) ?>;</pre>
+			/**
+			 * <?php echo $setting['description'] . "\n" ?>
+			 *
+			 * @var <?php echo phpType($setting['type']) . "\n" ?>
+			 */
+			UserConfig::$<?php echo $setting['name'] ?> = <?php codeValue($setting['type'], UserConfig::$$var_name, $setting['options']) ?>;</pre>
 					</td>
 				</tr>
 				<?php
