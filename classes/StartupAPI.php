@@ -57,7 +57,7 @@ class StartupAPI {
 	 * @return User
 	 */
 	static function requireLogin() {
-		return User::requireLogin();
+		return User::require_login();
 	}
 
 	/**

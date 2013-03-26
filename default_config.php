@@ -2,6 +2,7 @@
 /**
  * @package StartupAPI
  */
+require_once(__DIR__ . '/php-bootstrap/bootstrap.php');
 require_once(__DIR__ . '/classes/Plan.php');
 require_once(__DIR__ . '/classes/TransactionLogger.php');
 require_once(__DIR__ . '/classes/Cohort.php');

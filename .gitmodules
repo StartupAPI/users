@@ -25,3 +25,6 @@
 [submodule "calendarview"]
 	path = calendarview
 	url = git://github.com/jsmecham/CalendarView.git
+[submodule "php-bootstrap"]
+	path = php-bootstrap
+	url = git://github.com/sergeychernyshev/php-bootstrap.git
