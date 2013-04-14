@@ -356,9 +356,9 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 			$this->renderForm($action, 'connect');
 		} else {
 			try {
-				$me = $this->api('/' . $fb_id . '?fields=id,name,email,link');
+				$me = $this->api('/me?fields=id,name,email,link');
 			} catch (FacebookApiException $e) {
-				UserTools::debug("Can't get /me API data");
+				UserTools::debug("Can't get /me API data: " . $e);
 				return;
 			}
 			?>
@@ -478,7 +478,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		try {
 			$me = $this->api('/me?fields=id,name,email,link');
 		} catch (FacebookApiException $e) {
-			UserTools::debug("Can't get /me API data");
+			UserTools::debug("Can't get /me API data: " . $e);
 			return null;
 		}
 
@@ -543,7 +543,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 			try {
 				$me = $this->api('/me?fields=email');
 			} catch (FacebookApiException $e) {
-				UserTools::debug("Can't get /me API data");
+				UserTools::debug("Can't get /me API data: " . $e);
 				return null;
 			}
 
