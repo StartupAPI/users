@@ -408,7 +408,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		$remember = $this->remember;
 
 		try {
-			$fbuser = intval($this->sdk->getUser());
+			$fbuser = $this->sdk->getUser();
 		} catch (FacebookApiException $e) {
 			UserTools::debug("Can't get Facebook user");
 			return null;
@@ -455,7 +455,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		$remember = $this->remember;
 
 		try {
-			$fbuser = intval($this->sdk->getUser());
+			$fbuser = $this->sdk->getUser();
 		} catch (FacebookApiException $e) {
 			UserTools::debug("Can't get Facebook user");
 			return null;
@@ -516,7 +516,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		}
 
 		try {
-			$fbuser = intval($this->sdk->getUser());
+			$fbuser = $this->sdk->getUser();
 		} catch (FacebookApiException $e) {
 			UserTools::debug("Can't get Facebook user");
 			return null;
