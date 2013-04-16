@@ -909,36 +909,23 @@ EOD;
 	 * you have toput them into config.php
 	 */
 	public static function init() {
-		UserConfig::$ROOTPATH = __DIR__;
+		$users_env = PHPBootstrap\bootstrap(__FILE__);
+		$site_env = PHPBootstrap\bootstrap(__DIR__);
 
-		// Chopping of trailing slash which is not supposed to be there in Apache config
-		// See: http://httpd.apache.org/docs/2.0/mod/core.html#documentroot
-		$docroot = $_SERVER['DOCUMENT_ROOT'];
-		if (substr($docroot, -1) == DIRECTORY_SEPARATOR) {
-			$docroot = substr($docroot, 0, -1);
-		}
-		$docrootlength = strlen($docroot);
-		UserConfig::$USERSROOTURL = substr(UserConfig::$ROOTPATH, $docrootlength);
+		UserConfig::$ROOTPATH = $users_env['ROOT_FILESYSTEM_PATH'];
+		UserConfig::$USERSROOTURL = $users_env['ROOT_ABSOLUTE_URL_PATH'];
 
 		// we assume that package is extracted into the root of the site
-		UserConfig::$SITEROOTURL = substr(dirname(UserConfig::$ROOTPATH), $docrootlength) . '/';
+		UserConfig::$SITEROOTURL = $site_env['ROOT_ABSOLUTE_URL_PATH'] . '/';
+
 		UserConfig::$DEFAULTLOGINRETURN = UserConfig::$SITEROOTURL;
 		UserConfig::$DEFAULTLOGOUTRETURN = UserConfig::$SITEROOTURL;
 		UserConfig::$DEFAULTREGISTERRETURN = UserConfig::$SITEROOTURL;
 		UserConfig::$DEFAULTUPDATEPASSWORDRETURN = UserConfig::$SITEROOTURL;
 		UserConfig::$DEFAULT_EMAIL_VERIFIED_RETURN = UserConfig::$SITEROOTURL;
 
-		if (array_key_exists('HTTP_HOST', $_SERVER)) {
-			$host = $_SERVER['HTTP_HOST'];
-		} else {
-			$host = php_uname('n');
-			if (php_sapi_name() !== 'cli') {
-				error_log("[Startup API config] Warning: Can't determine site's host name, using $host");
-			}
-		}
-
-		UserConfig::$SITEROOTFULLURL = 'http://' . $host . UserConfig::$SITEROOTURL;
-		UserConfig::$USERSROOTFULLURL = 'http://' . $host . substr(UserConfig::$ROOTPATH, $docrootlength);
+		UserConfig::$SITEROOTFULLURL = $site_env['ROOT_FULL_URL'];
+		UserConfig::$USERSROOTFULLURL = $users_env['ROOT_FULL_URL'];
 
 		// Default locations for terms of service and privacy policy documents
 		UserConfig::$termsOfServiceURL = UserConfig::$SITEROOTURL . 'terms_of_service.php';
