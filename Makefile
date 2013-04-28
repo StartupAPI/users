@@ -7,9 +7,11 @@ success:
 	@echo "[*** SUCCESS ***] Installation and upgrade of Startup API completed successfully"
 
 updatecode:
+ifneq "$(wildcard .git )" ""
 	git pull origin master
 	git submodule init
 	git submodule update
+endif
 
 checkconfig:
 ifeq ($(wildcard ../users_config.php),)
