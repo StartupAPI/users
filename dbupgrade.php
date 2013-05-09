@@ -22,6 +22,13 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 29
+ * Updated activity table to use InnoDB engine
+*/
+$versions[29]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."activity` ENGINE = INNODB";
+$versions[29]['down'][]	= "ALTER TABLE `".UserConfig::$mysql_prefix."activity` ENGINE = MyISAM";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 28
  * Added OAuth connectivity data from oauth-php and linking table
 */
