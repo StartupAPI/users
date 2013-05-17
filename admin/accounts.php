@@ -41,13 +41,13 @@ if (is_null($search)) {
 				<th>Status</th>
 			</tr>
 			<tr>
-				<td colspan="6">
+				<td colspan="7">
 					<form action="" id="search" name="search" class="form-horizontal" style="margin: 0">
-						<a href="new_account.php" class="btn btn-success"><i class="icon-plus icon-white"></i> New Account</a>
+						<input type="search" class="search-query input-medium" placeholder="Account name" id="q" name="q"<?php echo is_null($search) ? '' : ' value="' . UserTools::escape($search) . '"' ?>/>
+						<button type="submit" class="btn btn-medium"><i class="icon-search"></i> Search</button>
+						<a href="accounts.php" class="btn">clear</a>
 						<div class="pull-right">
-							<input type="search" class="search-query input-medium" placeholder="Account name" id="q" name="q"<?php echo is_null($search) ? '' : ' value="' . UserTools::escape($search) . '"' ?>/>
-							<input type="submit" class="btn btn-medium" value="search"/>
-							<a href="accounts.php" class="btn">clear</a>
+							<a href="new_account.php" class="btn btn-success"><i class="icon-plus icon-white"></i> New Account</a>
 						</div>
 					</form>
 				</td>
@@ -72,7 +72,7 @@ if (is_null($search)) {
 						$plan = $account->getPlan();
 						if (!is_null($plan)) {
 							?><a class="badge badge-info" href="plan.php?slug=<?php echo $plan->slug ?>"><i class="icon-briefcase icon-white"></i> <?php echo $plan->name ?></a><?php
-						}
+				}
 						?>
 					</td>
 					<?php if (UserConfig::$useSubscriptions) { ?>
