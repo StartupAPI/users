@@ -1,11 +1,12 @@
 <?php
+
 /**
  * Various tools used within Startup API
  *
  * @package StartupAPI
  */
-class UserTools
-{
+class UserTools {
+
 	/**
 	 * @var string CSRF nonce for this request
 	 */
@@ -18,8 +19,7 @@ class UserTools
 	 *
 	 * @return string Escaped user data for output in HTML
 	 */
-	public static function escape($string)
-	{
+	public static function escape($string) {
 		return htmlentities($string, ENT_COMPAT, 'UTF-8');
 	}
 
@@ -32,11 +32,11 @@ class UserTools
 	 */
 	public static function preventCSRF() {
 		$storage = new MrClay_CookieStorage(array(
-			'secret' => UserConfig::$SESSION_SECRET,
-			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
-			'path' => UserConfig::$SITEROOTURL,
-			'httponly' => true
-		));
+					'secret' => UserConfig::$SESSION_SECRET,
+					'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+					'path' => UserConfig::$SITEROOTURL,
+					'httponly' => true
+				));
 
 		/*
 		 * Preventing CSRFs in all POST requests by double-posting cookies
@@ -56,7 +56,6 @@ class UserTools
 			$nonce_matched = false;
 			foreach ($passed_nonces as $passed_nonce) {
 				if ($passed_nonce == $_POST['CSRF_NONCE']) {
-					UserTools::debug('Nonce matched: '.$passed_nonce);
 					$nonce_matched = true;
 				} else {
 					$unused_nonces[] = $passed_nonce;
@@ -87,7 +86,7 @@ class UserTools
 	 */
 	public static function renderCSRFNonce() {
 		?><input type="hidden" name="CSRF_NONCE" value="<?php echo self::escape(self::$CSRF_NONCE); ?>"/>
-<?php
+		<?php
 	}
 
 	/**
@@ -114,10 +113,14 @@ class UserTools
 
 			$message = preg_replace('/\s+/', ' ', $message);
 
-			$log_message = '[DEBUG] ' . $message . ' (' . $trace[1]['function'];
+			$log_message = '[DEBUG] ' . $message;
+			if (count($trace) > 1) {
 
-			if (UserConfig::$DEBUG_SHOW_ARGS) {
-				$log_message .= '(' . var_export($trace[1]['args'], true) . ')';
+				$log_message .= ' (' . $trace[1]['function'];
+
+				if (UserConfig::$DEBUG_SHOW_ARGS) {
+					$log_message .= '(' . var_export($trace[1]['args'], true) . ')';
+				}
 			}
 
 			$log_message .= ' on line ' . $trace[0]['line'] . ' in ' . $trace[0]['file'] . ')';
@@ -125,4 +128,5 @@ class UserTools
 			error_log($log_message);
 		}
 	}
+
 }
