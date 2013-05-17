@@ -260,9 +260,9 @@ $config_variables = array(
 						'name' => 'registrationDisabledMessage'
 					),
 					array(
-						'description' => 'Require invitations by administrators before users can register',
+						'description' => 'Invitation from administrator required for registration',
 						'type' => 'boolean',
-						'name' => 'enableInvitations',
+						'name' => 'adminInvitationOnly',
 						'options' => array('true_string' => 'enabled', 'false_string' => 'disabled')
 					),
 					array(

@@ -152,7 +152,7 @@ require_once(__DIR__ . '/header.php');
 ?>
 <div class="span9">
 	<p>All available Startup API settings and their current values of are shown below.</p>
-	<p>To make changes to your configuration, click "code" button and copy the code show to <tt>users_config.php</tt> file in your application folder.</p>
+	<p>To make changes to your configuration, click <span class="btn btn-mini disabled"><i class="icon-cog"></i> code</span> button and copy the code to <tt>users_config.php</tt> file in your application folder.</p>
 
 <ul>
 	<?php foreach ($config_variables as $section) {
@@ -234,12 +234,12 @@ foreach ($config_variables as $section) {
 				<tr>
 					<td colspan="2">
 						<pre>
-			/**
-			 * <?php echo $setting['description'] . "\n" ?>
-			 *
-			 * @var <?php echo phpType($setting['type']) . "\n" ?>
-			 */
-			UserConfig::$<?php echo $setting['name'] ?> = <?php codeValue($setting['type'], UserConfig::$$var_name, $setting['options']) ?>;</pre>
+/**
+ * <?php echo $setting['description'] . "\n" ?>
+ *
+ * @var <?php echo phpType($setting['type']) . "\n" ?>
+ */
+UserConfig::$<?php echo $setting['name'] ?> = <?php codeValue($setting['type'], UserConfig::$$var_name, isset($setting['options']) ? $setting['options'] : null) ?>;</pre>
 					</td>
 				</tr>
 				<?php
