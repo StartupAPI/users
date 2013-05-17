@@ -25,7 +25,7 @@ class StartupAPI {
 	/**
 	 * @var int	Startup API patch level (version number) - to be incremented automatically when build script is ran
 	 */
-	private static $patch_level = 0;
+	private static $patch_level = 1;
 
 	/**
 	 * @var string Startup API pre-release version string
@@ -278,6 +278,14 @@ class StartupAPI {
 	 * This function should be called after all configuration is loaded to initialize the system.
 	 */
 	static function _init() {
+		/**
+		 * Legacy configuration options support
+		 */
+		if (!is_null(UserConfig::$enableInvitations)) {
+			UserConfig::$adminInvitationOnly = UserConfig::$enableInvitations;
+			error_log('[Deprecated] You are using deprecated configuration setting: UserConfig::$enableInvitations - rename it to UserConfig::$adminInvitationOnly');
+		}
+
 		if (!is_null(UserConfig::$appName)) {
 			UserConfig::$supportEmailXMailer = UserConfig::$appName . ' using ' . UserConfig::$supportEmailXMailer;
 		}

@@ -43,7 +43,7 @@ $admin_menu = new AdminMenu(array(
 				new Menu('registrations', 'Registered Users', $ADMIN_ROOT . '/users.php', 'user'),
 				new Menu('cohorts', 'Cohort Analysis', $ADMIN_ROOT . '/cohorts.php', 'th'),
 				new Menu('bymodule', 'Registrations By Module', $ADMIN_ROOT . '/bymodule.php', 'th-large'),
-				new Menu('invitations', 'Invitations', $ADMIN_ROOT . '/invitations.php', 'envelope', UserConfig::$enableInvitations, 'Invitations are disabled in configuration'),
+				new Menu('invitations', 'Invitations', $ADMIN_ROOT . '/invitations.php', 'envelope', UserConfig::$adminInvitationOnly, 'Invitations are disabled in configuration'),
 				new Menu('accounts', 'Accounts', $ADMIN_ROOT . '/accounts.php', 'folder-open'),
 			)),
 			new MenuSection('money', 'Money', null, array(

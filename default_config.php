@@ -498,7 +498,18 @@ class UserConfig {
 	/**
 	 * @var boolean Enables admin invitations
 	 */
-	public static $enableInvitations = false;
+	public static $adminInvitationOnly = false;
+
+	/**
+	 * @var boolean Deprecated config option, replaced with UserConfig::$adminInvitationOnly
+	 * @deprecated since version 0.5.1
+	 */
+	public static $enableInvitations = null;
+
+	/**
+	 * @var boolean Enables user invitations
+	 */
+	public static $enableUserInvitations = true;
 
 	/**
 	 * @var string Message to be displayed on registration page if person came without an invitation

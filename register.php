@@ -19,7 +19,7 @@ if (UserConfig::$enableRegistration && array_key_exists('register', $_POST))
 
 	$invitation = null;
 
-	if (UserConfig::$enableInvitations)
+	if (UserConfig::$adminInvitationOnly)
 	{
 		if (!array_key_exists('invite', $_GET))
 		{
@@ -89,7 +89,7 @@ if (UserConfig::$enableRegistration)
 	$show_registration_form = true;
 	$invitation_used = null;
 
-	if (UserConfig::$enableInvitations)
+	if (UserConfig::$adminInvitationOnly)
 	{
 		$message = null;
 
