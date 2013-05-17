@@ -1,6 +1,8 @@
 <?php
 require_once(dirname(dirname(__DIR__)).'/classes/User.php');
 
+UserTools::preventCSRF();
+
 $user = User::require_login();
 $account = Account::getCurrentAccount($user);
 

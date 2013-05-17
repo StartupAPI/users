@@ -1,0 +1,170 @@
+	{%if message %}
+		{%for msg in message %}
+			<h2>{{ msg }}</h2>
+		{%endfor%}
+	{%endif%}
+
+	{%if  not fatal %}
+		<h2>
+			Account: {{ account_name }}
+			{%if not account_isIndividual %}
+				<a href="{{ USERSROOTURL }}/edit_account.php" class="btn btn-mini"><i class="icon-pencil"></i> edit</a>
+			{%endif%}
+		</h2>
+		{%if account_isIndividual %}
+			<p>
+				<form action="{{ USERSROOTURL }}/controller/account.php" method="POST">
+					<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
+					Individual accout
+					{%if user %}
+						for <i class="icon-user"></i> {{ user.name }}
+					{%endif%}
+				</form>
+			</p>
+		{%endif%}
+		<p>
+			Status: {%if account_isActive %}<b class="badge badge-success">Active</b>{%else%}<b class="badge badge-important">Suspended</b>{%endif%}
+			Plan: <span class="badge badge-info"><i class="icon-briefcase icon-white"></i> {{ plan_name }}</span>
+		</p>
+
+{#
+		{%if useSubscriptions %}
+			<h3>Subscription</h3>
+				{%if plan_downgrade_to %}
+			<p>Plan automatically downgrades to: <a class="label" href="{{ USERSROOTURL }}/plan.php?slug={{ plan_downgrade_to_slug }}">{{ plan_downgrade_to }}</a>
+				if payment is due more than {{ plan_grace_period }} day(s)</p>
+				{%endif%}
+
+			<h4>Payment Schedule</h4>
+				{%if schedule_name %}
+			<p>Payment Schedule: <b>{{ schedule_name }}</b> ({{ schedule_description }})</p>
+			<p>Charge Amount: <b>${{ schedule_charge_amount }}</b></p>
+			<p>Charge Period: <b>{{ schedule_charge_period }}</b> days</p>
+				{%else%}
+			<i>Payment schedule is not defined</i>
+				{%endif%}
+
+			<h4>Payments</h4>
+			<p>Payment Engine used: <b>{{ account_engine }}</b>
+				<a class="btn btn-mini" href="{{ USERSROOTURL }}/admin/choose_engine.php?account_id={{ account_id }}">change</a>
+			</p>
+
+			<div>
+				{%if balance < 0 %}
+				<p>Amount owed</p>
+				<ul>
+						{% set total = 0 %}
+						{%for c in charges %}
+						<li>{{ c.datetime }} ${{ c.amount }}</li>
+							{% set total = total + c.amount %}
+						{%endfor%}
+					</ul>
+					<p>Total debt: <b>${{ "%.2f"|format(total) }}</b></p>
+				{%else%}
+					<p>Balance: <b>${{ "%.2f"|format(balance) }}</b></p>
+				{%endif%}
+			</div>
+
+			{%if account_next_charge %}
+				<div>
+					<p>Next charge: <b>{{ account_next_charge }}</b></p>
+				</div>
+			{%endif%}
+			{%if next_plan_name and next_plan_name != plan_name %}
+				<div>
+					<p>After this date following plan used:</p>
+					<p>Plan Name: <b><a href="{{ USERSROOTURL }}/plan.php?slug={{ next_plan_slug }}">{{ next_plan_name }}</a></b></p>
+					<p>Plan Description: {{ next_plan_description }}</p>
+					<p>Plan Details: <a href="{{ plan_details_url }}">{{ next_plan_details_url }}</a></p>
+				</div>
+			{%endif%}
+			{%if next_schedule and next_plan_name == plan_name %}
+				<p>After this date following schedule used:</p>
+			{%endif%}
+			{%if next_schedule %}
+				<p>Payment Schedule: <b>{{ next_schedule_name }}</b></p>
+				<p>Payment Schedule description: {{ next_schedule_description }}</p>
+				<p>Charge Amount: <b>${{ next_schedule_charge_amount }}</b></p>
+				<p>Charge Period: <b>{{ next_schedule_charge_period }}</b> days</p>
+			{%endif%}
+
+			<div>
+				<i class="icon-list-alt"></i> <a href="{{ USERSROOTURL }}/transaction_log.php">View account transaction log</a>
+			</div>
+		{%endif%}
+#}
+
+		{%if show_user_list %}
+			<h3>Account Users</h3>
+			{%if account_isIndividual %}
+				{%if individual_no_admins %}
+					<p class="alert alert-error">Attention, individual account has no admin user set</p>
+				{%else%}
+					<p class="alert alert-error">Attention, multiple users are defined for an individual account</p>
+				{%endif%}
+			{%endif%}
+
+			<form action="{{ USERSROOTURL }}/controller/account/account.php" method="POST">
+				<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
+
+				<table class="table table-condensed">
+				{%for user in users %}
+					<tr>
+						<td>
+							<i class="icon-user"></i>
+							{{ user.name }}
+						</td>
+						<td>
+							{%if user.admin %}
+								<span class="badge badge-important pull-right">admin</span>
+							{%else%}
+								<span class="badge pull-right">user</span>
+							{%endif%}
+						</td>
+
+						{%if user.self %}
+						<td colspan="2" class="user-self" title="You can't change your info, ask another admin to help you.">it's you</td>
+						{%else%}
+							<td>
+								{%if user.admin %}
+									<button class="btn btn-mini btn-danger{%if user.self %} disabled{%endif%}" name="demote_user" value="{{ user.id }}">
+										<i class="icon-chevron-down icon-white"></i> Demote
+									</button>
+								{%else%}
+									<button class="btn btn-mini{%if user.self %} disabled{%endif%}" name="promote_user" value="{{ user.id }}">
+										<i class="icon-chevron-up"></i> Promote
+									</button>
+								{%endif%}
+							</td>
+							<td>
+								<button class="btn btn-mini pull-right remove_button" name="remove_user" value="{{ user.id }}"><i class="icon-remove"></i> Remove</button>
+							</td>
+						{%endif%}
+					</tr>
+				{%endfor%}
+				</table>
+				<script>
+					$('.remove_button').on('click', function() {
+						 return confirm('Are you sure you want to remove this user?');
+					});
+				</script>
+
+			</form>
+
+			{#
+			{%if not account_isIndividual %}
+				<h3>Invite a user</h3>
+				<form class="form-horizontal" action="{{ USERSROOTURL }}/controller/account/account.php" method="POST">
+					<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
+
+					<div class="input-prepend">
+						<span class="add-on"><i class="icon-envelope"></i></span>
+						<input class="input-large" type="email" placeholder="Email address" name="invite-emails"/>
+					</div>
+
+					<button class="btn btn-primary"> Send Invitation</button>
+				</form>
+			{%endif%}
+			#}
+		{%endif%}
+{%endif%}
