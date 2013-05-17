@@ -48,7 +48,7 @@
 						<input type="hidden" name="account_id" value="{{ account_id }}" />
 						<input class="input-small" placeholder="Start date" type="text" name="from" id="from" value="{{ from }}"/><!--<span class="calendarButton" id="fromButton" >..</span>-->
 						<input class="input-small" placeholder="End date" type="text" name="to" id="to" value="{{ to }}" /><!--<span class="calendarButton" id="toButton" >..</span>-->
-						<input class="btn" type="submit" value="Filter" />
+						<button class="btn" type="submit"><i class="icon-calendar"></i> Filter</button>
 						<a href="?account_id={{ account_id }}" class="btn{%if from %} btn-primary{%endif%}">Reset</a>
 					</form>
 
