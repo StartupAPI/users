@@ -79,11 +79,7 @@ if (is_null($search)) {
 		$users = User::getUsers($pagenumber, $perpage, $sortby);
 	}
 } else {
-	UserTools::debug($search);
-
 	$users = User::searchUsers($search, $pagenumber, $perpage, $sortby);
-
-	UserTools::debug(count($users));
 }
 ?>
 <div class="span9">
@@ -102,7 +98,7 @@ if (is_null($search)) {
 							<input type="hidden" name="account_id" value="<?php echo UserTools::escape($account_id) ?>"/>
 
 							<input type="search" class="search-query input-medium" placeholder="User's name or email" id="q" name="q"<?php echo is_null($search) ? '' : ' value="' . UserTools::escape($search) . '"' ?>/>
-							<input type="submit" class="btn btn-medium" value="search"/>
+							<button type="submit" class="btn btn-medium"><i class="icon-search"></i> Search</button>
 							<input type="button" class="btn btn-medium" value="clear" onclick="document.getElementById('q').value=''; document.search.submit()"/>
 
 							<label class="pull-right">Sort by:
