@@ -496,7 +496,7 @@ class UserConfig {
 	public static $registrationDisabledMessage = 'Registration is disabled.';
 
 	/**
-	 * @var boolean Enables admin invitations
+	 * @var boolean Invitation from administrator required for registration
 	 */
 	public static $adminInvitationOnly = false;
 
@@ -808,19 +808,19 @@ class UserConfig {
 	/**
 	 * Default handler for UserConfig::$onRenderUserInvitationAction hook
 	 *
-	 * @param string $code Invitation code
+	 * @param Invitation $invitation Invitation object
 	 */
-	public static function renderUserInvitationAction($code) {
-		?><a class="btn btn-info" href="mailto:?Subject=Invitation&Body=<?php echo UserConfig::$SITEROOTFULLURL ?>users/register.php?invite=<?php echo urlencode($code) ?>"><i class="icon-envelope icon-white"></i> Invite</a><?php
+	public static function renderUserInvitationAction($invitation) {
+		?><a class="btn btn-info btn-mini" href="mailto:<?php echo UserTools::spaceencode($invitation->getSentToEmail()) ?>?Subject=Invitation&Body=<?php echo UserTools::spaceencode(UserConfig::$SITEROOTFULLURL . 'users/register.php?invite=' . urlencode($invitation->getCode())) ?>"><i class="icon-envelope icon-white"></i> Invite</a><?php
 	}
 
 	/**
 	 * Default handler for UserConfig::$onRenderUserInvitationFollowUpAction hook
 	 *
-	 * @param string $code Invitation code
+	 * @param Invitation $invitation Invitation object
 	 */
-	public static function renderUserInvitationFollowUpAction($code) {
-		?><a class="btn btn-warning"href="mailto:?Subject=Re:%20Invitation&Body=<?php echo UserConfig::$SITEROOTFULLURL ?>users/register.php?invite=<?php echo urlencode($code) ?>"><i class="icon-envelope icon-white"></i> Follow Up</a><?php
+	public static function renderUserInvitationFollowUpAction($invitation) {
+		?><a class="btn btn-warning btn-mini"href="mailto:<?php echo UserTools::spaceencode($invitation->getSentToEmail()) ?>?Subject=Re:%20Invitation&Body=<?php echo UserTools::spaceencode(UserConfig::$SITEROOTFULLURL . 'users/register.php?invite=' . urlencode($invitation->getCode())) ?>"><i class="icon-envelope icon-white"></i> Follow Up</a><?php
 	}
 
 	/**

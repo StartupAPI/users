@@ -22,6 +22,14 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 29
+ * Changing ambigous user column name to reflect that it's an ID
+*/
+$versions[29]['up'][] = "ALTER TABLE  `".UserConfig::$mysql_prefix."invitation` CHANGE  `user`  `user_id` BIGINT( 10 ) UNSIGNED NULL DEFAULT NULL COMMENT  'User ID'";
+$versions[29]['down'][]	= "ALTER TABLE  `".UserConfig::$mysql_prefix."invitation` CHANGE  `user_id`  `user` BIGINT( 10 ) UNSIGNED NULL DEFAULT NULL COMMENT  'User name'";
+
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 28
  * Added OAuth connectivity data from oauth-php and linking table
 */
@@ -57,6 +65,8 @@ $versions[28]['up'][] = "CREATE TABLE `".UserConfig::$mysql_prefix."user_oauth2_
 
 $versions[28]['down'][] = 'DROP TABLE '.UserConfig::$mysql_prefix.'user_oauth2_identity';
 $versions[28]['down'][] = 'DROP TABLE '.UserConfig::$mysql_prefix.'oauth2_clients';
+
+
 /* -------------------------------------------------------------------------------------------------------
  * VERSION 27
  * Renaming Manual Payment engine
