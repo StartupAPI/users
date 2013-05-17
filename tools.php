@@ -24,6 +24,18 @@ class UserTools {
 	}
 
 	/**
+	 * URL-encodes the value, but uses %20 for spaces instead of '+'
+	 * This is useful for some providers, including email clients that have problems with '+' signs
+	 *
+	 * @param string $string String to encode
+	 *
+	 * @return string Encoded string
+	 */
+	public static function spaceencode($string) {
+		return str_replace('+', '%20', urlencode($string));
+	}
+
+	/**
 	 * Prevents CSRF for all POST requests by comparing cookie and POST nonces.
 	 *
 	 * Keeps track of 3 recent nonces to avoid problems for double-submissions, but still prevent CSRF attacks
