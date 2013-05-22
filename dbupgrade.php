@@ -22,12 +22,18 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
- * VERSION 29
+ * VERSION 30
  * Changing ambigous user column name to reflect that it's an ID
 */
-$versions[29]['up'][] = "ALTER TABLE  `".UserConfig::$mysql_prefix."invitation` CHANGE  `user`  `user_id` BIGINT( 10 ) UNSIGNED NULL DEFAULT NULL COMMENT  'User ID'";
-$versions[29]['down'][]	= "ALTER TABLE  `".UserConfig::$mysql_prefix."invitation` CHANGE  `user_id`  `user` BIGINT( 10 ) UNSIGNED NULL DEFAULT NULL COMMENT  'User name'";
+$versions[30]['up'][] = "ALTER TABLE  `".UserConfig::$mysql_prefix."invitation` CHANGE  `user`  `user_id` BIGINT( 10 ) UNSIGNED NULL DEFAULT NULL COMMENT  'User ID'";
+$versions[30]['down'][]	= "ALTER TABLE  `".UserConfig::$mysql_prefix."invitation` CHANGE  `user_id`  `user` BIGINT( 10 ) UNSIGNED NULL DEFAULT NULL COMMENT  'User name'";
 
+/* -------------------------------------------------------------------------------------------------------
+ * VERSION 29 
+ * Updated activity table to use InnoDB engine
+*/
+$versions[29]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."activity` ENGINE = INNODB";
+$versions[29]['down'][]	= "ALTER TABLE `".UserConfig::$mysql_prefix."activity` ENGINE = MyISAM";
 
 /* -------------------------------------------------------------------------------------------------------
  * VERSION 28
