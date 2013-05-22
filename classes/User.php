@@ -5,6 +5,7 @@ require_once(__DIR__ . '/Account.php');
 require_once(__DIR__ . '/Badge.php');
 require_once(__DIR__ . '/CookieStorage.php');
 require_once(__DIR__ . '/CampaignTracker.php');
+require_once(__DIR__ . '/Invitation.php');
 
 /**
  * This class represents a registerd user in the system
@@ -423,8 +424,7 @@ class User {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($cmp_name, $cmp_content, $cmp_keywords, $cmp_medium, $cmp_source,
-					$userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
+			if (!$stmt->bind_result($cmp_name, $cmp_content, $cmp_keywords, $cmp_medium, $cmp_source, $userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
@@ -482,7 +482,6 @@ class User {
 			$personal = Account::createAccount($this->getName(), UserConfig::$default_plan_slug, NULL, $this, Account::ROLE_ADMIN, NULL);
 
 			$personal->setAsCurrent($this);
-
 		}
 
 		if (!is_null(UserConfig::$onCreate)) {
@@ -617,6 +616,37 @@ class User {
 
 		mail($email, $subject, $message, $headers);
 	}
+
+	/**
+	 * Sends email message inviting another person to join the system
+	 *
+	 * @param string $name Name of the receipient
+	 * @param string $email Email of reciepient
+	 * @param string $note (optional) Invitation message
+	 * @param Account $account (optional) Account object if user is invited to join an account
+	 */
+	public function sendInvitation($name, $email, $account = null) {
+		Invitation::sendUserInvitation($this, $name, $email, $account);
+	}
+
+	/**
+	 * Returns invitations initiated by a user
+	 *
+	 * @return Invitation[] Invitations sent, but not accepted yet
+	 */
+	public function getSentInvitations() {
+		return Invitation::getSent(false, $this);
+	}
+
+	/**
+	 * Returns an array of invitations that were accepted
+	 *
+	 * @return Invitation[] Accepted invitations
+	 */
+	public function getAcceptedInvitations() {
+		return Invitation::getAccepted(false, $this);
+	}
+
 
 	/**
 	 * Create new user based on Google Friend Connect info
@@ -775,36 +805,30 @@ class User {
 		return $user;
 	}
 
-  /**
-   * Deletes user from the system
-   *
-   * @throws DBException
-   */
-  public function delete()
-  {
+	/**
+	 * Deletes user from the system
+	 *
+	 * @throws DBException
+	 */
+	public function delete() {
 
-    $username = mb_convert_encoding($this -> username, 'UTF-8');
+		$username = mb_convert_encoding($this->username, 'UTF-8');
 
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix."users WHERE username = ?"))
-		{
-			if (!$stmt->bind_param('s', $username))
-			{
+		if ($stmt = $db->prepare('DELETE FROM ' . UserConfig::$mysql_prefix . "users WHERE username = ?")) {
+			if (!$stmt->bind_param('s', $username)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
-  }
+	}
 
 	/**
 	 * Returns total number of users in the system
@@ -1310,7 +1334,7 @@ class User {
 
 		$query = 'SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified
 			FROM ' . UserConfig::$mysql_prefix . 'users ' .
-			$where . '
+				$where . '
 			ORDER BY ' . $orderby . ' ' . ($sort_order ? 'ASC' : 'DESC') . '
 			LIMIT ?, ?';
 
@@ -2695,7 +2719,6 @@ class User {
 
 		return $activity_count;
 	}
-
 
 	/**
 	 * Returns a list of user's accounts

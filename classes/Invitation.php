@@ -1,6 +1,7 @@
 <?php
-require_once(dirname(__DIR__).'/global.php');
-require_once(dirname(__DIR__).'/classes/User.php');
+
+require_once(dirname(__DIR__) . '/global.php');
+require_once(dirname(__DIR__) . '/classes/User.php');
 
 /**
  * Invitation class
@@ -12,15 +13,15 @@ require_once(dirname(__DIR__).'/classes/User.php');
  *
  * @package StartupAPI
  */
-class Invitation
-{
+class Invitation {
+
 	/**
 	 * @var string Invitation code
 	 */
 	private $code;
 
 	/**
-	 * @var string Date/time when invitation code was created
+	 * @var int Date/time (UNIX timestamp) when invitation code was created
 	 */
 	private $time_created;
 
@@ -64,9 +65,7 @@ class Invitation
 	 * @param string $sent_to_note Invitation comment (reminder to issuer why it was sent)
 	 * @param int $user_id ID of the User who got invited
 	 */
-	private function __construct($code, $time_created, $issuedby, $is_admin_invite = true,
-			$sent_to_email = null, $sent_to_name = null, $sent_to_note = null, $user_id = null)
-	{
+	private function __construct($code, $time_created, $issuedby, $is_admin_invite = true, $sent_to_email = null, $sent_to_name = null, $sent_to_note = null, $user_id = null) {
 		$this->code = $code;
 		$this->time_created = $time_created;
 		$this->issuedby = $issuedby;
@@ -84,34 +83,27 @@ class Invitation
 	 *
 	 * @throws DBException
 	 */
-	public static function getUnsent()
-	{
+	public static function getUnsent() {
 		$invitations = array();
 
 		$db = UserConfig::getDB();
 
 		if ($stmt = $db->prepare('SELECT code, created, issuedby
-			FROM '.UserConfig::$mysql_prefix.'invitation
-			WHERE is_admin_invite = 1 AND sent_to_note IS NULL AND user_id IS NULL'))
-		{
-			if (!$stmt->execute())
-			{
+			FROM ' . UserConfig::$mysql_prefix . 'invitation
+			WHERE is_admin_invite = 1 AND sent_to_note IS NULL AND user_id IS NULL')) {
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($code, $time_created, $issuedby))
-			{
+			if (!$stmt->bind_result($code, $time_created, $issuedby)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while($stmt->fetch() === TRUE)
-			{
+			while ($stmt->fetch() === TRUE) {
 				$invitations[] = new self($code, $time_created, $issuedby, true);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -122,52 +114,56 @@ class Invitation
 	 * Returns invitations that were sent, but not used for registration yet
 	 *
 	 * @param boolean $admin Pass true if you want only admin invitations
+	 * @param User $issuer (optional) User who sent invitation
 	 *
 	 * @return array Array of Invitation objects
 	 *
 	 * @throws DBException
 	 */
-	public static function getSent($admin = null)
-	{
+	public static function getSent($admin = null, $issuer = null) {
 		$invitations = array();
 
 		$db = UserConfig::getDB();
 
-		$query = 'SELECT code, created, issuedby, is_admin_invite,
+		$query = 'SELECT code, UNIX_TIMESTAMP(created), issuedby, is_admin_invite,
 				sent_to_email, sent_to_name, sent_to_note
-			FROM '.UserConfig::$mysql_prefix.'invitation
+			FROM ' . UserConfig::$mysql_prefix . 'invitation
 			WHERE sent_to_note IS NOT NULL AND user_id IS NULL';
+
+		if (!is_null($issuer)) {
+			$query .= ' AND issuedby = ' . ($issuer->getID());
+		}
 
 		if (!is_null($admin)) {
 			$query .= ' AND is_admin_invite = ' . ($admin ? 1 : 0);
 		}
 
-		if ($stmt = $db->prepare($query))
-		{
-			if (!$stmt->execute())
-			{
+		if ($stmt = $db->prepare($query)) {
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite,
-					$sent_to_email, $sent_to_name, $sent_to_note))
-			{
+			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while($stmt->fetch() === TRUE)
-			{
+			while ($stmt->fetch() === TRUE) {
 				$invitations[] = new self($code, $time_created, $issuedby, $is_admin_invite ? true : false,
-						$sent_to_email, $sent_to_name, $sent_to_note);
+								$sent_to_email, $sent_to_name, $sent_to_note);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
 		return $invitations;
+	}
+
+	/**
+	 * Cancels this invitation
+	 */
+	public function cancel() {
+		self::cancelByCode($this->code);
 	}
 
 	/**
@@ -177,24 +173,19 @@ class Invitation
 	 *
 	 * @throws DBException
 	 */
-	public static function cancel($code) {
+	public static function cancelByCode($code) {
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.'invitation WHERE code = ?'))
-		{
-			if (!$stmt->bind_param('s', $code))
-			{
+		if ($stmt = $db->prepare('DELETE FROM ' . UserConfig::$mysql_prefix . 'invitation WHERE code = ?')) {
+			if (!$stmt->bind_param('s', $code)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 	}
@@ -203,48 +194,45 @@ class Invitation
 	 * Returns invitations that were accepted
 	 *
 	 * @param boolean $admin Pass true if you want only admin invitations
+	 * @param User $issuer (optional) User who sent invitation
 	 *
 	 * @return array Array of Invitation objects
 	 *
 	 * @throws DBException
 	 */
-	public static function getAccepted($admin = null)
-	{
+	public static function getAccepted($admin = null, $issuer = null) {
 		$invitations = array();
 
 		$db = UserConfig::getDB();
 
-		$query = 'SELECT code, created, issuedby, is_admin_invite,
+		$query = 'SELECT code, UNIX_TIMESTAMP(created), issuedby, is_admin_invite,
 				sent_to_email, sent_to_name, sent_to_note, user_id
-			FROM '.UserConfig::$mysql_prefix.'invitation
+			FROM ' . UserConfig::$mysql_prefix . 'invitation
 			WHERE user_id IS NOT NULL';
+
+		if (!is_null($issuer)) {
+			$query .= ' AND issuedby = ' . ($issuer->getID());
+		}
 
 		if (!is_null($admin)) {
 			$query .= ' AND is_admin_invite = ' . ($admin ? 1 : 0);
 		}
 
-		if ($stmt = $db->prepare($query))
-		{
-			if (!$stmt->execute())
-			{
+		if ($stmt = $db->prepare($query)) {
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite,
-					$sent_to_email, $sent_to_name, $sent_to_note, $user_id))
-			{
+			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			while($stmt->fetch() === TRUE)
-			{
+			while ($stmt->fetch() === TRUE) {
 				$invitations[] = new self($code, $time_created, $issuedby, $is_admin_invite ? true : false,
-						$sent_to_email, $sent_to_name, $sent_to_note, $user_id);
+								$sent_to_email, $sent_to_name, $sent_to_note, $user_id);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -260,41 +248,32 @@ class Invitation
 	 *
 	 * @throws DBException
 	 */
-	public static function getByCode($code)
-	{
+	public static function getByCode($code) {
 		$invitation = null;
 
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('SELECT code, created, issuedby, is_admin_invite,
+		if ($stmt = $db->prepare('SELECT code, UNIX_TIMESTAMP(created), issuedby, is_admin_invite,
 				sent_to_email, sent_to_name, sent_to_note, user_id
-			FROM '.UserConfig::$mysql_prefix.'invitation
-			WHERE code = ?'))
-		{
-			if (!$stmt->bind_param('s', $code))
-			{
+			FROM ' . UserConfig::$mysql_prefix . 'invitation
+			WHERE code = ?')) {
+			if (!$stmt->bind_param('s', $code)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite,
-					$sent_to_email, $sent_to_name, $sent_to_note, $user_id))
-			{
+			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
-			if ($stmt->fetch() === TRUE)
-			{
+			if ($stmt->fetch() === TRUE) {
 				$invitation = new self($code, $time_created, $issuedby, $is_admin_invite ? true : false,
-						$sent_to_email, $sent_to_name, $sent_to_note, $user_id);
+								$sent_to_email, $sent_to_name, $sent_to_note, $user_id);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -308,32 +287,89 @@ class Invitation
 	 *
 	 * @throws DBException
 	 */
-	public static function generateAdminInvites($howmany = 1)
-	{
+	public static function generateAdminInvites($howmany = 1) {
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'invitation (code, is_admin_invite) VALUES (?, 1)'))
-		{
-			for ($i = 0; $i < $howmany; $i++)
-			{
+		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . 'invitation (code, is_admin_invite) VALUES (?, 1)')) {
+			for ($i = 0; $i < $howmany; $i++) {
 				$code = self::generateCode();
 
-				if (!$stmt->bind_param('s', $code))
-				{
+				if (!$stmt->bind_param('s', $code)) {
 					throw new DBBindParamException($db, $stmt);
 				}
-				if (!$stmt->execute())
-				{
+				if (!$stmt->execute()) {
 					throw new DBExecuteStmtException($db, $stmt);
 				}
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
+	}
+
+	/**
+	 * Creates invitation object
+	 *
+	 * @param boolean $admin Is this and invitation from administrator?
+	 * @return Invitation
+	 */
+	public static function createInvite($from_admin = false) {
+		$db = UserConfig::getDB();
+
+		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . 'invitation (code, is_admin_invite) VALUES (?, ?)')) {
+			$code = self::generateCode();
+			$from_admin_int = $from_admin ? 1 : 0;
+
+			if (!$stmt->bind_param('si', $code, $from_admin_int)) {
+				throw new DBBindParamException($db, $stmt);
+			}
+			if (!$stmt->execute()) {
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+
+			$stmt->close();
+		} else {
+			throw new DBPrepareStmtException($db);
+		}
+
+		return self::getByCode($code);
+	}
+
+	/**
+	 * Sends email message inviting a person to join the system
+	 *
+	 * @param User $issuer Person issuing and invitation
+	 * @param string $name Name of the receipient
+	 * @param string $email Email of reciepient
+	 * @param string $note Personal note
+	 * @param Account $account Account object if user is invited to join an account
+	 */
+	public static function sendUserInvitation($issuer, $name, $email, $note = null, $account = null) {
+		$invitaion = self::createInvite();
+		$invitaion->setSentToName($name);
+		$invitaion->setSentToEmail($email);
+		$invitaion->setNote($note);
+		$invitaion->setIssuer($issuer);
+		$invitaion->save();
+
+		$invitaion->send();
+	}
+
+	/**
+	 * Sends (or re-sends) invitation to recipient
+	 */
+	public function send() {
+		$email = $this->getSentToEmail();
+
+		$message = call_user_func_array(UserConfig::$onRenderInvitationEmailMessage, array($this));
+		$subject = call_user_func_array(UserConfig::$onRenderInvitationEmailSubject, array($this));
+
+		$headers = 'From: ' . UserConfig::$supportEmailFrom . "\r\n" .
+				'Reply-To: ' . UserConfig::$supportEmailReplyTo . "\r\n" .
+				'X-Mailer: ' . UserConfig::$supportEmailXMailer;
+
+		mail($email, $subject, $message, $headers);
 	}
 
 	/**
@@ -341,8 +377,7 @@ class Invitation
 	 *
 	 * @return string Invitation code
 	 */
-	private static function generateCode()
-	{
+	private static function generateCode() {
 		// Length of invitation strings
 		$length = 10;
 
@@ -356,13 +391,13 @@ class Invitation
 		$string = $chars{rand(0, $chars_length)};
 
 		// Generate random string
-		for ($i = 1; $i < $length; $i = strlen($string))
-		{
+		for ($i = 1; $i < $length; $i = strlen($string)) {
 			// Grab a random character from our list
 			$r = $chars{rand(0, $chars_length)};
 
 			// Make sure the same two characters don't appear next to each other
-			if ($r != $string{$i - 1}) $string .=  $r;
+			if ($r != $string{$i - 1})
+				$string .= $r;
 		}
 
 		// Return the string
@@ -374,18 +409,16 @@ class Invitation
 	 *
 	 * @return string Invitation code
 	 */
-	public function getCode()
-	{
+	public function getCode() {
 		return $this->code;
 	}
 
 	/**
 	 * Returns date/time code was generated
 	 *
-	 * @return string Date/time when code was generated
+	 * @return int Date/time (Unix timestamp) when code was generated
 	 */
-	public function getTimeCreated()
-	{
+	public function getTimeCreated() {
 		return $this->time_created;
 	}
 
@@ -394,8 +427,7 @@ class Invitation
 	 *
 	 * @return User User who issued invitation
 	 */
-	public function getIssuer()
-	{
+	public function getIssuer() {
 		return User::getUser($this->issuedby);
 	}
 
@@ -449,8 +481,7 @@ class Invitation
 	 *
 	 * @return string Invitation comments
 	 */
-	public function getComment()
-	{
+	public function getNote() {
 		return $this->sent_to_note;
 	}
 
@@ -459,8 +490,7 @@ class Invitation
 	 *
 	 * @param string $comment Invitation comment
 	 */
-	public function setComment($comment)
-	{
+	public function setNote($comment) {
 		$this->sent_to_note = $comment;
 	}
 
@@ -469,36 +499,30 @@ class Invitation
 	 *
 	 * @throws DBException
 	 */
-	public function save()
-	{
+	public function save() {
 		$db = UserConfig::getDB();
 
 		$email = mb_convert_encoding($this->sent_to_email, 'UTF-8');
 		$name = mb_convert_encoding($this->sent_to_name, 'UTF-8');
-		$comment = mb_convert_encoding($this->sent_to_note, 'UTF-8');
+		$note = mb_convert_encoding($this->sent_to_note, 'UTF-8');
 
-		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'invitation
+		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'invitation
 			SET sent_to_email = ?,
 				sent_to_name = ?,
 				sent_to_note = ?,
 				issuedby = ?,
 				is_admin_invite = ?,
 				user_id = ?
-			WHERE code = ?'))
-		{
-			if (!$stmt->bind_param('sssiiis', $email, $name, $comment, $this->issuedby, $this->is_admin_invite, $this->user_id, $this->code))
-			{
+			WHERE code = ?')) {
+			if (!$stmt->bind_param('sssiiis', $email, $name, $note, $this->issuedby, $this->is_admin_invite, $this->user_id, $this->code)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 	}
@@ -508,8 +532,7 @@ class Invitation
 	 *
 	 * @return int User ID
 	 */
-	public function getUser()
-	{
+	public function getUser() {
 		return User::getUser($this->user_id);
 	}
 
@@ -518,8 +541,7 @@ class Invitation
 	 *
 	 * @param User $user User
 	 */
-	public function setUser($user)
-	{
+	public function setUser($user) {
 		$this->user_id = $user->getID();
 	}
 
@@ -528,8 +550,8 @@ class Invitation
 	 *
 	 * @return boolean True if invitation is already accepted
 	 */
-	public function getStatus()
-	{
+	public function getStatus() {
 		return !is_null($this->user_id);
 	}
+
 }

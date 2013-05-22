@@ -507,14 +507,19 @@ class UserConfig {
 	public static $enableInvitations = null;
 
 	/**
+	 * @var string Message to be displayed on registration page if person came without an invitation
+	 */
+	public static $invitationRequiredMessage = 'Please enter your invitation code';
+
+	/**
 	 * @var boolean Enables user invitations
 	 */
 	public static $enableUserInvitations = true;
 
 	/**
-	 * @var string Message to be displayed on registration page if person came without an invitation
+	 * @var string Invitation menu/section title
 	 */
-	public static $invitationRequiredMessage = 'Please enter your invitation code';
+	public static $userInvitationSectionTitle = 'Invite Friends';
 
 	/**
 	 * @var string URL of Terms of Service Document
@@ -662,9 +667,24 @@ class UserConfig {
 	public static $onRenderTemporaryPasswordEmail = 'UserConfig::renderTemporaryPasswordEmail';
 
 	/**
+	 * @var callable Formatter for user invitation message placeholder
+	 */
+	public static $onRenderUserInvitationMessagePlaceholder = 'UserConfig::renderUserInvitationMessagePlaceholder';
+
+	/**
 	 * @var callable Formatter for email verification message
 	 */
 	public static $onRenderVerificationCodeEmail = 'UserConfig::renderVerificationCodeEmail';
+
+	/**
+	 * @var callable Formatter for user-to-user invitation email message
+	 */
+	public static $onRenderInvitationEmailMessage = 'UserConfig::renderInvitationEmailMessage';
+
+	/**
+	 * @var callable Formatter for user-to-user invitation email subject
+	 */
+	public static $onRenderInvitationEmailSubject = 'UserConfig::renderInvitationEmailSubject';
 
 	/**
 	 * @var callable Handler to be called when new user is created, newly created user object is passed in
@@ -824,6 +844,25 @@ class UserConfig {
 	}
 
 	/**
+	 * Default formatter for a user invitation email message placeholder
+	 *
+	 * @param User $user User sending the invitation
+	 *
+	 * @return string
+	 */
+	public static function renderUserInvitationMessagePlaceholder($user) {
+		$app_name = UserConfig::$appName;
+		$user_name = $user->getName();
+
+		$message = <<<"END"
+I'd like to invite you to join me on $app_name.
+
+- $user_name
+END;
+		return trim($message);
+	}
+
+	/**
 	 * Default handler for UserConfig::$onrenderTemporaryPasswordEmail hook
 	 *
 	 * Create your own like this to override outgoing password recovery emails.
@@ -896,6 +935,79 @@ EOD;
 		}
 
 		return $message;
+	}
+
+	/**
+	 * Default renderer for invitation email message
+	 *
+	 * @param Invitation $invitation Invitation object
+	 *
+	 * @return string Invitation email message
+	 */
+	public static function renderInvitationEmailMessage($invitation) {
+		$code = $invitation->getCode();
+
+		$registration_code_link = UserConfig::$USERSROOTFULLURL . '/register.php?invite=' . urlencode($code);
+		$registration_url = UserConfig::$USERSROOTFULLURL . '/register.php';
+
+		$app = self::$appName;
+		$issuer_name = $invitation->getIssuer()->getName();
+
+		/*
+		$account = $invitation->getAccount();
+		$account_message = '';
+		if (!is_null($account)) {
+			$account_message = $account->getName() . ' on ';
+		}
+		*/
+
+		$name = $invitation->getSentToName();
+		$invitation_welcome = '';
+		if ($name) {
+			$invitation_welcome = "Hi $name,\n";
+		}
+
+		$note = $invitation->getNote();
+		if (!empty($note)) {
+			$note = "\n---------------------------------------------------------------------------------------\n" .
+					trim($note) .
+					"\n---------------------------------------------------------------------------------------\n";
+		}
+
+		$message = <<<EOD
+$invitation_welcome
+$issuer_name invited you to join $account_message$app
+$note
+Click this link to sign up
+$registration_code_link
+
+Or just go to $registration_url and enter the code: $code
+
+--
+$app Support
+EOD;
+		return $message;
+	}
+
+	/**
+	 * Creates a subject for invitation email
+	 *
+	 * @param Invitation $invitation Invitation object
+	 * @return string Invitation email subject
+	 */
+	public static function renderInvitationEmailSubject($invitation) {
+		$app = self::$appName;
+		$issuer_name = $invitation->getIssuer()->getName();
+
+		$account_message = '';
+
+		/*
+		if (!is_null($account)) {
+			$account_message = $account->getName() . ' on ';
+		}
+		*/
+
+		return "Invitation to $account_message$app from $issuer_name";
 	}
 
 	/**

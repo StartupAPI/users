@@ -26,7 +26,7 @@ if (array_key_exists('save', $_POST)) {
 		}
 
 		if (trim($_POST['note'][$code]) != '') {
-			$invitation->setComment($_POST['note'][$code]);
+			$invitation->setNote($_POST['note'][$code]);
 			$need_to_save = true;
 		}
 
@@ -55,7 +55,7 @@ foreach (array_keys($_POST) as $key) {
 	if (strstr('cancel_', $key) == 0) {
 		$code_to_delete = substr($key, strlen('cancel_'));
 
-		Invitation::cancel($code_to_delete);
+		Invitation::cancelByCode($code_to_delete);
 
 		header("Location: #message=cancelled");
 		exit;
@@ -172,7 +172,7 @@ require_once(__DIR__ . '/header.php');
 				foreach ($invitations as $invitation) {
 					$issuer = $invitation->getIssuer();
 					$email = trim($invitation->getSentToEmail());
-					$note = trim($invitation->getComment());
+					$note = trim($invitation->getNote());
 					?><tr>
 						<td><span class="badge badge-important"><?php echo UserTools::escape($invitation->getCode()) ?></span></td>
 						<td>
@@ -233,7 +233,7 @@ require_once(__DIR__ . '/header.php');
 				$issuer = $invitation->getIssuer();
 				$invited_user = $invitation->getUser();
 				$email = trim($invitation->getSentToEmail());
-				$note = trim($invitation->getComment());
+				$note = trim($invitation->getNote());
 				?><tr>
 					<td><span class="badge badge-success"><?php echo UserTools::escape($invitation->getCode()) ?></span></td>
 					<td><?php echo UserTools::escape(is_null($issuer) ? '' : $issuer->getName()) ?></td>

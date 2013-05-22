@@ -24,8 +24,17 @@ require_once(UserConfig::$header);
 						</li>
 						<?php
 					}
-					?>
-					<?php
+
+					if (UserConfig::$enableUserInvitations) {
+						?>
+						<li class="nav-header">Connections</li>
+						<li<?php if ($SECTION == 'invitations') { ?> class="active"<?php } ?>>
+							<a href="<?php echo UserConfig::$USERSROOTURL ?>/invitations.php"><?php echo UserConfig::$userInvitationSectionTitle ?></a>
+						</li>
+
+						<?php
+					}
+
 					if (UserConfig::$useAccounts) {
 						$current_account = $user->getCurrentAccount();
 
