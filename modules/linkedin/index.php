@@ -21,7 +21,7 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule {
 	 * @param string $oAuthConsumerSecret OAuth Consumer Secret
 	 * @param string $oAuthScope Requested permission scopes (zero or more scope strings, usually URLs, separated by spaces)
 	 */
-	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret, $oAuthScope = 'basic') {
+	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret, $oAuthScope = null) {
 		parent::__construct(
 			'LinkedIn','
 			https://api.linkedin.com',
