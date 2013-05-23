@@ -269,6 +269,11 @@ $config_variables = array(
 						'description' => 'Message to be displayed on registration page if person came without an invitation',
 						'type' => 'string',
 						'name' => 'invitationRequiredMessage'
+					),
+					array(
+						'description' => 'Invitation menu/section title',
+						'type' => 'string',
+						'name' => 'userInvitationSectionTitle'
 					)
 				)
 			),
@@ -540,7 +545,7 @@ $config_variables = array(
 						'type' => 'callable',
 						'name' => 'onRenderUserInvitationAction',
 						'options' => array(
-							'arguments' => array('invitation_code')
+							'arguments' => array('invitation')
 						)
 					),
 					array(
@@ -548,7 +553,7 @@ $config_variables = array(
 						'type' => 'callable',
 						'name' => 'onRenderUserInvitationFollowUpAction',
 						'options' => array(
-							'arguments' => array('invitation_code')
+							'arguments' => array('invitation')
 						)
 					),
 					array(
@@ -560,11 +565,35 @@ $config_variables = array(
 						)
 					),
 					array(
+						'description' => 'Formatter for user invitation message placeholder',
+						'type' => 'callable',
+						'name' => 'onRenderUserInvitationMessagePlaceholder',
+						'options' => array(
+							'arguments' => array('user')
+						)
+					),
+					array(
 						'description' => 'Formatter for email verification message',
 						'type' => 'callable',
 						'name' => 'onRenderVerificationCodeEmail',
 						'options' => array(
 							'arguments' => array('verification_link', 'verification_code')
+						)
+					),
+					array(
+						'description' => 'Formatter for user-to-user invitation email message',
+						'type' => 'callable',
+						'name' => 'onRenderInvitationEmailMessage',
+						'options' => array(
+							'arguments' => array('invitation')
+						)
+					),
+					array(
+						'description' => 'Formatter for user-to-user invitation email subject',
+						'type' => 'callable',
+						'name' => 'onRenderInvitationEmailSubject',
+						'options' => array(
+							'arguments' => array('invitation')
 						)
 					),
 					array(
