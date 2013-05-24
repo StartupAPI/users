@@ -3,6 +3,17 @@ require_once(__DIR__ . '/global.php');
 
 $user = User::require_login();
 
+$current_account = null;
+$can_invite_to_account = false;
+
+if (UserConfig::$useAccounts) {
+	$current_account = $user->getCurrentAccount();
+	if (!$current_account->isIndividual()
+			&& $current_account->getUserRole($user) === Account::ROLE_ADMIN) {
+		$can_invite_to_account = true;
+	}
+}
+
 $errors = array();
 
 if (array_key_exists('send', $_POST)) {
@@ -18,8 +29,14 @@ if (array_key_exists('send', $_POST)) {
 
 	$invitation_note = trim($_POST['invitation_note']);
 
+	$invite_to_account = null;
+	if ($can_invite_to_account && array_key_exists('invite_to_account', $_POST)) {
+		// can only invite to user's current account
+		$invite_to_account = $current_account;
+	}
+
 	if (count($errors) == 0) {
-		Invitation::sendUserInvitation($user, $invitation_name, $invitation_email, $invitation_note);
+		Invitation::sendUserInvitation($user, $invitation_name, $invitation_email, $invitation_note, $invite_to_account);
 		header("Location: #message=sent");
 		exit;
 	}
@@ -96,6 +113,20 @@ require_once(__DIR__ . '/sidebar_header.php');
 			<textarea class="span6" id="invitation_note" name="invitation_note" rows="3"><?php echo $message ?></textarea>
 		</div>
 	</div>
+	<?php
+	if ($can_invite_to_account) {
+		?>
+		<div class="control-group">
+			<div class="controls">
+				<label class="checkbox">
+					<input type="checkbox" class="checkbox" name="invite_to_account"/>
+					Invite them to join <i><?php echo UserTools::escape($current_account->getName()) ?></i> account
+				</label>
+			</div>
+		</div>
+		<?php
+	}
+	?>
 	<div class="control-group">
 		<div class="controls">
 			<button class="btn btn-primary" name="send">Send invitation</button>
@@ -194,4 +225,3 @@ if (count($invitations) > 0) {
 }
 
 require_once(__DIR__ . '/sidebar_footer.php');
-

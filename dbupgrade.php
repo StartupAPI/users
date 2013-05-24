@@ -10,8 +10,6 @@ require_once(__DIR__.'/global.php');
 require_once(__DIR__.'/dbupgrade/lib.php');
 
 $versions = array();
-// Add new migrations on top, right below this line.
-
 /* -------------------------------------------------------------------------------------------------------
  * VERSION _
  * ... add version description here ...
@@ -21,6 +19,19 @@ $versions[_]['up'][] = "";
 $versions[_]['down'][]	= "";
 */
 
+// Use boilerplate above to Add new migrations on top, right below this line.
+
+/* -------------------------------------------------------------------------------------------------------
+ * VERSION 31
+ * Adding account to user invitations
+*/
+$versions[31]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."invitation`
+	ADD COLUMN account_id INT(10) UNSIGNED DEFAULT NULL COMMENT 'Invitation account ID',
+	ADD CONSTRAINT invitation_account_id FOREIGN KEY (account_id) REFERENCES `".
+		UserConfig::$mysql_prefix."accounts` (id) ON UPDATE CASCADE ON DELETE CASCADE";
+$versions[31]['down'][]	= "ALTER TABLE `".UserConfig::$mysql_prefix."invitation`
+	DROP account_id, DROP FOREIGN KEY invitation_account_id";
+
 /* -------------------------------------------------------------------------------------------------------
  * VERSION 30
  * Changing ambigous user column name to reflect that it's an ID
@@ -29,7 +40,7 @@ $versions[30]['up'][] = "ALTER TABLE  `".UserConfig::$mysql_prefix."invitation` 
 $versions[30]['down'][]	= "ALTER TABLE  `".UserConfig::$mysql_prefix."invitation` CHANGE  `user_id`  `user` BIGINT( 10 ) UNSIGNED NULL DEFAULT NULL COMMENT  'User name'";
 
 /* -------------------------------------------------------------------------------------------------------
- * VERSION 29 
+ * VERSION 29
  * Updated activity table to use InnoDB engine
 */
 $versions[29]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."activity` ENGINE = INNODB";

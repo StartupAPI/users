@@ -56,6 +56,11 @@ class Invitation {
 	private $user_id;
 
 	/**
+	 * @var int ID of the account invitation is for, null if user is not invited to join an account
+	 */
+	private $account_id;
+
+	/**
 	 * Creates new invitation object
 	 *
 	 * @param string $code Invitation code
@@ -64,8 +69,9 @@ class Invitation {
 	 * @param boolean $is_admin_invite Is this an invitation from administrator
 	 * @param string $sent_to_note Invitation comment (reminder to issuer why it was sent)
 	 * @param int $user_id ID of the User who got invited
+	 * @param int $account_id ID of the account invitation is for, null if user is not invited to join an account
 	 */
-	private function __construct($code, $time_created, $issuedby, $is_admin_invite = true, $sent_to_email = null, $sent_to_name = null, $sent_to_note = null, $user_id = null) {
+	private function __construct($code, $time_created, $issuedby, $is_admin_invite = true, $sent_to_email = null, $sent_to_name = null, $sent_to_note = null, $user_id = null, $account_id = null) {
 		$this->code = $code;
 		$this->time_created = $time_created;
 		$this->issuedby = $issuedby;
@@ -74,6 +80,7 @@ class Invitation {
 		$this->sent_to_name = $sent_to_name;
 		$this->sent_to_note = $sent_to_note;
 		$this->user_id = $user_id;
+		$this->account_id = $account_id;
 	}
 
 	/**
@@ -126,7 +133,8 @@ class Invitation {
 		$db = UserConfig::getDB();
 
 		$query = 'SELECT code, UNIX_TIMESTAMP(created), issuedby, is_admin_invite,
-				sent_to_email, sent_to_name, sent_to_note
+				sent_to_email, sent_to_name, sent_to_note,
+				user_id, account_id
 			FROM ' . UserConfig::$mysql_prefix . 'invitation
 			WHERE sent_to_note IS NOT NULL AND user_id IS NULL';
 
@@ -142,13 +150,13 @@ class Invitation {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note)) {
+			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
 				$invitations[] = new self($code, $time_created, $issuedby, $is_admin_invite ? true : false,
-								$sent_to_email, $sent_to_name, $sent_to_note);
+								$sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id);
 			}
 
 			$stmt->close();
@@ -206,7 +214,7 @@ class Invitation {
 		$db = UserConfig::getDB();
 
 		$query = 'SELECT code, UNIX_TIMESTAMP(created), issuedby, is_admin_invite,
-				sent_to_email, sent_to_name, sent_to_note, user_id
+				sent_to_email, sent_to_name, sent_to_note, user_id, account_id
 			FROM ' . UserConfig::$mysql_prefix . 'invitation
 			WHERE user_id IS NOT NULL';
 
@@ -222,13 +230,13 @@ class Invitation {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id)) {
+			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
 				$invitations[] = new self($code, $time_created, $issuedby, $is_admin_invite ? true : false,
-								$sent_to_email, $sent_to_name, $sent_to_note, $user_id);
+								$sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id);
 			}
 
 			$stmt->close();
@@ -254,7 +262,7 @@ class Invitation {
 		$db = UserConfig::getDB();
 
 		if ($stmt = $db->prepare('SELECT code, UNIX_TIMESTAMP(created), issuedby, is_admin_invite,
-				sent_to_email, sent_to_name, sent_to_note, user_id
+				sent_to_email, sent_to_name, sent_to_note, user_id, account_id
 			FROM ' . UserConfig::$mysql_prefix . 'invitation
 			WHERE code = ?')) {
 			if (!$stmt->bind_param('s', $code)) {
@@ -263,13 +271,13 @@ class Invitation {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id)) {
+			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE) {
 				$invitation = new self($code, $time_created, $issuedby, $is_admin_invite ? true : false,
-								$sent_to_email, $sent_to_name, $sent_to_note, $user_id);
+								$sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id);
 			}
 
 			$stmt->close();
@@ -351,6 +359,7 @@ class Invitation {
 		$invitaion->setSentToEmail($email);
 		$invitaion->setNote($note);
 		$invitaion->setIssuer($issuer);
+		$invitaion->setAccount($account);
 		$invitaion->save();
 
 		$invitaion->send();
@@ -512,9 +521,10 @@ class Invitation {
 				sent_to_note = ?,
 				issuedby = ?,
 				is_admin_invite = ?,
-				user_id = ?
+				user_id = ?,
+				account_id = ?
 			WHERE code = ?')) {
-			if (!$stmt->bind_param('sssiiis', $email, $name, $note, $this->issuedby, $this->is_admin_invite, $this->user_id, $this->code)) {
+			if (!$stmt->bind_param('sssiiiis', $email, $name, $note, $this->issuedby, $this->is_admin_invite, $this->user_id, $this->account_id, $this->code)) {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
@@ -543,6 +553,28 @@ class Invitation {
 	 */
 	public function setUser($user) {
 		$this->user_id = $user->getID();
+	}
+
+	/**
+	 * Returns account user is invited to
+	 *
+	 * @return Account Account object
+	 */
+	public function getAccount() {
+		if (is_null($this->account_id)) {
+			return null;
+		} else {
+			return Account::getByID($this->account_id);
+		}
+	}
+
+	/**
+	 * Sets account user is invited to
+	 *
+	 * @param Account $account
+	 */
+	public function setAccount($account) {
+		$this->account_id = $account->getID();
 	}
 
 	/**
