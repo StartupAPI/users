@@ -457,11 +457,35 @@ class User {
 	}
 
 	/**
+	 * Returns invitation that was used to invite this user
+	 *
+	 * @return Invitation
+	 *
+	 * @throws DBException
+	 */
+	public function getInvitation() {
+		return Invitation::getUserInvitation($this);
+	}
+
+	/**
 	 * This method is called when new user is created
 	 *
 	 * @throws DBException
 	 */
 	private function init() {
+		$invitation_code = $_SESSION[UserConfig::$invitation_code_key];
+		unset($_SESSION[UserConfig::$invitation_code_key]);
+
+		$invitation = null;
+		if (!is_null($invitation_code)) {
+			$invitation = Invitation::getByCode($invitation_code);
+		}
+
+		if (!is_null($invitation)) {
+			$invitation->setUser($this);
+			$invitation->save();
+		}
+
 		$db = UserConfig::getDB();
 
 		if (UserConfig::$useAccounts) {
@@ -479,9 +503,26 @@ class User {
 				throw new DBPrepareStmtException($db, "Can't update user preferences (set current account)");
 			}
 
-			$personal = Account::createAccount($this->getName(), UserConfig::$default_plan_slug, NULL, $this, Account::ROLE_ADMIN, NULL);
+			$invitation_account = null;
+			if (!is_null($invitation)) {
+				$invitation_account = $invitation->getAccount();
 
-			$personal->setAsCurrent($this);
+				// only add to account if invited by the admin of a non-individual account
+				if ($invitation_account !== NULL &&
+						!$invitation_account->isIndividual() &&
+						$invitation_account->getUserRole($invitation->getIssuer()) === Account::ROLE_ADMIN
+				) {
+					$invitation_account->addUser($this);
+				}
+			}
+
+			$personal_account = null;
+			if (is_null($invitation_account) || UserConfig::$createPersonalAccountsIfInvitedToGroupAccount) {
+				$personal_account = Account::createAccount($this->getName(), UserConfig::$default_plan_slug, NULL, $this, Account::ROLE_ADMIN, NULL);
+			}
+
+			$current_account = is_null($invitation_account) ? $personal_account : $invitation_account;
+			$current_account->setAsCurrent($this);
 		}
 
 		if (!is_null(UserConfig::$onCreate)) {
@@ -645,16 +686,6 @@ class User {
 	 */
 	public function getAcceptedInvitations() {
 		return Invitation::getAccepted(false, $this);
-	}
-
-
-	/**
-	 * Create new user based on Google Friend Connect info
-	 *
-	 * @deprecated
-	 */
-	public static function createNewGoogleFriendConnectUser($name, $googleid, $userpic) {
-		throw StartupAPIDeprecatedException('Google Friend Connect support is deprecated');
 	}
 
 	/**

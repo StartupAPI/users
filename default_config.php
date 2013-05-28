@@ -201,6 +201,11 @@ class UserConfig {
 	public static $last_login_key = 'users-last-login';
 
 	/**
+	 * @var string Cookie name for storing invitation ID between registration start and user creation
+	 */
+	public static $invitation_code_key = 'users-invite-code';
+
+	/**
 	 * @var boolean Allow remembering a user beyond their browser session, true by default
 	 */
 	public static $allowRememberMe = true;
@@ -632,6 +637,13 @@ class UserConfig {
 	 */
 	public static $accountSwitchDestination = null;
 
+	/**
+	 * Creates personal accounts even if user was invited to a group account when registered
+	 *
+	 * @var boolean
+	 */
+	public static $createPersonalAccountsIfInvitedToGroupAccount = false;
+
 
 	/* ========================================================================
 	 *
@@ -953,13 +965,11 @@ EOD;
 		$app = self::$appName;
 		$issuer_name = $invitation->getIssuer()->getName();
 
-		/*
 		$account = $invitation->getAccount();
 		$account_message = '';
 		if (!is_null($account)) {
 			$account_message = $account->getName() . ' on ';
 		}
-		*/
 
 		$name = $invitation->getSentToName();
 		$invitation_welcome = '';
@@ -978,10 +988,8 @@ EOD;
 $invitation_welcome
 $issuer_name invited you to join $account_message$app
 $note
-Click this link to sign up
+Just click this link to sign up
 $registration_code_link
-
-Or just go to $registration_url and enter the code: $code
 
 --
 $app Support

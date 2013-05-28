@@ -289,6 +289,48 @@ class Invitation {
 	}
 
 	/**
+	 * Returns invitation that was used to invite particular user
+	 *
+	 * @param User $user User object
+	 *
+	 * @return Invitation
+	 *
+	 * @throws DBException
+	 */
+	public static function getUserInvitation($user) {
+		$invitation = null;
+		$user_id = $user->getID();
+
+		$db = UserConfig::getDB();
+
+		if ($stmt = $db->prepare('SELECT code, UNIX_TIMESTAMP(created), issuedby, is_admin_invite,
+				sent_to_email, sent_to_name, sent_to_note, user_id, account_id
+			FROM ' . UserConfig::$mysql_prefix . 'invitation
+			WHERE user_id = ?')) {
+			if (!$stmt->bind_param('i', $user_id)) {
+				throw new DBBindParamException($db, $stmt);
+			}
+			if (!$stmt->execute()) {
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id)) {
+				throw new DBBindResultException($db, $stmt);
+			}
+
+			if ($stmt->fetch() === TRUE) {
+				$invitation = new self($code, $time_created, $issuedby, $is_admin_invite ? true : false,
+								$sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id);
+			}
+
+			$stmt->close();
+		} else {
+			throw new DBPrepareStmtException($db);
+		}
+
+		return $invitation;
+	}
+
+	/**
 	 * Creates new invitation codes to be used for inviting new users in admin UI
 	 *
 	 * @param int $howmany How many codes to generate
@@ -574,7 +616,9 @@ class Invitation {
 	 * @param Account $account
 	 */
 	public function setAccount($account) {
-		$this->account_id = $account->getID();
+		if (!is_null($account)) {
+			$this->account_id = $account->getID();
+		}
 	}
 
 	/**
