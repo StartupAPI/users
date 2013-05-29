@@ -747,6 +747,7 @@ class User {
 		$user->setReferer();
 		$user->setRegCampaign();
 		$user->init();
+		$user->sendEmailVerificationCode();
 
 		return $user;
 	}
@@ -799,6 +800,7 @@ class User {
 		$user->setReferer();
 		$user->setRegCampaign();
 		$user->init();
+		$user->sendEmailVerificationCode();
 
 		return $user;
 	}
@@ -847,6 +849,7 @@ class User {
 		$user->setReferer();
 		$user->setRegCampaign();
 		$user->init();
+		$user->sendEmailVerificationCode();
 
 		return $user;
 	}
