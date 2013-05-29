@@ -155,31 +155,31 @@ require_once(__DIR__ . '/header.php');
 		?>
 	</ul>
 
-	<?php if (UserConfig::$useAccounts) { ?>
-		<h3>Accounts:</h3>
-		<ul>
-			<?php
-			$accounts_and_roles = $user->getAccountsAndRoles();
+	<h3>Accounts:</h3>
+	<ul>
+		<?php
+		$accounts_and_roles = $user->getAccountsAndRoles();
 
-			foreach ($accounts_and_roles as $account_and_role) {
-				$user_account = $account_and_role[0];
-				$role = $account_and_role[1];
+		foreach ($accounts_and_roles as $account_and_role) {
+			$user_account = $account_and_role[0];
+			$role = $account_and_role[1];
 
-				$plan = $user_account->getPlan();
-				?>
-				<li>
-					<a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/account.php?id=<?php echo $user_account->getID() ?>">
-						<?php echo UserTools::escape($user_account->getName()); ?>
-					</a>
-					<a class="badge badge-info" href="<?php echo UserConfig::$USERSROOTURL ?>/admin/plan.php?slug=<?php echo UserTools::escape($plan->slug); ?>"><i class="icon-briefcase icon-white"></i> <?php echo UserTools::escape($plan->name); ?></a>
+			$plan = $user_account->getPlan();
+			?>
+			<li>
+				<a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/account.php?id=<?php echo $user_account->getID() ?>">
+					<?php echo UserTools::escape($user_account->getName()); ?>
+				</a>
+				<a class="badge badge-info"
+				   href="<?php echo UserConfig::$USERSROOTURL ?>/admin/plan.php?slug=<?php echo UserTools::escape($plan->slug); ?>"><i
+						class="icon-briefcase icon-white"></i> <?php echo UserTools::escape($plan->name); ?></a>
 
-					<?php if ($role == Account::ROLE_ADMIN) { ?>
-						<span class = "badge badge-important">admin</span>
-					<?php } ?>
-				</li>
-			<?php } ?>
-		</ul>
-	<?php } ?>
+				<?php if ($role == Account::ROLE_ADMIN) { ?>
+					<span class="badge badge-important">admin</span>
+				<?php } ?>
+			</li>
+		<?php } ?>
+	</ul>
 
 	<h3>Source of registration</h3>
 	<p>Referer: <?php

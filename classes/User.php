@@ -503,42 +503,40 @@ class User {
 
 		$db = UserConfig::getDB();
 
-		if (UserConfig::$useAccounts) {
-			$userid = $this->getID();
+		$userid = $this->getID();
 
-			if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . 'user_preferences (user_id) VALUES (?)')) {
-				if (!$stmt->bind_param('i', $userid)) {
-					throw new DBBindParamException($db, $stmt);
-				}
-				if (!$stmt->execute()) {
-					throw new DBExecuteStmtException($db, $stmt, "Can't update user preferences (set current account)");
-				}
-				$stmt->close();
-			} else {
-				throw new DBPrepareStmtException($db, "Can't update user preferences (set current account)");
+		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . 'user_preferences (user_id) VALUES (?)')) {
+			if (!$stmt->bind_param('i', $userid)) {
+				throw new DBBindParamException($db, $stmt);
 			}
-
-			$invitation_account = null;
-			if (!is_null($invitation)) {
-				$invitation_account = $invitation->getAccount();
-
-				// only add to account if invited by the admin of a non-individual account
-				if ($invitation_account !== NULL &&
-						!$invitation_account->isIndividual() &&
-						$invitation_account->getUserRole($invitation->getIssuer()) === Account::ROLE_ADMIN
-				) {
-					$invitation_account->addUser($this);
-				}
+			if (!$stmt->execute()) {
+				throw new DBExecuteStmtException($db, $stmt, "Can't update user preferences (set current account)");
 			}
-
-			$personal_account = null;
-			if (is_null($invitation_account) || UserConfig::$createPersonalAccountsIfInvitedToGroupAccount) {
-				$personal_account = $this->createPersonalAccount(false);
-			}
-
-			$current_account = is_null($invitation_account) ? $personal_account : $invitation_account;
-			$current_account->setAsCurrent($this);
+			$stmt->close();
+		} else {
+			throw new DBPrepareStmtException($db, "Can't update user preferences (set current account)");
 		}
+
+		$invitation_account = null;
+		if (!is_null($invitation)) {
+			$invitation_account = $invitation->getAccount();
+
+			// only add to account if invited by the admin of a non-individual account
+			if ($invitation_account !== NULL &&
+				!$invitation_account->isIndividual() &&
+				$invitation_account->getUserRole($invitation->getIssuer()) === Account::ROLE_ADMIN
+			) {
+				$invitation_account->addUser($this);
+			}
+		}
+
+		$personal_account = null;
+		if (is_null($invitation_account) || UserConfig::$createPersonalAccountsIfInvitedToGroupAccount) {
+			$personal_account = $this->createPersonalAccount(false);
+		}
+
+		$current_account = is_null($invitation_account) ? $personal_account : $invitation_account;
+		$current_account->setAsCurrent($this);
 
 		if (!is_null(UserConfig::$onCreate)) {
 			call_user_func_array(UserConfig::$onCreate, array($this));

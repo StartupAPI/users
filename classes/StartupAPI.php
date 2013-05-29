@@ -88,7 +88,7 @@ class StartupAPI {
 		$current_account = null;
 
 		$accounts = array();
-		if (UserConfig::$useAccounts && !is_null($current_user)) {
+		if (!is_null($current_user)) {
 			$accounts = Account::getUserAccounts($current_user);
 
 			$current_account = Account::getCurrentAccount($current_user);

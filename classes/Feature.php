@@ -259,7 +259,7 @@ class Feature {
 		}
 
 		// if user's account has feature, user has it too
-		if (UserConfig::$useAccounts && $user->getCurrentAccount()->hasFeature($this)) {
+		if ($user->getCurrentAccount()->hasFeature($this)) {
 			return true;
 		}
 

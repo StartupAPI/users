@@ -6,12 +6,11 @@ $user = User::require_login();
 $current_account = null;
 $can_invite_to_account = false;
 
-if (UserConfig::$useAccounts) {
-	$current_account = $user->getCurrentAccount();
-	if (!$current_account->isIndividual()
-			&& $current_account->getUserRole($user) === Account::ROLE_ADMIN) {
-		$can_invite_to_account = true;
-	}
+$current_account = $user->getCurrentAccount();
+if (!$current_account->isIndividual()
+	&& $current_account->getUserRole($user) === Account::ROLE_ADMIN
+) {
+	$can_invite_to_account = true;
 }
 
 $errors = array();

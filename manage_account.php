@@ -3,11 +3,6 @@
 require_once(__DIR__ . '/global.php');
 require_once(__DIR__ . '/classes/User.php');
 
-if (!UserConfig::$useAccounts) {
-	header('Location: ' . UserConfig::$DEFAULTLOGOUTRETURN);
-	exit;
-}
-
 $user = User::require_login();
 $account = $user->getCurrentAccount();
 

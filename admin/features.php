@@ -87,7 +87,6 @@ foreach (Feature::getAll() as $feature) {
 					<span class="badge"><?php echo $user_count; ?></span> users (<?php echo $user_percent ?>%)
 				</td>
 			</tr>
-			<?php if (UserConfig::$useAccounts) { ?>
 			<tr style="border: none">
 				<td style="border: none">
 					<div class="progress">
@@ -99,7 +98,6 @@ foreach (Feature::getAll() as $feature) {
 					<span class="badge"><?php echo $account_count; ?></span> accounts (<?php echo $account_percent ?>%)
 				</td>
 			</tr>
-			<?php } ?>
 			</table>
 		</td>
 	<?php
