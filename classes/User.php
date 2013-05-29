@@ -457,6 +457,21 @@ class User {
 	}
 
 	/**
+	 * Creates a personal account for the user meking them an admin
+	 *
+	 * @param bool $set_as_current To set as current account (default) or not
+	 *
+	 * @return Account
+	 */
+	public function createPersonalAccount($set_as_current = true) {
+		$personal = Account::createPersonalAccount($this);
+		if ($set_as_current) {
+			$personal->setAsCurrent($this);
+		}
+		return $personal;
+	}
+
+	/**
 	 * Returns invitation that was used to invite this user
 	 *
 	 * @return Invitation
@@ -518,7 +533,7 @@ class User {
 
 			$personal_account = null;
 			if (is_null($invitation_account) || UserConfig::$createPersonalAccountsIfInvitedToGroupAccount) {
-				$personal_account = Account::createAccount($this->getName(), UserConfig::$default_plan_slug, NULL, $this, Account::ROLE_ADMIN, NULL);
+				$personal_account = $this->createPersonalAccount(false);
 			}
 
 			$current_account = is_null($invitation_account) ? $personal_account : $invitation_account;

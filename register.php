@@ -21,9 +21,9 @@ if (UserConfig::$enableRegistration && array_key_exists('register', $_POST)) {
 		throw new StartupAPIException('Invitation code is not submitted');
 	}
 
-	if ((UserConfig::$enableUserInvitations || UserConfig::$adminInvitationOnly) && array_key_exists('invite', $_GET)) {
-		$code = trim($_GET['invite']);
-
+	if ((UserConfig::$enableUserInvitations || UserConfig::$adminInvitationOnly)
+			&& array_key_exists('invite', $_GET) && $code = trim($_GET['invite'])
+	) {
 		$invitation = Invitation::getByCode($code);
 
 		if (is_null($invitation) || $invitation->getStatus()) {
@@ -70,21 +70,22 @@ require_once(UserConfig::$header);
 		$show_registration_form = true;
 		$invitation_used = null;
 
+		if (array_key_exists('invite', $_GET)) {
+			$invitation = Invitation::getByCode($_GET['invite']);
+
+			if (!is_null($invitation) && !$invitation->getStatus()) {
+				$invitation_used = $invitation;
+			}
+		}
+
 		if (UserConfig::$adminInvitationOnly) {
 			$message = null;
 
 			$show_registration_form = false;
-
-			if (array_key_exists('invite', $_GET)) {
-				$invitation = Invitation::getByCode($_GET['invite']);
-
-				if (is_null($invitation) || $invitation->getStatus()) {
-					$message = 'Invitation code you entered is not valid';
-				} else {
-					$invitation_used = $invitation;
-
-					$show_registration_form = true;
-				}
+			if (is_null($invitation_used)) {
+				$message = 'Invitation code you entered is not valid';
+			} else {
+				$show_registration_form = true;
 			}
 
 			if (!$show_registration_form) {
@@ -131,7 +132,7 @@ require_once(UserConfig::$header);
 						<?php
 					}
 
-					$module->renderRegistrationForm(true, "?module=$id&invite=" . (is_null($invitation_used) ? '' : $invitation_used->getCode()), array_key_exists($id, $errors) ? $errors[$id] : array(), $_POST);
+					$module->renderRegistrationForm(true, "?module=$id" . (is_null($invitation_used) ? '' : '&amp;invite=' . urlencode($invitation_used->getCode())), array_key_exists($id, $errors) ? $errors[$id] : array(), $_POST);
 					?></div>
 				<?php
 			}
