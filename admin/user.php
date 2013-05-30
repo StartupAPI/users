@@ -22,7 +22,7 @@ if (array_key_exists("savefeatures", $_POST)) {
 	if (array_key_exists("feature", $_POST) && is_array($_POST['feature'])) {
 		foreach (array_keys($_POST['feature']) as $featureid) {
 			$feature = Feature::getByID($featureid);
-			if (!is_null($feature) && $feature->isEnabled()) {
+			if (!is_null($feature) && $feature->isEnabled() && !$feature->isRolledOutToAllUsers()) {
 				$features_to_set[] = $feature;
 			}
 		}

@@ -882,6 +882,24 @@ class Account {
 	}
 
 	/**
+	 * Explicitly enable features on the list for account and removes the rest of the features
+	 * (global roll-out will still apply)
+	 *
+	 * @param array $features Array of Feature objects)
+	 */
+	public function setFeatures($features) {
+		$all_features = Feature::getAll();
+
+		foreach ($all_features as $id => $feature) {
+			if ($feature->isEnabled() && in_array($feature, $features)) {
+				$feature->enableForAccount($this);
+			} else {
+				$feature->removeForAccount($this);
+			}
+		}
+	}
+
+	/**
 	 * Populates charges array from database
 	 *
 	 * @param int $account_id Account ID

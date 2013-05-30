@@ -122,3 +122,23 @@ if ($template_data['account_isIndividual'] && count($admins) == 1 && count($user
 	$template_data['show_user_list'] = FALSE;
 };
 
+// features
+$features = Feature::getAll();
+$template_data['has_features_to_save'] = false;
+
+$template_data['features'] = array();
+foreach ($features as $id => $feature) {
+	$feature_data = array();
+
+	$feature_data['id'] = $feature->getID();
+	$feature_data['name'] = $feature->getName();
+	$feature_data['enabled'] = $feature->isEnabled();
+	$feature_data['rolled_out_to_all'] = $feature->isRolledOutToAllUsers();
+	$feature_data['enabled_for_account'] = $feature->isEnabledForAccount($account);
+
+	$template_data['features'][] = $feature_data;
+
+	if ($feature_data['enabled'] && !$feature_data['enabled_for_account']) {
+		$template_data['has_features_to_save'] = true;
+	}
+}

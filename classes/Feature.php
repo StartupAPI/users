@@ -154,7 +154,7 @@ class Feature {
 	/**
 	 * Returns all features
 	 *
-	 * @return array Array of Feature objects configured in the system
+	 * @return Feature[] Array of Feature objects configured in the system
 	 */
 	public static function getAll() {
 		return self::$features;
@@ -232,6 +232,67 @@ class Feature {
 			$stmt->close();
 
 			return $enabled > 0 ? true : false;
+		}
+		else
+		{
+			throw new DBPrepareStmtException($db);
+		}
+	}
+
+	/**
+	 * Enables feature for particular account
+	 *
+	 * @param Account $account Account to enable this feature for
+	 *
+	 * @throws DBException
+	 */
+	public function enableForAccount($account) {
+		$db = UserConfig::getDB();
+
+		$account_id = $account->getID();
+
+		if ($stmt = $db->prepare('REPLACE INTO '.UserConfig::$mysql_prefix.'account_features (account_id, feature_id) VALUES (?, ?)'))
+		{
+			if (!$stmt->bind_param('ii', $account_id, $this->id))
+			{
+				throw new DBBindParamException($db, $stmt);
+			}
+			if (!$stmt->execute())
+			{
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+
+			$stmt->close();
+		}
+		else
+		{
+			throw new DBPrepareStmtException($db);
+		}
+	}
+
+	/**
+	 * Removes feature for particular user (global roll-out will still apply)
+	 *
+	 * @param Account $account Account to remove this feature for
+	 *
+	 * @throws DBException
+	 */
+	public function removeForAccount($account) {
+		$db = UserConfig::getDB();
+
+		$account_id = $account->getID();
+
+		if ($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.'account_features WHERE account_id = ? AND feature_id = ?'))
+		{
+			if (!$stmt->bind_param('ii', $account_id, $this->id))
+			{
+				throw new DBBindParamException($db, $stmt);
+			}
+			if (!$stmt->execute())
+			{
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+			$stmt->close();
 		}
 		else
 		{
@@ -373,13 +434,13 @@ class Feature {
 	}
 
 	/**
-	 * Disables feature for particular user
+	 * Removes feature for particular user (account preferences and global roll-out will still apply)
 	 *
-	 * @param User $user User to disable this feature for
+	 * @param User $user User to remove this feature for
 	 *
 	 * @throws DBException
 	 */
-	public function disableForUser($user) {
+	public function removeForUser($user) {
 		// now, let's see if user has it enabled
 		$db = UserConfig::getDB();
 

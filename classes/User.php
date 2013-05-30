@@ -2814,7 +2814,8 @@ class User {
 	}
 
 	/**
-	 * Explicitly enable features on the list for the user and disable the rest of the features
+	 * Explicitly enable features on the list for the user and removes the rest of the features
+	 * (account features and global roll-out will still apply)
 	 *
 	 * @param array $features Array of Feature objects)
 	 */
@@ -2822,11 +2823,10 @@ class User {
 		$all_features = Feature::getAll();
 
 		foreach ($all_features as $id => $feature) {
-
 			if ($feature->isEnabled() && in_array($feature, $features)) {
 				$feature->enableForUser($this);
 			} else {
-				$feature->disableForUser($this);
+				$feature->removeForUser($this);
 			}
 		}
 	}
