@@ -12,7 +12,7 @@ $user_id = intval(trim($_GET['id']));
 $user = User::getUser($user_id);
 if (is_null($user)) {
 	header("HTTP/1.0 404 User Not Found");
-	?><h1>404 User Not Found</h3><?php
+	?><h1>404 User Not Found</h1><?php
 	exit;
 }
 
@@ -51,7 +51,7 @@ $ADMIN_SECTION = 'registrations';
 $BREADCRUMB_EXTRA = $user->getName();
 require_once(__DIR__ . '/header.php');
 ?>
-<div class="span9">
+	<div class="span9">
 
 	<form action="" method="POST">
 		<h2>
@@ -65,19 +65,27 @@ require_once(__DIR__ . '/header.php');
 				if ($user->isDisabled()) {
 					?>
 					<b style="color: red">Deactivated</b>
-					<input class="btn btn-success" type="submit" name="activate" value="Activate" style="font: small" onclick="return confirm('Are you sure you want to activate this user?')"/>
-					<?php
+					<input class="btn btn-success" type="submit" name="activate" value="Activate"
+					       style="font: small"
+					       onclick="return confirm('Are you sure you want to activate this user?')"/>
+				<?php
 				} else {
 					if (!$user->isTheSameAs($current_user)) {
 						?>
-						<form name="imp" action="" method="POST"><input class="btn btn-inverse" type="submit" value="Impersonate" style="font: small"/><input type="hidden" name="impersonate" value="<?php echo $user->getID() ?>"/>
+						<form name="imp" action="" method="POST"><input class="btn btn-inverse" type="submit"
+						                                                value="Impersonate"
+						                                                style="font: small"/><input type="hidden"
+						                                                                            name="impersonate"
+						                                                                            value="<?php echo $user->getID() ?>"/>
 							<?php UserTools::renderCSRFNonce(); ?>
 						</form>
-						<?php
+					<?php
 					}
 					?>
-					<input type="submit" class="btn btn-danger" name="deactivate" value="Deactivate" style="font: small" onclick="return confirm('Are you sure you want to disable access for this user?')"/>
-					<?php
+					<input type="submit" class="btn btn-danger" name="deactivate" value="Deactivate"
+					       style="font: small"
+					       onclick="return confirm('Are you sure you want to disable access for this user?')"/>
+				<?php
 				}
 				UserTools::renderCSRFNonce();
 				?>
@@ -94,21 +102,25 @@ require_once(__DIR__ . '/header.php');
 			<a href="mailto:<?php echo urlencode(UserTools::escape($email)) ?>" target="_blank">
 				<i class="icon-envelope"></i> <?php echo UserTools::escape($email) ?>
 			</a>
-			<?php
+		<?php
 		}
 		?>
 	</p>
+
 	<p>
 		<?php
 		$regtime = $user->getRegTime();
 		$ago = intval(floor((time() - $regtime) / 86400));
 		?>
 		<b>Registered:</b> <?php echo date('M j, Y h:iA', $regtime) ?>
-		<span class="badge<?php if ($ago <= 5) { ?> badge-success<?php } ?>"><?php echo $ago ?></span> day<?php echo $ago != 1 ? 's' : '' ?> ago
+		<span class="badge<?php if ($ago <= 5) { ?> badge-success<?php } ?>"><?php echo $ago ?></span>
+		day<?php echo $ago != 1 ? 's' : '' ?> ago
 	</p>
 
 	<p>
-		<b>Activity points:</b> <span class="badge"><?php echo $user->getPoints(); ?></span> <a class="btn btn-small" href="activity.php?userid=<?php echo $user->getID() ?>"><i class="icon-signal"></i> See activity</a>
+		<b>Activity points:</b> <span class="badge"><?php echo $user->getPoints(); ?></span> <a
+			class="btn btn-small" href="activity.php?userid=<?php echo $user->getID() ?>"><i
+				class="icon-signal"></i> See activity</a>
 	</p>
 
 	<h3>Gamification</h3>
@@ -120,36 +132,36 @@ require_once(__DIR__ . '/header.php');
 
 	foreach ($available_badges as $badge) {
 		?><a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/badge.php?id=<?php echo $badge->getID() ?>"><?php
-	if (array_key_exists($badge->getID(), $user_badges)) {
-		$badge_level = $user_badges[$badge->getID()][1];
+		if (array_key_exists($badge->getID(), $user_badges)) {
+			$badge_level = $user_badges[$badge->getID()][1];
 			?><img
-					style="margin-right: 0.5em"
-					src="<?php echo $badge->getImageURL($adminBadgeSize, $badge_level) ?>"
-					title="<?php echo $badge->getTitle() ?>"
-					width="<?php echo $adminBadgeSize ?>"
-					height="<?php echo $adminBadgeSize ?>"/>
-					<?php
-				} else {
-					?><img style="margin-right: 0.5em"
-					 src="<?php echo $badge->getPlaceholderImageURL($adminBadgeSize) ?>"
-					 title="Hint: <?php echo $badge->getHint() ?>"
-					 width="<?php echo $adminBadgeSize ?>"
-					 height="<?php echo $adminBadgeSize ?>"/>
-					 <?php
-				 }
-				 ?></a><?php
+			style="margin-right: 0.5em"
+			src="<?php echo $badge->getImageURL($adminBadgeSize, $badge_level) ?>"
+			title="<?php echo $badge->getTitle() ?>"
+			width="<?php echo $adminBadgeSize ?>"
+			height="<?php echo $adminBadgeSize ?>"/>
+		<?php
+		} else {
+			?><img style="margin-right: 0.5em"
+			       src="<?php echo $badge->getPlaceholderImageURL($adminBadgeSize) ?>"
+			       title="Hint: <?php echo $badge->getHint() ?>"
+			       width="<?php echo $adminBadgeSize ?>"
+			       height="<?php echo $adminBadgeSize ?>"/>
+		<?php
+		}
+		?></a><?php
 	}
-			 ?>
+	?>
 
 	<h3>Authentication Credentials</h3>
 	<ul><?php
-	foreach (UserConfig::$authentication_modules as $module) {
-		$creds = $module->getUserCredentials($user);
+		foreach (UserConfig::$authentication_modules as $module) {
+			$creds = $module->getUserCredentials($user);
 
-		if (!is_null($creds)) {
-					 ?>
+			if (!is_null($creds)) {
+				?>
 				<li><b><?php echo $module->getID() ?>: </b><?php echo $creds->getHTML() ?></li>
-				<?php
+			<?php
 			}
 		}
 		?>
@@ -182,73 +194,76 @@ require_once(__DIR__ . '/header.php');
 	</ul>
 
 	<h3>Source of registration</h3>
-	<p>Referer: <?php
-	$referer = $user->getReferer();
 
-	if (is_null($referer)) {
-		?><i>unknown</i><?php
-	} else {
-		?><a target="_blank" href="<?php echo UserTools::escape($referer) ?>"><?php echo UserTools::escape($referer) ?></a><?php
-	}
-	?>
+	<p>Referer: <?php
+		$referer = $user->getReferer();
+
+		if (is_null($referer)) {
+			?><i>unknown</i><?php
+		} else {
+			?><a target="_blank"
+			     href="<?php echo UserTools::escape($referer) ?>"><?php echo UserTools::escape($referer) ?></a><?php
+		}
+		?>
 	</p>
 	<?php
 	$campaign = $user->getCampaign();
 	if (count($campaign) > 0) {
 		?><h4>Campaign codes</h4><?php
-}
+	}
 
-if (array_key_exists('cmp_name', $campaign)) {
+	if (array_key_exists('cmp_name', $campaign)) {
 		?><p>Name: <b><?php echo UserTools::escape($campaign['cmp_name']) ?></b></p><?php
-}
-if (array_key_exists('cmp_source', $campaign)) {
+	}
+	if (array_key_exists('cmp_source', $campaign)) {
 		?><p>Source: <b><?php echo UserTools::escape($campaign['cmp_source']) ?></b></p><?php
-}
-if (array_key_exists('cmp_medium', $campaign)) {
+	}
+	if (array_key_exists('cmp_medium', $campaign)) {
 		?><p>Medium: <b><?php echo UserTools::escape($campaign['cmp_medium']) ?></b></p><?php
-}
-if (array_key_exists('cmp_keywords', $campaign)) {
+	}
+	if (array_key_exists('cmp_keywords', $campaign)) {
 		?><p>Keywords: <b><?php echo UserTools::escape($campaign['cmp_keywords']) ?></b></p><?php
-}
-if (array_key_exists('cmp_content', $campaign)) {
+	}
+	if (array_key_exists('cmp_content', $campaign)) {
 		?><p>Content: <b><?php echo UserTools::escape($campaign['cmp_content']) ?></b></p><?php
-}
+	}
 
-$features = Feature::getAll();
-if (count($features) > 0) {
-	$has_features_to_save = false;
+	$features = Feature::getAll();
+	if (count($features) > 0) {
+		$has_features_to_save = false;
 		?><h3>Features</h3>
 		<form class="form" action="" method="POST">
 			<?php foreach ($features as $id => $feature) {
-				?><div<?php if (!$feature->isEnabled()) { ?> style="color: grey; text-decoration: line-through"<?php } ?>>
+				?>
+				<div<?php if (!$feature->isEnabled()) { ?> style="color: grey; text-decoration: line-through"<?php } ?>>
 					<label class="checkbox">
 						<input id="feature_<?php echo UserTools::escape($feature->getID()) ?>"
-							   type="checkbox"
-							   name="feature[<?php echo UserTools::escape($feature->getID()) ?>]"
-							   <?php if ($feature->isEnabledForUser($user)) { ?> checked="true"<?php } ?>
-							   <?php if (!$feature->isEnabled() || $feature->isRolledOutToAllUsers()) { ?> disabled="disabled"<?php
-				   } else {
-					   $has_features_to_save = true;
-				   }
-							   ?>
-							   >
-							   <?php echo UserTools::escape($feature->getName()) ?>
+						       type="checkbox"
+						       name="feature[<?php echo UserTools::escape($feature->getID()) ?>]"
+							<?php if ($feature->isEnabledForUser($user)) { ?> checked="true"<?php } ?>
+							<?php if (!$feature->isEnabled() || $feature->isRolledOutToAllUsers()) { ?> disabled="disabled"<?php
+							} else {
+								$has_features_to_save = true;
+							}
+							?>
+							>
+						<?php echo UserTools::escape($feature->getName()) ?>
 					</label>
 				</div>
 			<?php } ?>
 			<input class="btn<?php if ($has_features_to_save) { ?> btn-primary<?php } ?>"
-				   type="submit"
-				   name="savefeatures"
-				   value="update features"
-				   <?php if (!$has_features_to_save) { ?> disabled="disabled"<?php } ?>
-				   >
-				   <?php UserTools::renderCSRFNonce();
-				   ?>
+			       type="submit"
+			       name="savefeatures"
+			       value="update features"
+				<?php if (!$has_features_to_save) { ?> disabled="disabled"<?php } ?>
+				>
+			<?php UserTools::renderCSRFNonce();
+			?>
 		</form>
-		<?php
+	<?php
 	}
 	?>
 
-</div>
+	</div>
 <?php
 require_once(__DIR__ . '/footer.php');
