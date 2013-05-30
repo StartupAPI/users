@@ -138,7 +138,7 @@ foreach ($features as $id => $feature) {
 
 	$template_data['features'][] = $feature_data;
 
-	if ($feature_data['enabled'] && !$feature_data['enabled_for_account']) {
+	if ($feature_data['enabled'] && !$feature_data['rolled_out_to_all']) {
 		$template_data['has_features_to_save'] = true;
 	}
 }

@@ -29,13 +29,16 @@ if (array_key_exists("savefeatures", $_POST)) {
 	}
 
 	$user->setFeatures($features_to_set);
+
+	header('Location: ' . UserConfig::$USERSROOTURL . '/admin/user.php?id=' . $_GET['id'] . '#featuressaved');
+	exit;
 }
 
 if (array_key_exists("activate", $_POST)) {
 	$user->setStatus(true);
 	$user->save();
 
-	header('Location: ' . UserConfig::$USERSROOTURL . '/admin/user.php?id=' . $_GET['id']);
+	header('Location: ' . UserConfig::$USERSROOTURL . '/admin/user.php?id=' . $_GET['id'] . '#activated');
 	exit;
 }
 
@@ -43,7 +46,7 @@ if (array_key_exists("deactivate", $_POST)) {
 	$user->setStatus(false);
 	$user->save();
 
-	header('Location: ' . UserConfig::$USERSROOTURL . '/admin/user.php?id=' . $_GET['id']);
+	header('Location: ' . UserConfig::$USERSROOTURL . '/admin/user.php?id=' . $_GET['id'] . '#deactivated');
 	exit;
 }
 
@@ -229,9 +232,13 @@ require_once(__DIR__ . '/header.php');
 	}
 
 	$features = Feature::getAll();
+	$accounts = $user->getAccounts();
 	if (count($features) > 0) {
 		$has_features_to_save = false;
 		?><h3>Features</h3>
+		<p>You can enable or remove particular features for this user</p>
+		<p>Keep in mind that if set for a user, it overrides account feature settings so most of the times, you might want to control features on
+			account level instead of here.</p>
 		<form class="form" action="" method="POST">
 			<?php foreach ($features as $id => $feature) {
 				?>
@@ -240,7 +247,7 @@ require_once(__DIR__ . '/header.php');
 						<input id="feature_<?php echo UserTools::escape($feature->getID()) ?>"
 						       type="checkbox"
 						       name="feature[<?php echo UserTools::escape($feature->getID()) ?>]"
-							<?php if ($feature->isEnabledForUser($user)) { ?> checked="true"<?php } ?>
+							<?php if ($feature->isEnabledForUser($user, true)) { ?> checked="true"<?php } ?>
 							<?php if (!$feature->isEnabled() || $feature->isRolledOutToAllUsers()) { ?> disabled="disabled"<?php
 							} else {
 								$has_features_to_save = true;
@@ -248,10 +255,32 @@ require_once(__DIR__ . '/header.php');
 							?>
 							>
 						<?php echo UserTools::escape($feature->getName()) ?>
+						<?php
+						$enabled_for_accounts = array();
+						foreach ($accounts as $account) {
+							if ($feature->isEnabledForAccount($account)) {
+								$enabled_for_accounts[] = $account;
+							}
+						}
+
+						if (count($enabled_for_accounts) > 0 && $feature->isEnabled() && !$feature->isRolledOutToAllUsers()) {
+							?><br/>(Enabled in accounts: <?php
+							$first = true;
+							foreach ($enabled_for_accounts as $feature_account) {
+								if (!$first) {
+									?>, <?php
+								}
+								?><a
+								href="<?php echo UserConfig::$USERSROOTURL ?>/admin/account.php?id=<?php echo $feature_account->getID() ?>"><?php echo $feature_account->getName() ?></a><?php
+								$first = false;
+							}
+							?>)<?php
+						}
+						?>
 					</label>
 				</div>
 			<?php } ?>
-			<input class="btn<?php if ($has_features_to_save) { ?> btn-primary<?php } ?>"
+			<input class="btn"
 			       type="submit"
 			       name="savefeatures"
 			       value="update features"

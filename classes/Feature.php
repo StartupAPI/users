@@ -304,34 +304,36 @@ class Feature {
 	 * Checks if feature is enabled for particular user
 	 *
 	 * @param User $user User to check
+	 * @param boolean $ignore_propagation Set this to true only if you want to ignore feature propagation
+	 *                                      (don't use unless you know what you're doing)
 	 *
 	 * @return boolean Enabled / Disabled
 	 *
 	 * @throws DBException
 	 */
-	public function isEnabledForUser($user) {
-		if ($this->emergency_shutdown || !$this->enabled) {
+	public function isEnabledForUser($user, $ignore_propagation = false) {
+		if (!$ignore_propagation && $this->emergency_shutdown || !$this->enabled) {
 			return false;
 		}
 
 		// if feature is forced, return true
-		if ($this->rolled_out_to_all_users) {
+		if (!$ignore_propagation && $this->rolled_out_to_all_users) {
 			return true;
 		}
 
 		// if user's account has feature, user has it too
-		if ($user->getCurrentAccount()->hasFeature($this)) {
+		if (!$ignore_propagation && $user->getCurrentAccount()->hasFeature($this)) {
 			return true;
 		}
 
 		// now, let's see if user has it enabled
 		$db = UserConfig::getDB();
 
-		$userid = $user->getID();
+		$user_id = $user->getID();
 
 		if ($stmt = $db->prepare('SELECT COUNT(*) FROM '.UserConfig::$mysql_prefix.'user_features WHERE user_id = ? AND feature_id = ?'))
 		{
-			if (!$stmt->bind_param('ii', $userid, $this->id))
+			if (!$stmt->bind_param('ii', $user_id, $this->id))
 			{
 				throw new DBBindParamException($db, $stmt);
 			}
