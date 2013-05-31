@@ -197,6 +197,21 @@ class Plan {
 	}
 
 	/**
+	 * Checks if plan has particular feature enabled
+	 *
+	 * @param Feature $feature Feature to check
+	 *
+	 * @return boolean Enabled / Disabled
+	 */
+	public function hasFearureEnabled($feature) {
+		if (array_key_exists('enable_features', $this->capabilities) && is_array($this->capabilities['enable_features'])) {
+			return in_array($feature->getID(), $this->capabilities['enable_features']);
+		}
+
+		return false;
+	}
+
+	/**
 	 * Returns schedule slugs
 	 *
 	 * @param string $slug Schedule slug

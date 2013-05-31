@@ -190,6 +190,17 @@ class Feature {
 	}
 
 	/**
+	 * Checks if feature is enabled for a subscription plan
+	 *
+	 * @param Plan $plan Subscription plan to check
+	 *
+	 * @return boolean Enabled / Disabled
+	 */
+	public function isEnabledForPlan($plan) {
+		return $plan->hasFearureEnabled($this);
+	}
+
+	/**
 	 * Checks if feature is enabled for particular account
 	 *
 	 * @param Account $account Account to check
@@ -205,6 +216,10 @@ class Feature {
 
 		// if feature is forced, return true
 		if ($this->rolled_out_to_all_users) {
+			return true;
+		}
+
+		if ($account->getPlan()->hasFearureEnabled($this)) {
 			return true;
 		}
 
