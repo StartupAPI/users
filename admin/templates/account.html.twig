@@ -175,8 +175,11 @@
 									{% endif %}
 									/>
 							{{ feature.name }}
-							{% if feature.enabled_for_plan %}
-								(enabled by <a href="plan.php?slug={{ plan_slug }}">subscription plan</a>)
+							{% if feature.enabled and feature.rolled_out_to_all%}
+								(Rolled out to all users)
+							{% endif %}
+							{% if feature.enabled and not feature.rolled_out_to_all and feature.enabled_for_plan %}
+								(Enabled by <a href="plan.php?slug={{ plan_slug }}">subscription plan</a>)
 							{% endif %}
 						</label>
 					</div>

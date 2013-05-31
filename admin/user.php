@@ -237,7 +237,8 @@ require_once(__DIR__ . '/header.php');
 		$has_features_to_save = false;
 		?><h3>Features</h3>
 		<p>You can enable or remove particular features for this user</p>
-		<p>Keep in mind that if set for a user, it overrides account feature settings so most of the times, you might want to control features on
+		<p>Keep in mind that if set for a user, it overrides account feature settings so most of the times, you might
+			want to control features on
 			account level instead of here.</p>
 		<form class="form" action="" method="POST">
 			<?php foreach ($features as $id => $feature) {
@@ -264,18 +265,22 @@ require_once(__DIR__ . '/header.php');
 							}
 						}
 
-						if (count($enabled_for_accounts) > 0 && $feature->isEnabled() && !$feature->isRolledOutToAllUsers()) {
-							?><br/>(Enabled in accounts: <?php
-							$first = true;
-							foreach ($enabled_for_accounts as $feature_account) {
-								if (!$first) {
-									?>, <?php
+						if ($feature->isEnabled()) {
+							if ($feature->isRolledOutToAllUsers()) {
+								?><br/>(Rolled out to all users)<?php
+							} else if (count($enabled_for_accounts) > 0) {
+								?><br/>(Enabled in accounts: <?php
+								$first = true;
+								foreach ($enabled_for_accounts as $feature_account) {
+									if (!$first) {
+										?>, <?php
+									}
+									?><a
+									href="<?php echo UserConfig::$USERSROOTURL ?>/admin/account.php?id=<?php echo $feature_account->getID() ?>"><?php echo $feature_account->getName() ?></a><?php
+									$first = false;
 								}
-								?><a
-								href="<?php echo UserConfig::$USERSROOTURL ?>/admin/account.php?id=<?php echo $feature_account->getID() ?>"><?php echo $feature_account->getName() ?></a><?php
-								$first = false;
+								?>)<?php
 							}
-							?>)<?php
 						}
 						?>
 					</label>
