@@ -241,14 +241,15 @@ require_once(__DIR__ . '/header.php');
 			account level instead of here.</p>
 		<form class="form" action="" method="POST">
 			<?php foreach ($features as $id => $feature) {
+				$disable_editing = !$feature->isEnabled() || $feature->isRolledOutToAllUsers();
 				?>
 				<div<?php if (!$feature->isEnabled()) { ?> style="color: grey; text-decoration: line-through"<?php } ?>>
 					<label class="checkbox">
 						<input id="feature_<?php echo UserTools::escape($feature->getID()) ?>"
 						       type="checkbox"
 						       name="feature[<?php echo UserTools::escape($feature->getID()) ?>]"
-							<?php if ($feature->isEnabledForUser($user, true)) { ?> checked="true"<?php } ?>
-							<?php if (!$feature->isEnabled() || $feature->isRolledOutToAllUsers()) { ?> disabled="disabled"<?php
+							<?php if ($feature->isEnabledForUser($user, !$disable_editing)) { ?> checked="true"<?php } ?>
+							<?php if ($disable_editing) { ?> disabled="disabled"<?php
 							} else {
 								$has_features_to_save = true;
 							}
