@@ -50,7 +50,11 @@ if (array_key_exists('activityid', $_REQUEST) && is_numeric($_REQUEST['activityi
 		if (!array_key_exists('points', $dates[$record['date']])) {
 			$dates[$record['date']]['points'] = 0;
 		}
-		$dates[$record['date']]['points'] += $record['total'] * UserConfig::$activities[$record['activity']][1];
+
+		// Only work with activities that are still enabled in the system
+		if (array_key_exists($record['activity'], UserConfig::$activities)) {
+			$dates[$record['date']]['points'] += $record['total'] * UserConfig::$activities[$record['activity']][1];
+		}
 	}
 }
 
