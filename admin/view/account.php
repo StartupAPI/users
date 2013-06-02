@@ -133,9 +133,16 @@ foreach ($features as $id => $feature) {
 	$feature_data['id'] = $feature->getID();
 	$feature_data['name'] = $feature->getName();
 	$feature_data['enabled'] = $feature->isEnabled();
+	$feature_data['shut_down'] = $feature->isShutDown();
 	$feature_data['rolled_out_to_all'] = $feature->isRolledOutToAllUsers();
-	$feature_data['enabled_for_account'] = $feature->isEnabledForAccount($account);
 	$feature_data['enabled_for_plan'] = $account->getPlan()->hasFearureEnabled($feature);
+
+	$feature_data['disable_editing'] = !$feature->isEnabled() || $feature->isShutDown()
+		|| $feature->isRolledOutToAllUsers() || $feature_data['enabled_for_plan'];
+
+	$feature_data['enabled_for_account'] = $feature->isEnabledForAccount($account, true);
+	$feature_data['is_checked'] = $feature->isRolledOutToAllUsers() || $feature_data['enabled_for_plan']
+		|| $feature_data['enabled_for_account'];
 
 	$template_data['features'][] = $feature_data;
 

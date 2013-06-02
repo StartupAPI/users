@@ -891,7 +891,7 @@ class Account {
 		$all_features = Feature::getAll();
 
 		foreach ($all_features as $id => $feature) {
-			if ($feature->isEnabled() && in_array($feature, $features)) {
+			if (in_array($feature, $features)) {
 				$feature->enableForAccount($this);
 			} else {
 				$feature->removeForAccount($this);

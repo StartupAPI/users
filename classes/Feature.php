@@ -209,28 +209,30 @@ class Feature {
 	 *
 	 * @throws DBException
 	 */
-	public function isEnabledForAccount($account){
-		if ($this->emergency_shutdown || !$this->enabled) {
-			return false;
-		}
+	public function isEnabledForAccount($account, $ignore_propagation = false){
+		if (!$ignore_propagation) {
+			if ($this->emergency_shutdown || !$this->enabled) {
+				return false;
+			}
 
-		// if feature is forced, return true
-		if ($this->rolled_out_to_all_users) {
-			return true;
-		}
+			// if feature is forced, return true
+			if ($this->rolled_out_to_all_users) {
+				return true;
+			}
 
-		if ($account->getPlan()->hasFearureEnabled($this)) {
-			return true;
+			if ($account->getPlan()->hasFearureEnabled($this)) {
+				return true;
+			}
 		}
 
 		// now, let's see if account has it enabled
 		$db = UserConfig::getDB();
 
-		$accountid = $account->getID();
+		$account_id = $account->getID();
 
 		if ($stmt = $db->prepare('SELECT COUNT(*) FROM '.UserConfig::$mysql_prefix.'account_features WHERE account_id = ? AND feature_id = ?'))
 		{
-			if (!$stmt->bind_param('ii', $accountid, $this->id))
+			if (!$stmt->bind_param('ii', $account_id, $this->id))
 			{
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -246,7 +248,7 @@ class Feature {
 			$stmt->fetch();
 			$stmt->close();
 
-			return $enabled > 0 ? true : false;
+			return $enabled > 0;
 		}
 		else
 		{

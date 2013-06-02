@@ -9,9 +9,9 @@ if (!is_null($account = Account::getByID($account_id))) {
 		$features_to_set = array();
 
 		if (array_key_exists("feature", $_POST) && is_array($_POST['feature'])) {
-			foreach (array_keys($_POST['feature']) as $featureid) {
-				$feature = Feature::getByID($featureid);
-				if (!is_null($feature) && $feature->isEnabled() && !$feature->isRolledOutToAllUsers()) {
+			foreach (array_keys($_POST['feature']) as $feature_id) {
+				$feature = Feature::getByID($feature_id);
+				if (!is_null($feature) && !$feature->isRolledOutToAllUsers()) {
 					$features_to_set[] = $feature;
 				}
 			}
