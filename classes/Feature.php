@@ -13,13 +13,14 @@
  * and then use it when implementing the feature in your code
  * <code>
  * if ($user->hasFeature(MY_FIRST_FEATURE_ID)) {
- *		echo "Hey, you can use my first feature!";
+ *        echo "Hey, you can use my first feature!";
  * }
  * </code>
  *
  * @package StartupAPI
  */
-class Feature {
+class Feature
+{
 	/**
 	 * @var int Numeric feature ID
 	 */
@@ -63,15 +64,15 @@ class Feature {
 	 * @param boolean Flag indicating that feature is currently active
 	 * @param boolean Flag indicating that feature is rolled out to all users
 	 * @param integer Priority number indicating that feature
-	 *			should be shut down (automatically or manually) in case of system oveload
+	 *            should be shut down (automatically or manually) in case of system oveload
 	 * @param boolean Flag indicating that this feature is temporarily shut down
-	 *			due to operational emergency (e.g. system overload)
+	 *            due to operational emergency (e.g. system overload)
 	 */
 	public function __construct($id, $name,
-		$enabled = true,
-		$rolled_out_to_all_users = false,
-		$shutdown_priority = null,
-		$emergency_shutdown = false
+	                            $enabled = true,
+	                            $rolled_out_to_all_users = false,
+	                            $shutdown_priority = null,
+	                            $emergency_shutdown = false
 	) {
 		$this->id = $id;
 		$this->name = $name;
@@ -81,7 +82,7 @@ class Feature {
 		if (is_null($shutdown_priority)) {
 			// make it higher then current maximum (first features are first to shut-down)
 			$this->shutdown_priority = 1;
-			foreach(self::$features as $feature) {
+			foreach (self::$features as $feature) {
 				$priority = $feature->getShutdownPriority();
 				if ($priority > $this->shutdown_priority) {
 					$this->shutdown_priority = $priority;
@@ -209,7 +210,7 @@ class Feature {
 	 *
 	 * @throws DBException
 	 */
-	public function isEnabledForAccount($account, $ignore_propagation = false){
+	public function isEnabledForAccount($account, $ignore_propagation = false) {
 		if (!$ignore_propagation) {
 			if ($this->emergency_shutdown || !$this->enabled) {
 				return false;
@@ -230,18 +231,14 @@ class Feature {
 
 		$account_id = $account->getID();
 
-		if ($stmt = $db->prepare('SELECT COUNT(*) FROM '.UserConfig::$mysql_prefix.'account_features WHERE account_id = ? AND feature_id = ?'))
-		{
-			if (!$stmt->bind_param('ii', $account_id, $this->id))
-			{
+		if ($stmt = $db->prepare('SELECT COUNT(*) FROM ' . UserConfig::$mysql_prefix . 'account_features WHERE account_id = ? AND feature_id = ?')) {
+			if (!$stmt->bind_param('ii', $account_id, $this->id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($enabled))
-			{
+			if (!$stmt->bind_result($enabled)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
@@ -249,9 +246,7 @@ class Feature {
 			$stmt->close();
 
 			return $enabled > 0;
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 	}
@@ -268,21 +263,16 @@ class Feature {
 
 		$account_id = $account->getID();
 
-		if ($stmt = $db->prepare('REPLACE INTO '.UserConfig::$mysql_prefix.'account_features (account_id, feature_id) VALUES (?, ?)'))
-		{
-			if (!$stmt->bind_param('ii', $account_id, $this->id))
-			{
+		if ($stmt = $db->prepare('REPLACE INTO ' . UserConfig::$mysql_prefix . 'account_features (account_id, feature_id) VALUES (?, ?)')) {
+			if (!$stmt->bind_param('ii', $account_id, $this->id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 	}
@@ -299,20 +289,15 @@ class Feature {
 
 		$account_id = $account->getID();
 
-		if ($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.'account_features WHERE account_id = ? AND feature_id = ?'))
-		{
-			if (!$stmt->bind_param('ii', $account_id, $this->id))
-			{
+		if ($stmt = $db->prepare('DELETE FROM ' . UserConfig::$mysql_prefix . 'account_features WHERE account_id = ? AND feature_id = ?')) {
+			if (!$stmt->bind_param('ii', $account_id, $this->id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 	}
@@ -329,18 +314,20 @@ class Feature {
 	 * @throws DBException
 	 */
 	public function isEnabledForUser($user, $ignore_propagation = false) {
-		if (!$ignore_propagation && $this->emergency_shutdown || !$this->enabled) {
-			return false;
-		}
+		if (!$ignore_propagation) {
+			if ($this->emergency_shutdown || !$this->enabled) {
+				return false;
+			}
 
-		// if feature is forced, return true
-		if (!$ignore_propagation && $this->rolled_out_to_all_users) {
-			return true;
-		}
+			// if feature is forced, return true
+			if ($this->rolled_out_to_all_users) {
+				return true;
+			}
 
-		// if user's account has feature, user has it too
-		if (!$ignore_propagation && $user->getCurrentAccount()->hasFeature($this)) {
-			return true;
+			// if user's account has feature, user has it too
+			if ($user->getCurrentAccount()->hasFeature($this)) {
+				return true;
+			}
 		}
 
 		// now, let's see if user has it enabled
@@ -348,18 +335,14 @@ class Feature {
 
 		$user_id = $user->getID();
 
-		if ($stmt = $db->prepare('SELECT COUNT(*) FROM '.UserConfig::$mysql_prefix.'user_features WHERE user_id = ? AND feature_id = ?'))
-		{
-			if (!$stmt->bind_param('ii', $user_id, $this->id))
-			{
+		if ($stmt = $db->prepare('SELECT COUNT(*) FROM ' . UserConfig::$mysql_prefix . 'user_features WHERE user_id = ? AND feature_id = ?')) {
+			if (!$stmt->bind_param('ii', $user_id, $this->id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($enabled))
-			{
+			if (!$stmt->bind_result($enabled)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
@@ -367,9 +350,7 @@ class Feature {
 			$stmt->close();
 
 			return $enabled > 0 ? true : false;
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -386,18 +367,14 @@ class Feature {
 	public function getUserCount() {
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('SELECT COUNT(*) FROM '.UserConfig::$mysql_prefix.'user_features WHERE feature_id = ?'))
-		{
-			if (!$stmt->bind_param('i', $this->id))
-			{
+		if ($stmt = $db->prepare('SELECT COUNT(*) FROM ' . UserConfig::$mysql_prefix . 'user_features WHERE feature_id = ?')) {
+			if (!$stmt->bind_param('i', $this->id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($rolledout))
-			{
+			if (!$stmt->bind_result($rolledout)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
@@ -405,9 +382,7 @@ class Feature {
 			$stmt->close();
 
 			return $rolledout;
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -424,18 +399,14 @@ class Feature {
 	public function getAccountCount() {
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('SELECT COUNT(*) FROM '.UserConfig::$mysql_prefix.'account_features WHERE feature_id = ?'))
-		{
-			if (!$stmt->bind_param('i', $this->id))
-			{
+		if ($stmt = $db->prepare('SELECT COUNT(*) FROM ' . UserConfig::$mysql_prefix . 'account_features WHERE feature_id = ?')) {
+			if (!$stmt->bind_param('i', $this->id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($rolledout))
-			{
+			if (!$stmt->bind_result($rolledout)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
@@ -443,9 +414,7 @@ class Feature {
 			$stmt->close();
 
 			return $rolledout;
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -465,20 +434,15 @@ class Feature {
 
 		$userid = $user->getID();
 
-		if ($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.'user_features WHERE user_id = ? AND feature_id = ?'))
-		{
-			if (!$stmt->bind_param('ii', $userid, $this->id))
-			{
+		if ($stmt = $db->prepare('DELETE FROM ' . UserConfig::$mysql_prefix . 'user_features WHERE user_id = ? AND feature_id = ?')) {
+			if (!$stmt->bind_param('ii', $userid, $this->id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 	}
@@ -496,21 +460,16 @@ class Feature {
 
 		$userid = $user->getID();
 
-		if ($stmt = $db->prepare('REPLACE INTO '.UserConfig::$mysql_prefix.'user_features (user_id, feature_id) VALUES (?, ?)'))
-		{
-			if (!$stmt->bind_param('ii', $userid, $this->id))
-			{
+		if ($stmt = $db->prepare('REPLACE INTO ' . UserConfig::$mysql_prefix . 'user_features (user_id, feature_id) VALUES (?, ?)')) {
+			if (!$stmt->bind_param('ii', $userid, $this->id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
-			if (!$stmt->execute())
-			{
+			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
-		}
-		else
-		{
+		} else {
 			throw new DBPrepareStmtException($db);
 		}
 	}

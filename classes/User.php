@@ -2823,7 +2823,7 @@ class User {
 		$all_features = Feature::getAll();
 
 		foreach ($all_features as $id => $feature) {
-			if ($feature->isEnabled() && in_array($feature, $features)) {
+			if (in_array($feature, $features)) {
 				$feature->enableForUser($this);
 			} else {
 				$feature->removeForUser($this);

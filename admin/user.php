@@ -22,7 +22,7 @@ if (array_key_exists("savefeatures", $_POST)) {
 	if (array_key_exists("feature", $_POST) && is_array($_POST['feature'])) {
 		foreach (array_keys($_POST['feature']) as $featureid) {
 			$feature = Feature::getByID($featureid);
-			if (!is_null($feature) && $feature->isEnabled() && !$feature->isRolledOutToAllUsers()) {
+			if (!is_null($feature) && !$feature->isRolledOutToAllUsers()) {
 				$features_to_set[] = $feature;
 			}
 		}
@@ -242,20 +242,38 @@ require_once(__DIR__ . '/header.php');
 			account level instead of here.</p>
 		<form class="form" action="" method="POST">
 			<?php foreach ($features as $id => $feature) {
-				$disable_editing = !$feature->isEnabled() || $feature->isRolledOutToAllUsers();
+				$disable_editing = $feature->isRolledOutToAllUsers() || !$feature->isEnabled() || $feature->isShutDown();
+				$is_checked = $feature->isRolledOutToAllUsers() || $feature->isEnabledForUser($user, true);
 				?>
-				<div<?php if (!$feature->isEnabled()) { ?> style="color: grey; text-decoration: line-through"<?php } ?>>
+				<div
+					<?php if ($feature->isShutDown()) {
+						?>
+						style="color: red; text-decoration: line-through"
+						title="Feature is shut down due to emergency"
+					<?php
+					} else if (!$feature->isEnabled()) {
+						?>
+						style="color: grey; text-decoration: line-through"
+						title="Feature is disabled"
+					<?php
+					}
+					?>
+					>
 					<label class="checkbox">
 						<input id="feature_<?php echo UserTools::escape($feature->getID()) ?>"
 						       type="checkbox"
 						       name="feature[<?php echo UserTools::escape($feature->getID()) ?>]"
-							<?php if ($feature->isEnabledForUser($user, !$disable_editing)) { ?> checked="true"<?php } ?>
+							<?php if ($is_checked) { ?> checked="true"<?php } ?>
 							<?php if ($disable_editing) { ?> disabled="disabled"<?php
 							} else {
 								$has_features_to_save = true;
 							}
 							?>
 							>
+						<?php if ($disable_editing && $feature->isEnabledForUser($user, true)) { ?>
+							<input type="hidden" name="feature[<?php echo UserTools::escape($feature->getID()) ?>]"
+							       value="true"/>
+						<?php } ?>
 						<?php echo UserTools::escape($feature->getName()) ?>
 						<?php
 						$enabled_for_accounts = array();
