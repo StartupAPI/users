@@ -342,8 +342,9 @@ class Account {
 		$stmt->close();
 
 		if (count($accounts) == 0) {
-			// there must be at least one personal account for each user
-			throw new StartupAPIException("No accounts are set for the user");
+			// Creating personal account if it was never set (e.g. used deprecated UserConfig::$useAccounts = false setting)
+			$personal_account = $user->createPersonalAccount();
+			$accounts[] = array($personal_account, self::ROLE_ADMIN);
 		}
 
 		return $accounts;
