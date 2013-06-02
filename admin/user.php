@@ -171,7 +171,7 @@ require_once(__DIR__ . '/header.php');
 	</ul>
 
 	<h3>Accounts:</h3>
-	<ul>
+	<table class="table">
 		<?php
 		$accounts_and_roles = $user->getAccountsAndRoles();
 
@@ -181,20 +181,25 @@ require_once(__DIR__ . '/header.php');
 
 			$plan = $user_account->getPlan();
 			?>
-			<li>
-				<a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/account.php?id=<?php echo $user_account->getID() ?>">
-					<?php echo UserTools::escape($user_account->getName()); ?>
-				</a>
-				<a class="badge badge-info"
-				   href="<?php echo UserConfig::$USERSROOTURL ?>/admin/plan.php?slug=<?php echo UserTools::escape($plan->slug); ?>"><i
-						class="icon-briefcase icon-white"></i> <?php echo UserTools::escape($plan->name); ?></a>
-
-				<?php if ($role == Account::ROLE_ADMIN) { ?>
-					<span class="badge badge-important">admin</span>
-				<?php } ?>
-			</li>
+			<tr>
+				<td>
+					<a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/account.php?id=<?php echo $user_account->getID() ?>">
+						<?php echo UserTools::escape($user_account->getName()); ?>
+					</a>
+				</td>
+				<td>
+					<?php if ($role == Account::ROLE_ADMIN) { ?>
+						<span class="badge badge-important">admin</span>
+					<?php } ?>
+				</td>
+				<td>
+					<a class="badge badge-info"
+					   href="<?php echo UserConfig::$USERSROOTURL ?>/admin/plan.php?slug=<?php echo UserTools::escape($plan->slug); ?>"><i
+							class="icon-briefcase icon-white"></i> <?php echo UserTools::escape($plan->name); ?></a>
+				</td>
+			</tr>
 		<?php } ?>
-	</ul>
+	</table>
 
 	<h3>Source of registration</h3>
 
