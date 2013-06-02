@@ -68,15 +68,15 @@ if (UserConfig::$useSubscriptions) {
 }
 
 $account_users = $account->getUsers();
-uasort($account_users, function($a, $b) {
-			// sort by role first
-			if ($a[1] !== $b[1]) {
-				return $b[1] - $a[1];
-			}
+uasort($account_users, function ($a, $b) {
+	// sort by role first
+	if ($a[1] !== $b[1]) {
+		return $b[1] - $a[1];
+	}
 
-			// then sort by user name
-			return strcmp($a[0]->getName(), $b[0]->getName());
-		});
+	// then sort by user name
+	return strcmp($a[0]->getName(), $b[0]->getName());
+});
 
 $users = array();
 $admins = array();
