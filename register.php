@@ -80,12 +80,14 @@ require_once(UserConfig::$header);
 
 		if (UserConfig::$adminInvitationOnly) {
 			$message = null;
-
 			$show_registration_form = false;
-			if (is_null($invitation_used)) {
-				$message = 'Invitation code you entered is not valid';
-			} else {
-				$show_registration_form = true;
+
+			if (array_key_exists('invite', $_GET)) {
+				if (is_null($invitation_used)) {
+					$message = 'Invitation code you entered is not valid';
+				} else {
+					$show_registration_form = true;
+				}
 			}
 
 			if (!$show_registration_form) {
