@@ -428,6 +428,13 @@ class UserConfig {
 	);
 
 	/**
+	 * Array of match => replacement pairs for rewriting referrers in referrer report in admin UI
+	 *
+	 * @var array
+	 */
+	public static $refererRegexes = array();
+
+	/**
 	 * An array of user IDs to exclude from activity listing in admin UI.
 	 * Try not to use it unless absolutely necessary - transparency is very important for operations.
 	 *

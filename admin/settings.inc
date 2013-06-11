@@ -470,6 +470,11 @@ $config_variables = array(
 						'name' => 'campaign_variables'
 					),
 					array(
+						'description' => 'Array of match => replacement pairs for rewriting referrers in referrer report in admin UI.',
+						'type' => 'array',
+						'name' => 'refererRegexes'
+					),
+					array(
 						'description' => 'An array of user IDs to exclude from activity listing in admin UI. Try not to use it unless absolutely necessary - transparency is very important for operations.',
 						'type' => 'user-id[]',
 						'name' => 'dont_display_activity_for'

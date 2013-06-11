@@ -7,6 +7,23 @@ require_once(__DIR__ . '/header.php');
 $days = 30;
 
 $sources = User::getReferers($days);
+
+if (is_array(UserConfig::$refererRegexes)) {
+	foreach (UserConfig::$refererRegexes as $match => $replacement) {
+		foreach ($sources as $source => $users) {
+			if (preg_match($match, $source)) {
+				$new_source = preg_replace($match, $replacement, $source);
+				if (array_key_exists($new_source, $sources)) {
+					$sources[$new_source] = array_merge($sources[$new_source], $users);
+				} else {
+					$sources[$new_source] = $users;
+				}
+				unset($sources[$source]);
+			}
+		}
+	}
+}
+
 uasort($sources, function($a, $b) {
 			return count($b) - count($a);
 		});
