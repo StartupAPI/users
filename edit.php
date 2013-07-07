@@ -115,6 +115,24 @@ if (array_key_exists('save', $_POST)) {
 	}
 }
 
+if (!is_null($current_module)) {
+	$module_forms = array();
+	foreach (UserConfig::$authentication_modules as $module) {
+		$id = $module->getID();
+
+		if (($compact_page && !$module->isCompact())
+				|| (!$compact_page && $current_module->getID() != $id)) {
+			continue;
+		}
+
+		// capturing form HTMLs for each module
+		ob_start();
+		$module->renderEditUserForm("?module=$id", array_key_exists($id, $errors) ? $errors[$id] : array(), $user, $_POST);
+		$module_forms[$id] = ob_get_contents();
+		ob_end_clean();
+	}
+}
+
 require_once(__DIR__ . '/sidebar_header.php');
 ?>
 <div>
@@ -172,9 +190,7 @@ require_once(__DIR__ . '/sidebar_header.php');
 				<?php
 				?>
 				<div style="margin-bottom: 2em">
-					<?php
-					$module->renderEditUserForm("?module=$id", array_key_exists($id, $errors) ? $errors[$id] : array(), $user, $_POST);
-					?>
+					<?php echo $module_forms[$id] ?>
 				</div>
 			</div>
 			<?php
