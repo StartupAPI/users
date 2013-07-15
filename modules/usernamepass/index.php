@@ -157,7 +157,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 				<div class="control-group<?php if (array_key_exists('username', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['username'])) ?><?php } ?>">
 					<label class="control-label" for="startupapi-<?php echo $slug ?>-login-username">Username</label>
 					<div class="controls">
-						<input id="startupapi-<?php echo $slug ?>-login-username" name="username" type="text" size="25" maxlength="25"/>
+						<input id="startupapi-<?php echo $slug ?>-login-username" name="username" type="text" size="25" required="true"/>
 					</div>
 				</div>
 
@@ -202,7 +202,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 				<div class="control-group<?php if (array_key_exists('username', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['username'])) ?><?php } ?>">
 					<label class="control-label" for="startupapi-<?php echo $slug ?>-registration-username">Username</label>
 					<div class="controls">
-						<input id="startupapi-<?php echo $slug ?>-registration-username" name="username" type="text" size="25" maxlength="25" value="<?php echo array_key_exists('username', $data) ? UserTools::escape($data['username']) : '' ?>"/>
+						<input id="startupapi-<?php echo $slug ?>-registration-username" name="username" type="text" size="25" required="true" value="<?php echo array_key_exists('username', $data) ? UserTools::escape($data['username']) : '' ?>"/>
 					</div>
 				</div>
 
@@ -273,7 +273,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 
 							if (is_null($username)) {
 								?>
-								<input id="username" name="startupapi-<?php echo $slug ?>-edit-username" type="text" maxlength="25" value="<?php echo array_key_exists('username', $data) ? UserTools::escape($data['username']) : '' ?>"/>
+								<input id="username" name="startupapi-<?php echo $slug ?>-edit-username" type="text" required="true" value="<?php echo array_key_exists('username', $data) ? UserTools::escape($data['username']) : '' ?>"/>
 								<?php
 							} else {
 								?>
