@@ -277,7 +277,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 								<?php
 							} else {
 								?>
-								<input disabled="disabled" title="Sorry, you can't change your username" value="<?php echo UserTools::escape($username) ?>"/>
+								<input disabled="disabled" class="input" type="text" title="Sorry, you can't change your username" value="<?php echo UserTools::escape($username) ?>"/>
 							<?php } ?>
 						</div>
 					</div>
