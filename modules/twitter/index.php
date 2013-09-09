@@ -79,8 +79,7 @@ class TwitterAuthenticationModule extends OAuthAuthenticationModule
 
 	public function getIdentity($oauth_user_id) {
 		// get twitter handle
-		#$request = new OAuthRequester('http://api.twitter.com/1/account/verify_credentials.xml', 'GET');
-		$request = new OAuthRequester('http://api.twitter.com/1/account/verify_credentials.json', 'GET');
+		$request = new OAuthRequester('http://api.twitter.com/1.1/account/verify_credentials.json', 'GET');
 		$result = $request->doRequest($oauth_user_id);
 
 		if ($result['code'] == 200) {
