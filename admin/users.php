@@ -146,7 +146,7 @@ foreach ($users as $user)
 		}
 	}
 	?></td>
-	<td><i class="icon-user"></i> <a href="user.php?id=<?php echo $userid ?>"<?php if ($user->isDisabled()) {?> style="color: silver; text-decoration: line-through"<?php } ?>><?php echo UserTools::escape($user->getName())?></a></td>
+	<td><i class="icon-user"></i> <a href="user.php?id=<?php echo $userid ?>"<?php if ($user->isDisabled()) { ?> class="startupapi-user-disabled"<?php } ?>><?php echo UserTools::escape($user->getName())?></a></td>
 	<td><?php echo UserTools::escape($user->getEmail())?></td>
 	<td><?php
 	$points = $user->getPoints();

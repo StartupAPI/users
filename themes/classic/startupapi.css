@@ -1282,5 +1282,6 @@
 }
 
 .startupapi-user-disabled {
+	color: silver;
 	text-decoration: line-through;
 }
