@@ -264,8 +264,7 @@ foreach ($activities as $activity)
 	if (is_null($activityuser)) {
 	?>
 		<td>
-
-			<a href="user.php?id=<?php echo $user->getID()?>"><i class="icon-user"></i> <?php echo UserTools::escape($user->getName());?></a>
+			<a href="user.php?id=<?php echo $user->getID()?>"<?php if ($user->isDisabled()) { ?> class="startupapi-user-disabled"<?php } ?>><i class="icon-user"></i> <?php echo UserTools::escape($user->getName());?></a>
 			<a class="btn btn-mini pull-right" href="activity.php?userid=<?php echo $user->getID()?>"><i class="icon-signal"></i> user activity</a>
 		</td>
 	<?php

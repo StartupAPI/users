@@ -1277,6 +1277,10 @@
 	margin-bottom: 1em;
 }
 
-.user-self {
+.startupapi-user-self {
 	color: silver;
+}
+
+.startupapi-user-disabled {
+	text-decoration: line-through;
 }
