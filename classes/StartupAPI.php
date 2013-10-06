@@ -142,7 +142,16 @@ class StartupAPI {
 							}
 							?>
 							<li class="dropdown">
-								<a href="#" title="Change account" class="dropdown-toggle" data-toggle="dropdown"><?php echo UserTools::escape($current_account->getName()) ?><b class="caret"></b></a>
+								<a href="#" title="Change account" class="dropdown-toggle" data-toggle="dropdown">
+									<?php echo UserTools::escape($current_account->getName()) ?>
+									<?php
+									$current_plan = $current_account->getPlan();
+									?>
+									<span class="label label-info" style="margin-left: 0.5em" title="<?php echo UserTools::escape($current_plan->description) ?>">
+										<?php echo UserTools::escape($current_plan->name) ?>
+									</span>
+									<b class="caret"></b>
+								</a>
 								<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" id="startupapi-account-switcher">
 									<?php
 									foreach ($accounts as $account) {
@@ -153,18 +162,21 @@ class StartupAPI {
 										}
 										?>
 										<li>
-											<a tabindex="-1" href="#"
-											<?php
-											if (!$is_current) {
-												?>
+											<a tabindex="-1"
+											   href="#"
+											   <?php
+											   if (!$is_current) {
+												   ?>
 												   data-account-swtich-to="<?php echo $account->getID() ?>"
 												   <?php
 											   }
+											   $plan = $account->getPlan();
 											   ?>
 											   >
-												   <?php
-												   echo UserTools::escape($account->getName());
-												   ?>
+												<?php echo UserTools::escape($account->getName()); ?>
+												<span class="label" style="margin-left: 0.5em" title="<?php echo UserTools::escape($plan->description) ?>">
+													<?php echo UserTools::escape($plan->name) ?>
+												</span>
 											</a>
 										</li>
 										<?php
@@ -172,8 +184,8 @@ class StartupAPI {
 									?>
 								</ul>
 								<script>
-									$('#startupapi-account-switcher').click(function(e) {
-										var account_swtich_to = $(e.target).data('account-swtich-to');
+									$('#startupapi-account-switcher a').click(function(e) {
+										var account_swtich_to = $(this).data('account-swtich-to');
 
 										if (typeof(account_swtich_to) !== 'undefined') {
 											document.location.href = '<?php echo UserConfig::$USERSROOTURL ?>/change_account.php?return=<?php echo $destination ?>&account='+account_swtich_to;
