@@ -85,7 +85,7 @@ if (!isset($BREADCRUMB_EXTRA)) {
 		?>
 		<link href="<?php echo $bootstrapCSS ?>" rel="stylesheet">
 		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
-		<script src="<?php echo UserConfig::$USERSROOTURL ?>/jquery-1.8.2.min.js"></script>
+		<script src="<?php echo UserConfig::$USERSROOTURL ?>/jquery-1.10.2.min.js"></script>
 		<script src="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/js/bootstrap.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="<?php echo UserConfig::$USERSROOTURL ?>/themes/<?php echo UserConfig::$theme ?>/startupapi.css">
 		<style>
