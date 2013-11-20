@@ -6,6 +6,11 @@ if (!UserConfig::$useSubscriptions) {
 	exit;
 }
 
+/*
+ * This page is used for assigning plans event if no plan is currently set for account
+ */
+UserConfig::$IGNORE_CURRENT_ACCOUNT_PLAN_VERIFICATION = true;
+
 $user = User::require_login();
 $account = Account::getCurrentAccount($user);
 

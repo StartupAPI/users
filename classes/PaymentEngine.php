@@ -177,7 +177,8 @@ abstract class PaymentEngine extends StartupAPIModule {
 				continue;
 			}
 
-			if (is_null($plan = $account->getPlan())) {
+			$plan = $account->getPlan(); // can be FALSE
+			if (!$plan) {
 				continue;
 			}
 
@@ -243,8 +244,8 @@ abstract class PaymentEngine extends StartupAPIModule {
 
 				$account->paymentIsDue();
 
-				$plan = $account->getPlan();
-				if (!is_null($schedule = $plan->getPaymentSchedule())) {
+				$plan = $account->getPlan(); // can be FALSE
+				if ($plan && !is_null($schedule = $plan->getPaymentSchedule())) {
 
 					// Set new next_charge
 					if (!($stmt2 = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .

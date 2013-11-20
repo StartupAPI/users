@@ -44,6 +44,11 @@ class TestUser extends UnitTestCase {
     $acc = Account::getCurrentAccount($user);
     $this -> assertNotNull( $acc );
     $plan = $acc -> getPlan();
+
+	/**
+	 * WRONG ASSERTIONS - plan might not be assigned at user creation time
+	 * if UserConfig::$default_plan_slug is set to null
+	 */
     $this -> assertNotNull( $plan );
     $this -> assertEqual( $plan -> slug, 'PLAN_FREE');
 
@@ -104,5 +109,3 @@ class TestUser extends UnitTestCase {
   }
 
 }
-
-?>

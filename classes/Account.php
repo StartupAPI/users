@@ -401,6 +401,7 @@ class Account {
 		if (is_null($this->plan)) {
 			$this->plan = Plan::getPlanBySlug(UserConfig::$default_plan_slug);
 		}
+
 		$this->schedule = is_null($schedule_slug) || is_null($this->plan) ?
 				NULL : $this->plan->getPaymentScheduleBySlug($schedule_slug);
 		$this->nextCharge = is_null($this->schedule) ? NULL : $next_charge;
@@ -793,9 +794,11 @@ class Account {
 		$stmt->fetch();
 		$stmt->close();
 
+		$account = null;
+
 		if ($id) {
 			$charges = self::fillCharges($id);
-			return new self($id, $name, $plan_slug, $schedule_slug, $engine_slug,
+			$account = new self($id, $name, $plan_slug, $schedule_slug, $engine_slug,
 							$charges, $active, $next_charge,
 							$next_plan_slug, $next_schedule_slug);
 		} else {
@@ -803,8 +806,17 @@ class Account {
 
 			if (count($user_accounts) > 0) {
 				$user_accounts[0]->setAsCurrent($user);
-				return $user_accounts[0];
+				$account = $user_accounts[0];
 			}
+		}
+
+		if (!is_null($account)) {
+			$plan = $account->getPlan(); // can be FALSE
+
+			// redirecting to account UI if plan not set
+			Plan::enforcePlan($plan);
+
+			return $account;
 		}
 
 		throw new Exception("No accounts are set for the user");
@@ -1163,9 +1175,14 @@ class Account {
 	 * @throws DBException
 	 */
 	public function activatePlan($plan_slug, $schedule_slug = NULL) {
+		if (!$plan_slug) {
+			$plan_slug = null;
+		}
 
 		$new_plan = Plan::getPlanBySlug($plan_slug);
-		if (is_null($new_plan) || $new_plan === FALSE) {
+
+		// if default plan slug is set, it means plan must always be assigned
+		if (!is_null(UserConfig::$default_plan_slug) && (is_null($new_plan) || $new_plan === FALSE)) {
 			return FALSE;
 		}
 
@@ -1174,7 +1191,7 @@ class Account {
 		 */
 		$db = UserConfig::getDB();
 
-		if (!UserConfig::$useSubscriptions) {
+		if (!$new_plan || !UserConfig::$useSubscriptions) {
 			if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
 					'accounts SET plan_slug = ?, schedule_slug = NULL, active = 1, next_charge = NULL, ' .
 					'next_plan_slug = NULL, next_schedule_slug = NULL WHERE id = ?'))) {
@@ -1210,9 +1227,13 @@ class Account {
 				return FALSE;
 			}
 
-			$old_plan_slug = $this->plan->slug;
+			$old_plan_slug = ($this->plan ? TRUE : FALSE) && $this->plan->slug;
 			$old_schedule_slug = is_null($this->schedule) ? NULL : $this->schedule->slug;
-			$this->plan->deactivate_hook($this->id, $plan_slug, $schedule_slug);
+
+			if ($this->plan) {
+				$this->plan->deactivate_hook($this->id, $plan_slug, $schedule_slug);
+			}
+
 			$this->plan = $new_plan;
 			$this->schedule = $new_schedule;
 			$this->plan->activate_hook($this->id, $old_plan_slug, $old_schedule_slug);
@@ -1328,7 +1349,11 @@ class Account {
 	 * @return string Subscription plan slug
 	 */
 	public function getPlanSlug() {
-		return $this->plan->slug;
+		if ($this->plan) {
+			return $this->plan->slug;
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -1346,14 +1371,14 @@ class Account {
 	 * @return boolean True if account is individual
 	 */
 	public function isIndividual() {
-		$plan = $this->getPlan();
+		$plan = $this->getPlan(); // can be FALSE
 
 		// in case for whatever reason, we don't have a plan assigned to account
-		if (is_null($plan)) {
+		if (!$plan) {
 			$plan = Plan::getPlanBySlug(UserConfig::$default_plan_slug);
 		}
 
-		if (array_key_exists('individual', $plan->capabilities)) {
+		if ($plan && array_key_exists('individual', $plan->capabilities)) {
 			return $plan->capabilities['individual'] ? true : false;
 		}
 

@@ -145,11 +145,16 @@ class StartupAPI {
 								<a href="#" title="Change account" class="dropdown-toggle" data-toggle="dropdown">
 									<?php echo UserTools::escape($current_account->getName()) ?>
 									<?php
-									$current_plan = $current_account->getPlan();
+									$current_plan = $current_account->getPlan(); // can be FALSE
+
+									if ($current_plan) {
+										?>
+										<span class="label label-info" style="margin-left: 0.5em" title="<?php echo UserTools::escape($current_plan->description) ?>">
+											<?php echo UserTools::escape($current_plan->name) ?>
+										</span>
+										<?php
+									}
 									?>
-									<span class="label label-info" style="margin-left: 0.5em" title="<?php echo UserTools::escape($current_plan->description) ?>">
-										<?php echo UserTools::escape($current_plan->name) ?>
-									</span>
 									<b class="caret"></b>
 								</a>
 								<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" id="startupapi-account-switcher">
@@ -170,13 +175,26 @@ class StartupAPI {
 												   data-account-swtich-to="<?php echo $account->getID() ?>"
 												   <?php
 											   }
-											   $plan = $account->getPlan();
 											   ?>
 											   >
-												<?php echo UserTools::escape($account->getName()); ?>
-												<span class="label" style="margin-left: 0.5em" title="<?php echo UserTools::escape($plan->description) ?>">
-													<?php echo UserTools::escape($plan->name) ?>
-												</span>
+												   <?php echo UserTools::escape($account->getName()); ?>
+												   <?php
+												   $plan = $account->getPlan(); // can be FALSE
+
+												   if ($plan) {
+													   ?>
+													<span class="label" style="margin-left: 0.5em" title="<?php echo UserTools::escape($plan->description) ?>">
+														<?php echo UserTools::escape($plan->name) ?>
+													</span>
+													<?php
+												} else {
+													?>
+													<span class="label label-important" style="margin-left: 0.5em" title="No plan set for this account">
+														NO PLAN
+													</span>
+													<?php
+												}
+												?>
 											</a>
 										</li>
 										<?php

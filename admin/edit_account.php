@@ -24,8 +24,18 @@ if (array_key_exists('account_name', $_POST)) {
 
 	if (array_key_exists('plan_slug', $_POST)) {
 		$selected_plan_slug = $_POST['plan_slug'];
-		if (in_array($selected_plan_slug, Plan::getPlanSlugs())
-				&& $account->getPlanSlug() !== $_POST['plan_slug']
+
+		if (
+				// if default slug is not set, then we can switch to no plan
+				(
+				is_null(UserConfig::$default_plan_slug)
+				&& !$selected_plan_slug
+				)
+				||
+				(
+				in_array($selected_plan_slug, Plan::getPlanSlugs())
+				&& $account->getPlanSlug() !== $selected_plan_slug
+				)
 		) {
 			if (!$account->activatePlan($selected_plan_slug)) {
 				$errors['plan'][] = "Can't update plan";
@@ -87,7 +97,6 @@ require_once(__DIR__ . '/header.php');
 					<?php
 					$current_plan_slug = $account->getPlanSlug();
 
-
 					foreach ($plan_slugs as $plan_slug) {
 						$plan = Plan::getPlanBySlug($plan_slug);
 						?>
@@ -104,6 +113,25 @@ require_once(__DIR__ . '/header.php');
 								   ?>
 								   >
 							<span class="badge badge-info"><i class="icon-briefcase icon-white"></i> <?php echo UserTools::escape($plan->name) ?></span>
+						</label>
+						<?php
+					}
+
+					if (is_null(UserConfig::$default_plan_slug)) {
+						?>
+						<label class="radio">
+							<input type="radio"
+								   name="plan_slug"
+								   value=""
+								   <?php
+								   if (!$current_plan_slug) {
+									   ?>
+									   checked
+									   <?php
+								   }
+								   ?>
+								   >
+							<span class="badge badge-important">NONE</span>
 						</label>
 						<?php
 					}

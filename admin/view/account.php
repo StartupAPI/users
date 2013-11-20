@@ -29,13 +29,16 @@ if (!is_null($next_charge)) {
 	$template_data['account_next_charge'] = preg_replace("/ .*/", "", $next_charge);
 }
 
-$plan = $account->getPlan();
+$plan = $account->getPlan(); // can be FALSE
+$template_data['planIsSet'] = $plan ? TRUE : FALSE;
 
-foreach ($plan_data as $d) {
-	$template_data['plan_' . $d] = $plan->$d;
+if ($plan) {
+	foreach ($plan_data as $d) {
+		$template_data['plan_' . $d] = $plan->$d;
+	}
 }
 
-if (UserConfig::$useSubscriptions) {
+if ($plan && UserConfig::$useSubscriptions) {
 	$downgrade = Plan::getPlanBySlug($plan->downgrade_to);
 	if ($downgrade) {
 		$template_data['plan_downgrade_to'] = $downgrade->name;
@@ -69,14 +72,14 @@ if (UserConfig::$useSubscriptions) {
 
 $account_users = $account->getUsers();
 uasort($account_users, function ($a, $b) {
-	// sort by role first
-	if ($a[1] !== $b[1]) {
-		return $b[1] - $a[1];
-	}
+			// sort by role first
+			if ($a[1] !== $b[1]) {
+				return $b[1] - $a[1];
+			}
 
-	// then sort by user name
-	return strcmp($a[0]->getName(), $b[0]->getName());
-});
+			// then sort by user name
+			return strcmp($a[0]->getName(), $b[0]->getName());
+		});
 
 $users = array();
 $admins = array();
@@ -135,14 +138,14 @@ foreach ($features as $id => $feature) {
 	$feature_data['enabled'] = $feature->isEnabled();
 	$feature_data['shut_down'] = $feature->isShutDown();
 	$feature_data['rolled_out_to_all'] = $feature->isRolledOutToAllUsers();
-	$feature_data['enabled_for_plan'] = $account->getPlan()->hasFearureEnabled($feature);
+	$feature_data['enabled_for_plan'] = ($plan ? TRUE : FALSE) && $plan->hasFearureEnabled($feature);
 
 	$feature_data['disable_editing'] = !$feature->isEnabled() || $feature->isShutDown()
-		|| $feature->isRolledOutToAllUsers() || $feature_data['enabled_for_plan'];
+			|| $feature->isRolledOutToAllUsers() || $feature_data['enabled_for_plan'];
 
 	$feature_data['enabled_for_account'] = $feature->isEnabledForAccount($account, true);
 	$feature_data['is_checked'] = $feature->isRolledOutToAllUsers() || $feature_data['enabled_for_plan']
-		|| $feature_data['enabled_for_account'];
+			|| $feature_data['enabled_for_account'];
 
 	$template_data['features'][] = $feature_data;
 

@@ -652,6 +652,19 @@ class UserConfig {
 	public static $createPersonalAccountsIfInvitedToGroupAccount = false;
 
 
+	/**
+	 * Bypasses required account plan verification flag if set to true
+	 *
+	 * THIS SHOULD ONLY BE SET ON PLAN SELECTION PAGESS
+	 * SETTING THIS ON OTHER PAGES CAN RESULT IN PRIVILEGE ESCALATION
+	 *
+	 * @var boolean
+	 *
+	 * @internal
+	 */
+	public static $IGNORE_CURRENT_ACCOUNT_PLAN_VERIFICATION = false;
+
+
 	/* ========================================================================
 	 *
 	 * OAuth client configuration

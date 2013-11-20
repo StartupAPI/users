@@ -32,14 +32,17 @@ if (!is_null($next_charge)) {
 	$template_data['account_next_charge'] = preg_replace("/ .*/", "", $next_charge);
 }
 
-$plan = $account->getPlan();
+$plan = $account->getPlan(); // can be FALSE
+$template_data['planIsSet'] = $plan ? TRUE : FALSE;
 
-foreach ($plan_data as $d) {
-	$template_data['plan_' . $d] = $plan->$d;
+if ($plan) {
+	foreach ($plan_data as $d) {
+		$template_data['plan_' . $d] = $plan->$d;
+	}
 }
 
 /*
-  if (UserConfig::$useSubscriptions) {
+  if ($plan && UserConfig::$useSubscriptions) {
   $downgrade = Plan::getPlanBySlug($plan->downgrade_to);
   if ($downgrade) {
   $template_data['plan_downgrade_to'] = $downgrade->name;

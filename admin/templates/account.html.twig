@@ -28,11 +28,17 @@
 	<p>
 		Status: {% if account_isActive %}<b class="badge badge-success">Active</b>{% else %}<b
 				class="badge badge-important">Suspended</b>{% endif %}
-		Plan: <a class="badge badge-info" href="plan.php?slug={{ plan_slug }}"><i
-					class="icon-briefcase icon-white"></i> {{ plan_name }}</a>
+		Plan:
+			{% if planIsSet %}
+				<a class="badge badge-info" href="plan.php?slug={{ plan_slug }}">
+					<i class="icon-briefcase icon-white"></i> {{ plan_name }}
+				</a>
+			{% else %}
+				<span class="badge badge-important">NONE</span>
+			{% endif %}
 	</p>
 
-	{% if useSubscriptions %}
+	{% if planIsSet and useSubscriptions %}
 		<h3>Subscription</h3>
 		{% if plan_downgrade_to %}
 			<p>Plan automatically downgrades to: <a class="label"

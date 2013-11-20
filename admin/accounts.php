@@ -69,10 +69,16 @@ if (is_null($search)) {
 					<td><a href="account.php?id=<?php echo $account_id ?>"><?php echo UserTools::escape($account->getName()) ?></a></td>
 					<td>
 						<?php
-						$plan = $account->getPlan();
-						if (!is_null($plan)) {
-							?><a class="badge badge-info" href="plan.php?slug=<?php echo $plan->slug ?>"><i class="icon-briefcase icon-white"></i> <?php echo $plan->name ?></a><?php
-				}
+						$plan = $account->getPlan(); // can be FALSE
+						if ($plan) {
+							?>
+							<a class="badge badge-info" href="plan.php?slug=<?php echo $plan->slug ?>"><i class="icon-briefcase icon-white"></i> <?php echo $plan->name ?></a>
+							<?php
+						} else {
+							?>
+							<span class="badge badge-important">NO PLAN</span>
+							<?php
+						}
 						?>
 					</td>
 					<?php if (UserConfig::$useSubscriptions) { ?>

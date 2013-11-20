@@ -109,6 +109,8 @@
 					{% set col = col + 1 %}
 				{% endfor %}
 
+				<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
+
 				<table class="userbase-account-plans-table">
 					{% set col = 0 %}
 					<tr>

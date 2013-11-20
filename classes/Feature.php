@@ -221,7 +221,9 @@ class Feature
 				return true;
 			}
 
-			if ($account->getPlan()->hasFearureEnabled($this)) {
+			$plan = $account->getPlan(); // can be FALSE
+
+			if ($plan && $plan->hasFearureEnabled($this)) {
 				return true;
 			}
 		}

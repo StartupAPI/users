@@ -324,7 +324,6 @@ class Plan {
 	 * null if there is no such plan with a slug and Plan object if found
 	 */
 	public static function getPlanBySlug($slug) {
-
 		if ($slug === NULL || !count(self::$Plans)) {
 			return FALSE;
 		}
@@ -355,6 +354,19 @@ class Plan {
 		}
 
 		return $slugs;
+	}
+
+	/**
+	 * Checks if user actually has plan assigned and if not,
+	 * redirects user to a page where they can get one
+	 *
+	 * @param Plan $plan Plan object or null / false to indicate that there is no plan
+	 */
+	public static function enforcePlan($plan) {
+		if (!UserConfig::$IGNORE_CURRENT_ACCOUNT_PLAN_VERIFICATION && !$plan) {
+			header('Location: ' . UserConfig::$USERSROOTURL . '/plans.php');
+			exit;
+		}
 	}
 
 }

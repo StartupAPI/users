@@ -1,4 +1,5 @@
 <?php
+
 $template_data['account'] = array('name' => $account->getName());
 
 session_start();
@@ -27,6 +28,9 @@ $schedule_data = array(
 
 $plans = array();
 
+UserTools::preventCSRF();
+$template_data['CSRF_NONCE'] = UserTools::$CSRF_NONCE;
+
 $template_data['next_charge'] = $account->getNextCharge();
 
 $balance = $account->getBalance();
@@ -41,10 +45,14 @@ foreach ($plan_slugs as $p) { # Iterate over all configured plans
 		$plan[$d] = $this_plan->$d;
 	}
 
-	if ($account->getPlan()->slug == $this_plan->slug) # Mark plan as current if so
+	$current_plan = $account->getPlan(); // can be FALSE
+	//
+	# Mark plan as current if slugs match
+	if ($current_plan && $current_plan->slug == $this_plan->slug) {
 		$plan['current'] = TRUE;
-	else
+	} else {
 		$plan['current'] = FALSE;
+	}
 
 	$schedule = array();
 	$schedule_slugs = $this_plan->getPaymentScheduleSlugs(); # Iterate over all schedules of this plan

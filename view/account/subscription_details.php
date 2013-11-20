@@ -25,7 +25,11 @@ $template_data['account_isActive'] = $account->isActive();
 $template_data['account_engine'] = is_null($account->getPaymentEngine()) ? 'None' : $account->getPaymentEngine()->getTitle();
 $template_data['account_next_charge'] = preg_replace("/ .*/","",$account->getNextCharge());
 
-$plan = $account->getPlan();
+$plan = $account->getPlan(); // can be FALSE
+
+// If plan is not set, this page just does not make sense
+Plan::enforcePlan($plan);
+
 foreach ($plan_data as $d) {
   $template_data['plan_'.$d] = $plan->$d;
 }
