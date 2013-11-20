@@ -52,14 +52,17 @@
 			<p>Charge Amount: <b>${{ schedule_charge_amount }}</b></p>
 			<p>Charge Period: <b>{{ schedule_charge_period }}</b> days</p>
 		{% else %}
-			<i>Payment schedule is not defined</i>
+			<i>Payment schedule is not set for this account</i>
 		{% endif %}
 
 		<h4>Payments</h4>
+
+		{% if schedule_name %}
 		<p>Payment Engine used: <b>{{ account_engine }}</b>
 			<a class="btn btn-mini"
 			   href="{{ USERSROOTURL }}/admin/choose_engine.php?account_id={{ account_id }}">change</a>
 		</p>
+		{% endif %}
 
 		<div>
 			{% if balance < 0 %}
