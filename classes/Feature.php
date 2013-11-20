@@ -198,7 +198,7 @@ class Feature
 	 * @return boolean Enabled / Disabled
 	 */
 	public function isEnabledForPlan($plan) {
-		return $plan->hasFearureEnabled($this);
+		return $plan->hasFeatureEnabled($this);
 	}
 
 	/**
@@ -223,7 +223,7 @@ class Feature
 
 			$plan = $account->getPlan(); // can be FALSE
 
-			if ($plan && $plan->hasFearureEnabled($this)) {
+			if ($plan && $plan->hasFeatureEnabled($this)) {
 				return true;
 			}
 		}

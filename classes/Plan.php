@@ -203,7 +203,7 @@ class Plan {
 	 *
 	 * @return boolean Enabled / Disabled
 	 */
-	public function hasFearureEnabled($feature) {
+	public function hasFeatureEnabled($feature) {
 		if (array_key_exists('enable_features', $this->capabilities) && is_array($this->capabilities['enable_features'])) {
 			return in_array($feature->getID(), $this->capabilities['enable_features']);
 		}

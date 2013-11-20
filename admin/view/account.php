@@ -138,7 +138,7 @@ foreach ($features as $id => $feature) {
 	$feature_data['enabled'] = $feature->isEnabled();
 	$feature_data['shut_down'] = $feature->isShutDown();
 	$feature_data['rolled_out_to_all'] = $feature->isRolledOutToAllUsers();
-	$feature_data['enabled_for_plan'] = ($plan ? TRUE : FALSE) && $plan->hasFearureEnabled($feature);
+	$feature_data['enabled_for_plan'] = ($plan ? TRUE : FALSE) && $plan->hasFeatureEnabled($feature);
 
 	$feature_data['disable_editing'] = !$feature->isEnabled() || $feature->isShutDown()
 			|| $feature->isRolledOutToAllUsers() || $feature_data['enabled_for_plan'];
