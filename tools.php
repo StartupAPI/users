@@ -60,7 +60,7 @@ class UserTools {
 
 		if (count($_POST) > 0) {
 			if (!array_key_exists('CSRF_NONCE', $_POST)) {
-				UserTools::debug('POST request in admin interface without CSRF nonce. Make sure form includes CSRF_NONCE hidden field.');
+				UserTools::debug('POST request without CSRF nonce. Make sure form includes CSRF_NONCE hidden field.');
 				header('HTTP/1.0 403 POST request origin check failed', true, 403);
 				exit;
 			}
