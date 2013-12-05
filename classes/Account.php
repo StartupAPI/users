@@ -404,11 +404,12 @@ class Account {
 
 		$this->schedule = is_null($schedule_slug) || is_null($this->plan) ?
 				NULL : $this->plan->getPaymentScheduleBySlug($schedule_slug);
-		$this->nextCharge = is_null($this->schedule) ? NULL : $next_charge;
 		$this->active = $active;
 		$this->nextPlan = is_null($next_plan_slug) ? NULL : Plan::getPlanBySlug($next_plan_slug);
 		$this->nextSchedule = is_null($next_schedule_slug) || is_null($this->nextPlan) ?
 				NULL : $this->nextPlan->getPaymentScheduleBySlug($next_schedule_slug);
+
+		$this->nextCharge = (is_null($this->schedule) && is_null($this->nextSchedule)) ? NULL : $next_charge;
 
 		if ($engine_slug !== NULL) {
 			$this->paymentEngine = StartupAPIModule::get($engine_slug);
@@ -798,6 +799,7 @@ class Account {
 
 		if ($id) {
 			$charges = self::fillCharges($id);
+
 			$account = new self($id, $name, $plan_slug, $schedule_slug, $engine_slug,
 							$charges, $active, $next_charge,
 							$next_plan_slug, $next_schedule_slug);
@@ -812,7 +814,6 @@ class Account {
 
 		if (!is_null($account)) {
 			$plan = $account->getPlan(); // can be FALSE
-
 			// redirecting to account UI if plan not set
 			Plan::enforcePlan($plan);
 
@@ -1372,7 +1373,6 @@ class Account {
 	 */
 	public function isIndividual() {
 		$plan = $this->getPlan(); // can be FALSE
-
 		// in case for whatever reason, we don't have a plan assigned to account
 		if (!$plan) {
 			$plan = Plan::getPlanBySlug(UserConfig::$default_plan_slug);

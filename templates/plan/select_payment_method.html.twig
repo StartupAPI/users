@@ -1,0 +1,89 @@
+<div class="container-fluid" style="margin-top: 1em">
+	<div class="row-fluid">
+		<div class="span12">
+			{% for msg in message %}
+			<p class="alert">
+				<button type="button" class="close" data-dismiss="alert">×</button>
+				{{ msg }}
+			</p>
+			{% endfor %}
+
+			{% if not fatal %}
+			<h2>{{ plan.name }} plan</h2>
+
+			{% if plan.description %}
+				<p>{{ plan.description }}</p>
+			{% endif %}
+
+			<form action="" method="POST">
+				{% set next_chosen = false %}
+
+				{% if plan.schedules | length > 0 %}
+					{% for schedule in plan.schedules %}
+						{% if schedule.chosen %}
+							{% set next_chosen = true %}
+						{% endif %}
+					{% endfor %}
+				{% endif %}
+
+				<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
+
+				{% if plan.schedules and plan.schedules|length > 0 %}
+					{% set n = 0 %}
+					{% for schedule in plan.schedules %}
+						<div class="well">
+							<div class="pull-right" style="text-align: right">
+								<div>
+									<div class="pull-right" style="margin-left: 1em">
+										<button
+											class="btn btn-success"
+											type="submit"
+											name="plan"
+											id="plan-radio-{{ col }}-{{ n }}"
+											value="{{ plan.slug }}.{{ schedule.slug }}"
+											{% if not plan.available or not schedule.available %} disabled{% endif %}
+											{% if next_chosen %}
+												{% if schedule.chosen%}checked{% endif %}
+											{% else %}
+												{% if schedule.current %}checked{% endif %}
+											{% endif %}
+												>
+											Sign Up
+										</button>
+									</div>
+
+									<h4 style="padding-top: 4px">
+										${{ schedule.charge_amount}}
+									</h4>
+								</div>
+								<div class="clearfix">
+									{{ schedule.description }}
+								</div>
+							</div>
+
+							<label for="plan-radio-{{ col }}-{{ n }}"
+								{% if schedule.current %} class="userbase-account-current-schedule"{% endif %}
+							>
+								<span class="userbase-account-schedule-name">{{ schedule.name }}</span>
+								<br/>
+								<span class="userbase-account-schedule-details">{{ schedule.description }}</span>
+								{% if schedule.current and next_chosen %}
+									<br/>
+									<span class="badge badge-important">until {{ next_charge|date("M d, Y") }}</span>
+								{% endif %}
+								{% if schedule.chosen %}
+									<br/>
+									<span class="badge badge-success">starting {{ next_charge|date("M d, Y") }}</span>
+								{% endif %}
+							</label>
+
+							<div class="clearfix"></div>
+						</div>
+						{% set n = n + 1 %}
+					{% endfor %}
+				{% endif %}
+			</form>
+			{% endif %}
+		</div>
+	</div>
+</div>

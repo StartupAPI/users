@@ -9,7 +9,7 @@
 			{% endfor %}
 
 			{% if not fatal %}
-			<h2>Choose Subscription Plan for {{ account.name }}</h2>
+			<h2>Choose Subscription Plan</h2>
 			<style>
 				.userbase-account-plan-container {
 					float: left;
@@ -56,7 +56,7 @@
 					border-style: solid;
 					border-color: gray;
 				}
-				td.userbase-account-pay-button {
+				td.userbase-account-pay-button, td.userbase-account-next-plan-dates {
 					text-align: center;
 				}
 				table.userbase-account-plans-table th.userbase-account-plan-current {
@@ -86,12 +86,19 @@
 
 			<form action="" method="POST">
 				{% set next_chosen = false %}
-				{% set current_plan_col = null %}
+				{% set show_chosen = false %}
+				{% set plan_change_mode = false %}
 				{% set col = 0 %}
 
 				{% for plan in plans %}
+					{% if plan.current or plan.chosen %}
+						{% set plan_change_mode = true %}
+					{% endif %}
 					{% if plan.chosen %}
 						{% set next_chosen = true %}
+					{% endif %}
+					{% if next_chosen and (plan.current or plan.chosen) and not (plan.current and plan.chosen) %}
+						{% set show_chosen = true %}
 					{% endif %}
 					{% if plan.schedules | length > 0 %}
 						{% for schedule in plan.schedules %}
@@ -102,20 +109,13 @@
 					{% endif %}
 				{% endfor %}
 
-				{% for plan in plans %}
-					{% if plan.current %}
-						{% set current_plan_col = col %}
-					{% endif %}
-					{% set col = col + 1 %}
-				{% endfor %}
-
 				<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
 
 				<table class="userbase-account-plans-table">
 					{% set col = 0 %}
 					<tr>
 						{% for plan in plans %}
-						<th {% if col == current_plan_col %} class="userbase-account-plan-current"{% endif %}>
+						<th {% if plan.is_base_plan %} class="userbase-account-plan-current"{% endif %}>
 							<h3>
 								{% if plan.details_url %}
 								<a href="{{ plan.details_url }}">{{ plan.name }}</a>
@@ -130,6 +130,7 @@
 									free
 								{% endif %}
 							</p>
+
 							{% set col = col + 1 %}
 						</th>
 						{% endfor %}
@@ -138,7 +139,7 @@
 					{% set col = 0 %}
 					<tr>
 						{% for plan in plans %}
-						<td{% if col == current_plan_col %} class="userbase-account-plan-current"{% endif %}>
+						<td{% if plan.is_base_plan %} class="userbase-account-plan-current"{% endif %}>
 							{{ plan.description }}
 						</td>
 						{% set col = col + 1 %}
@@ -146,101 +147,53 @@
 					</tr>
 
 					{% set col = 0 %}
-					<tr class="userbase-account-schedule-selector">
+					<tr>
 						{% for plan in plans %}
-						<td{% if col == current_plan_col %} class="userbase-account-plan-current"{% endif %}>
-						{% if plan.schedules and plan.schedules|length > 0 %}
-							{% set n = 0 %}
-							<table class="userbase-account-plan-schedules">
-								{% for schedule in plan.schedules %}
-								<tr>
-									<td>
-										<input
-											type="radio"
-											name="plan"
-											id="plan-radio-{{ col }}-{{ n }}"
-											value="{{ plan.slug }}.{{ schedule.slug }}"
-											{% if not plan.available or not schedule.available %}disabled{% endif %}
-											{% if next_chosen %}
-												{% if schedule.chosen%}checked{% endif %}
+							<td class="userbase-account-pay-button {% if plan.is_base_plan %} userbase-account-plan-current{% endif %}">
+								{% if plan.available %}
+									{% set button_label = 'Sign Up' %}
+									{% if plan_change_mode %}
+										{% if next_chosen and plan.chosen or not next_chosen and plan.current %}
+											{% set button_label = 'Change Settings' %}
+										{% else %}
+											{% if plan.base_price > base_plan.base_price %}
+												{% set button_label = 'Upgrade' %}
 											{% else %}
-												{% if schedule.current %}checked{% endif %}
+												{% set button_label = 'Downgrade' %}
 											{% endif %}
-											/>
-									</td>
-									<td>
-										<label for="plan-radio-{{ col }}-{{ n }}"
-											{% if schedule.current %} class="userbase-account-current-schedule"{% endif %}
-										>
-											<span class="userbase-account-schedule-name">{{ schedule.name }}</span>
-											<br/>
-											<span class="userbase-account-schedule-details">{{ schedule.description }}</span>
-											{% if schedule.current and next_chosen %}
-												<br/>
-												<span class="badge badge-important">until {{ next_charge|date("M d, Y") }}</span>
-											{% endif %}
-											{% if schedule.chosen %}
-												<br/>
-												<span class="badge badge-success">starting {{ next_charge|date("M d, Y") }}</span>
-											{% endif %}
-										</label>
-									</td>
-								</tr>
-								{% set n = n + 1 %}
-							{% endfor %}
-						</table>
-					{% else %}
-						<label class="radio" for="plan-radio-{{ col }}"{% if plan.current %} class="userbase-account-current-plan"{% endif %}>
-							<input type="radio" name="plan" value="{{ plan.slug }}"
-							   id="plan-radio-{{ col }}"
-							   {% if not plan.available %}disabled{% endif %}
-							   {% if next_chosen %}
-								   {% if plan.chosen %}checked{% endif %}
-							   {% else %}
-								   {% if plan.current %}checked{% endif %}
-								{% endif %}
-							   />
-							<span class="userbase-account-plan-name">Free</span>
-							{% if next_chosen and plan.current %}
-							<span class="badge badge-important">until {{ next_charge }}</span>
-							{% endif %}
-							{% if plan.chosen %}
-							<span class="badge badge-success">starting {{ next_charge }}</span>
-							{% endif %}
-						</label>
-					{% endif %}
-					</td>
-					{% set col = col + 1 %}
-				{% endfor %}
-				</tr>
+										{% endif %}
+									{% endif %}
 
-				{% set col = 0 %}
-				<tr>
-					{% for plan in plans %}
-						<td class="userbase-account-pay-button {% if col == current_plan_col %} userbase-account-plan-current{% endif %}">
-							{% if plan.available %}
-								{% if not current_plan_col %}
-									{% if plan.base_price %}
-										<input class="btn" type="submit" value="Pay Now"/>
+									{% if plan.schedules and plan.schedules|length > 0 %}
+										<a class="btn" href="?plan={{ plan.slug }}">{{ button_label }}</a>
 									{% else %}
-										<input class="btn" type="submit" value="Sign Up"/>
+										<button class="btn" name="plan" value="{{ plan.slug }}">{{ button_label }}</button>
 									{% endif %}
 								{% else %}
-									{% if col == current_plan_col %}
-										<input class="btn" type="submit" value="Update"/>
-									{% else %}
-										<input class="btn" type="submit" value="Change"/>
-									{% endif %}
+									<input class="btn disabled" type="button" value="Coming soon"/>
 								{% endif %}
-							{%else%}
-								<input class="btn disabled" type="button" value="Coming soon"/>
-							{% endif %}
-						</td>
-						{% set col = col + 1 %}
-					{% endfor %}
-				</tr>
+							</td>
+							{% set col = col + 1 %}
+						{% endfor %}
+					</tr>
 
-			</table>
+					{% if show_chosen %}
+						{% set col = 0 %}
+						<tr>
+							{% for plan in plans %}
+								<td class="userbase-account-next-plan-dates{% if plan.is_base_plan %} userbase-account-plan-current{% endif %}">
+									{% if plan.current %}
+										<span class="badge badge-warning">until {{ next_charge|date("M d, Y")}}</span>
+									{% endif %}
+									{% if plan.chosen %}
+										<span class="badge badge-success">starting {{ next_charge|date("M d, Y")}}</span>
+									{% endif %}
+								</td>
+								{% set col = col + 1 %}
+							{% endfor %}
+						</tr>
+					{% endif %}
+				</table>
 			</form>
 			{% endif %}
 		</div>

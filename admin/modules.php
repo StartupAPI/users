@@ -76,6 +76,11 @@ $builtin_modules = array(
 		'experimental' => true,
 		'category_slug' => 'payment'
 	),
+	'external_payment' => array(
+		'class' => 'ExternalPaymentEngine',
+		'experimental' => true,
+		'category_slug' => 'payment'
+	),
 	'stripe' => array(
 		'class' => 'StripePaymentEngine',
 		'experimental' => true,

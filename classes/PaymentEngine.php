@@ -44,19 +44,36 @@ abstract class PaymentEngine extends StartupAPIModule {
 	}
 
 	/**
-	 * Records transaction details
+	 * Records transaction details, must be overriden if there are any details available
 	 *
 	 * @param int $transaction_id Transaction ID
 	 * @param mixed[] $details Transaction details array
 	 */
-	public abstract function storeTransactionDetails($transaction_id, $details);
+	public function storeTransactionDetails($transaction_id, $details) {
+		return TRUE;
+	}
 
 	/**
 	 * Returns details for transaction, specific to particular payment engine
 	 *
 	 * @param int $transaction_id Transaction ID
+	 *
+	 * @return mixed[]|false Retrieves array of transaction details or false if none available
 	 */
-	public abstract function expandTransactionDetails($transaction_id);
+	public function expandTransactionDetails($transaction_id) {
+		return FALSE;
+	}
+
+	/**
+	 * Renders transation details if they are available
+	 *
+	 * @param int $transaction_id Transaction ID
+	 *
+	 * @return string HTML rendering of transaction details
+	 */
+	public function renderTransactionLogDetails($transaction_id) {
+		return "";
+	}
 
 	/**
 	 * This method should be called by subsclasses which actually receives information about payment

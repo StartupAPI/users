@@ -1,5 +1,4 @@
 <?php
-
 require_once(__DIR__ . '/global.php');
 
 // This page is only used when subscriptions are enabled, no need to have it otherwise
@@ -41,15 +40,16 @@ if (array_key_exists('plan', $_POST)) {
 		if (!($plan = Plan::getPlanBySlug($data[0])))
 			throw new Exception("Unknown plan '" . $data[0] . '"');
 
-		if (!is_null($data[1]) && !($schedule = $plan->getPaymentScheduleBySlug($data[1])))
+		if (!is_null($data[1]) && !($schedule = $plan->getPaymentScheduleBySlug($data[1]))) {
 			throw new Exception("Unknown schedule '" . $data[1] . "' for plan '" . $data[0] . "'");
+		}
 	} catch (Exception $e) {
 		$_SESSION['message'][] = $e->getMessage();
-		header('Location: ' . $_SERVER['HTTP_REFERER']);
+			header('Location: ' . UserConfig::$USERSROOTURL . '/plans.php');
 		exit;
 	}
 
-// Check balance
+	// Check balance
 	if (!is_null($schedule) && $schedule->charge_amount > $account->getBalance()) {
 		$_SESSION['message'][] = "Not enough funds to activate plan/schedule";
 	} elseif ($account->getPlanSlug() != $data[0] ||
@@ -86,7 +86,8 @@ if (array_key_exists('plan', $_POST)) {
 		}
 	}
 
-	header('Location: ' . $_SERVER['HTTP_REFERER']);
+	header('Location: ' . UserConfig::$DEFAULTLOGINRETURN . '?upgraded');
+	exit;
 }
 /* ------------------- / Handling form submission -------------------------------------- */
 
@@ -124,6 +125,11 @@ $balance = $account->getBalance();
 $template_data['balance'] = $balance;
 $plan_slugs = Plan::getPlanSlugs();
 
+$current_plan = $account->getPlan(); // can be FALSE
+
+$i = 0;
+$base_plan_index = null;
+
 $plans = array();
 foreach ($plan_slugs as $p) { # Iterate over all configured plans
 	$this_plan = Plan::getPlanBySlug($p);
@@ -133,7 +139,6 @@ foreach ($plan_slugs as $p) { # Iterate over all configured plans
 		$plan[$d] = $this_plan->$d;
 	}
 
-	$current_plan = $account->getPlan(); // can be FALSE
 	# Mark plan as current if slugs match
 	if ($current_plan && $current_plan->slug == $this_plan->slug) {
 		$plan['current'] = TRUE;
@@ -144,7 +149,7 @@ foreach ($plan_slugs as $p) { # Iterate over all configured plans
 	$schedule = array();
 	$schedule_slugs = $this_plan->getPaymentScheduleSlugs(); # Iterate over all schedules of this plan
 
-	if (empty($schedule_slugs) && !is_null($account->getNextPlan()) &&
+	if (!is_null($account->getNextPlan()) &&
 			$account->getNextPlan()->slug == $this_plan->slug) {
 		$plan['chosen'] = TRUE;
 	} else {
@@ -160,7 +165,9 @@ foreach ($plan_slugs as $p) { # Iterate over all configured plans
 		}
 
 		$schedule['available'] = TRUE;
-		if ($plan['current'] && $account->getSchedule()->slug == $this_schedule->slug) {
+		$account_schedule = $account->getSchedule();
+
+		if ($plan['current'] && !is_null($account_schedule) && $account_schedule->slug == $this_schedule->slug) {
 			$schedule['current'] = TRUE;
 		} else {
 			$schedule['current'] = FALSE;
@@ -179,16 +186,55 @@ foreach ($plan_slugs as $p) { # Iterate over all configured plans
 		$plan['schedules'][] = $schedule;
 	}
 	$plans[] = $plan;
+
+	// Plan which is being upgraded
+	if ($plan['current']) {
+		$template_data['base_plan'] = $plan;
+		$base_plan_index = $i;
+	}
+
+	if ($plan['chosen']) {
+		$template_data['base_plan'] = $plan;
+		$base_plan_index = $i;
+	}
+
+	$i++;
 }
 
 $template_data['plans'] = $plans;
+
+if (array_key_exists('base_plan', $template_data)) {
+	$template_data['plans'][$base_plan_index]['is_base_plan'] = true;
+}
+
 $template_data['USERSROOTURL'] = UserConfig::$USERSROOTURL;
+
+$display_template = 'plan/plans.html.twig';
+
+/*
+ * If plan was selected, show schedule and payment engine selection UI
+ */
+if (array_key_exists('plan', $_GET)) {
+	$selected_plan = Plan::getPlanBySlug($_GET['plan']);
+
+	if ($selected_plan) {
+		foreach ($template_data['plans'] as $plan) {
+			if ($plan['slug'] == $selected_plan->slug) {
+				$template_data['plan'] = $plan;
+				$display_template = 'plan/select_payment_method.html.twig';
+				break;
+			}
+		}
+	}
+}
+
+$template_data['payment_engines'] = UserConfig::$payment_modules;
 
 /* ------------------- / Preparing data for template -------------------------------------- */
 
 require_once(UserConfig::$header);
 
-StartupAPI::$template->display('plan/plans.html.twig', $template_data);
+StartupAPI::$template->display($display_template, $template_data);
 
 require_once(UserConfig::$footer);
 
