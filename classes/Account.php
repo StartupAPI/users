@@ -1467,6 +1467,10 @@ class Account {
 		} else {
 			$new_schedule = NULL;
 		}
+
+		// make sure that charges are up to date
+		$this->charges = self::fillCharges($this->getID());
+
 		/* Check, if plan/schedule could be activated immediately
 		  It could, if:
 		  1. current plan has no schedule
