@@ -120,7 +120,7 @@ abstract class StartupAPIModule implements iStartupAPIModule {
 	 *
 	 * @param string $slug Module slug
 	 *
-	 * @return StartupAPIModule StartupAPIModule object
+	 * @return StartupAPIModule|null StartupAPIModule object or null if no such module is registered with the system
 	 */
 	public static function get($slug) {
 		foreach (UserConfig::$all_modules as $module) {
@@ -128,6 +128,8 @@ abstract class StartupAPIModule implements iStartupAPIModule {
 				return $module;
 			}
 		}
+
+		return null;
 	}
 
 }

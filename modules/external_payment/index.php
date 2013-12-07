@@ -15,13 +15,62 @@ class ExternalPaymentEngine extends PaymentEngine {
 	 */
 	private static $loaded = false;
 
-	public function __construct() {
+	/**
+	 * @var string URL to redirect user to when they click sign up button
+	 */
+	private $url;
+
+	private $button_label;
+
+	/**
+	 * @param string $url External URL to send users to when they try to pay
+	 */
+	public function __construct($url = null, $button_label = null) {
+		$this->url = $url;
+		$this->button_label = $button_label;
+
+		if (is_null($this->url)) {
+			$this->url = UserConfig::$USERSROOTFULLURL . '/modules/external_payment/external_page.php';
+		}
+
+		if (is_null($this->button_label)) {
+			$this->button_label = 'Fake';
+		}
 
 		$this->slug = 'external_payment';
 		if (!self::$loaded) {
 			parent::__construct();
 			self::$loaded = true;
 		}
+	}
+
+	/**
+	 * Returns a URL for external payment UI
+	 *
+	 * @param Plan $plan Plan to swtitch to
+	 * @param PaymentSchedule $schedule Payment schedule to use
+	 * @param Account $account Account being upgraded
+	 *
+	 * @return string
+	 */
+	public function getActionURL($plan = null, $schedule = null, $account = null) {
+				return $this->url .
+						'?plan=' . $plan->slug .
+						'&schedule=' . $schedule->slug .
+						'&account=' . $account->getID();
+	}
+
+	/**
+	 * Returns button label to use for payment engine sign up
+	 *
+	 * @param Plan $plan Payment plan user is trying to switch to
+	 * @param PaymentSchedule $schedule Payment schedule user is trying to use
+	 * @param Account $account Account to change subscription for
+	 *
+	 * @return string
+	 */
+	public function getActionButtonLabel($plan = null, $schedule = null, $account = null) {
+		return $this->button_label;
 	}
 
 	public static function getModulesTitle() {
@@ -50,4 +99,5 @@ class ExternalPaymentEngine extends PaymentEngine {
 		// Okay
 		return TRUE;
 	}
+
 }

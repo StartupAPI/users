@@ -33,32 +33,29 @@
 					{% for schedule in plan.schedules %}
 						<div class="well">
 							<div class="pull-right" style="text-align: right">
-								<div>
-									<div class="pull-right" style="margin-left: 1em">
-										<button
-											class="btn btn-success"
-											type="submit"
-											name="plan"
-											id="plan-radio-{{ col }}-{{ n }}"
-											value="{{ plan.slug }}.{{ schedule.slug }}"
-											{% if not plan.available or not schedule.available %} disabled{% endif %}
-											{% if next_chosen %}
-												{% if schedule.chosen%}checked{% endif %}
-											{% else %}
-												{% if schedule.current %}checked{% endif %}
-											{% endif %}
-												>
-											Sign Up
-										</button>
-									</div>
-
-									<h4 style="padding-top: 4px">
-										${{ schedule.charge_amount}}
-									</h4>
-								</div>
-								<div class="clearfix">
-									{{ schedule.description }}
-								</div>
+								<h3>${{ schedule.charge_amount}}</h3>
+								{% for engine in payment_engines %}
+									<button
+										class="btn btn-success"
+										type="submit"
+										name="plan"
+										id="plan-radio-{{ col }}-{{ n }}"
+										value="{{ plan.slug }}.{{ schedule.slug }}.{{ engine.slug }}"
+										{% if not plan.available
+											or not schedule.available
+											or (engine.requires_pre_payment
+												and balance < schedule.charge_amount)
+										%} disabled{% endif %}
+										{% if next_chosen %}
+											{% if schedule.chosen%}checked{% endif %}
+										{% else %}
+											{% if schedule.current %}checked{% endif %}
+										{% endif %}
+											>
+										{{ engine.button_label }}
+									</button>
+								{% endfor %}
+								<p style="margin-top: 1em">{{ schedule.description }}</p>
 							</div>
 
 							<label for="plan-radio-{{ col }}-{{ n }}"

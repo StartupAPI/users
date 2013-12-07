@@ -1,4 +1,5 @@
 <?php
+
 require_once(__DIR__ . '/global.php');
 
 // This page is only used when subscriptions are enabled, no need to have it otherwise
@@ -33,57 +34,77 @@ if (array_key_exists('plan', $_POST)) {
 
 	if (!isset($data[1])) {
 		$data[1] = NULL;
+		$data[2] = NULL;
 	}
+
+	$selected_plan_slug = $data[0];
+	$selected_schedule_slug = $data[1];
+	$selected_engine_slug = $data[2];
 
 	try {
 		// Check if plan and schedule exists
-		if (!($plan = Plan::getPlanBySlug($data[0])))
-			throw new Exception("Unknown plan '" . $data[0] . '"');
+		if (!($plan = Plan::getPlanBySlug($selected_plan_slug))) {
+			throw new Exception("Unknown plan '" . $selected_plan_slug . '"');
+		}
 
-		if (!is_null($data[1]) && !($schedule = $plan->getPaymentScheduleBySlug($data[1]))) {
-			throw new Exception("Unknown schedule '" . $data[1] . "' for plan '" . $data[0] . "'");
+		if (!is_null($selected_schedule_slug) && !($schedule = $plan->getPaymentScheduleBySlug($selected_schedule_slug))) {
+			throw new Exception("Unknown schedule '" . $selected_schedule_slug . "' for plan '" . $selected_plan_slug . "'");
+		}
+
+		if (!is_null($selected_engine_slug) && !($engine = PaymentEngine::getEngineBySlug($selected_engine_slug))) {
+			throw new Exception("Unknown payment engine '" . $engine . "' for schedule schedule '" . $selected_schedule_slug . "' for plan '" . $selected_plan_slug . "'");
 		}
 	} catch (Exception $e) {
 		$_SESSION['message'][] = $e->getMessage();
-			header('Location: ' . UserConfig::$USERSROOTURL . '/plans.php');
+		header('Location: ' . UserConfig::$USERSROOTURL . '/plans.php');
 		exit;
 	}
 
-	// Check balance
-	if (!is_null($schedule) && $schedule->charge_amount > $account->getBalance()) {
-		$_SESSION['message'][] = "Not enough funds to activate plan/schedule";
-	} elseif ($account->getPlanSlug() != $data[0] ||
-			(!is_null($account->getNextPlan()) && $account->getNextPlan()->slug != $data[0])) {
-		// Not changing plan if requested plan is same as current or next
+	if (!$engine || $engine->requiresPrePayment()) {
+		// Check balance
+		if (!is_null($schedule) && $schedule->charge_amount > $account->getBalance()) {
+			$_SESSION['message'][] = "Not enough funds to activate plan/schedule";
+		} elseif (
+				$account->getPlanSlug() != $selected_plan_slug ||
+				(!is_null($account->getNextPlan()) && $account->getNextPlan()->slug != $selected_plan_slug)
+		) {
+			// Not changing plan if requestfed plan is same as current or next
 
-		if ($account->planChangeRequest($data[0], $data[1])) {
-			if ($account->getPlanSlug() != $data[0]) {
-				// Plan activation postponed
-				$_SESSION['message'][] = "Your request to activate plan '" . $data[0] . '/' . $data[1] .
-						"' accepted. Plan will be activated on the next charge according to your current schedule.";
+			if ($account->planChangeRequest($selected_plan_slug, $selected_schedule_slug)) {
+				if ($account->getPlanSlug() != $selected_plan_slug) {
+					// Plan activation postponed
+					$_SESSION['message'][] = "Your request to activate plan '" . $selected_plan_slug . '/' . $selected_schedule_slug .
+							"' accepted. Plan will be activated on the next charge according to your current schedule.";
+				} else {
+					// Plan activated immediately
+					$_SESSION['message'][] = "Plan " . $selected_plan_slug . '/' . $selected_schedule_slug . " activated.";
+				}
 			} else {
-				// Plan activated immediately
-				$_SESSION['message'][] = "Plan " . $data[0] . '/' . $data[1] . " activated.";
+				$_SESSION['message'][] = "Error activating plan";
 			}
-		} else {
-			$_SESSION['message'][] = "Error activating plan";
-		}
-	} elseif (!is_null($data[1]) && ($account->getScheduleSlug() != $data[1] ||
-			(!is_null($account->getNextSchedule()) && $account->getNextSchedule()->slug != $data[1]))) {
-		// Not changing schedule if requested schedule is same as current or next
+		} elseif (!is_null($selected_schedule_slug) && ($account->getScheduleSlug() != $selected_schedule_slug ||
+				(!is_null($account->getNextSchedule()) && $account->getNextSchedule()->slug != $selected_schedule_slug))) {
+			// Not changing schedule if requested schedule is same as current or next
 
-		if ($account->scheduleChangeRequest($data[1])) {
-			if ($account->getScheduleSlug() != $data[1]) {
-				// Schedule change postponed
-				$_SESSION['message'][] = "Your request to change payment schedule to '" . $data[1] .
-						"' accepted. Schedule will be activated on the next charge according to your current schedule.";
+			if ($account->scheduleChangeRequest($selected_schedule_slug)) {
+				if ($account->getScheduleSlug() != $selected_schedule_slug) {
+					// Schedule change postponed
+					$_SESSION['message'][] = "Your request to change payment schedule to '" . $selected_schedule_slug .
+							"' accepted. Schedule will be activated on the next charge according to your current schedule.";
+				} else {
+					// Schedule changed immediately
+					$_SESSION['message'][] = "Payment schedule changed to " . $selected_schedule_slug;
+				}
 			} else {
-				// Schedule changed immediately
-				$_SESSION['message'][] = "Payment schedule changed to " . $data[1];
+				$_SESSION['message'][] = "Error changing schedule";
 			}
-		} else {
-			$_SESSION['message'][] = "Error changing schedule";
 		}
+	} else {
+		// now we need to redirect to engine's action URL (potentially external
+		$action_url = $engine->getActionURL($plan, $schedule, $account);
+
+		header('Location: ' . $action_url);
+		exit;
 	}
 
 	header('Location: ' . UserConfig::$DEFAULTLOGINRETURN . '?upgraded');
@@ -171,10 +192,6 @@ foreach ($plan_slugs as $p) { # Iterate over all configured plans
 			$schedule['current'] = TRUE;
 		} else {
 			$schedule['current'] = FALSE;
-			# If user has enough on his balance, schedule could be activated
-			if ($balance < $this_schedule->charge_amount) {
-				$schedule['available'] = FALSE;
-			}
 		}
 
 		if (!is_null($account->getNextSchedule()) && $account->getNextSchedule()->slug == $this_schedule->slug) {
@@ -215,11 +232,11 @@ $display_template = 'plan/plans.html.twig';
  * If plan was selected, show schedule and payment engine selection UI
  */
 if (array_key_exists('plan', $_GET)) {
-	$selected_plan = Plan::getPlanBySlug($_GET['plan']);
+	$selected_plan_slug = Plan::getPlanBySlug($_GET['plan']);
 
-	if ($selected_plan) {
+	if ($selected_plan_slug) {
 		foreach ($template_data['plans'] as $plan) {
-			if ($plan['slug'] == $selected_plan->slug) {
+			if ($plan['slug'] == $selected_plan_slug->slug) {
 				$template_data['plan'] = $plan;
 				$display_template = 'plan/select_payment_method.html.twig';
 				break;
@@ -228,7 +245,14 @@ if (array_key_exists('plan', $_GET)) {
 	}
 }
 
-$template_data['payment_engines'] = UserConfig::$payment_modules;
+foreach (UserConfig::$payment_modules as $payment_engine) {
+	$template_data['payment_engines'][] = array(
+		'slug' => $payment_engine->getSlug(),
+		'title' => $payment_engine->getTitle(),
+		'button_label' => $payment_engine->getActionButtonLabel(),
+		'requires_pre_payment' => $payment_engine->requiresPrePayment()
+	);
+}
 
 /* ------------------- / Preparing data for template -------------------------------------- */
 

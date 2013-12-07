@@ -26,6 +26,46 @@ abstract class PaymentEngine extends StartupAPIModule {
 	}
 
 	/**
+	 * Returns true if module requires prepayment to be used.
+	 *
+	 * Modules that require pre-payment will only enable payment schedules that
+	 * require payment that is less then account balance.
+	 *
+	 * @return boolean True if module requires prepayment
+	 */
+	public function requiresPrePayment() {
+		return FALSE;
+	}
+
+	/**
+	 * Returns action URL to send user to to accept payments for specific plan and schedule.
+	 *
+	 * Must be defined by all engines that do not require prepayment.
+	 *
+	 * @param Plan $plan Payment plan user is trying to switch to
+	 * @param PaymentSchedule $schedule Payment schedule user is trying to use
+	 * @param Account $account Account to change subscription for
+	 *
+	 * @return null
+	 */
+	public function getActionURL($plan = null, $schedule = null, $account = null) {
+		return null;
+	}
+
+	/**
+	 * Returns button label to use for payment engine sign up
+	 *
+	 * @param Plan $plan Payment plan user is trying to switch to
+	 * @param PaymentSchedule $schedule Payment schedule user is trying to use
+	 * @param Account $account Account to change subscription for
+	 *
+	 * @return string
+	 */
+	public function getActionButtonLabel($plan = null, $schedule = null, $account = null) {
+		return "Sign Up";
+	}
+
+	/**
 	 * Called when subscription for account changes
 	 *
 	 * @param int $account_id Account ID
@@ -41,6 +81,17 @@ abstract class PaymentEngine extends StartupAPIModule {
 	 */
 	public function getSlug() {
 		return $this->slug;
+	}
+
+	/**
+	 * Returns payment engine for a specififed slug
+	 *
+	 * @param string $slug Payment engine slug
+	 *
+	 * @return PaymentEngine|null Payment engine or null if payment engine is not registered
+	 */
+	public static function getEngineBySlug($slug) {
+		return StartupAPIModule::get($slug);
 	}
 
 	/**

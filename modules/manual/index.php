@@ -37,6 +37,18 @@ class ManualPaymentEngine extends PaymentEngine {
 	}
 
 	/**
+	 * Always returns TRUE as manual payment module requires prepayment
+	 *
+	 * Modules that require pre-payment will only enable payment schedules that
+	 * require payment that is less then account balance.
+	 *
+	 * @return boolean True if module requires prepayment
+	 */
+	public function requiresPrePayment() {
+		return TRUE;
+	}
+
+	/**
 	 * Called when subscription changes
 	 *
 	 * @param int $account_id Account ID
