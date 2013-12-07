@@ -76,7 +76,7 @@
 
 				{%for tr in log %}
 				<tr valign="top">
-					<td>{{ tr.date_time }}</td><td align="center">{%if tr.amount < 0 %}-{%endif%}${{ "%.2f"|format(tr.amount|abs)}}</td>
+					<td>{{ tr.date_time }}</td><td align="center">{%if tr.amount == 0 %}-{%else%}{%if tr.amount < 0 %}-{%endif%}${{ "%.2f"|format(tr.amount|abs)}}{%endif%}</td>
 					<td>{{ tr.message }}{{ tr.details|raw }}</td><td>{{ tr.engine_slug }}</td></tr>
 				{%endfor%}
 			</table>
