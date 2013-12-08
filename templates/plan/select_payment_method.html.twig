@@ -31,6 +31,7 @@
 				{% if plan.schedules and plan.schedules|length > 0 %}
 					{% set n = 0 %}
 					{% for schedule in plan.schedules %}
+						{% set engine_slug = "unknown" %}
 						<div class="well">
 							<div class="pull-right" style="text-align: right">
 								<h3>${{ schedule.charge_amount}}</h3>
@@ -39,7 +40,7 @@
 										class="btn btn-success"
 										type="submit"
 										name="plan"
-										id="plan-radio-{{ col }}-{{ n }}"
+										id="payment-button-{{plan.slug}}-{{schedule.slug}}-{{engine.slug}}"
 										value="{{ plan.slug }}.{{ schedule.slug }}.{{ engine.slug }}"
 										{% if not plan.available
 											or not schedule.available
@@ -54,11 +55,12 @@
 											>
 										{{ engine.button_label }}
 									</button>
+									{% set engine_slug = engine.slug %}
 								{% endfor %}
 								<p style="margin-top: 1em">{{ schedule.description }}</p>
 							</div>
 
-							<label for="plan-radio-{{ col }}-{{ n }}"
+							<label {% if engine|length > 1 %}for="payment-button-{{plan.slug}}-{{schedule.slug}}-{{engine_slug}}"{% endif %}
 								{% if schedule.current %} class="userbase-account-current-schedule"{% endif %}
 							>
 								<span class="userbase-account-schedule-name">{{ schedule.name }}</span>
