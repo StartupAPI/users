@@ -11,21 +11,30 @@
 class ExternalPaymentEngine extends PaymentEngine {
 
 	/**
-	 * @var boolean Singleton flag
+	 * @var int Counter of instances created
 	 */
-	private static $loaded = false;
+	private static $instance_counter = 0;
+
+	/**
+	 * @var int Instance number
+	 */
+	private $instance_number = 0;
 
 	/**
 	 * @var string URL to redirect user to when they click sign up button
 	 */
 	private $url;
-
 	private $button_label;
 
 	/**
 	 * @param string $url External URL to send users to when they try to pay
 	 */
 	public function __construct($url = null, $button_label = null) {
+		self::$instance_counter++;
+		$this->instance_number = self::$instance_counter;
+
+		$this->slug = 'external_payment_' . $this->instance_number;
+
 		$this->url = $url;
 		$this->button_label = $button_label;
 
@@ -33,15 +42,13 @@ class ExternalPaymentEngine extends PaymentEngine {
 			$this->url = UserConfig::$USERSROOTFULLURL . '/modules/external_payment/external_page.php';
 		}
 
+		$this->url .= (strstr($this->url, '?') === FALSE ? '?' : '&') . 'engine=' . $this->slug;
+
 		if (is_null($this->button_label)) {
 			$this->button_label = 'Fake';
 		}
 
-		$this->slug = 'external_payment';
-		if (!self::$loaded) {
-			parent::__construct();
-			self::$loaded = true;
-		}
+		parent::__construct();
 	}
 
 	/**
@@ -54,10 +61,10 @@ class ExternalPaymentEngine extends PaymentEngine {
 	 * @return string
 	 */
 	public function getActionURL($plan = null, $schedule = null, $account = null) {
-				return $this->url .
-						'?plan=' . $plan->slug .
-						'&schedule=' . $schedule->slug .
-						'&account=' . $account->getID();
+		return $this->url . (strstr($this->url, '?') === FALSE ? '?' : '&') .
+				'plan=' . $plan->slug .
+				'&schedule=' . $schedule->slug .
+				'&account=' . $account->getID();
 	}
 
 	/**
@@ -75,6 +82,10 @@ class ExternalPaymentEngine extends PaymentEngine {
 
 	public static function getModulesTitle() {
 		return "External Payment Processing";
+	}
+
+	public function getTitle() {
+		return "External Payment Processing #" . $this->instance_number . ' (' . $this->button_label . ')';
 	}
 
 	public static function getModulesDescription() {
