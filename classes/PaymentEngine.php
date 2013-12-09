@@ -149,7 +149,6 @@ abstract class PaymentEngine extends StartupAPIModule {
 		if (is_null($account)) {
 			return FALSE;
 		}
-		$account->setPaymentEngine($this->slug);
 		$account->paymentReceived($data['amount']);
 
 		return $account->getLastTransactionID();
