@@ -176,6 +176,7 @@ foreach ($plan_slugs as $p) { # Iterate over all configured plans
 	if (!is_null($account->getNextPlan()) &&
 			$account->getNextPlan()->slug == $this_plan->slug) {
 		$plan['chosen'] = TRUE;
+		$template_data['next_chosen'] = TRUE;
 	} else {
 		$plan['chosen'] = FALSE;
 	}
@@ -197,7 +198,7 @@ foreach ($plan_slugs as $p) { # Iterate over all configured plans
 			$schedule['current'] = FALSE;
 		}
 
-		if (!is_null($account->getNextSchedule()) && $account->getNextSchedule()->slug == $this_schedule->slug) {
+		if ($plan['chosen'] && !is_null($account->getNextSchedule()) && $account->getNextSchedule()->slug == $this_schedule->slug) {
 			$schedule['chosen'] = TRUE;
 		} else {
 			$schedule['chosen'] = FALSE;

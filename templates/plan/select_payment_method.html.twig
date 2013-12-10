@@ -9,32 +9,53 @@
 			{% endfor %}
 
 			{% if not fatal %}
-			<h2>{{ plan.name }} plan</h2>
+			<h2><a href="{{ USERSROOTURL }}/plans.php">Subscription</a>: {{ plan.name }}</h2>
 
 			{% if plan.description %}
 				<p>{{ plan.description }}</p>
 			{% endif %}
 
 			<form action="" method="POST">
-				{% set next_chosen = false %}
-
-				{% if plan.schedules | length > 0 %}
-					{% for schedule in plan.schedules %}
-						{% if schedule.chosen %}
-							{% set next_chosen = true %}
-						{% endif %}
-					{% endfor %}
-				{% endif %}
-
 				<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
 
 				{% if plan.schedules and plan.schedules|length > 0 %}
+					<style>
+					.schedules {
+						max-width: 650px;
+					}
+
+					.schedules .well {
+						border-color: grey;
+					}
+
+					.schedules .startupapi-payment-schedule-highlighted {
+						background-color: silver;
+					}
+					</style>
+
+					<div class="schedules">
+
 					{% set n = 0 %}
 					{% for schedule in plan.schedules %}
 						{% set engine_slug = "unknown" %}
-						<div class="well">
+
+						{% set well_extra_class = '' %}
+
+						{% if next_chosen %}
+							{%if schedule.chosen %}
+								{% set well_extra_class = ' startupapi-payment-schedule-highlighted' %}
+							{% endif %}
+						{% else %}
+							{% if schedule.current %}
+								{% set well_extra_class = ' startupapi-payment-schedule-highlighted' %}
+							{% endif %}
+						{% endif %}
+
+						<div class="well{{ well_extra_class }}">
 							<div class="pull-right" style="text-align: right">
 								<h3>${{ schedule.charge_amount}}</h3>
+								<p style="margin-top: 1em">{{ schedule.description }}</p>
+
 								{% for engine in payment_engines %}
 									<button
 										class="btn btn-success"
@@ -47,17 +68,11 @@
 											or (engine.requires_pre_payment
 												and balance < schedule.charge_amount)
 										%} disabled{% endif %}
-										{% if next_chosen %}
-											{% if schedule.chosen%}checked{% endif %}
-										{% else %}
-											{% if schedule.current %}checked{% endif %}
-										{% endif %}
 											>
 										{{ engine.button_label }}
 									</button>
 									{% set engine_slug = engine.slug %}
 								{% endfor %}
-								<p style="margin-top: 1em">{{ schedule.description }}</p>
 							</div>
 
 							<label {% if engine|length > 1 %}for="payment-button-{{plan.slug}}-{{schedule.slug}}-{{engine_slug}}"{% endif %}
@@ -66,13 +81,14 @@
 								<span class="userbase-account-schedule-name">{{ schedule.name }}</span>
 								<br/>
 								<span class="userbase-account-schedule-details">{{ schedule.description }}</span>
-								{% if schedule.current and next_chosen %}
+								{% if next_chosen %}
 									<br/>
-									<span class="badge badge-important">until {{ next_charge|date("M d, Y") }}</span>
-								{% endif %}
-								{% if schedule.chosen %}
-									<br/>
-									<span class="badge badge-success">starting {{ next_charge|date("M d, Y") }}</span>
+									{%if schedule.current %}
+										<span class="badge badge-important">until {{ next_charge|date("M d, Y") }}</span>
+									{% endif %}
+									{% if schedule.chosen %}
+										<span class="badge badge-success">starting {{ next_charge|date("M d, Y") }}</span>
+									{% endif %}
 								{% endif %}
 							</label>
 
@@ -80,6 +96,8 @@
 						</div>
 						{% set n = n + 1 %}
 					{% endfor %}
+					</div>
+
 				{% endif %}
 			</form>
 			{% endif %}
