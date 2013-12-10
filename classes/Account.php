@@ -1240,6 +1240,7 @@ class Account {
 
 			$old_plan_slug = ($this->plan ? TRUE : FALSE) && $this->plan->slug;
 			$old_schedule_slug = is_null($this->schedule) ? NULL : $this->schedule->slug;
+			$old_engine_slug = is_null($this->paymentEngine) ? NULL : $this->paymentEngine->slug;
 
 			if ($this->plan) {
 				$this->plan->deactivate_hook($this->id, $plan_slug, $schedule_slug);
@@ -1247,7 +1248,7 @@ class Account {
 
 			$this->plan = $new_plan;
 			$this->schedule = $new_schedule;
-			$this->plan->activate_hook($this->id, $old_plan_slug, $old_schedule_slug);
+			$this->plan->activate_hook($this->id, $old_plan_slug, $old_schedule_slug, $old_engine_slug);
 			$this->active = 1;
 			$this->nextCharge = is_null($this->schedule) ?
 					NULL : date('Y-m-d H:i:s', time() + $this->schedule->charge_period * 86400);

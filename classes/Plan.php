@@ -71,12 +71,12 @@ class Plan {
 	/**
 	 * @var callable Plan activation hook, called when plan is activated for account
 	 */
-	private $user_activate_hook;
+	private $account_activate_hook;
 
 	/**
 	 * @var callable Plan deactivation hook, called when plan is deactivated for account
 	 */
-	private $user_deactivate_hook;
+	private $account_deactivate_hook;
 
 	/**
 	 * @var Plan[] Array of currently registered plans in the system
@@ -157,11 +157,11 @@ class Plan {
 		}
 
 		# Check user hooks
-		if (!is_null($this->user_activate_hook) && !is_callable($this->user_activate_hook)) {
+		if (!is_null($this->account_activate_hook) && !is_callable($this->account_activate_hook)) {
 			throw new Exception("Activate hook defined, but is not callable");
 		}
 
-		if (!is_null($this->user_deactivate_hook) && !is_callable($this->user_deactivate_hook)) {
+		if (!is_null($this->account_deactivate_hook) && !is_callable($this->account_deactivate_hook)) {
 			throw new Exception("Deactivate hook defined, but is not callable");
 		}
 
@@ -256,19 +256,21 @@ class Plan {
 	 * Calls account activation hooks registered for the plan
 	 *
 	 * @param int $account_id Account ID
-	 * @param string $plan_slug Plan slug
-	 * @param string $schedule_slug Payment schedule slug
+	 * @param string $old_plan_slug Old plan slug
+	 * @param string $old_schedule_slug Old payment schedule slug
+	 * @param string $old_engine_slug Old payment engine slug
 	 */
-	public function activate_hook($account_id, $plan_slug, $schedule_slug) {
+	public function activate_hook($account_id, $old_plan_slug, $old_schedule_slug, $old_engine_slug) {
 
-		if ($this->user_activate_hook == '') {
+		if (!is_callable($this->account_activate_hook)) {
 			return;
 		}
 
-		call_user_func_array($this->user_activate_hook, array(
+		call_user_func_array($this->account_activate_hook, array(
 			'AccountID' => $account_id,
-			'OldPlanSlug' => $plan_slug,
-			'OldScheduleSlug' => $schedule_slug,
+			'OldPlanSlug' => $old_plan_slug,
+			'OldScheduleSlug' => $old_schedule_slug,
+			'OldEngineSlug' => $old_engine_slug
 		));
 	}
 
@@ -276,19 +278,21 @@ class Plan {
 	 * Calls account activation hooks registered for the plan
 	 *
 	 * @param int $account_id Account ID
-	 * @param string $plan_slug Plan slug
-	 * @param string $schedule_slug Payment schedule slug
+	 * @param string $new_plan_slug New plan slug
+	 * @param string $new_schedule_slug New payment schedule slug
+	 * @param string $new_engine_slug New payment engine slug
 	 */
-	public function deactivate_hook($account_id, $plan_slug, $schedule_slug) {
+	public function deactivate_hook($account_id, $new_plan_slug, $new_schedule_slug, $new_engine_slug) {
 
-		if ($this->user_deactivate_hook == '') {
+		if (!is_callable($this->account_deactivate_hook)) {
 			return;
 		}
 
-		call_user_func_array($this->user_deactivate_hook, array(
+		call_user_func_array($this->account_deactivate_hook, array(
 			'AccountID' => $account_id,
-			'NewPlanSlug' => $plan_slug,
-			'NewScheduleSlug' => $schedule_slug,
+			'NewPlanSlug' => $new_plan_slug,
+			'NewScheduleSlug' => $new_schedule_slug,
+			'NewEngineSlug' => $new_engine_slug,
 		));
 	}
 
