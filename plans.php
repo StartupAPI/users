@@ -41,6 +41,9 @@ if (array_key_exists('plan', $_POST)) {
 	$selected_schedule_slug = $data[1];
 	$selected_engine_slug = $data[2];
 
+	$engine = null;
+	$schedule = null;
+
 	try {
 		// Check if plan and schedule exists
 		if (!($plan = Plan::getPlanBySlug($selected_plan_slug))) {
@@ -70,7 +73,7 @@ if (array_key_exists('plan', $_POST)) {
 		) {
 			// Not changing plan if requestfed plan is same as current or next
 
-			if ($account->planChangeRequest($selected_plan_slug, $selected_schedule_slug)) {
+			if ($account->planChangeRequest($selected_plan_slug, $selected_schedule_slug, $selected_engine_slug)) {
 				if ($account->getPlanSlug() != $selected_plan_slug) {
 					// Plan activation postponed
 					$_SESSION['message'][] = "Your request to activate plan '" . $selected_plan_slug . '/' . $selected_schedule_slug .
@@ -86,7 +89,7 @@ if (array_key_exists('plan', $_POST)) {
 				(!is_null($account->getNextSchedule()) && $account->getNextSchedule()->slug != $selected_schedule_slug))) {
 			// Not changing schedule if requested schedule is same as current or next
 
-			if ($account->scheduleChangeRequest($selected_schedule_slug)) {
+			if ($account->scheduleChangeRequest($selected_schedule_slug, $selected_engine_slug)) {
 				if ($account->getScheduleSlug() != $selected_schedule_slug) {
 					// Schedule change postponed
 					$_SESSION['message'][] = "Your request to change payment schedule to '" . $selected_schedule_slug .

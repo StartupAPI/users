@@ -257,8 +257,9 @@ abstract class PaymentEngine extends StartupAPIModule {
 
 		// Find all accounts which are served by this Payment Engine and which has next_charge date earlier than now
 
-		if (!($stmt = $db->prepare('SELECT id, plan_slug, next_plan_slug, schedule_slug, next_schedule_slug FROM ' .
-				UserConfig::$mysql_prefix . 'accounts WHERE engine_slug = ? AND active = 1 AND next_charge < ?'))) {
+		if (!($stmt = $db->prepare('SELECT id, plan_slug, next_plan_slug, schedule_slug, next_schedule_slug, next_engine_slug ' .
+				'FROM ' . UserConfig::$mysql_prefix . 'accounts ' .
+				'WHERE engine_slug = ? AND active = 1 AND next_charge < ?'))) {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -274,7 +275,7 @@ abstract class PaymentEngine extends StartupAPIModule {
 			throw new DBException($db, $stmt, "Can't store result");
 		}
 
-		if (!$stmt->bind_result($account_id, $plan_slug, $next_plan_slug, $schedule_slug, $next_schedule_slug)) {
+		if (!$stmt->bind_result($account_id, $plan_slug, $next_plan_slug, $schedule_slug, $next_schedule_slug, $next_engine_slug)) {
 			throw new DBBindResultException($db, $stmt);
 		}
 
@@ -288,20 +289,22 @@ abstract class PaymentEngine extends StartupAPIModule {
 			}
 
 			$billed = 0;
-			if (!is_null($next_plan_slug) || !is_null($next_schedule_slug)) {
+			if (!is_null($next_plan_slug) || !is_null($next_schedule_slug) || !is_null($next_engine_slug)) {
 
 				$next_plan = Plan::getPlanBySlug($next_plan_slug);
 				$next_schedule = is_null($next_plan) ? NULL : $next_plan->getPaymentScheduleBySlug($next_schedule_slug);
+				$next_engine = PaymentEngine::getEngineBySlug($next_schedule_slug);
 
 				// ok if either no next_schedule, or balance is sufficient
-				$ok = is_null($next_schedule) || $account->getBalance() >= $next_schedule->charge_amount;
+				$ok = is_null($next_schedule)
+					|| $account->getBalance() >= $next_schedule->charge_amount && !is_null($next_engine);
 
 				if (!is_null($next_plan) && $ok) { // next_plan found, change could be performed
 					if ($next_plan_slug == $plan_slug) { // only change schedule
-						$account->setPaymentSchedule($next_schedule_slug); // schedule changed, user billed automatically
+						$account->setPaymentSchedule($next_schedule_slug, $next_engine_slug); // schedule changed, user billed automatically
 						$billed = 1;
 					} else { // change plan and schedule
-						$account->activatePlan($next_plan_slug, $next_schedule_slug);
+						$account->activatePlan($next_plan_slug, $next_schedule_slug, $next_engine_slug);
 						$billed = 1;
 					}
 				} // othrewise plan and schedule left as it was before

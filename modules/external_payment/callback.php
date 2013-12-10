@@ -34,7 +34,7 @@ if (array_key_exists('paid', $_GET)) {
 	// paying enough money to satisfy selected schedule
 	$engine->paymentReceived(array('account_id' => $account->getID(), 'amount' => $schedule->charge_amount));
 
-	if ($account->planChangeRequest($plan->slug, $schedule->slug)) {
+	if ($account->planChangeRequest($plan->slug, $schedule->slug, $engine->getSlug())) {
 		header('Location: ' . UserConfig::$DEFAULTLOGINRETURN . '?upgraded');
 	} else {
 		header('Location: ' . UserConfig::$USERSROOTURL . '/plans.php?failed');

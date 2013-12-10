@@ -67,6 +67,11 @@ class Account {
 	private $paymentEngine;
 
 	/**
+	 * @var PaymentEngine Next payment engine object
+	 */
+	private $nextPaymentEngine;
+
+	/**
 	 * @var boolean True if account is active and false if disabled
 	 */
 	private $active;
@@ -99,7 +104,7 @@ class Account {
 		$account = null;
 
 		if (!($stmt = $db->prepare('SELECT name, plan_slug, schedule_slug, engine_slug,
-			active, next_charge, next_plan_slug, next_schedule_slug FROM ' .
+			active, next_charge, next_plan_slug, next_schedule_slug, next_engine_slug FROM ' .
 				UserConfig::$mysql_prefix . 'accounts WHERE id = ?'))) {
 			throw new DBPrepareStmtException($db);
 		}
@@ -116,14 +121,14 @@ class Account {
 			throw new DBException($db, $stmt, "Can't store result");
 		}
 
-		if (!$stmt->bind_result($name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $next_plan_slug, $next_schedule_slug)) {
+		if (!$stmt->bind_result($name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $next_plan_slug, $next_schedule_slug, $next_engine_slug)) {
 			throw new DBBindResultException($db, $stmt);
 		}
 
 		if ($stmt->fetch() === TRUE) {
 			$charges = self::fillCharges($id);
 			$account = new self($id, $name, $plan_slug, $schedule_slug, $engine_slug,
-							$charges, $active, $next_charge, $next_plan_slug, $next_schedule_slug);
+							$charges, $active, $next_charge, $next_plan_slug, $next_schedule_slug, $next_engine_slug);
 		}
 
 		$stmt->free_result();
@@ -149,7 +154,7 @@ class Account {
 
 		if (!($stmt = $db->prepare(
 				'SELECT a.id, a.name, a.plan_slug, a.schedule_slug, a.engine_slug, a.active, ' .
-				'a.next_charge, a.next_plan_slug, a.next_schedule_slug, au.role  FROM ' .
+				'a.next_charge, a.next_plan_slug, a.next_schedule_slug, a.next_engine_slug, au.role  FROM ' .
 				UserConfig::$mysql_prefix . 'accounts a INNER JOIN ' .
 				UserConfig::$mysql_prefix . 'account_users au ON a.id = au.account_id ' .
 				'WHERE au.user_id = ?'))) {
@@ -168,14 +173,14 @@ class Account {
 			throw new DBException($db, $stmt, "Can't store result");
 		}
 
-		if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $role, $next_plan_slug, $next_schedule_slug)) {
+		if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $role, $next_plan_slug, $next_schedule_slug, $next_engine_slug)) {
 			throw new DBBindResultException($db, $stmt);
 		}
 
 		while ($stmt->fetch() === TRUE) {
 			$charges = self::fillCharges($id);
 			$accounts[] = new self($id, $name, $plan_slug, $schedule_slug, $engine_slug,
-							$charges, $active, $next_charge, $next_plan_slug, $next_schedule_slug);
+							$charges, $active, $next_charge, $next_plan_slug, $next_schedule_slug, $next_engine_slug);
 		}
 
 		$stmt->free_result();
@@ -206,7 +211,7 @@ class Account {
 
 		if (!($stmt = $db->prepare(
 				'SELECT id, name, plan_slug, schedule_slug, engine_slug, active,
-					next_charge, next_plan_slug, next_schedule_slug
+					next_charge, next_plan_slug, next_schedule_slug, next_engine_slug
 					FROM ' . UserConfig::$mysql_prefix . 'accounts
 					LIMIT ?, ?'
 				))) {
@@ -225,13 +230,13 @@ class Account {
 			throw new DBException($db, $stmt, "Can't store result");
 		}
 
-		if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $next_plan_slug, $next_schedule_slug)) {
+		if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $next_plan_slug, $next_schedule_slug, $next_engine_slug)) {
 			throw new DBBindResultException($db, $stmt);
 		}
 
 		while ($stmt->fetch() === TRUE) {
 			$accounts[] = new self($id, $name, $plan_slug, $schedule_slug, $engine_slug,
-							null, $active, $next_charge, $next_plan_slug, $next_schedule_slug);
+							null, $active, $next_charge, $next_plan_slug, $next_schedule_slug, $next_engine_slug);
 		}
 
 		$stmt->close();
@@ -255,7 +260,7 @@ class Account {
 
 		if (!($stmt = $db->prepare(
 				'SELECT id, name, plan_slug, schedule_slug, engine_slug, active,
-					next_charge, next_plan_slug, next_schedule_slug
+					next_charge, next_plan_slug, next_schedule_slug, next_engine_slug
 					FROM ' . UserConfig::$mysql_prefix . 'accounts
 					WHERE INSTR(name, ?) > 0
 					LIMIT ?, ?'
@@ -275,13 +280,13 @@ class Account {
 			throw new DBException($db, $stmt, "Can't store result");
 		}
 
-		if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $next_plan_slug, $next_schedule_slug)) {
+		if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $next_plan_slug, $next_schedule_slug, $next_engine_slug)) {
 			throw new DBBindResultException($db, $stmt);
 		}
 
 		while ($stmt->fetch() === TRUE) {
 			$accounts[] = new self($id, $name, $plan_slug, $schedule_slug, $engine_slug,
-							null, $active, $next_charge, $next_plan_slug, $next_schedule_slug);
+							null, $active, $next_charge, $next_plan_slug, $next_schedule_slug, $next_engine_slug);
 		}
 
 		$stmt->close();
@@ -306,7 +311,7 @@ class Account {
 
 		if (!($stmt = $db->prepare(
 				'SELECT a.id, a.name, a.plan_slug, a.schedule_slug, a.engine_slug, a.active, ' .
-				'a.next_charge, a.next_plan_slug, a.next_schedule_slug, au.role  FROM ' .
+				'a.next_charge, a.next_plan_slug, a.next_schedule_slug, a.next_engine_slug, au.role  FROM ' .
 				UserConfig::$mysql_prefix . 'accounts a INNER JOIN ' .
 				UserConfig::$mysql_prefix . 'account_users au ON a.id = au.account_id ' .
 				'WHERE au.user_id = ?'))) {
@@ -325,7 +330,7 @@ class Account {
 			throw new DBException($db, $stmt, "Can't store result");
 		}
 
-		if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $next_plan_slug, $next_schedule_slug, $role)) {
+		if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $next_plan_slug, $next_schedule_slug, $next_engine_slug, $role)) {
 			throw new DBBindResultException($db, $stmt);
 		}
 
@@ -333,7 +338,7 @@ class Account {
 			$charges = self::fillCharges($id);
 			$accounts[] = array(
 				new self($id, $name, $plan_slug, $schedule_slug, $engine_slug,
-						$charges, $active, $next_charge, $next_plan_slug, $next_schedule_slug),
+						$charges, $active, $next_charge, $next_plan_slug, $next_schedule_slug, $next_engine_slug),
 				$role
 			);
 		}
@@ -392,8 +397,9 @@ class Account {
 	 * @param string $next_charge String representation of next charge
 	 * @param string $next_plan_slug Slug of next plan
 	 * @param string $next_schedule_slug Slug of next payment schedule
+	 * @param string $next_engine_slug Slug of next payment engine
 	 */
-	private function __construct($id, $name, $plan_slug, $schedule_slug = NULL, $engine_slug = NULL, $charges = NULL, $active = TRUE, $next_charge = NULL, $next_plan_slug = NULL, $next_schedule_slug = NULL) {
+	private function __construct($id, $name, $plan_slug, $schedule_slug = NULL, $engine_slug = NULL, $charges = NULL, $active = TRUE, $next_charge = NULL, $next_plan_slug = NULL, $next_schedule_slug = NULL, $next_engine_slug = NULL) {
 		$this->id = $id;
 		$this->name = $name;
 
@@ -408,6 +414,9 @@ class Account {
 		$this->nextPlan = is_null($next_plan_slug) ? NULL : Plan::getPlanBySlug($next_plan_slug);
 		$this->nextSchedule = is_null($next_schedule_slug) || is_null($this->nextPlan) ?
 				NULL : $this->nextPlan->getPaymentScheduleBySlug($next_schedule_slug);
+
+		$this->nextPaymentEngine = is_null($next_engine_slug) ?
+				NULL : PaymentEngine::getEngineBySlug($next_engine_slug);
 
 		$this->nextCharge = (is_null($this->schedule) && is_null($this->nextSchedule)) ? NULL : $next_charge;
 
@@ -739,7 +748,7 @@ class Account {
 		$stmt->close();
 
 		$account = new self($id, $name, $plan_slug, NULL, $engine_slug);
-		$account->activatePlan($plan_slug, $schedule_slug);
+		$account->activatePlan($plan_slug, $schedule_slug, $engine_slug);
 		TransactionLogger::Log($id, is_null($engine_slug) ? NULL : $account->paymentEngine->getSlug(), 0, 'Account created');
 
 		if ($user !== null) {
@@ -770,7 +779,7 @@ class Account {
 
 		if (!($stmt = $db->prepare(
 				'SELECT a.id, a.name, a.plan_slug, a.schedule_slug, a.engine_slug, a.active, ' .
-				'a.next_charge, a.next_plan_slug, a.next_schedule_slug, au.role FROM ' .
+				'a.next_charge, a.next_plan_slug, a.next_schedule_slug, a.next_engine_slug, au.role FROM ' .
 				UserConfig::$mysql_prefix . 'user_preferences up INNER JOIN ' .
 				UserConfig::$mysql_prefix . 'accounts a ON a.id = up.current_account_id INNER JOIN ' .
 				UserConfig::$mysql_prefix . 'account_users au ON a.id = au.account_id ' .
@@ -788,7 +797,7 @@ class Account {
 			throw new DBExecuteStmtException($db, $stmt);
 		}
 
-		if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $next_plan_slug, $next_schedule_slug, $role)) {
+		if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $next_plan_slug, $next_schedule_slug, $next_engine_slug, $role)) {
 			throw new DBBindResultException($db, $stmt);
 		}
 
@@ -802,7 +811,7 @@ class Account {
 
 			$account = new self($id, $name, $plan_slug, $schedule_slug, $engine_slug,
 							$charges, $active, $next_charge,
-							$next_plan_slug, $next_schedule_slug);
+							$next_plan_slug, $next_schedule_slug, $next_engine_slug);
 		} else {
 			$user_accounts = self::getUserAccounts($user);
 
@@ -1170,12 +1179,13 @@ class Account {
 	 *
 	 * @param string $plan_slug Plan slug
 	 * @param string $schedule_slug Payment schedule slug
+	 * @param string $engine_slug Payment engine slug
 	 *
 	 * @return boolean True if activation was successful
 	 *
 	 * @throws DBException
 	 */
-	public function activatePlan($plan_slug, $schedule_slug = NULL) {
+	public function activatePlan($plan_slug, $schedule_slug = NULL, $engine_slug = NULL) {
 		if (!$plan_slug) {
 			$plan_slug = null;
 		}
@@ -1188,14 +1198,14 @@ class Account {
 		}
 
 		/**
-		 * If subscriptions are not used, then just change plan, otherwise require a schedule
+		 * If subscriptions are not used, then just change plan, otherwise require a schedule and engine
 		 */
 		$db = UserConfig::getDB();
 
 		if (!$new_plan || !UserConfig::$useSubscriptions) {
 			if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
-					'accounts SET plan_slug = ?, schedule_slug = NULL, active = 1, next_charge = NULL, ' .
-					'next_plan_slug = NULL, next_schedule_slug = NULL WHERE id = ?'))) {
+					'accounts SET plan_slug = ?, schedule_slug = NULL, engine_slug = NULL, active = 1, next_charge = NULL, ' .
+					'next_plan_slug = NULL, next_schedule_slug = NULL, next_engine_slug = NULL WHERE id = ?'))) {
 				throw new DBPrepareStmtException($db);
 			}
 
@@ -1248,12 +1258,12 @@ class Account {
 			 * will differ from db state. Should be addressed in further releases.
 			 */
 			if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
-					'accounts SET plan_slug = ?, schedule_slug = ?, active = 1, next_charge = ?, ' .
-					'next_plan_slug = NULL, next_schedule_slug = NULL WHERE id = ?'))) {
+					'accounts SET plan_slug = ?, schedule_slug = ?, engine_slug = ?, active = 1, next_charge = ?, ' .
+					'next_plan_slug = NULL, next_schedule_slug = NULL, next_engine_slug = NULL WHERE id = ?'))) {
 				throw new DBPrepareStmtException($db);
 			}
 
-			if (!$stmt->bind_param('sssi', $plan_slug, $schedule_slug, $this->nextCharge, $this->id)) {
+			if (!$stmt->bind_param('ssssi', $plan_slug, $schedule_slug, $engine_slug, $this->nextCharge, $this->id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
 
@@ -1263,7 +1273,7 @@ class Account {
 
 			$this->paymentIsDue();
 			$this->lastTransactionID =
-					TransactionLogger::Log($this->id, is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(), 0, 'Plan "' . $this->plan->name . '" activated');
+					TransactionLogger::Log($this->id, $engine_slug, 0, 'Plan "' . $this->plan->name . '" activated');
 			return TRUE;
 		}
 	}
@@ -1297,12 +1307,13 @@ class Account {
 	 * Sets payment schedule for the account
 	 *
 	 * @param string $schedule_slug Payment schedule slug
+	 * @param string $engine_slug Payment engine slug
 	 *
 	 * @return boolean True if successfully set the schedule
 	 *
 	 * @throws DBException
 	 */
-	public function setPaymentSchedule($schedule_slug) {
+	public function setPaymentSchedule($schedule_slug, $engine_slug) {
 
 		if (!($schedule = $this->plan->getPaymentScheduleBySlug($schedule_slug))) {
 			return FALSE;
@@ -1314,13 +1325,14 @@ class Account {
 		// Update db
 		$db = UserConfig::getDB();
 
-		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
-				'accounts SET schedule_slug = ?, next_charge = ?, next_plan_slug = NULL, ' .
-				'next_schedule_slug = NULL WHERE id = ?'))) {
+		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'accounts SET
+			schedule_slug = ?, engine_slug = ?, next_charge = ?,
+			next_plan_slug = NULL, next_schedule_slug = NULL, next_engine_slug = NULL
+			WHERE id = ?'))) {
 			throw new DBPrepareStmtException($db);
 		}
 
-		if (!$stmt->bind_param('ssi', $schedule_slug, $this->nextCharge, $this->id)) {
+		if (!$stmt->bind_param('sssi', $schedule_slug, $engine_slug, $this->nextCharge, $this->id)) {
 			throw new DBBindParamException($db, $stmt);
 		}
 
@@ -1331,7 +1343,7 @@ class Account {
 		// Bill user
 		$this->paymentIsDue();
 		$this->lastTransactionID =
-				TransactionLogger::Log($this->id, is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(), 0, 'Payment schedule "' . $this->schedule->name . '" set.');
+				TransactionLogger::Log($this->id, $engine_slug, 0, 'Payment schedule "' . $this->schedule->name . '" set.');
 		return TRUE;
 	}
 
@@ -1448,12 +1460,13 @@ class Account {
 	 *
 	 * @param string $plan_slug Slug of new plan
 	 * @param string $schedule_slug Slug of new payment schedule
+	 * @param string $engine_slug Slug of new payment engine
 	 *
 	 * @return boolean True if request was successful
 	 *
 	 * @throws DBException
 	 */
-	public function planChangeRequest($plan_slug, $schedule_slug) {
+	public function planChangeRequest($plan_slug, $schedule_slug, $engine_slug) {
 		// Sanity checks
 		$new_plan = Plan::getPlanBySlug($plan_slug);
 		if (is_null($new_plan) || $new_plan === FALSE) {
@@ -1485,7 +1498,7 @@ class Account {
 				$this->paymentEngine->changeSubscription($this->id, $plan_slug, $schedule_slug);
 			}
 
-			return $this->activatePlan($plan_slug, $schedule_slug);
+			return $this->activatePlan($plan_slug, $schedule_slug, $engine_slug);
 		}
 
 		// if no schedule specified and no default schedule found
@@ -1504,11 +1517,11 @@ class Account {
 		$db = UserConfig::getDB();
 
 		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
-				'accounts SET next_plan_slug = ?, next_schedule_slug = ? WHERE id = ?'))) {
+				'accounts SET next_plan_slug = ?, next_schedule_slug = ?, next_engine_slug = ? WHERE id = ?'))) {
 			throw new DBPrepareStmtException($db);
 		}
 
-		if (!$stmt->bind_param('ssi', $plan_slug, $schedule_slug, $this->id)) {
+		if (!$stmt->bind_param('sssi', $plan_slug, $schedule_slug, $engine_slug, $this->id)) {
 			throw new DBBindParamException($db, $stmt);
 		}
 
@@ -1517,7 +1530,7 @@ class Account {
 		}
 
 		$this->lastTransactionID =
-				TransactionLogger::Log($this->id, is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(), 0, 'Request to change plan to "' . $new_plan->name .
+				TransactionLogger::Log($this->id, $engine_slug, 0, 'Request to change plan to "' . $new_plan->name .
 						(is_null($new_schedule) ? '"' : '" and schedule to "' . $new_schedule->name) . '" stored.');
 		return TRUE;
 	}
@@ -1525,14 +1538,17 @@ class Account {
 	/**
 	 * Request a change of payment schedule to be applied at the end of current charge period
 	 *
-	 * @param string $schedule_slug New payment schedule
+	 * @param string $schedule_slug New payment schedule slug
+	 * @param string $engine_slug New payment engine slug
 	 *
 	 * @return boolean True if request was successful
 	 *
 	 * @throws DBException
 	 */
-	public function scheduleChangeRequest($schedule_slug) {
-		if (!($schedule = $this->plan->getPaymentScheduleBySlug($schedule_slug))) {
+	public function scheduleChangeRequest($schedule_slug, $engine_slug) {
+		if (!($schedule = $this->plan->getPaymentScheduleBySlug($schedule_slug))
+				|| !($engine = PaymentEngine::getEngineBySlug($engine_slug))
+		) {
 			return FALSE;
 		}
 
@@ -1543,7 +1559,7 @@ class Account {
 				$this->paymentEngine->changeSubscription($this->id, $this->plan, $schedule);
 			}
 
-			return $this->setPaymentSchedule($schedule_slug);
+			return $this->setPaymentSchedule($schedule_slug, $engine_slug);
 		}
 
 		// If requested schedule is same as current schedule, cancel any pending request
@@ -1555,11 +1571,12 @@ class Account {
 		$db = UserConfig::getDB();
 
 		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
-				'accounts SET next_plan_slug = plan_slug, next_schedule_slug = ? WHERE id = ?'))) {
+				'accounts SET next_plan_slug = plan_slug, next_schedule_slug = ?,
+					next_engine_slug = ? WHERE id = ?'))) {
 			throw new DBPrepareStmtException($db);
 		}
 
-		if (!$stmt->bind_param('si', $schedule_slug, $this->id)) {
+		if (!$stmt->bind_param('ssi', $schedule_slug, $engine_slug, $this->id)) {
 			throw new DBBindParamException($db, $stmt);
 		}
 
@@ -1568,7 +1585,7 @@ class Account {
 		}
 
 		$this->lastTransactionID =
-				TransactionLogger::Log($this->id, is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(), 0, 'Request to change schedule to "' . $schedule->name . '" stored.');
+				TransactionLogger::Log($this->id, $engine_slug, 0, 'Request to change schedule to "' . $schedule->name . '" stored.');
 		return TRUE;
 	}
 
@@ -1650,8 +1667,8 @@ class Account {
 
 		$db = UserConfig::getDB();
 
-		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
-				'accounts SET next_plan_slug = NULL, next_schedule_slug = NULL ' .
+		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'accounts SET ' .
+				'next_plan_slug = NULL, next_schedule_slug = NULL, next_engine_slug = NULL ' .
 				'WHERE id = ?'))) {
 			throw new DBPrepareStmtException($db);
 		}

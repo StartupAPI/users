@@ -22,6 +22,15 @@ $versions[_]['down'][]	= "";
 // Use boilerplate above to Add new migrations on top, right below this line.
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 32
+ * Payment Plans and Engines
+*/
+$versions[32]['up'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
+  ADD COLUMN next_engine_slug varchar(256) DEFAULT NULL AFTER `engine_slug`";
+$versions[32]['down'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
+  DROP COLUMN next_engine_slug";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 31
  * Adding account to user invitations
 */
