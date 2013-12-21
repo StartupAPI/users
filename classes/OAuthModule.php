@@ -449,7 +449,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		}
 
 		// nobody registered with this identity yet
-		if (is_null($user_id)) {
+		if (!$user_id) {
 			return null;
 		}
 
@@ -620,7 +620,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		?>
 		<form style="margin-bottom: 0" action="<?php echo $action?>" method="POST">
 		<?php
-		if (is_null($oauth_user_id)) {
+		if (!$oauth_user_id) {
 			if (is_null($this->connectButtonURL)) {
 				?><input type="submit" value="Connect existing <?php echo $this->getTitle() ?> account"/><?php
 			} else {
