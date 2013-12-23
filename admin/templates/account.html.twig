@@ -9,7 +9,7 @@
 					class="icon-pencil"></i> edit</a></h2>
 	{% if account_isIndividual %}
 		<p>
-		<form action="{{ USERSROOTURL }}/admin/controller/account.php?id={{ account_id }}" method="POST">
+		<form action="{{ USERSROOTURL }}/admin/account.php?id={{ account_id }}" method="POST">
 			<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
 			Individual accout
 			{% if user %}
@@ -123,7 +123,7 @@
 			{% endif %}
 		{% endif %}
 
-		<form action="{{ USERSROOTURL }}/admin/controller/account.php?id={{ account_id }}" method="POST">
+		<form action="{{ USERSROOTURL }}/admin/account.php?id={{ account_id }}" method="POST">
 			<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
 
 			<table class="table table-condensed">
@@ -169,7 +169,7 @@
 
 	{% if features %}
 		<h3>Features</h3>
-		<form class="form" action="{{ USERSROOTURL }}/admin/controller/account.php?id={{ account_id }}"
+		<form class="form" action="{{ USERSROOTURL }}/admin/account.php?id={{ account_id }}"
 		      method="POST">
 			{% for feature in features %}
 				<div
