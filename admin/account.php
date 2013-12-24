@@ -79,6 +79,7 @@ $template_data['account_name'] = $account->getName();
 $template_data['account_isActive'] = $account->isActive();
 
 $template_data['account_engine'] = is_null($account->getPaymentEngine()) ? 'None' : $account->getPaymentEngine()->getTitle();
+$template_data['next_account_engine'] = is_null($account->getNextPaymentEngine()) ? 'None' : $account->getNextPaymentEngine()->getTitle();
 
 $next_charge = $account->getNextCharge();
 if (!is_null($next_charge)) {
@@ -115,10 +116,12 @@ if ($plan && UserConfig::$useSubscriptions) {
 		}
 	}
 
-	$schedule = $account->getNextSchedule();
+	$next_schedule = $account->getNextSchedule();
 	if ($schedule) {
+		$template_data['next_schedule'] = $next_schedule->slug;
+
 		foreach ($schedule_data as $d) {
-			$template_data['next_schedule_' . $d] = $schedule->$d;
+			$template_data['next_schedule_' . $d] = $next_schedule->$d;
 		}
 	}
 

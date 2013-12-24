@@ -1240,7 +1240,7 @@ class Account {
 
 			$old_plan_slug = ($this->plan ? TRUE : FALSE) && $this->plan->slug;
 			$old_schedule_slug = is_null($this->schedule) ? NULL : $this->schedule->slug;
-			$old_engine_slug = is_null($this->paymentEngine) ? NULL : $this->paymentEngine->slug;
+			$old_engine_slug = is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug();
 
 			if ($this->plan) {
 				$this->plan->deactivate_hook($this->id, $plan_slug, $schedule_slug);
@@ -1377,6 +1377,15 @@ class Account {
 	 */
 	public function getPaymentEngine() {
 		return $this->paymentEngine;
+	}
+
+	/**
+	 * Returns next payment engine object to be used when current schedule ends
+	 *
+	 * @return PaymentEngine Payment engine object
+	 */
+	public function getNextPaymentEngine() {
+		return $this->nextPaymentEngine;
 	}
 
 	/**

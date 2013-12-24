@@ -28,7 +28,7 @@
 	<p>
 		Status: {% if account_isActive %}<b class="badge badge-success">Active</b>{% else %}<b
 				class="badge badge-important">Suspended</b>{% endif %}
-		Plan:
+		Current Plan:
 			{% if planIsSet %}
 				<a class="badge badge-info" href="plan.php?slug={{ plan_slug }}">
 					<i class="icon-briefcase icon-white"></i> {{ plan_name }}
@@ -38,32 +38,7 @@
 			{% endif %}
 	</p>
 
-	{% if planIsSet and useSubscriptions %}
-		<h3>Subscription</h3>
-		{% if plan_downgrade_to %}
-			<p>Plan automatically downgrades to: <a class="label"
-			                                        href="plan.php?slug={{ plan_downgrade_to_slug }}">{{ plan_downgrade_to }}</a>
-				if payment is due more than {{ plan_grace_period }} day(s)</p>
-		{% endif %}
-
-		<h4>Payment Schedule</h4>
-		{% if schedule_name %}
-			<p>Payment Schedule: <b>{{ schedule_name }}</b> ({{ schedule_description }})</p>
-			<p>Charge Amount: <b>${{ schedule_charge_amount }}</b></p>
-			<p>Charge Period: <b>{{ schedule_charge_period }}</b> days</p>
-		{% else %}
-			<i>Payment schedule is not set for this account</i>
-		{% endif %}
-
-		<h4>Payments</h4>
-
-		{% if schedule_name %}
-		<p>Payment Engine used: <b>{{ account_engine }}</b>
-			<a class="btn btn-mini"
-			   href="{{ USERSROOTURL }}/admin/choose_engine.php?account_id={{ account_id }}">change</a>
-		</p>
-		{% endif %}
-
+	<p>
 		<div>
 			{% if balance < 0 %}
 				<p>Amount owed</p>
@@ -80,37 +55,90 @@
 			{% endif %}
 		</div>
 
-		{% if account_next_charge %}
-			<div>
-				<p>Next charge: <b>{{ account_next_charge }}</b></p>
-			</div>
-		{% endif %}
-		{% if next_plan_name and next_plan_name != plan_name %}
-			<div>
-				<p>After this date following plan used:</p>
-
-				<p>Plan Name: <b><a href="plan.php?slug={{ next_plan_slug }}">{{ next_plan_name }}</a></b></p>
-
-				<p>Plan Description: {{ next_plan_description }}</p>
-
-				<p>Plan Details: <a href="{{ plan_details_url }}">{{ next_plan_details_url }}</a></p>
-			</div>
-		{% endif %}
-		{% if next_schedule and next_plan_name == plan_name %}
-			<p>After this date following schedule used:</p>
-		{% endif %}
-		{% if next_schedule %}
-			<p>Payment Schedule: <b>{{ next_schedule_name }}</b></p>
-			<p>Payment Schedule description: {{ next_schedule_description }}</p>
-			<p>Charge Amount: <b>${{ next_schedule_charge_amount }}</b></p>
-			<p>Charge Period: <b>{{ next_schedule_charge_period }}</b> days</p>
-		{% endif %}
-
 		<div>
 			<i class="icon-list-alt"></i> <a
 					href="{{ USERSROOTURL }}/admin/transaction_log.php?account_id={{ account_id }}">View account
 				transaction log</a>
 		</div>
+	</p>
+
+	{% if useSubscriptions and planIsSet and schedule_name %}
+		<h3>Subscriptions</h3>
+
+		{% if plan_downgrade_to %}
+			<p>Plan automatically downgrades to: <a class="label"
+			                                        href="plan.php?slug={{ plan_downgrade_to_slug }}">{{ plan_downgrade_to }}</a>
+				if payment is due more than {{ plan_grace_period }} day(s)</p>
+		{% endif %}
+
+		{% if schedule_name %}
+			<div class="well">
+				{% if next_plan_name and next_plan_name != plan_name or next_schedule %}
+					<h4>Current Subscription</h4>
+					{% if next_plan_name and next_plan_name != plan_name or next_schedule %}
+						<p><span class="badge badge-warning">until {{ account_next_charge }}</span></p>
+					{% endif %}
+				{% endif %}
+
+				{% if next_plan_name and next_plan_name != plan_name %}
+					<p>Plan Name:
+						<a class="badge badge-info" href="plan.php?slug={{ plan_slug }}">
+							<i class="icon-briefcase icon-white"></i> {{ plan_name }}
+						</a>
+					</p>
+
+					<p>Plan Description: {{ plan_description }}</p>
+
+					{% if plan_details_url %}
+						<p>Plan Details: <a href="{{ plan_details_url }}">{{ plan_details_url }}</a></p>
+					{% endif %}
+				{% endif %}
+
+				<p>Payment Schedule: <b>{{ schedule_name }}</b> ({{ schedule_description }})</p>
+				<p>Charge Amount: <b>${{ schedule_charge_amount }}</b></p>
+				<p>Charge Period: <b>{{ schedule_charge_period }}</b> days</p>
+				<p>Payment Engine: <b>{{ account_engine }}</b></p>
+
+				{% if account_next_charge %}
+					<div>
+						{% if next_plan_name and next_plan_name != plan_name or next_schedule %}
+						{% else %}
+							<p>Next charge: <b>{{ account_next_charge }}</b></p>
+						{% endif %}
+					</div>
+				{% endif %}
+			</div>
+
+			{% if next_plan_name and next_plan_name != plan_name or next_schedule %}
+				<div class="well">
+					<h4>Next Subscription</h4>
+					<p><span class="badge badge-success">starting {{ account_next_charge }}</span></p>
+
+					{% if next_plan_name and next_plan_name != plan_name %}
+						<p>Plan Name:
+							<a class="badge badge-info" href="plan.php?slug={{ next_plan_slug }}">
+								<i class="icon-briefcase icon-white"></i> {{ next_plan_name }}
+							</a>
+						</p>
+
+						<p>Plan Description: {{ next_plan_description }}</p>
+
+						{% if next_plan_details_url %}
+							<p>Plan Details: <a href="{{ next_plan_details_url }}">{{ next_plan_details_url }}</a></p>
+						{% endif %}
+					{% endif %}
+
+					{% if next_schedule %}
+						<p>Payment Schedule: <b>{{ next_schedule_name }}</b> ({{ next_schedule_description }})</p>
+						<p>Charge Amount: <b>${{ next_schedule_charge_amount }}</b></p>
+						<p>Charge Period: <b>{{ next_schedule_charge_period }}</b> days</p>
+						<p>Payment Engine: <b>{{ next_account_engine }}</b></p>
+					{% endif %}
+				</div>
+			{% endif %}
+
+		{% endif %}
+
 	{% endif %}
 
 	{% if show_user_list %}
