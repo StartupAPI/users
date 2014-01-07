@@ -127,6 +127,19 @@ abstract class PaymentEngine extends StartupAPIModule {
 	}
 
 	/**
+	 * Indicates that user interaction required and therefore admins
+	 * can't just switch plans through admin UI
+	 *
+	 * For most classes it would return TRUE (default), but for manual (pre-payment / invoicing)
+	 * engine, which process payments offline, this will return FALSE.
+	 *
+	 * @return boolean
+	 */
+	public function isUserInteractionRequired() {
+		return TRUE;
+	}
+
+	/**
 	 * This method should be called by subsclasses which actually receives information about payment
 	 *
 	 * @param array $data Array with "account_id" and "amount" keys

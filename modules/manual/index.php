@@ -169,4 +169,16 @@ class ManualPaymentEngine extends PaymentEngine {
 		return "<div>Operator: <b>$name</b>, Source: <b>$source</b>, Comment: $comment</div>";
 	}
 
+	/**
+	 * Indicates that user interaction required and therefore admins
+	 * can't just switch plans through admin UI
+	 *
+	 * This engine processes payments offline, this method should return FALSE.
+	 *
+	 * @return boolean
+	 */
+	public function isUserInteractionRequired() {
+		return FALSE;
+	}
+
 }
