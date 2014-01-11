@@ -62,7 +62,7 @@ class ExternalPaymentEngine extends PaymentEngine {
 	 */
 	public function getActionURL($plan = null, $schedule = null, $account = null) {
 		return $this->url . (strstr($this->url, '?') === FALSE ? '?' : '&') .
-				'plan=' . $plan->slug .
+				'plan=' . $plan->getSlug() .
 				'&schedule=' . $schedule->slug .
 				'&account=' . $account->getID();
 	}

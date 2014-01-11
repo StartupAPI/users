@@ -263,7 +263,8 @@ abstract class PaymentEngine extends StartupAPIModule {
 				continue;
 			}
 
-			if ($plan->grace_period && $plan->grace_period * 86400 + $date_time > time()) {
+			$grace_period = $plan->getGracePeriod();
+			if ($grace_period && $grace_period * 86400 + $date_time > time()) {
 				$account->deactivatePlan();
 			}
 		}

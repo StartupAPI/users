@@ -67,8 +67,6 @@ if (array_key_exists('promote_user', $_POST) || array_key_exists('demote_user', 
 /* ------------------- Preparing data for template ------------------------------------- */
 $template_data['CSRF_NONCE'] = UserTools::$CSRF_NONCE;
 
-$plan_data = array('slug', 'name', 'description', 'base_price', 'base_period', 'details_url', 'grace_period');
-
 $schedule_data = array('name', 'description', 'charge_amount', 'charge_period');
 
 $template_data['useSubscriptions'] = UserConfig::$useSubscriptions;
@@ -90,23 +88,32 @@ $plan = $account->getPlan(); // can be FALSE
 $template_data['planIsSet'] = $plan ? TRUE : FALSE;
 
 if ($plan) {
-	foreach ($plan_data as $d) {
-		$template_data['plan_' . $d] = $plan->$d;
-	}
+	$template_data['plan_slug'] = $plan->getSlug();
+	$template_data['plan_name'] = $plan->getName();
+	$template_data['plan_description'] = $plan->getDescription();
+	$template_data['plan_base_price'] = $plan->getBasePrice();
+	$template_data['plan_base_period'] = $plan->getBasePeriod();
+	$template_data['plan_details_url'] = $plan->getDetailsURL();
+	$template_data['plan_grace_period'] = $plan->getGracePeriod();
 }
 
 if ($plan && UserConfig::$useSubscriptions) {
-	$downgrade = Plan::getPlanBySlug($plan->downgrade_to);
+	$downgrade = $plan->getDowngradeToPlan();
 	if ($downgrade) {
-		$template_data['plan_downgrade_to'] = $downgrade->name;
-		$template_data['plan_downgrade_to_slug'] = $downgrade->slug;
+		$template_data['plan_downgrade_to'] = $downgrade->getName();
+		$template_data['plan_downgrade_to_slug'] = $downgrade->getSlug();
 	}
 
 	$next_plan = $account->getNextPlan();
+
 	if ($next_plan) {
-		foreach ($plan_data as $d) {
-			$template_data['next_plan_' . $d] = $next_plan->$d;
-		}
+		$template_data['next_plan_slug'] = $next_plan->getSlug();
+		$template_data['next_plan_name'] = $next_plan->getName();
+		$template_data['next_plan_description'] = $next_plan->getDescription();
+		$template_data['next_plan_base_price'] = $next_plan->getBasePrice();
+		$template_data['next_plan_base_period'] = $next_plan->getBasePeriod();
+		$template_data['next_plan_details_url'] = $next_plan->getDetailsURL();
+		$template_data['next_plan_grace_period'] = $next_plan->getGracePeriod();
 	}
 
 	$schedule = $account->getSchedule();

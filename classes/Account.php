@@ -1238,7 +1238,7 @@ class Account {
 				return FALSE;
 			}
 
-			$old_plan_slug = ($this->plan ? TRUE : FALSE) && $this->plan->slug;
+			$old_plan_slug = ($this->plan ? TRUE : FALSE) && $this->plan->getSlug();
 			$old_schedule_slug = is_null($this->schedule) ? NULL : $this->schedule->slug;
 			$old_engine_slug = is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug();
 
@@ -1274,7 +1274,7 @@ class Account {
 
 			$this->paymentIsDue();
 			$this->lastTransactionID =
-					TransactionLogger::Log($this->id, $engine_slug, 0, 'Plan "' . $this->plan->name . '" activated');
+					TransactionLogger::Log($this->id, $engine_slug, 0, 'Plan "' . $this->plan->getName() . '" activated');
 			return TRUE;
 		}
 	}
@@ -1282,6 +1282,8 @@ class Account {
 	/**
 	 * Deactivates subscription plan and downgrades to plan defined in "downgrade_to"
 	 * or suspend the account
+	 *
+	 * @TODO Something is off here - downgrade_to property is not on account, but on Plan
 	 *
 	 * @return boolean True if account is still active and false if suspended
 	 */
@@ -1292,14 +1294,14 @@ class Account {
 
 			$this->activatePlan($this->downgrade_to);
 			$this->lastTransactionID =
-					TransactionLogger::Log($this->id, is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(), 0, 'Plan downgraded to "' . $this->plan->name . '"');
+					TransactionLogger::Log($this->id, is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(), 0, 'Plan downgraded to "' . $this->plan->getName() . '"');
 			return TRUE;
 		} else {
 
 			// Nothing to downgrade to - mark account as not active
 			$this->suspend();
 			$this->lastTransactionID =
-					TransactionLogger::Log($this->id, is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(), 0, 'Account suspended due to plan "' . $this->plan->name . '" deactivation');
+					TransactionLogger::Log($this->id, is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(), 0, 'Account suspended due to plan "' . $this->plan->getName() . '" deactivation');
 			return FALSE;
 		}
 	}
@@ -1364,7 +1366,7 @@ class Account {
 	 */
 	public function getPlanSlug() {
 		if ($this->plan) {
-			return $this->plan->slug;
+			return $this->plan->getSlug();
 		} else {
 			return null;
 		}
@@ -1400,8 +1402,9 @@ class Account {
 			$plan = Plan::getPlanBySlug(UserConfig::$default_plan_slug);
 		}
 
-		if ($plan && array_key_exists('individual', $plan->capabilities)) {
-			return $plan->capabilities['individual'] ? true : false;
+		$capabilities = $plan->getCapabilities();
+		if ($plan && array_key_exists('individual', $capabilities)) {
+			return $capabilities['individual'] ? true : false;
 		}
 
 		// if nothing worked, default to multi-user accounts
@@ -1518,7 +1521,7 @@ class Account {
 		}
 
 		// If requested plan/schedule is same as current plan/schedule, cancel any pending request
-		if ($this->plan->slug == $plan_slug && ((!is_null($this->schedule) &&
+		if ($this->plan->getSlug() == $plan_slug && ((!is_null($this->schedule) &&
 				$this->schedule->slug == $schedule_slug) || (is_null($this->schedule) && is_null($schedule_slug)))) {
 			return $this->cancelChangeRequest();
 		}
@@ -1540,7 +1543,7 @@ class Account {
 		}
 
 		$this->lastTransactionID =
-				TransactionLogger::Log($this->id, $engine_slug, 0, 'Request to change plan to "' . $new_plan->name .
+				TransactionLogger::Log($this->id, $engine_slug, 0, 'Request to change plan to "' . $new_plan->getName() .
 						(is_null($new_schedule) ? '"' : '" and schedule to "' . $new_schedule->name) . '" stored.');
 		return TRUE;
 	}

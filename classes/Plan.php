@@ -22,6 +22,11 @@ class Plan {
 	private $name;
 
 	/**
+	 * @var boolean Indicates to users that plan is available for selection
+	 */
+	private $available;
+
+	/**
 	 * @var string Plan description
 	 */
 	private $description;
@@ -56,7 +61,7 @@ class Plan {
 	/**
 	 * @var string Slug of the plan to downgrade to when subscription ends or cancelled
 	 */
-	private $downgrade_to;
+	private $downgrade_to_slug;
 
 	/**
 	 * @var int Amount of days to wait after due payment is not recieved before downgrading the account
@@ -81,7 +86,7 @@ class Plan {
 	/**
 	 * @var Plan[] Array of currently registered plans in the system
 	 */
-	private static $Plans = array();
+	private static $plans = array();
 
 	/**
 	 * Creates new plan
@@ -91,58 +96,51 @@ class Plan {
 	 *
 	 * @throws Exception
 	 */
-	public function __construct($slug, $a) {
+	public function __construct($slug, $settings) {
 
-		# Known parameters and their default values listed here:
-		$parameters = array(
-			'slug' => NULL,
-			'name' => NULL,
-			'available' => TRUE,
-			'description' => NULL,
-			'base_price' => NULL,
-			'base_period' => NULL,
-			'details_url' => NULL,
-			'payment_schedules' => array(),
-			'capabilities' => array(),
-			'downgrade_to' => UserConfig::$default_plan_slug,
-			'grace_period' => NULL,
-			'user_activate_hook' => NULL,
-			'user_deactivate_hook' => NULL
-		);
-
-		if ($slug === NULL) {
-			throw new Exception("slug required");
+		if (!$slug) {
+			throw new Exception("Plan slug is required");
 		}
 
-		if (!is_array($a)) {
-			throw new Exception("configuration array required");
+		if (!is_array($settings)) {
+			throw new Exception("Configuration array required");
 		}
 
-		$a['slug'] = $slug;
+		$settings['slug'] = $slug;
 
-		# Mandatory parameters are those whose default value is NULL
-		$mandatory = array('slug', 'name');
-
-		$missing = array_diff($mandatory, array_keys($a));
-		if (count($missing)) {
-			throw new Exception("Following mandatory parameters were not found in init array for plan $slug: " . implode(',', $missing));
+		if (!array_key_exists('slug', $settings) && $settings['slug']) {
+			throw new Exception("Mandatory parameter 'slug' was not found in init array for plan $slug");
 		}
 
-		# Set attributes according to init array
-		foreach ($parameters as $p => $v) {
-			if (isset($a[$p])) {
-				$this->$p = $a[$p];
-			} else {
-				$this->$p = $v;
-			}
+		if (!array_key_exists('name', $settings) && $settings['name']) {
+			throw new Exception("Mandatory parameter 'name' was not found in init array for plan $slug");
 		}
 
-		# If downgrade_to has the same slug as we have, reset it to null
-		if ($this->slug == $this->downgrade_to) {
-			$this->downgrade_to = NULL;
+		// mandatory parameters checked above
+		$this->slug = $settings['slug'];
+		$this->name = $settings['name'];
+
+		// these are initialized to non-null value if not set
+		$this->available = isset($settings['available']) ? $settings['available'] : TRUE;
+		$this->payment_schedules = isset($settings['payment_schedules']) ? $settings['payment_schedules'] : array();
+		$this->downgrade_to_slug = isset($settings['downgrade_to']) ? $settings['downgrade_to'] : UserConfig::$default_plan_slug;
+
+		// the rest are initialized to null if not set
+		$this->description = isset($settings['description']) ? $settings['description'] : NULL;
+		$this->base_price = isset($settings['base_price']) ? $settings['base_price'] : NULL;
+		$this->base_period = isset($settings['base_period']) ? $settings['base_period'] : NULL;
+		$this->details_url = isset($settings['details_url']) ? $settings['details_url'] : NULL;
+		$this->capabilities = isset($settings['capabilities']) ? $settings['capabilities'] : NULL;
+		$this->grace_period = isset($settings['grace_period']) ? $settings['grace_period'] : NULL;
+		$this->account_activate_hook = isset($settings['account_activate_hook']) ? $settings['account_activate_hook'] : NULL;
+		$this->account_deactivate_hook = isset($settings['account_deactivate_hook']) ? $settings['account_deactivate_hook'] : NULL;
+
+		// If downgrade_to has the same slug as we have, reset it to null
+		if ($this->slug == $this->downgrade_to_slug) {
+			$this->downgrade_to_slug = NULL;
 		}
 
-		# Instantiate PaymentSchedules, replacing stored parameters arrays with actual objects
+		// Instantiate PaymentSchedules, replacing stored parameters arrays with actual objects
 		if (is_array($this->payment_schedules)) {
 			$schedules = array();
 			foreach ($this->payment_schedules as $slug => $s) {
@@ -165,20 +163,88 @@ class Plan {
 			throw new Exception("Deactivate hook defined, but is not callable");
 		}
 
-		self::$Plans[] = $this;
-
-		# We are all set
+		// register new plan globally
+		self::$plans[] = $this;
 	}
 
 	/**
-	 * Makes private properties visible, but read-only
-	 *
-	 * @param string $v Name of property to return
-	 *
-	 * @return mixed Value of property
+	 * @return string Plan slug
 	 */
-	public function __get($v) {
-		return (!in_array($v, array('instance')) && isset($this->$v)) ? $this->$v : false;
+	public function getSlug() {
+		return $this->slug;
+	}
+
+	/**
+	 * @return string Plan name
+	 */
+	public function getName() {
+		return $this->name;
+	}
+
+	/**
+	 * @return boolean True if plan is available and False if it's registered, but currently disabled
+	 */
+	public function isAvailable() {
+		return $this->available ? TRUE : FALSE;
+	}
+
+	/**
+	 * @return PaymentSchedule[] Array of payment schedules for this plan
+	 */
+	public function getPaymentSchedules() {
+		return $this->payment_schedules;
+	}
+
+	/**
+	 * @return Plan Plan to downgrade to
+	 */
+	public function getDowngradeToPlan() {
+		return self::getPlanBySlug($this->downgrade_to_slug);
+	}
+
+	/**
+	 * @return string Plan descriptions
+	 */
+	public function getDescription() {
+		return $this->description;
+	}
+
+	/**
+	 * @return int Price to be displayed in UI (actually charged price is defined in payment schedules)
+	 */
+	public function getBasePrice() {
+		return $this->base_price;
+	}
+
+	/**
+	 * Returns charge period string (associated with base price) to be displayed in UI
+	 * (actual periods used are defined in payment schedules)
+	 *
+	 * @return string Charge period to be displayed in UI
+	 */
+	public function getBasePeriod() {
+		return $this->base_period;
+	}
+
+	/**
+	 * @return string URL of plan details page
+	 */
+	public function getDetailsURL() {
+		return $this->details_url;
+	}
+
+	/**
+	 * @return mixed[] Array of capabilities enabled as part of this plan
+	 */
+	public function getCapabilities() {
+		return $this->capabilities;
+	}
+
+	/**
+	 * @return int Amount of days to wait after due payment is not recieved before downgrading the account
+	 */
+	public function getGracePeriod() {
+		return $this->grace_period;
 	}
 
 	/**
@@ -194,6 +260,17 @@ class Plan {
 		}
 
 		return $slugs;
+	}
+
+	/**
+	 * Compares two plans (by matching slugs)
+	 *
+	 * @param Plan $other_plan Plan to compare to
+	 *
+	 * @return boolean True if same plan
+	 */
+	public function isTheSameAs($other_plan) {
+		return $this->slug == $other_plan->getSlug();
 	}
 
 	/**
@@ -267,10 +344,10 @@ class Plan {
 		}
 
 		call_user_func_array($this->account_activate_hook, array(
-			'AccountID' => $account_id,
-			'OldPlanSlug' => $old_plan_slug,
-			'OldScheduleSlug' => $old_schedule_slug,
-			'OldEngineSlug' => $old_engine_slug
+			$account_id,
+			$old_plan_slug,
+			$old_schedule_slug,
+			$old_engine_slug
 		));
 	}
 
@@ -289,10 +366,10 @@ class Plan {
 		}
 
 		call_user_func_array($this->account_deactivate_hook, array(
-			'AccountID' => $account_id,
-			'NewPlanSlug' => $new_plan_slug,
-			'NewScheduleSlug' => $new_schedule_slug,
-			'NewEngineSlug' => $new_engine_slug,
+			$account_id,
+			$new_plan_slug,
+			$new_schedule_slug,
+			$new_engine_slug,
 		));
 	}
 
@@ -308,10 +385,10 @@ class Plan {
 //    if (count(self::$Plans))
 //      throw new Exception("Already initialized");
 
-		self::$Plans = array(); // Isn't it an init?
+		self::$plans = array(); // Isn't it an init?
 
 		if (!is_array($plan_parameters)) {
-			throw new Exception("Parameter is not an array");
+			throw new Exception("Plan parameters is not an array");
 		}
 
 		foreach ($plan_parameters as $slug => $param) {
@@ -328,11 +405,11 @@ class Plan {
 	 * null if there is no such plan with a slug and Plan object if found
 	 */
 	public static function getPlanBySlug($slug) {
-		if ($slug === NULL || !count(self::$Plans)) {
+		if ($slug === NULL || !count(self::$plans)) {
 			return FALSE;
 		}
 
-		foreach (self::$Plans as $p) {
+		foreach (self::$plans as $p) {
 			if ($p->slug == $slug) {
 				return $p;
 			}
@@ -348,12 +425,12 @@ class Plan {
 	 */
 	public static function getPlanSlugs() {
 
-		if (!count(self::$Plans)) {
+		if (!count(self::$plans)) {
 			return FALSE;
 		}
 
 		$slugs = array();
-		foreach (self::$Plans as $p) {
+		foreach (self::$plans as $p) {
 			$slugs[] = $p->slug;
 		}
 

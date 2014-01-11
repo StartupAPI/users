@@ -17,28 +17,33 @@ if (is_null($plan)) {
 }
 
 $ADMIN_SECTION = 'plans';
-$BREADCRUMB_EXTRA = $plan->name;
+$BREADCRUMB_EXTRA = $plan->getName();
 require_once(__DIR__ . '/header.php');
 ?>
 <div class="span9">
-	<h2><?php echo UserTools::escape($plan->name); ?></h2>
+	<h2><?php echo UserTools::escape($plan->getName()); ?></h2>
 	<p>
-		<?php if (isset($plan->capabilities['individual']) && $plan->capabilities['individual']) { ?>
+		<?php
+		$capabilities = $plan->getCapabilities();
+		if (isset($capabilities['individual']) && $capabilities['individual']) {
+			?>
 			<span class="badge">individual</span>
-		<?php } ?>
+			<?php
+		}
+		?>
 	</p>
 	<p>
-		<?php echo UserTools::escape($plan->description); ?><br/>
-		<?php if ($plan->details_url) { ?><i>Details page: <a target="_blank" href="<?php echo UserTools::escape($plan->details_url); ?>"><?php echo UserTools::escape($plan->details_url); ?></a></i><?php } ?>
+		<?php echo UserTools::escape($plan->getDescription()); ?><br/>
+		<?php if ($plan->getDetailsURL()) { ?><i>Details page: <a target="_blank" href="<?php echo UserTools::escape($plan->getDetailsURL()); ?>"><?php echo UserTools::escape($plan->getDetailsURL()); ?></a></i><?php } ?>
 	</p>
 	<?php
 	if (UserConfig::$useSubscriptions) {
-		$downgrade_to = Plan::getPlanBySlug($plan->downgrade_to);
+		$downgrade_to = $plan->getDowngradeToPlan();
 		if (!is_null($downgrade_to)) {
 			?>
 			<p>
 				Downgrades to:
-				<a class="badge badge-info" href="plan.php?slug=<?php echo $downgrade_to->slug ?>"><i class="icon-briefcase icon-white"></i> <?php echo $downgrade_to->name ?></a>
+				<a class="badge badge-info" href="plan.php?slug=<?php echo $downgrade_to->getSlug() ?>"><i class="icon-briefcase icon-white"></i> <?php echo $downgrade_to->getName() ?></a>
 			</p>
 			<?php
 		}

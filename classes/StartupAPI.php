@@ -149,8 +149,8 @@ class StartupAPI {
 
 									if ($current_plan) {
 										?>
-										<span class="label label-info" style="margin-left: 0.5em" title="<?php echo UserTools::escape($current_plan->description) ?>">
-											<?php echo UserTools::escape($current_plan->name) ?>
+										<span class="label label-info" style="margin-left: 0.5em" title="<?php echo UserTools::escape($current_plan->getDescription()) ?>">
+											<?php echo UserTools::escape($current_plan->getName()) ?>
 										</span>
 										<?php
 									}
@@ -183,8 +183,8 @@ class StartupAPI {
 
 												   if ($plan) {
 													   ?>
-													<span class="label" style="margin-left: 0.5em" title="<?php echo UserTools::escape($plan->description) ?>">
-														<?php echo UserTools::escape($plan->name) ?>
+													<span class="label" style="margin-left: 0.5em" title="<?php echo UserTools::escape($plan->getDescription()) ?>">
+														<?php echo UserTools::escape($plan->getName()) ?>
 													</span>
 													<?php
 												} else {
@@ -305,7 +305,7 @@ class StartupAPI {
 	}
 
 	/**
-	 * This function should be called after all configuration is loaded to initialize the system.
+	 * This function is called after all configuration is loaded to initialize the system.
 	 */
 	static function _init() {
 		/**
@@ -393,7 +393,7 @@ class DBException extends StartupAPIException {
 			$exception_message = "[$class] Can't connect to database: (" . $db->connect_errno . ") " .
 					$db->connect_error . " (in $file on line $line)";
 		} else if ($db->error) {
-			$exception_message = "[$class] DB Error: " . $db->error . " (in $file on line $line)" ;
+			$exception_message = "[$class] DB Error: " . $db->error . " (in $file on line $line)";
 		} else if (!$stmt) {
 			$exception_message = "[$class]" .
 					' $db->error: ' . $db->error .

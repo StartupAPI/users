@@ -23,8 +23,8 @@ class TestSimple1 extends UnitTestCase {
     $plan = new Plan(0,array('name' => 'test plan',
                              'details_url' => 'lalala'));
     $this -> assertNotNull( $plan );
-    $this -> assertEqual( $plan->name, 'test plan' );
-    $this -> assertEqual( $plan->details_url, 'lalala' );
+	$this -> assertEqual( $plan->getName(), 'test plan' );
+	$this -> assertEqual( $plan->getDetailsURL(), 'lalala' );
     $this -> assertEqual( $plan -> getPaymentScheduleSlugs(), array());
   }
 

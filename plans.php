@@ -69,7 +69,7 @@ if (array_key_exists('plan', $_POST)) {
 			$_SESSION['message'][] = "Not enough funds to activate plan/schedule";
 		} elseif (
 				$account->getPlanSlug() != $selected_plan_slug ||
-				(!is_null($account->getNextPlan()) && $account->getNextPlan()->slug != $selected_plan_slug)
+				(!is_null($account->getNextPlan()) && $account->getNextPlan()->getSlug() != $selected_plan_slug)
 		) {
 			// Not changing plan if requestfed plan is same as current or next
 
@@ -136,8 +136,6 @@ if (!$account->isActive()) {
 	return;
 }
 
-$plan_data = array(
-	'slug', 'name', 'description', 'base_price', 'base_period', 'details_url', 'downgrade_to', 'grace_period', 'available');
 $schedule_data = array(
 	'slug', 'name', 'description', 'charge_amount', 'charge_period');
 
@@ -155,16 +153,22 @@ $i = 0;
 $base_plan_index = null;
 
 $plans = array();
-foreach ($plan_slugs as $p) { # Iterate over all configured plans
-	$this_plan = Plan::getPlanBySlug($p);
+foreach ($plan_slugs as $plan_slug) { # Iterate over all configured plans
+	$this_plan = Plan::getPlanBySlug($plan_slug);
 	$plan = array();
-	foreach ($plan_data as $d) {
-		# Put all plan properties
-		$plan[$d] = $this_plan->$d;
-	}
+
+	$plan['slug'] = $this_plan->getSlug();
+	$plan['name'] = $this_plan->getName();
+	$plan['description'] = $this_plan->getDescription();
+	$plan['base_price'] = $this_plan->getBasePrice();
+	$plan['base_period'] = $this_plan->getBasePeriod();
+	$plan['details_url'] = $this_plan->getDetailsURL();
+	$plan['downgrade_to'] = $this_plan->getDowngradeToPlan();
+	$plan['grace_period'] = $this_plan->getGracePeriod();
+	$plan['available'] = $this_plan->isAvailable();
 
 	# Mark plan as current if slugs match
-	if ($current_plan && $current_plan->slug == $this_plan->slug) {
+	if ($current_plan && $current_plan->getSlug() == $this_plan->getSlug()) {
 		$plan['current'] = TRUE;
 	} else {
 		$plan['current'] = FALSE;
@@ -174,7 +178,7 @@ foreach ($plan_slugs as $p) { # Iterate over all configured plans
 	$schedule_slugs = $this_plan->getPaymentScheduleSlugs(); # Iterate over all schedules of this plan
 
 	if (!is_null($account->getNextPlan()) &&
-			$account->getNextPlan()->slug == $this_plan->slug) {
+			$account->getNextPlan()->getSlug() == $this_plan->getSlug()) {
 		$plan['chosen'] = TRUE;
 		$template_data['next_chosen'] = TRUE;
 	} else {
@@ -240,7 +244,7 @@ if (array_key_exists('plan', $_GET)) {
 
 	if ($selected_plan_slug) {
 		foreach ($template_data['plans'] as $plan) {
-			if ($plan['slug'] == $selected_plan_slug->slug) {
+			if ($plan['slug'] == $selected_plan_slug->getSlug()) {
 				$template_data['plan'] = $plan;
 				$display_template = 'plan/select_payment_method.html.twig';
 				break;

@@ -57,7 +57,7 @@ require_once(__DIR__ . '/header.php');
 								   }
 								   ?>
 								   >
-							<span class="badge badge-info"><i class="icon-briefcase icon-white"></i> <?php echo UserTools::escape($plan->name) ?></span>
+							<span class="badge badge-info"><i class="icon-briefcase icon-white"></i> <?php echo UserTools::escape($plan->getName()) ?></span>
 						</label>
 						<?php
 					}

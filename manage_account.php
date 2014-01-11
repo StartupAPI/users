@@ -15,7 +15,6 @@ UserTools::preventCSRF();
 $template_data['CSRF_NONCE'] = UserTools::$CSRF_NONCE;
 
 // plan and schedule properties
-$plan_data = array('slug', 'name', 'description', 'base_price', 'base_period', 'details_url', 'grace_period');
 $schedule_data = array('name', 'description', 'charge_amount', 'charge_period');
 
 $template_data['useSubscriptions'] = UserConfig::$useSubscriptions;
@@ -36,44 +35,14 @@ $plan = $account->getPlan(); // can be FALSE
 $template_data['planIsSet'] = $plan ? TRUE : FALSE;
 
 if ($plan) {
-	foreach ($plan_data as $d) {
-		$template_data['plan_' . $d] = $plan->$d;
-	}
+	$template_data['plan_slug'] = $plan->getSlug();
+	$template_data['plan_name'] = $plan->getName();
+	$template_data['plan_description'] = $plan->getDescription();
+	$template_data['plan_base_price'] = $plan->getBasePrice();
+	$template_data['plan_base_period'] = $plan->getBasePeriod();
+	$template_data['plan_details_url'] = $plan->getDetailsURL();
+	$template_data['plan_grace_period'] = $plan->getGracePeriod();
 }
-
-/*
-  if ($plan && UserConfig::$useSubscriptions) {
-  $downgrade = Plan::getPlanBySlug($plan->downgrade_to);
-  if ($downgrade) {
-  $template_data['plan_downgrade_to'] = $downgrade->name;
-  $template_data['plan_downgrade_to_slug'] = $downgrade->slug;
-  }
-
-  $next_plan = $account->getNextPlan();
-  if ($next_plan) {
-  foreach ($plan_data as $d) {
-  $template_data['next_plan_' . $d] = $next_plan->$d;
-  }
-  }
-
-  $schedule = $account->getSchedule();
-  if ($schedule) {
-  foreach ($schedule_data as $d) {
-  $template_data['schedule_' . $d] = $schedule->$d;
-  }
-  }
-
-  $schedule = $account->getNextSchedule();
-  if ($schedule) {
-  foreach ($schedule_data as $d) {
-  $template_data['next_schedule_' . $d] = $schedule->$d;
-  }
-  }
-
-  $template_data['charges'] = $account->getCharges();
-  $template_data['balance'] = $account->getBalance();
-  }
- */
 
 $account_users = $account->getUsers();
 uasort($account_users, function($a, $b) {

@@ -196,9 +196,9 @@ require_once(__DIR__ . '/header.php');
 					if ($plan) {
 						?>
 						<a class="badge badge-info"
-						   href="<?php echo UserConfig::$USERSROOTURL ?>/admin/plan.php?slug=<?php echo UserTools::escape($plan->slug); ?>">
+						   href="<?php echo UserConfig::$USERSROOTURL ?>/admin/plan.php?slug=<?php echo UserTools::escape($plan->getSlug()); ?>">
 							<i class="icon-briefcase icon-white"></i>
-							<?php echo UserTools::escape($plan->name); ?>
+							<?php echo UserTools::escape($plan->getName()); ?>
 						</a>
 						<?php
 					} else {

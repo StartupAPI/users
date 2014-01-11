@@ -72,7 +72,7 @@ if (is_null($search)) {
 						$plan = $account->getPlan(); // can be FALSE
 						if ($plan) {
 							?>
-							<a class="badge badge-info" href="plan.php?slug=<?php echo $plan->slug ?>"><i class="icon-briefcase icon-white"></i> <?php echo $plan->name ?></a>
+							<a class="badge badge-info" href="plan.php?slug=<?php echo $plan->getSlug() ?>"><i class="icon-briefcase icon-white"></i> <?php echo $plan->getName() ?></a>
 							<?php
 						} else {
 							?>
