@@ -67,8 +67,6 @@ if (array_key_exists('promote_user', $_POST) || array_key_exists('demote_user', 
 /* ------------------- Preparing data for template ------------------------------------- */
 $template_data['CSRF_NONCE'] = UserTools::$CSRF_NONCE;
 
-$schedule_data = array('name', 'description', 'charge_amount', 'charge_period');
-
 $template_data['useSubscriptions'] = UserConfig::$useSubscriptions;
 
 $template_data['account_id'] = $account_id;
@@ -118,18 +116,20 @@ if ($plan && UserConfig::$useSubscriptions) {
 
 	$schedule = $account->getSchedule();
 	if ($schedule) {
-		foreach ($schedule_data as $d) {
-			$template_data['schedule_' . $d] = $schedule->$d;
-		}
+		$template_data['schedule_name'] = $schedule->getName();
+		$template_data['schedule_description'] = $schedule->getDescription();
+		$template_data['schedule_charge_amount'] = $schedule->getChargeAmount();
+		$template_data['schedule_charge_period'] = $schedule->getChargePeriod();
 	}
 
 	$next_schedule = $account->getNextSchedule();
-	if ($schedule) {
-		$template_data['next_schedule'] = $next_schedule->slug;
+	if ($next_schedule) {
+		$template_data['next_schedule'] = $next_schedule->getSlug();
 
-		foreach ($schedule_data as $d) {
-			$template_data['next_schedule_' . $d] = $next_schedule->$d;
-		}
+		$template_data['next_schedule_name'] = $next_schedule->getName();
+		$template_data['next_schedule_description'] = $next_schedule->getDescription();
+		$template_data['next_schedule_charge_amount'] = $next_schedule->getChargeAmount();
+		$template_data['next_schedule_charge_period'] = $next_schedule->getChargePeriod();
 	}
 
 	$template_data['charges'] = $account->getCharges();

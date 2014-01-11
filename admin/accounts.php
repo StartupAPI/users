@@ -86,7 +86,7 @@ if (is_null($search)) {
 							<?php
 							$schedule = $account->getSchedule();
 							if (!is_null($schedule)) {
-								echo $schedule->name;
+								echo $schedule->getName();
 							}
 							?>
 						</td>

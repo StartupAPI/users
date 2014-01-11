@@ -106,18 +106,12 @@ class Plan {
 			throw new Exception("Configuration array required");
 		}
 
-		$settings['slug'] = $slug;
-
-		if (!array_key_exists('slug', $settings) && $settings['slug']) {
-			throw new Exception("Mandatory parameter 'slug' was not found in init array for plan $slug");
-		}
-
 		if (!array_key_exists('name', $settings) && $settings['name']) {
 			throw new Exception("Mandatory parameter 'name' was not found in init array for plan $slug");
 		}
 
 		// mandatory parameters checked above
-		$this->slug = $settings['slug'];
+		$this->slug = $slug;
 		$this->name = $settings['name'];
 
 		// these are initialized to non-null value if not set
@@ -143,8 +137,8 @@ class Plan {
 		// Instantiate PaymentSchedules, replacing stored parameters arrays with actual objects
 		if (is_array($this->payment_schedules)) {
 			$schedules = array();
-			foreach ($this->payment_schedules as $slug => $s) {
-				$schedules[] = new PaymentSchedule($slug, $s);
+			foreach ($this->payment_schedules as $slug => $schedule_settings) {
+				$schedules[] = new PaymentSchedule($slug, $schedule_settings);
 			}
 
 			$this->payment_schedules = $schedules;
@@ -256,7 +250,7 @@ class Plan {
 		$slugs = array();
 
 		foreach ($this->payment_schedules as $schedule) {
-			$slugs[] = $schedule->slug;
+			$slugs[] = $schedule->getSlug();
 		}
 
 		return $slugs;
@@ -303,9 +297,9 @@ class Plan {
 		}
 
 		if (is_array($this->payment_schedules)) {
-			foreach ($this->payment_schedules as $x => $s) {
-				if ($s->slug == $slug) {
-					return $s;
+			foreach ($this->payment_schedules as $x => $schedule) {
+				if ($schedule->getSlug() == $slug) {
+					return $schedule;
 				}
 			}
 		}
@@ -320,9 +314,9 @@ class Plan {
 	public function getDefaultPaymentSchedule() {
 
 		if (is_array($this->payment_schedules))
-			foreach ($this->payment_schedules as $x => $s) {
-				if ($s->is_default) {
-					return $s;
+			foreach ($this->payment_schedules as $x => $schedule) {
+				if ($schedule->isDefault()) {
+					return $schedule;
 				}
 			}
 

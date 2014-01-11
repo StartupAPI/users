@@ -82,7 +82,7 @@ class TestUser extends UnitTestCase {
 		$schedule = $acc->getSchedule();
 		if ($plan_slug != 'PLAN_FREE') {
 			$this->assertNotNull($schedule);
-			$this->assertEqual($schedule->slug, $schedule_slug);
+			$this->assertEqual($schedule->getSlug(), $schedule_slug);
 		}
 		//$this -> dump($schedule);
 	}

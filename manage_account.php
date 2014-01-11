@@ -14,9 +14,6 @@ if ($account->getUserRole($user) !== Account::ROLE_ADMIN) {
 UserTools::preventCSRF();
 $template_data['CSRF_NONCE'] = UserTools::$CSRF_NONCE;
 
-// plan and schedule properties
-$schedule_data = array('name', 'description', 'charge_amount', 'charge_period');
-
 $template_data['useSubscriptions'] = UserConfig::$useSubscriptions;
 
 $template_data['account_id'] = $account->getID();

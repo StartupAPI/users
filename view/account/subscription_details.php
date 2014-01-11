@@ -69,23 +69,23 @@ if ($next_plan) {
 /*
  * Current payment schedule information
  */
-$schedule_data = array('name', 'description', 'charge_amount', 'charge_period');
-
 $schedule = $account->getSchedule();
 if (!is_null($schedule)) {
-	foreach ($schedule_data as $d) {
-		$template_data['schedule_' . $d] = $schedule->$d;
-	}
+	$template_data['schedule_name'] = $schedule->getName();
+	$template_data['schedule_description'] = $schedule->getDescription();
+	$template_data['schedule_charge_amount'] = $schedule->getChargeAmount();
+	$template_data['schedule_charge_period'] = $schedule->getChargePeriod();
 }
 
 /*
  * Information about next payment schedule to be used when plan change request exists
  */
-$schedule = $account->getNextSchedule();
-if (!is_null($schedule)) {
-	foreach ($schedule_data as $d) {
-		$template_data['next_schedule_' . $d] = $schedule->$d;
-	}
+$next_schedule = $account->getNextSchedule();
+if (!is_null($next_schedule)) {
+	$template_data['next_schedule_name'] = $next_schedule->getName();
+	$template_data['next_schedule_description'] = $next_schedule->getDescription();
+	$template_data['next_schedule_charge_amount'] = $next_schedule->getChargeAmount();
+	$template_data['next_schedule_charge_period'] = $next_schedule->getChargePeriod();
 }
 
 /*

@@ -32,9 +32,9 @@ try {
 
 if (array_key_exists('paid', $_GET)) {
 	// paying enough money to satisfy selected schedule
-	$engine->paymentReceived(array('account_id' => $account->getID(), 'amount' => $schedule->charge_amount));
+	$engine->paymentReceived(array('account_id' => $account->getID(), 'amount' => $schedule->getChargeAmount()));
 
-	if ($account->planChangeRequest($plan->getSlug(), $schedule->slug, $engine->getSlug())) {
+	if ($account->planChangeRequest($plan->getSlug(), $schedule->getSlug(), $engine->getSlug())) {
 		header('Location: ' . UserConfig::$DEFAULTLOGINRETURN . '?upgraded');
 	} else {
 		header('Location: ' . UserConfig::$USERSROOTURL . '/plans.php?failed');

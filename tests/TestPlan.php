@@ -57,7 +57,7 @@ class TestSimple1 extends UnitTestCase {
        )));
     $this -> assertEqual( $plan -> getPaymentScheduleSlugs(), array(0, 1));
     $this -> assertNotNull( $plan -> getDefaultPaymentSchedule() );
-    $this -> assertEqual( $plan -> getDefaultPaymentSchedule() -> slug, 0 );
+	$this -> assertEqual( $plan -> getDefaultPaymentSchedule() -> getSlug(), 0 );
   }
 
   function testGetSchedule()
@@ -78,16 +78,16 @@ class TestSimple1 extends UnitTestCase {
     $this -> assertEqual( $plan -> getPaymentScheduleSlugs(), array(0, 1));
 
     $this -> assertNotNull( $plan -> getPaymentScheduleBySlug( 0 ));
-    $this -> assertEqual( $plan -> getPaymentScheduleBySlug( 0 ) -> slug, 0 );
-    $this -> assertEqual( $plan -> getPaymentScheduleBySlug( 0 ) -> name, 'some schedule' );
-    $this -> assertEqual( $plan -> getPaymentScheduleBySlug( 0 ) -> charge_amount, 5 );
-    $this -> assertEqual( $plan -> getPaymentScheduleBySlug( 0 ) -> charge_period, 10 );
+	$this -> assertEqual( $plan -> getPaymentScheduleBySlug( 0 ) -> getSlug(), 0 );
+	$this -> assertEqual( $plan -> getPaymentScheduleBySlug( 0 ) -> getName(), 'some schedule' );
+	$this -> assertEqual( $plan -> getPaymentScheduleBySlug( 0 ) -> getChargeAmount(), 5 );
+	$this -> assertEqual( $plan -> getPaymentScheduleBySlug( 0 ) -> getChargePeriod(), 10 );
 
     $this -> assertNotNull( $plan -> getPaymentScheduleBySlug( 1 ) );
-    $this -> assertEqual( $plan -> getPaymentScheduleBySlug( 1 ) -> slug, 1 );
-    $this -> assertEqual( $plan -> getPaymentScheduleBySlug( 1 ) -> name, 'some other schedule' );
-    $this -> assertEqual( $plan -> getPaymentScheduleBySlug( 1 ) -> charge_amount, 6 );
-    $this -> assertEqual( $plan -> getPaymentScheduleBySlug( 1 ) -> charge_period, 11 );
+	$this -> assertEqual( $plan -> getPaymentScheduleBySlug( 1 ) -> getSlug(), 1 );
+	$this -> assertEqual( $plan -> getPaymentScheduleBySlug( 1 ) -> getName(), 'some other schedule' );
+	$this -> assertEqual( $plan -> getPaymentScheduleBySlug( 1 ) -> getChargeAmount(), 6 );
+	$this -> assertEqual( $plan -> getPaymentScheduleBySlug( 1 ) -> getChargePeriod(), 11 );
 
     $this -> assertNull( $plan -> getPaymentScheduleBySlug( 2 ) );
 

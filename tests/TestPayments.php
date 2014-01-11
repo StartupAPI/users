@@ -33,13 +33,13 @@ class TestPayments extends UnitTestCase {
     $this -> assertNotNull( $acc -> getCharges());
     $this -> assertEqual( count($acc -> getCharges()), 1);
     $charges = $acc -> getCharges();
-    $this -> assertEqual( $charges[0]['amount'], -$acc->getSchedule()->charge_amount);
+	$this -> assertEqual( $charges[0]['amount'], -$acc->getSchedule()->getChargeAmount());
     $acc -> paymentIsDue();
     $this -> assertNotNull( $acc -> getCharges());
     $this -> assertEqual( count($acc -> getCharges()), 2);
     $charges = $acc -> getCharges();
-    $this -> assertEqual( $charges[0]['amount'], -$acc->getSchedule()->charge_amount);
-    $this -> assertEqual( $charges[1]['amount'], -$acc->getSchedule()->charge_amount);
+	$this -> assertEqual( $charges[0]['amount'], -$acc->getSchedule()->getChargeAmount());
+	$this -> assertEqual( $charges[1]['amount'], -$acc->getSchedule()->getChargeAmount());
   }
 
   function testAddPaymentExact()
@@ -48,7 +48,7 @@ class TestPayments extends UnitTestCase {
     $user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $acc = Account::getCurrentAccount($user);
 
-    $acc -> paymentReceived( $acc->getSchedule()->charge_amount  );
+	$acc -> paymentReceived( $acc->getSchedule()->getChargeAmount()  );
     $this -> assertEqual( count($acc -> getCharges()), 0);
   }
 
@@ -58,7 +58,7 @@ class TestPayments extends UnitTestCase {
     $user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $acc = Account::getCurrentAccount($user);
 
-    $acc -> paymentReceived( $acc->getSchedule()->charge_amount - 1  );
+	$acc -> paymentReceived( $acc->getSchedule()->getChargeAmount() - 1  );
     $this -> assertEqual( count($acc -> getCharges()), 1);
     $charges = $acc -> getCharges();
     $this -> assertEqual( $charges[0]['amount'], -1 );
@@ -69,7 +69,7 @@ class TestPayments extends UnitTestCase {
     $user = $this -> user;
     $user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $acc = Account::getCurrentAccount($user);
-    $amount = $acc->getSchedule()->charge_amount;
+	$amount = $acc->getSchedule()->getChargeAmount();
 
     $this -> assertTrue( $amount > 3 );
     $acc -> paymentReceived( $amount - 3  );
@@ -88,13 +88,13 @@ class TestPayments extends UnitTestCase {
     $user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $acc = Account::getCurrentAccount($user);
 
-    $acc -> paymentReceived( $acc->getSchedule()->charge_amount + 3 );
+	$acc -> paymentReceived( $acc->getSchedule()->getChargeAmount() + 3 );
 
     $this -> assertEqual( count($acc -> getCharges()), 1);
 
     $acc -> paymentIsDue();
 
-    $acc -> paymentReceived( $acc->getSchedule()->charge_amount - 3 );
+	$acc -> paymentReceived( $acc->getSchedule()->getChargeAmount() - 3 );
 
     $this -> assertEqual( count($acc -> getCharges()), 0, 'should use my excessive money!');
 
@@ -106,7 +106,7 @@ class TestPayments extends UnitTestCase {
     $user = $this -> user;
     $user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $acc = Account::getCurrentAccount($user);
-    $amount = $acc->getSchedule()->charge_amount;
+	$amount = $acc->getSchedule()->getChargeAmount();
 
     $acc -> paymentIsDue();
     $acc -> paymentIsDue();
@@ -135,7 +135,7 @@ class TestPayments extends UnitTestCase {
     $user = $this -> user;
     $user -> getCurrentAccount() -> activatePlan('personal-pro', 'monthly');
     $acc = Account::getCurrentAccount($user);
-    $amount = $acc->getSchedule()->charge_amount;
+	$amount = $acc->getSchedule()->getChargeAmount();
 
     $acc -> paymentIsDue();
     $acc -> paymentIsDue();

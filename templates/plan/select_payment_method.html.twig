@@ -64,7 +64,6 @@
 										id="payment-button-{{plan.slug}}-{{schedule.slug}}-{{engine.slug}}"
 										value="{{ plan.slug }}.{{ schedule.slug }}.{{ engine.slug }}"
 										{% if not plan.available
-											or not schedule.available
 											or (engine.requires_pre_payment
 												and balance < schedule.charge_amount)
 										%} disabled{% endif %}

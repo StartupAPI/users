@@ -177,7 +177,7 @@ EOF;
 	 */
 	protected function api_call($path, $method = "GET", $params = null, $body = null, $files = null) {
 		return makeOAuthRequest(
-			$this->$APIRootURL.$path,
+			$this->APIRootURL . $path,
 			$method,
 			$params,
 			$body,

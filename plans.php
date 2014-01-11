@@ -65,7 +65,7 @@ if (array_key_exists('plan', $_POST)) {
 
 	if (!$engine || $engine->requiresPrePayment()) {
 		// Check balance
-		if (!is_null($schedule) && $schedule->charge_amount > $account->getBalance()) {
+		if (!is_null($schedule) && $schedule->getChargeAmount() > $account->getBalance()) {
 			$_SESSION['message'][] = "Not enough funds to activate plan/schedule";
 		} elseif (
 				$account->getPlanSlug() != $selected_plan_slug ||
@@ -86,7 +86,7 @@ if (array_key_exists('plan', $_POST)) {
 				$_SESSION['message'][] = "Error activating plan";
 			}
 		} elseif (!is_null($selected_schedule_slug) && ($account->getScheduleSlug() != $selected_schedule_slug ||
-				(!is_null($account->getNextSchedule()) && $account->getNextSchedule()->slug != $selected_schedule_slug))) {
+				(!is_null($account->getNextSchedule()) && $account->getNextSchedule()->getSlug() != $selected_schedule_slug))) {
 			// Not changing schedule if requested schedule is same as current or next
 
 			if ($account->scheduleChangeRequest($selected_schedule_slug, $selected_engine_slug)) {
@@ -135,9 +135,6 @@ if (!$account->isActive()) {
 	$template_data['fatal'] = 1;
 	return;
 }
-
-$schedule_data = array(
-	'slug', 'name', 'description', 'charge_amount', 'charge_period');
 
 $template_data['CSRF_NONCE'] = UserTools::$CSRF_NONCE;
 
@@ -188,21 +185,22 @@ foreach ($plan_slugs as $plan_slug) { # Iterate over all configured plans
 	foreach ($schedule_slugs as $s) {
 
 		$this_schedule = $this_plan->getPaymentScheduleBySlug($s);
-		foreach ($schedule_data as $sd) {
-			# Put all schedule properties
-			$schedule[$sd] = $this_schedule->$sd;
-		}
 
-		$schedule['available'] = TRUE;
+		$schedule['slug'] = $this_schedule->getSlug();
+		$schedule['name'] = $this_schedule->getName();
+		$schedule['description'] = $this_schedule->getDescription();
+		$schedule['charge_amount'] = $this_schedule->getChargeAmount();
+		$schedule['charge_period'] = $this_schedule->getChargePeriod();
+
 		$account_schedule = $account->getSchedule();
 
-		if ($plan['current'] && !is_null($account_schedule) && $account_schedule->slug == $this_schedule->slug) {
+		if ($plan['current'] && !is_null($account_schedule) && $account_schedule->getSlug() == $this_schedule->getSlug()) {
 			$schedule['current'] = TRUE;
 		} else {
 			$schedule['current'] = FALSE;
 		}
 
-		if ($plan['chosen'] && !is_null($account->getNextSchedule()) && $account->getNextSchedule()->slug == $this_schedule->slug) {
+		if ($plan['chosen'] && !is_null($account->getNextSchedule()) && $account->getNextSchedule()->getSlug() == $this_schedule->getSlug()) {
 			$schedule['chosen'] = TRUE;
 		} else {
 			$schedule['chosen'] = FALSE;

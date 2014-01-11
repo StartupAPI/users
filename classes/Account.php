@@ -982,7 +982,7 @@ class Account {
 			return;
 		}
 
-		$charge_amount = is_null($refund) ? $this->schedule->charge_amount : $refund;
+		$charge_amount = is_null($refund) ? $this->schedule->getChargeAmount() : $refund;
 		// Look if there is a positive charge (actually, account surplus), it should be a single element
 		$c = reset(array_keys($this->charges));
 
@@ -1064,7 +1064,7 @@ class Account {
 
 		if (is_null($refund)) {
 			$this->lastTransactionID =
-					TransactionLogger::Log($this->id, is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(), -$this->schedule->charge_amount, 'Payment Schedule charge');
+							TransactionLogger::Log($this->id, is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(), -$this->schedule->getChargeAmount(), 'Payment Schedule charge');
 		} else {
 			$this->lastTransactionID =
 					TransactionLogger::Log($this->id, is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(), -$refund, 'Refund recorded');
@@ -1239,7 +1239,7 @@ class Account {
 			}
 
 			$old_plan_slug = ($this->plan ? TRUE : FALSE) && $this->plan->getSlug();
-			$old_schedule_slug = is_null($this->schedule) ? NULL : $this->schedule->slug;
+			$old_schedule_slug = is_null($this->schedule) ? NULL : $this->schedule->getSlug();
 			$old_engine_slug = is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug();
 
 			if ($this->plan) {
@@ -1251,7 +1251,7 @@ class Account {
 			$this->plan->activate_hook($this->id, $old_plan_slug, $old_schedule_slug, $old_engine_slug);
 			$this->active = 1;
 			$this->nextCharge = is_null($this->schedule) ?
-					NULL : date('Y-m-d H:i:s', time() + $this->schedule->charge_period * 86400);
+				NULL : date('Y-m-d H:i:s', time() + $this->schedule->getChargePeriod() * 86400);
 
 			/*
 			 * @TODO
@@ -1323,7 +1323,7 @@ class Account {
 		}
 
 		$this->schedule = $schedule;
-		$this->nextCharge = date('Y-m-d H:i:s', time() + $this->schedule->charge_period * 86400);
+		$this->nextCharge = date('Y-m-d H:i:s', time() + $this->schedule->getChargePeriod() * 86400);
 
 		// Update db
 		$db = UserConfig::getDB();
@@ -1346,7 +1346,7 @@ class Account {
 		// Bill user
 		$this->paymentIsDue();
 		$this->lastTransactionID =
-				TransactionLogger::Log($this->id, $engine_slug, 0, 'Payment schedule "' . $this->schedule->name . '" set.');
+			TransactionLogger::Log($this->id, $engine_slug, 0, 'Payment schedule "' . $this->schedule->getName() . '" set.');
 		return TRUE;
 	}
 
@@ -1356,7 +1356,7 @@ class Account {
 	 * @return string Payment schedule slug
 	 */
 	public function getScheduleSlug() {
-		return $this->schedule ? $this->schedule->slug : NULL;
+		return $this->schedule ? $this->schedule->getSlug() : NULL;
 	}
 
 	/**
@@ -1402,9 +1402,11 @@ class Account {
 			$plan = Plan::getPlanBySlug(UserConfig::$default_plan_slug);
 		}
 
-		$capabilities = $plan->getCapabilities();
-		if ($plan && array_key_exists('individual', $capabilities)) {
-			return $capabilities['individual'] ? true : false;
+		if ($plan) {
+			$capabilities = $plan->getCapabilities();
+			if (array_key_exists('individual', $capabilities)) {
+				return $capabilities['individual'] ? TRUE : FALSE;
+			}
 		}
 
 		// if nothing worked, default to multi-user accounts
@@ -1505,7 +1507,7 @@ class Account {
 		 */
 
 		if (is_null($this->nextCharge) && (is_null($new_schedule) ||
-				$this->getBalance() >= $new_schedule->charge_amount)) {
+				$this->getBalance() >= $new_schedule->getChargeAmount())) {
 
 			if (!is_null($this->paymentEngine)) {
 				$this->paymentEngine->changeSubscription($this->id, $plan_slug, $schedule_slug);
@@ -1522,7 +1524,7 @@ class Account {
 
 		// If requested plan/schedule is same as current plan/schedule, cancel any pending request
 		if ($this->plan->getSlug() == $plan_slug && ((!is_null($this->schedule) &&
-				$this->schedule->slug == $schedule_slug) || (is_null($this->schedule) && is_null($schedule_slug)))) {
+				$this->schedule->getSlug() == $schedule_slug) || (is_null($this->schedule) && is_null($schedule_slug)))) {
 			return $this->cancelChangeRequest();
 		}
 
@@ -1544,7 +1546,7 @@ class Account {
 
 		$this->lastTransactionID =
 				TransactionLogger::Log($this->id, $engine_slug, 0, 'Request to change plan to "' . $new_plan->getName() .
-						(is_null($new_schedule) ? '"' : '" and schedule to "' . $new_schedule->name) . '" stored.');
+					(is_null($new_schedule) ? '"' : '" and schedule to "' . $new_schedule->getName()) . '" stored.');
 		return TRUE;
 	}
 
@@ -1567,7 +1569,7 @@ class Account {
 
 		// Check, if schedule could be activated immediately
 		if (is_null($this->nextCharge) &&
-				$this->getBalance() >= $schedule->charge_amount) {
+				$this->getBalance() >= $schedule->getChargeAmount()) {
 			if (!is_null($this->paymentEngine)) {
 				$this->paymentEngine->changeSubscription($this->id, $this->plan, $schedule);
 			}
@@ -1576,7 +1578,7 @@ class Account {
 		}
 
 		// If requested schedule is same as current schedule, cancel any pending request
-		if (!is_null($this->schedule) && $this->schedule->slug == $schedule_slug) {
+		if (!is_null($this->schedule) && $this->schedule->getSlug() == $schedule_slug) {
 			return $this->cancelChangeRequest();
 		}
 
@@ -1598,7 +1600,7 @@ class Account {
 		}
 
 		$this->lastTransactionID =
-				TransactionLogger::Log($this->id, $engine_slug, 0, 'Request to change schedule to "' . $schedule->name . '" stored.');
+				TransactionLogger::Log($this->id, $engine_slug, 0, 'Request to change schedule to "' . $schedule->getName() . '" stored.');
 		return TRUE;
 	}
 

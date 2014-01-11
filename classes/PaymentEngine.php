@@ -311,7 +311,7 @@ abstract class PaymentEngine extends StartupAPIModule {
 
 				// ok if either no next_schedule, or balance is sufficient
 				$ok = is_null($next_schedule)
-					|| $account->getBalance() >= $next_schedule->charge_amount && !is_null($next_engine);
+					|| $account->getBalance() >= $next_schedule->getChargeAmount() && !is_null($next_engine);
 
 				if (!is_null($next_plan) && $ok) { // next_plan found, change could be performed
 					if ($next_plan_slug == $plan_slug) { // only change schedule
@@ -330,7 +330,7 @@ abstract class PaymentEngine extends StartupAPIModule {
 				$account->paymentIsDue();
 
 				$plan = $account->getPlan(); // can be FALSE
-				if ($plan && !is_null($schedule = $plan->getPaymentSchedule())) {
+				if ($plan && !is_null($schedule = $account->getSchedule())) {
 
 					// Set new next_charge
 					if (!($stmt2 = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
@@ -338,7 +338,7 @@ abstract class PaymentEngine extends StartupAPIModule {
 						throw new DBPrepareStmtException($db);
 					}
 
-					if (!$stmt2->bind_param('ii', $schedule->charge_period, $account->getID())) {
+					if (!$stmt2->bind_param('ii', $schedule->getChargePeriod(), $account->getID())) {
 						throw new DBBindParamException($db, $stmt);
 					}
 

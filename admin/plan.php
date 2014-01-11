@@ -59,10 +59,10 @@ require_once(__DIR__ . '/header.php');
 					$schedule = $plan->getPaymentScheduleBySlug($s);
 					?>
 					<li>
-						<b><?php echo $schedule->name ?></b><?php if ($schedule->is_default) { ?> (default)<?php } ?>
-						<p><b>$<?php echo $schedule->charge_amount ?></b>
-							every <b><?php echo $schedule->charge_period ?></b> days</p>
-						<p><?php echo $schedule->description ?></p>
+						<b><?php echo $schedule->getName() ?></b><?php if ($schedule->isDefault()) { ?> (default)<?php } ?>
+						<p><b>$<?php echo $schedule->getChargeAmount() ?></b>
+							every <b><?php echo $schedule->getChargePeriod() ?></b> days</p>
+						<p><?php echo $schedule->getDescription() ?></p>
 					</li>
 					<?php
 				}
