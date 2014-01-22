@@ -238,7 +238,7 @@ class StartupAPI {
 						<?php
 					} else {
 						?>
-						<li id="startupapi-navbox-signup"><a href="<?php echo UserConfig::$USERSROOTURL ?>/register.php">Sign Up Now!</a></li>
+						<li id="startupapi-navbox-signup"><a href="<?php echo UserConfig::$USERSROOTURL ?>/register.php">Sign Up</a></li>
 						<li id="startupapi-navbox-login"><a href="<?php echo UserConfig::$USERSROOTURL ?>/login.php">Log in</a></li>
 						<?php
 					}
