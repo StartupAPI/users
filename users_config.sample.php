@@ -81,7 +81,13 @@ new UsernamePasswordAuthenticationModule();
 
 /**
  * Twitter Authentication configuration
+ *
  * Register your app here: https://dev.twitter.com/apps/new
+ *
+ * - check the box next to "Allow this application to be used to Sign in with Twitter"
+ * - enter the value for "Callback URL" to the root URL of your app
+ *   (actual value will be sent at runtime - setting it just enables the callbacks)
+ *
  * And then uncomment two lines below and copy API Key and App Secret
  */
 #UserConfig::loadModule('twitter');
