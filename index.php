@@ -119,25 +119,31 @@ $dependencies = array(
 	'mysqli' => array(
 		'name' => 'PHP mysqli extension',
 		'description' => 'PHP mysqli database extension is needed for security and performance',
-		'url' => 'http://us3.php.net/manual/en/book.mysqli.php',
+		'url' => 'http://www.php.net/manual/en/book.mysqli.php',
 		'ready' => true
 	),
 	'mcrypt' => array(
 		'name' => 'PHP Mcrypt support',
 		'description' => 'PHP Mcrypt library support needed for security of user information',
-		'url' => 'http://us3.php.net/manual/en/book.mcrypt.php',
+		'url' => 'http://www.php.net/manual/en/book.mcrypt.php',
 		'ready' => true
 	),
 	'curl' => array(
 		'name' => 'PHP Curl support',
 		'description' => 'Startup API uses curl for API requests',
-		'url' => 'http://us3.php.net/manual/en/book.curl.php',
+		'url' => 'http://www.php.net/manual/en/book.curl.php',
 		'ready' => true
 	),
 	'mbstring' => array(
 		'name' => 'PHP Bultibyte string support (mbstring)',
 		'description' => 'Multibyte string support is needed for managing internationalized user data',
-		'url' => 'http://us3.php.net/manual/en/book.mbstring.php',
+		'url' => 'http://www.php.net/manual/en/book.mbstring.php',
+		'ready' => true
+	),
+	'json' => array(
+		'name' => 'PHP JavaScript Object Notation parser (json)',
+		'description' => 'JSON support is needed for various components, primarily related to external APIs',
+		'url' => 'http://www.php.net/manual/en/intro.json.php',
 		'ready' => true
 	)
 );
@@ -149,7 +155,7 @@ if (!version_compare($current_php_version, $required_php_version, '>=')) {
 	$dependencies['php-version'] = false;
 }
 
-$required_extensions = array('mysqli', 'mcrypt', 'curl', 'mbstring');
+$required_extensions = array('mysqli', 'mcrypt', 'curl', 'mbstring', 'json');
 $current_php_extensions = get_loaded_extensions();
 foreach ($required_extensions as $extension) {
 	if (!in_array($extension, $current_php_extensions)) {
