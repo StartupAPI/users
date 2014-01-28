@@ -22,13 +22,25 @@ $versions[_]['down'][]	= "";
 // Use boilerplate above to Add new migrations on top, right below this line.
 
 /* -------------------------------------------------------------------------------------------------------
- * VERSION 32
+ * VERSION 33
  * Payment Plans and Engines
 */
-$versions[32]['up'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
+$versions[33]['up'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
   ADD COLUMN next_engine_slug varchar(256) DEFAULT NULL AFTER `engine_slug`";
-$versions[32]['down'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
+$versions[33]['down'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."accounts
   DROP COLUMN next_engine_slug";
+
+/* -------------------------------------------------------------------------------------------------------
+ * VERSION 32
+ * Making password and salt optional (for accounts that only have 3rd party auth, for example)
+*/
+$versions[32]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."users`
+CHANGE `pass` `pass` VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'Password digest',
+CHANGE `salt` `salt` VARCHAR(13) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'Salt'";
+
+$versions[32]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."users`
+CHANGE `pass` `pass` VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'Password digest',
+CHANGE `salt` `salt` VARCHAR(13) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'Salt'";
 
 /* -------------------------------------------------------------------------------------------------------
  * VERSION 31
