@@ -4,7 +4,7 @@
  * http://startupapi.org/Startup_API/Installation#Prerequisites
  */
 $required_php_version = '5.3.0';
-$required_extensions = array('mysqli', 'mcrypt', 'curl', 'mbstring');
+$required_extensions = array('mysqli', 'mcrypt', 'curl', 'mbstring', 'json');
 
 $current_php_version = phpversion();
 if (version_compare($current_php_version, $required_php_version, '>=')) {
