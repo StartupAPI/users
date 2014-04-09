@@ -133,7 +133,12 @@ foreach ($users as $user)
 
 	?><tr valign="top">
 	<td><a href="user.php?id=<?php $userid = $user->getID(); echo $userid; ?>"><?php echo $userid; ?></a></td>
-	<td align="right"><?php echo date('M j, h:iA', $regtime)?><br/><span class="badge<?php if ($ago <= 5) {?> badge-success<?php }?>"><?php echo $ago?></span> day<?php echo $ago != 1 ? 's' : '' ?> ago</td>
+	<td align="right">
+		<?php echo date('M j Y, h:iA', $regtime) ?><br/>
+		<span class="badge<?php if ($ago <= 5) {?> badge-success<?php }?>">
+			<?php echo $ago?>
+		</span> day<?php echo $ago != 1 ? 's' : '' ?> ago
+	</td>
 	<td><?php
 	foreach (UserConfig::$authentication_modules as $module)
 	{

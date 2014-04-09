@@ -226,14 +226,21 @@ require_once(__DIR__ . '/header.php');
 				<th>Code</th>
 				<th>Invited By</th>
 				<th>Sent to</th>
+				<th>Registered</th>
 				<th>Registered User</th>
 			</tr>
 			<?php
+			$now = time();
 			foreach ($invitations as $invitation) {
 				$issuer = $invitation->getIssuer();
 				$invited_user = $invitation->getUser();
 				$email = trim($invitation->getSentToEmail());
 				$note = trim($invitation->getNote());
+
+				$regtime = $invited_user->getRegTime();
+				$ago = intval(floor(($now - $regtime) / 86400));
+
+				$tz = date_default_timezone_get();
 				?><tr>
 					<td><span class="badge badge-success"><?php echo UserTools::escape($invitation->getCode()) ?></span></td>
 					<td><?php echo UserTools::escape(is_null($issuer) ? '' : $issuer->getName()) ?></td>
@@ -253,15 +260,21 @@ require_once(__DIR__ . '/header.php');
 						}
 						?>
 					</td>
+					<td align="right">
+						<?php echo date('M j Y, h:iA', $regtime) ?><br/>
+						<span class="badge<?php if ($ago <= 5) { ?> badge-success<?php } ?>">
+							<?php echo $ago ?>
+						</span> day<?php echo $ago != 1 ? 's' : '' ?> ago
+					</td>
 					<td>
 						<i class="icon-user"></i> <a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/user.php?id=<?php echo UserTools::escape($invited_user->getID()) ?>"><?php echo UserTools::escape($invited_user->getName()) ?></a>
 					</td>
-				</tr><?php
+				</tr>
+				<?php
 			}
 		}
-				?>
+		?>
 	</table>
-
 </div>
 
 

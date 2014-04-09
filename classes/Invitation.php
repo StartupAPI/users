@@ -213,10 +213,12 @@ class Invitation {
 
 		$db = UserConfig::getDB();
 
-		$query = 'SELECT code, UNIX_TIMESTAMP(created), issuedby, is_admin_invite,
-				sent_to_email, sent_to_name, sent_to_note, user_id, account_id
-			FROM ' . UserConfig::$mysql_prefix . 'invitation
-			WHERE user_id IS NOT NULL';
+		$query = 'SELECT i.code, UNIX_TIMESTAMP(i.created), i.issuedby, i.is_admin_invite,
+				i.sent_to_email, i.sent_to_name, i.sent_to_note, i.user_id, i.account_id
+			FROM ' . UserConfig::$mysql_prefix . 'invitation i
+				INNER JOIN ' . UserConfig::$mysql_prefix . 'users u
+					ON i.user_id = u.id
+			WHERE i.user_id IS NOT NULL';
 
 		if (!is_null($issuer)) {
 			$query .= ' AND issuedby = ' . ($issuer->getID());
@@ -225,6 +227,8 @@ class Invitation {
 		if (!is_null($admin)) {
 			$query .= ' AND is_admin_invite = ' . ($admin ? 1 : 0);
 		}
+
+		$query .= ' ORDER BY u.regtime DESC';
 
 		if ($stmt = $db->prepare($query)) {
 			if (!$stmt->execute()) {
