@@ -226,8 +226,8 @@ require_once(__DIR__ . '/header.php');
 				<th>Code</th>
 				<th>Invited By</th>
 				<th>Sent to</th>
-				<th>Registered</th>
 				<th>Registered User</th>
+				<th>Registered</th>
 			</tr>
 			<?php
 			$now = time();
@@ -260,14 +260,14 @@ require_once(__DIR__ . '/header.php');
 						}
 						?>
 					</td>
+					<td>
+						<i class="icon-user"></i> <a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/user.php?id=<?php echo UserTools::escape($invited_user->getID()) ?>"><?php echo UserTools::escape($invited_user->getName()) ?></a>
+					</td>
 					<td align="right">
 						<?php echo date('M j Y, h:iA', $regtime) ?><br/>
 						<span class="badge<?php if ($ago <= 5) { ?> badge-success<?php } ?>">
 							<?php echo $ago ?>
 						</span> day<?php echo $ago != 1 ? 's' : '' ?> ago
-					</td>
-					<td>
-						<i class="icon-user"></i> <a href="<?php echo UserConfig::$USERSROOTURL ?>/admin/user.php?id=<?php echo UserTools::escape($invited_user->getID()) ?>"><?php echo UserTools::escape($invited_user->getName()) ?></a>
 					</td>
 				</tr>
 				<?php
