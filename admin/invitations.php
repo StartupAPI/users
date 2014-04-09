@@ -225,7 +225,7 @@ require_once(__DIR__ . '/header.php');
 			<tr>
 				<th>Code</th>
 				<th>Invited By</th>
-				<th>Sent to</th>
+				<th>Sent to / Note</th>
 				<th>Registered User</th>
 				<th>Registered</th>
 			</tr>
