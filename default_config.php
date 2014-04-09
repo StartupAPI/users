@@ -1064,7 +1064,7 @@ EOD;
 		$site_env = PHPBootstrap\bootstrap(__DIR__);
 
 		UserConfig::$ROOTPATH = $users_env['ROOT_FILESYSTEM_PATH'];
-		UserConfig::$USERSROOTURL = $users_env['ROOT_ABSOLUTE_URL_PATH'];
+		UserConfig::$USERSROOTURL = $users_env['ROOT_ABSOLUTE_URL_PATH'] . '/';
 
 		// we assume that package is extracted into the root of the site
 		UserConfig::$SITEROOTURL = $site_env['ROOT_ABSOLUTE_URL_PATH'] . '/';
@@ -1075,8 +1075,8 @@ EOD;
 		UserConfig::$DEFAULTUPDATEPASSWORDRETURN = UserConfig::$SITEROOTURL;
 		UserConfig::$DEFAULT_EMAIL_VERIFIED_RETURN = UserConfig::$SITEROOTURL;
 
-		UserConfig::$SITEROOTFULLURL = $site_env['ROOT_FULL_URL'];
-		UserConfig::$USERSROOTFULLURL = $users_env['ROOT_FULL_URL'];
+		UserConfig::$SITEROOTFULLURL = $site_env['ROOT_FULL_URL'] . '/';
+		UserConfig::$USERSROOTFULLURL = $users_env['ROOT_FULL_URL'] . '/';
 
 		// Default locations for terms of service and privacy policy documents
 		UserConfig::$termsOfServiceURL = UserConfig::$SITEROOTURL . 'terms_of_service.php';
