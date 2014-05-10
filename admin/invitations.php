@@ -11,6 +11,7 @@ if (!$user->isAdmin()) {
 require_once(dirname(__DIR__) . '/classes/Invitation.php');
 
 if (array_key_exists('save', $_POST)) {
+	$saved_one = false;
 	foreach (array_keys($_POST['email']) as $code) {
 		$invitation = Invitation::getByCode($code);
 		$need_to_save = false;
@@ -30,13 +31,20 @@ if (array_key_exists('save', $_POST)) {
 			$need_to_save = true;
 		}
 
+		$invitation->setPlan(Plan::getPlanBySlug($_POST['plan_slug'][$code]));
+
 		if ($need_to_save) {
 			$invitation->setIssuer($user);
 			$invitation->save();
+			$saved_one = true;
 		}
 	}
 
-	header("Location: #message=saved");
+	if ($saved_one) {
+		header("Location: #message=saved");
+	} else {
+		header("Location: #message=nothing_to_save");
+	}
 	exit;
 }
 
@@ -93,11 +101,12 @@ require_once(__DIR__ . '/header.php');
 		<?php
 	} else {
 		?>
-		<form class="form-inline" action="" method="POST">
+		<form class="form" action="" method="POST">
 			<table class="table">
 				<tr>
 					<th>Code</th>
 					<th>Sent to</th>
+					<th>Service Plan</th>
 					<?php if (!is_null(UserConfig::$onRenderUserInvitationAction)) { ?><th>Actions</th><?php } ?>
 				</tr>
 
@@ -111,19 +120,62 @@ require_once(__DIR__ . '/header.php');
 						</td>
 						<td>
 							<div class="controls controls-row">
-								<input type="text" class="span4"
+								<input type="text" class="span6"
 									   name="name[<?php echo UserTools::escape($code) ?>]"
 									   id="name_<?php echo UserTools::escape($code) ?>"
 									   placeholder="John Smith">
-								<input type="email" class="span4"
+								<input type="email" class="span6"
 									   name="email[<?php echo UserTools::escape($code) ?>]"
 									   id="email_<?php echo UserTools::escape($code) ?>"
 									   placeholder="john.smith@example.com">
-								<input type="text" class="span4"
-									   name="note[<?php echo UserTools::escape($code) ?>]"
-									   id="note_<?php echo UserTools::escape($code) ?>"
-									   placeholder="note">
 							</div>
+							<div class="controls controls-row">
+								<textarea class="span12"
+										  name="note[<?php echo UserTools::escape($code) ?>]"
+										  id="note_<?php echo UserTools::escape($code) ?>"
+										  placeholder="(optional note)"></textarea>
+							</div>
+						</td>
+						<td>
+							<?php
+							$plan_slugs = Plan::getPlanSlugs();
+
+							if (count($plan_slugs) > 1) {
+								foreach ($plan_slugs as $plan_slug) {
+									$plan = Plan::getPlanBySlug($plan_slug);
+									?>
+									<label class="radio">
+										<input type="radio"
+											   name="plan_slug[<?php echo UserTools::escape($code) ?>]"
+											   value="<?php echo UserTools::escape($plan_slug) ?>"
+											   <?php
+											   if ($plan_slug == UserConfig::$default_plan_slug) {
+												   ?>
+												   checked
+												   <?php
+											   }
+											   ?>
+											   >
+										<span class="badge badge-info"><i class="icon-briefcase icon-white"></i> <?php echo UserTools::escape($plan->getName()) ?></span>
+									</label>
+									<?php
+								}
+
+								if (is_null(UserConfig::$default_plan_slug)) {
+									?>
+									<label class="radio">
+										<input type="radio"
+											   name="plan_slug[<?php echo UserTools::escape($code) ?>]"
+											   value=""
+											   checked
+											   >
+										<span class="badge badge-important">NONE</span>
+									</label>
+									<?php
+								}
+							}
+							?>
+
 						</td>
 
 						<?php
@@ -164,6 +216,7 @@ require_once(__DIR__ . '/header.php');
 					<th>Code</th>
 					<th>Invited By</th>
 					<th>Sent to</th>
+					<th>Subscription plan</th>
 					<?php if (!is_null(UserConfig::$onRenderUserInvitationFollowUpAction)) { ?>
 						<th>Actions</th>
 					<?php } ?>
@@ -173,6 +226,7 @@ require_once(__DIR__ . '/header.php');
 					$issuer = $invitation->getIssuer();
 					$email = trim($invitation->getSentToEmail());
 					$note = trim($invitation->getNote());
+					$plan = $invitation->getPlan();
 					?><tr>
 						<td><span class="badge badge-important"><?php echo UserTools::escape($invitation->getCode()) ?></span></td>
 						<td>
@@ -190,6 +244,17 @@ require_once(__DIR__ . '/header.php');
 							if ($note) {
 								?>
 								<p><?php echo UserTools::escape($note) ?></p>
+								<?php
+							}
+							?>
+						</td>
+						<td>
+							<?php
+							if ($plan) {
+								?>
+								<span class="badge badge-info"><i class="icon-briefcase icon-white"></i>
+									<?php echo $plan->getName(); ?>
+								</span>
 								<?php
 							}
 							?>

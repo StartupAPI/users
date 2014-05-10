@@ -724,7 +724,7 @@ class Account {
 	 *
 	 * @throws DBException
 	 */
-	public static function createAccount($name, $plan_slug, $schedule_slug = null, $user = null, $role = Account::ROLE_USER, $engine_slug = null) {
+	public static function createAccount($name, $plan_slug, $schedule_slug = null, $user = null, $role = self::ROLE_ADMIN, $engine_slug = null) {
 		$name = mb_convert_encoding($name, 'UTF-8');
 
 		$db = UserConfig::getDB();

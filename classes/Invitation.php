@@ -61,6 +61,11 @@ class Invitation {
 	private $account_id;
 
 	/**
+	 * @var string Subscription plan slug (or null if no plan, e.g. there is no default)
+	 */
+	private $plan_slug;
+
+	/**
 	 * Creates new invitation object
 	 *
 	 * @param string $code Invitation code
@@ -70,8 +75,9 @@ class Invitation {
 	 * @param string $sent_to_note Invitation comment (reminder to issuer why it was sent)
 	 * @param int $user_id ID of the User who got invited
 	 * @param int $account_id ID of the account invitation is for, null if user is not invited to join an account
+	 * @param string|null $plan_slug Slug of the plan or null if default or no (if UserConfig::$default_plan_slug is null) plan to be set once user registers
 	 */
-	private function __construct($code, $time_created, $issuedby, $is_admin_invite = true, $sent_to_email = null, $sent_to_name = null, $sent_to_note = null, $user_id = null, $account_id = null) {
+	private function __construct($code, $time_created, $issuedby, $is_admin_invite = true, $sent_to_email = null, $sent_to_name = null, $sent_to_note = null, $user_id = null, $account_id = null, $plan_slug = null) {
 		$this->code = $code;
 		$this->time_created = $time_created;
 		$this->issuedby = $issuedby;
@@ -81,6 +87,7 @@ class Invitation {
 		$this->sent_to_note = $sent_to_note;
 		$this->user_id = $user_id;
 		$this->account_id = $account_id;
+		$this->plan_slug = $plan_slug;
 	}
 
 	/**
@@ -134,7 +141,7 @@ class Invitation {
 
 		$query = 'SELECT code, UNIX_TIMESTAMP(created), issuedby, is_admin_invite,
 				sent_to_email, sent_to_name, sent_to_note,
-				user_id, account_id
+				user_id, account_id, plan_slug
 			FROM ' . UserConfig::$mysql_prefix . 'invitation
 			WHERE sent_to_note IS NOT NULL AND user_id IS NULL';
 
@@ -150,13 +157,13 @@ class Invitation {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id)) {
+			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id, $plan_slug)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
 				$invitations[] = new self($code, $time_created, $issuedby, $is_admin_invite ? true : false,
-								$sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id);
+								$sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id, $plan_slug);
 			}
 
 			$stmt->close();
@@ -214,7 +221,7 @@ class Invitation {
 		$db = UserConfig::getDB();
 
 		$query = 'SELECT i.code, UNIX_TIMESTAMP(i.created), i.issuedby, i.is_admin_invite,
-				i.sent_to_email, i.sent_to_name, i.sent_to_note, i.user_id, i.account_id
+				i.sent_to_email, i.sent_to_name, i.sent_to_note, i.user_id, i.account_id, i.plan_slug
 			FROM ' . UserConfig::$mysql_prefix . 'invitation i
 				INNER JOIN ' . UserConfig::$mysql_prefix . 'users u
 					ON i.user_id = u.id
@@ -234,13 +241,13 @@ class Invitation {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id)) {
+			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id, $plan_slug)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
 				$invitations[] = new self($code, $time_created, $issuedby, $is_admin_invite ? true : false,
-								$sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id);
+								$sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id, $plan_slug);
 			}
 
 			$stmt->close();
@@ -266,7 +273,7 @@ class Invitation {
 		$db = UserConfig::getDB();
 
 		if ($stmt = $db->prepare('SELECT code, UNIX_TIMESTAMP(created), issuedby, is_admin_invite,
-				sent_to_email, sent_to_name, sent_to_note, user_id, account_id
+				sent_to_email, sent_to_name, sent_to_note, user_id, account_id, plan_slug
 			FROM ' . UserConfig::$mysql_prefix . 'invitation
 			WHERE code = ?')) {
 			if (!$stmt->bind_param('s', $code)) {
@@ -275,13 +282,13 @@ class Invitation {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id)) {
+			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id, $plan_slug)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE) {
 				$invitation = new self($code, $time_created, $issuedby, $is_admin_invite ? true : false,
-								$sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id);
+								$sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id, $plan_slug);
 			}
 
 			$stmt->close();
@@ -308,7 +315,7 @@ class Invitation {
 		$db = UserConfig::getDB();
 
 		if ($stmt = $db->prepare('SELECT code, UNIX_TIMESTAMP(created), issuedby, is_admin_invite,
-				sent_to_email, sent_to_name, sent_to_note, user_id, account_id
+				sent_to_email, sent_to_name, sent_to_note, user_id, account_id, plan_slug
 			FROM ' . UserConfig::$mysql_prefix . 'invitation
 			WHERE user_id = ?')) {
 			if (!$stmt->bind_param('i', $user_id)) {
@@ -317,13 +324,13 @@ class Invitation {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id)) {
+			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id, $plan_slug)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE) {
 				$invitation = new self($code, $time_created, $issuedby, $is_admin_invite ? true : false,
-								$sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id);
+								$sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id, $plan_slug);
 			}
 
 			$stmt->close();
@@ -550,6 +557,26 @@ class Invitation {
 	}
 
 	/**
+	 * Returns a subscription plan associated with invitation
+	 *
+	 * @return Plan Subscription Plan
+	 */
+	public function getPlan() {
+		return Plan::getPlanBySlug($this->plan_slug);
+	}
+
+	/**
+	 * Sets a subscription plan associated with invitation
+	 *
+	 * @param Plan|null $plan Plan Subscription Plan
+	 */
+	public function setPlan($plan) {
+		if ($plan) {
+			$this->plan_slug = $plan->getSlug();
+		}
+	}
+
+	/**
 	 * Persists invitation object in database
 	 *
 	 * @throws DBException
@@ -568,9 +595,10 @@ class Invitation {
 				issuedby = ?,
 				is_admin_invite = ?,
 				user_id = ?,
-				account_id = ?
+				account_id = ?,
+				plan_slug = ?
 			WHERE code = ?')) {
-			if (!$stmt->bind_param('sssiiiis', $email, $name, $note, $this->issuedby, $this->is_admin_invite, $this->user_id, $this->account_id, $this->code)) {
+			if (!$stmt->bind_param('sssiiiiss', $email, $name, $note, $this->issuedby, $this->is_admin_invite, $this->user_id, $this->account_id, $this->plan_slug, $this->code)) {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {

@@ -19,6 +19,15 @@ $versions[_]['up'][] = "";
 $versions[_]['down'][]	= "";
 */
 
+/* -------------------------------------------------------------------------------------------------------
+ * VERSION 34
+ * Setting plans for invitations
+*/
+$versions[34]['up'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."invitation
+  ADD COLUMN `plan_slug` varchar(256) DEFAULT NULL COMMENT 'Invitation subscription plan'";
+$versions[34]['down'][] = "ALTER TABLE ".UserConfig::$mysql_prefix."invitation
+  DROP COLUMN plan_slug";
+
 // Use boilerplate above to Add new migrations on top, right below this line.
 
 /* -------------------------------------------------------------------------------------------------------
