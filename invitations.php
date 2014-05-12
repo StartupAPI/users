@@ -118,8 +118,8 @@ require_once(__DIR__ . '/sidebar_header.php');
 		<div class="control-group">
 			<div class="controls">
 				<label class="checkbox">
-					<input type="checkbox" class="checkbox" name="invite_to_account"/>
-					Invite them to join <i><?php echo UserTools::escape($current_account->getName()) ?></i> account
+					<input type="checkbox" class="checkbox" name="invite_to_account" <?php if (array_key_exists('joinaccount', $_GET)) { ?> checked="checked"<?php } ?>/>
+					Invite them to join <b><i><?php echo UserTools::escape($current_account->getName()) ?></i></b> account
 				</label>
 			</div>
 		</div>

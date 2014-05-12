@@ -81,28 +81,14 @@
 					</tr>
 				{%endfor%}
 				</table>
+				{%if not account_isIndividual %}
+					<a class="btn btn-mini" href="{{ USERSROOTURL }}/invitations.php?joinaccount=yes"><i class="icon-plus"></i> Invite more users</a>
+				{%endif%}
 				<script>
 					$('.remove_button').on('click', function() {
 						 return confirm('Are you sure you want to remove this user?');
 					});
 				</script>
-
 			</form>
-
-			{#
-			{%if not account_isIndividual %}
-				<h3>Invite a user</h3>
-				<form class="form-horizontal" action="{{ USERSROOTURL }}/controller/account/account.php" method="POST">
-					<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
-
-					<div class="input-prepend">
-						<span class="add-on"><i class="icon-envelope"></i></span>
-						<input class="input-large" type="email" placeholder="Email address" name="invite-emails"/>
-					</div>
-
-					<button class="btn btn-primary"> Send Invitation</button>
-				</form>
-			{%endif%}
-			#}
 		{%endif%}
 {%endif%}
