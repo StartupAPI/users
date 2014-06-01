@@ -518,6 +518,7 @@ class User {
 		}
 
 		$invitation_account = null;
+		$plan = null;
 		if (!is_null($invitation)) {
 			$invitation_account = $invitation->getAccount();
 
@@ -528,11 +529,12 @@ class User {
 			) {
 				$invitation_account->addUser($this);
 			}
+
+			$plan = $invitation->getPlan();
 		}
 
 		$new_user_account = null;
 		if (is_null($invitation_account) || UserConfig::$createPersonalAccountsIfInvitedToGroupAccount) {
-			$plan = $invitation->getPlan();
 			if ($plan) {
 				$new_user_account = Account::createAccount($this->name, $plan->getSlug(), null, $this, Account::ROLE_ADMIN);
 			} else {
