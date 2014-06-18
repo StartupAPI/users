@@ -2526,6 +2526,62 @@ class User {
 		}
 	}
 
+	public function getSettings() {
+		$db = UserConfig::getDB();
+
+		$json = null;
+
+		$userid = $this->userid;
+
+		if ($stmt = $db->prepare('SELECT app_settings_json
+				FROM ' . UserConfig::$mysql_prefix . 'user_preferences
+				WHERE user_id = ?')
+		) {
+			if (!$stmt->bind_param('i', $userid)) {
+				throw new DBBindParamException($db, $stmt);
+			}
+			if (!$stmt->bind_result($json)) {
+				throw new DBBindResultException($db, $stmt);
+			}
+			if (!$stmt->execute()) {
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+
+			$stmt->fetch();
+			$stmt->close();
+		} else {
+			throw new DBPrepareStmtException($db);
+		}
+
+		$settings = json_decode($json, true);
+		if (!is_array($settings)) {
+			$settings = array();
+		}
+
+		return $settings;
+	}
+
+	public function saveSettings($settings) {
+		$db = UserConfig::getDB();
+
+		$json = json_encode($settings);
+
+		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'user_preferences
+			SET app_settings_json = ? WHERE user_id = ?')
+		) {
+			if (!$stmt->bind_param('si', $json, $this->userid)) {
+				throw new DBBindParamException($db, $stmt);
+			}
+			if (!$stmt->execute()) {
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+
+			$stmt->close();
+		} else {
+			throw new DBPrepareStmtException($db);
+		}
+	}
+
 	/**
 	 * Persists user's data into the database
 	 *

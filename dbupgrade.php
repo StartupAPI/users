@@ -20,6 +20,16 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 35
+ * Adding application settings for a user (free-form JSON)
+*/
+$versions[35]['up'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."user_preferences`
+	ADD `app_settings_json` BLOB NULL DEFAULT NULL COMMENT  'Application settings'";
+$versions[35]['down'][] = "ALTER TABLE `".UserConfig::$mysql_prefix."user_preferences`
+	DROP `app_settings_json`";
+
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 34
  * Setting plans for invitations
 */
