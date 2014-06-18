@@ -240,11 +240,11 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 	private function renderForm($action, $form) {
 		if ($form == 'login') {
 			$formsubmit = 'login';
-			$buttonspritestyle = 'background-position: 0px -22px; width: 198px; height: 22px;';
+			$buttonspritestyle = 'background-position: 0px -22px; width: 147px; height: 22px;';
 			$buttontitle = 'Login with Facebook';
 		} else if ($form == 'register') {
 			$formsubmit = 'register';
-			$buttonspritestyle = 'background-position: 0px 0px; width: 250px; height: 22px;';
+			$buttonspritestyle = 'background-position: 0px 0px; width: 200px; height: 22px;';
 			$buttontitle = 'Quick Sign-up using Facebook';
 		} else if ($form == 'connect') {
 			$formsubmit = 'save';
