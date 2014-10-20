@@ -59,6 +59,8 @@ else
 	tar -c StartupAPI_${v}/ |bzip2 > StartupAPI_${v}.tar.bz2
 	zip -r StartupAPI_${v}.zip StartupAPI_${v}
 	rm -rf StartupAPI_${v}
+
+	echo "Upload files to GitHub: https://github.com/StartupAPI/users/releases/tag/${v}"
 endif
 
 docs:	documentation
