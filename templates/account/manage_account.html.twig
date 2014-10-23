@@ -4,13 +4,13 @@
 		{%endfor%}
 	{%endif%}
 
-	{%if  not fatal %}
-		<h2>
-			Account: {{ account_name }}
-			{%if not account_isIndividual %}
+	{%if not fatal %}
+		<legend>
+			Accounts / <b>{{ account_name }}</b>
+			{%if account_isAdmin and not account_isIndividual %}
 				<a href="{{ USERSROOTURL }}/edit_account.php" class="btn btn-mini"><i class="icon-pencil"></i> edit</a>
 			{%endif%}
-		</h2>
+		</legend>
 		{%if account_isIndividual %}
 			<p>
 				<form action="{{ USERSROOTURL }}/controller/account.php" method="POST">
@@ -22,6 +22,8 @@
 				</form>
 			</p>
 		{%endif%}
+
+		{%if account_isAdmin %}
 		<p>
 			Status: {%if account_isActive %}<b class="badge badge-success">Active</b>{%else%}<b class="badge badge-important">Suspended</b>{%endif%}
 			Plan:
@@ -31,64 +33,77 @@
 					<span class="badge badge-important">NONE</span>
 				{% endif %}
 		</p>
+		{%endif%}
 
 		{%if show_user_list %}
-			<h3>Account Users</h3>
-			{%if account_isIndividual %}
-				{%if individual_no_admins %}
-					<p class="alert alert-error">Attention, individual account has no admin user set</p>
-				{%else%}
-					<p class="alert alert-error">Attention, multiple users are defined for an individual account</p>
+			{%if account_isAdmin %}
+				<h3>Account Users</h3>
+				{%if account_isIndividual %}
+					{%if individual_no_admins %}
+						<p class="alert alert-error">Attention, individual account has no admin user set</p>
+					{%else%}
+						<p class="alert alert-error">Attention, multiple users are defined for an individual account</p>
+					{%endif%}
 				{%endif%}
-			{%endif%}
 
-			<form action="{{ USERSROOTURL }}/controller/account/account.php" method="POST">
-				<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
+				<form action="{{ USERSROOTURL }}/controller/account/account.php" method="POST">
+					<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
 
-				<table class="table table-condensed">
-				{%for user in users %}
-					<tr>
-						<td>
-							<i class="icon-user"></i>
-							{{ user.name }}
-						</td>
-						<td>
-							{%if user.admin %}
-								<span class="badge badge-important pull-right">admin</span>
-							{%else%}
-								<span class="badge pull-right">user</span>
-							{%endif%}
-						</td>
-
-						{%if user.self %}
-						<td colspan="2" class="startupapi-user-self" title="You can't change your info, ask another admin to help you.">it's you</td>
-						{%else%}
+					<table class="table table-condensed">
+					{%for user in users %}
+						<tr>
+							<td>
+								<i class="icon-user"></i>
+								{{ user.name }}
+							</td>
 							<td>
 								{%if user.admin %}
-									<button class="btn btn-mini btn-danger{%if user.self %} disabled{%endif%}" name="demote_user" value="{{ user.id }}">
-										<i class="icon-chevron-down icon-white"></i> Demote
-									</button>
+									<span class="badge badge-important pull-right">admin</span>
 								{%else%}
-									<button class="btn btn-mini{%if user.self %} disabled{%endif%}" name="promote_user" value="{{ user.id }}">
-										<i class="icon-chevron-up"></i> Promote
-									</button>
+									<span class="badge pull-right">user</span>
 								{%endif%}
 							</td>
-							<td>
-								<button class="btn btn-mini pull-right remove_button" name="remove_user" value="{{ user.id }}"><i class="icon-remove"></i> Remove</button>
-							</td>
-						{%endif%}
-					</tr>
+
+							{%if user.self %}
+							<td colspan="2" class="startupapi-user-self" title="You can't change your info, ask another admin to help you.">it's you</td>
+							{%else%}
+								<td>
+									{%if user.admin %}
+										<button class="btn btn-mini btn-danger{%if user.self %} disabled{%endif%}" name="demote_user" value="{{ user.id }}">
+											<i class="icon-chevron-down icon-white"></i> Demote
+										</button>
+									{%else%}
+										<button class="btn btn-mini{%if user.self %} disabled{%endif%}" name="promote_user" value="{{ user.id }}">
+											<i class="icon-chevron-up"></i> Promote
+										</button>
+									{%endif%}
+								</td>
+								<td>
+									<button class="btn btn-mini pull-right remove_button" name="remove_user" value="{{ user.id }}"><i class="icon-remove"></i> Remove</button>
+								</td>
+							{%endif%}
+						</tr>
+					{%endfor%}
+					</table>
+					{%if not account_isIndividual %}
+						<a class="btn btn-mini" href="{{ USERSROOTURL }}/invitations.php?joinaccount=yes"><i class="icon-plus"></i> Invite more users</a>
+					{%endif%}
+					<script>
+						$('.remove_button').on('click', function() {
+							 return confirm('Are you sure you want to remove this user?');
+						});
+					</script>
+				</form>
+			{%else%}
+				<h3>Administrators</h3>
+				{%for user in users %}
+					{%if user.admin %}
+						<div>
+							<i class="icon-user"></i>
+							{{ user.name }}
+						</div>
+					{%endif%}
 				{%endfor%}
-				</table>
-				{%if not account_isIndividual %}
-					<a class="btn btn-mini" href="{{ USERSROOTURL }}/invitations.php?joinaccount=yes"><i class="icon-plus"></i> Invite more users</a>
-				{%endif%}
-				<script>
-					$('.remove_button').on('click', function() {
-						 return confirm('Are you sure you want to remove this user?');
-					});
-				</script>
-			</form>
+			{%endif%}
 		{%endif%}
 {%endif%}

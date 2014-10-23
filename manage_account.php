@@ -6,13 +6,10 @@ require_once(__DIR__ . '/classes/User.php');
 $user = User::require_login();
 $account = $user->getCurrentAccount();
 
-if ($account->getUserRole($user) !== Account::ROLE_ADMIN) {
-	header('Location: ' . UserConfig::$DEFAULTLOGOUTRETURN);
-	exit;
-}
-
 UserTools::preventCSRF();
 $template_data['CSRF_NONCE'] = UserTools::$CSRF_NONCE;
+
+$template_data['account_isAdmin'] = ($account->getUserRole($user) == Account::ROLE_ADMIN);
 
 $template_data['useSubscriptions'] = UserConfig::$useSubscriptions;
 

@@ -36,18 +36,14 @@ require_once(UserConfig::$header);
 					}
 
 					$current_account = $user->getCurrentAccount();
-
-					if ($current_account->getUserRole($user) == Account::ROLE_ADMIN) {
-						?>
-						<li class="nav-header">My Account</li>
-						<li<?php if ($SECTION == 'manage_account') { ?> class="active"<?php } ?>>
-							<a href="<?php echo UserConfig::$USERSROOTURL ?>/manage_account.php">
-								<?php echo UserTools::escape($current_account->getName()) ?>
-							</a>
-						</li>
+					?>
+					<li class="nav-header">My Account</li>
+					<li<?php if ($SECTION == 'manage_account') { ?> class="active"<?php } ?>>
+						<a href="<?php echo UserConfig::$USERSROOTURL ?>/manage_account.php">
+							<?php echo UserTools::escape($current_account->getName()) ?>
+						</a>
+					</li>
 					<?php
-					}
-
 					if (UserConfig::$enableGamification) {
 						?>
 						<li class="nav-header">My achievements</li>
