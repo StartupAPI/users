@@ -253,7 +253,7 @@ if ($code_ready && $dependencies_ready && $config_ready && $database_ready && $a
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
 		<link href="bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
-		<script src="jquery-1.10.2.min.js"></script>
+		<script src="jquery-1.11.1.min.js"></script>
 		<script src="bootstrap/js/bootstrap.min.js"></script>
 
 		<link rel="stylesheet" type="text/css" href="themes/classic/startupapi.css">
