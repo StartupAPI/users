@@ -78,15 +78,15 @@ if (!isset($BREADCRUMB_EXTRA)) {
 		<title><?php echo is_null(UserConfig::$appName) ? '' : UserConfig::$appName; ?><?php $admin_menu->renderTitle($BREADCRUMB_EXTRA) ?></title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<?php
-		$bootstrapCSS = UserConfig::$USERSROOTURL . '/bootstrap/css/bootstrap.min.css';
+		$bootstrapCSS = UserConfig::$USERSROOTURL . '/bootstrap2/css/bootstrap.min.css';
 		if (!is_null(UserConfig::$bootstrapAdminCSS)) {
 			$bootstrapCSS = UserConfig::$bootstrapAdminCSS;
 		}
 		?>
 		<link href="<?php echo $bootstrapCSS ?>" rel="stylesheet">
-		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
+		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap2/css/bootstrap-responsive.min.css" rel="stylesheet">
 		<script src="<?php echo UserConfig::$USERSROOTURL ?>/jquery-1.11.1.min.js"></script>
-		<script src="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap/js/bootstrap.min.js"></script>
+		<script src="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap2/js/bootstrap.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="<?php echo UserConfig::$USERSROOTURL ?>/themes/<?php echo UserConfig::$theme ?>/startupapi.css">
 		<style>
 			.startupapi-sidebar.affix {
