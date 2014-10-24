@@ -343,8 +343,14 @@ class UserConfig {
 
 	/**
 	 * @var string If specified, StartupAPI::head() will include this Twitter Bootstrap CSS instead of default one
+	 * @deprecated since 0.7 Now using Bootstrap 3 which has separate theme file, main bootstrap file is no longer modifiable
 	 */
 	public static $bootstrapCSS = null;
+
+	/**
+	 * @var string If specified, StartupAPI::head() will include this Twitter Bootstrap Theme CSS instead of default one
+	 */
+	public static $bootstrapThemeCSS = null;
 
 	/**
 	 * @var string If specified, Admin UI will include this Twitter Bootstrap CSS instead of default one
