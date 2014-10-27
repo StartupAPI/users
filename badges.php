@@ -1,4 +1,5 @@
 <?php
+
 require_once(__DIR__ . '/global.php');
 
 if (!UserConfig::$enableGamification) {
@@ -8,33 +9,35 @@ if (!UserConfig::$enableGamification) {
 
 $user = User::require_login();
 
-$SECTION = 'badges';
+$template_info = StartupAPI::getTemplateInfo();
 
-require_once(__DIR__ . '/sidebar_header.php');
+// setting section value
+$template_info['PAGE']['SECTION'] = 'badges';
+
 $available_badges = Badge::getAvailableBadges();
+$user_badges = $user->getBadges();
 
-if (count($available_badges) > 0) {
-	?>
-	<div>
-		<h2>My Badges</h2>
-		<?php
-		$user_badges = $user->getBadges();
+foreach ($available_badges as $badge) {
+	$badge_info = array(
+		'size' => UserConfig::$badgeListingSize,
+	);
 
-		foreach ($available_badges as $badge) {
+	if (array_key_exists($badge->getID(), $user_badges)) {
+		$badge_level = $user_badges[$badge->getID()][1];
 
-			if (array_key_exists($badge->getID(), $user_badges)) {
-				$badge_level = $user_badges[$badge->getID()][1];
-				?>
-				<a href="<?php echo UserConfig::$USERSROOTURL . '/show_badge.php?name=' . $badge->getSlug() ?>"><img class="startupapi-badge" src="<?php echo $badge->getImageURL(UserConfig::$badgeListingSize, $badge_level) ?>" title="<?php echo $badge->getTitle() ?>" width="<?php echo UserConfig::$badgeListingSize ?>" height="<?php echo UserConfig::$badgeListingSize ?>"/></a>
-				<?php
-			} else {
-				?>
-				<img class="startupapi-badge" src="<?php echo $badge->getPlaceholderImageURL(UserConfig::$badgeListingSize) ?>" title="Hint: <?php echo $badge->getHint() ?>" width="<?php echo UserConfig::$badgeListingSize ?>" height="<?php echo UserConfig::$badgeListingSize ?>"/>
-				<?php
-			}
-		}
-		?>
-	</div>
-	<?php
+
+
+		$badge_info['slug'] = $badge->getSlug();
+
+		$badge_info['url'] = $badge->getImageURL(UserConfig::$badgeListingSize, $badge_level);
+
+		$badge_info['title'] = $badge->getTitle();
+	} else {
+		$badge_info['placeholder_url'] = $badge->getPlaceholderImageURL(UserConfig::$badgeListingSize);
+		$badge_info['hint'] = $badge->getHint();
+	}
+
+	$template_info['badges'][] = $badge_info;
 }
-require_once(__DIR__ . '/sidebar_footer.php');
+
+StartupAPI::$template->display('badges.html.twig', $template_info);

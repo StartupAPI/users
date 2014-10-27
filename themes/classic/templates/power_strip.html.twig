@@ -1,31 +1,32 @@
-{% if not nav_pills and show_navbar %}
-	<div class="navbar{% if inverted_navbar %} navbar-inverse{% endif %} {%if pull_right %} pull-right{% endif %}">
+<!-- Power Strip Start -->
+{% if not POWERSTRIP.nav_pills and POWERSTRIP.show_navbar %}
+	<div class="navbar{% if POWERSTRIP.inverted_navbar %} navbar-inverse{% endif %} {%if POWERSTRIP.pull_right %} pull-right{% endif %}">
 		<div class="navbar-inner">
 {% endif %}
 
-		<ul class="nav{% if nav_pills %} nav-pills{% endif %} {% if pull_right %} pull-right{% endif %}">
-			{% if is_logged_in %}
-				{% if is_impersonated %}
-					<li><span><a class="btn btn-danger" id="startupapi-navbox-impersonating" href="{{ USERSROOTURL }}/admin/stopimpersonation.php" title="Impersonated by <?php echo UserTools::escape($current_user->getImpersonator()->getName()) ?>">Stop Impersonation</a></span></li>
+		<ul class="nav{% if POWERSTRIP.nav_pills %} nav-pills{% endif %}{% if POWERSTRIP.pull_right %} pull-right{% endif %}">
+			{% if AUTH.current_user.is_logged_in %}
+				{% if AUTH.current_user.is_impersonated %}
+					<li><span><a class="btn btn-danger" id="startupapi-navbox-impersonating" href="{{ UserConfig.USERSROOTURL }}/admin/stopimpersonation.php" title="Impersonated by <?php echo UserTools::escape($current_user->getImpersonator()->getName()) ?>">Stop Impersonation</a></span></li>
 				{% endif %}
 
-				{% if is_admin %}
-					<li><a id="startupapi-navbox-admin" href="{{ USERSROOTURL }}/admin/">Admin</a></li>
+				{% if AUTH.current_user.is_admin %}
+					<li><a id="startupapi-navbox-admin" href="{{ UserConfig.USERSROOTURL }}/admin/">Admin</a></li>
 				{% endif %}
 
-				{% if accounts|length > 1 %}
+				{% if AUTH.accounts|length > 1 %}
 					<li class="dropdown">
 						<a href="#" title="Change account" class="dropdown-toggle" data-toggle="dropdown">
-							{{ current_account.name }}
+							{{ AUTH.current_account.name }}
 							{% if current_plan %}
-								<span class="label label-info" style="margin-left: 0.5em" title="{{ current_plan.description }}">
-									{{ current_plan.name }}
+								<span class="label label-info" style="margin-left: 0.5em" title="{{ AUTH.current_plan.description }}">
+									{{ AUTH.current_plan.name }}
 								</span>
 							{% endif %}
 							<b class="caret"></b>
 						</a>
 						<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" id="startupapi-account-switcher">
-							{% for account in accounts %}
+							{% for account in AUTH.accounts %}
 								<li>
 									<a tabindex="-1" href="#" data-account-swtich-to="{{ account.id }}">
 										{{ account.name }}
@@ -47,13 +48,13 @@
 								var account_swtich_to = $(this).data('account-swtich-to');
 
 								{% if accountSwitchDestination %}
-									var destination = {{ accountSwitchDestination|json_encode()|raw}};
+									var destination = {{ UserConfig.accountSwitchDestination|json_encode()|raw}};
 								{% else %}
 									var destination = document.location;
 								{% endif %}
 
 								if (typeof(account_swtich_to) !== 'undefined') {
-									document.location.href = '{{ USERSROOTURL }}/change_account.php?return=' + encodeURIComponent(destination) + '&account=' + account_swtich_to;
+									document.location.href = '{{ UserConfig.USERSROOTURL }}/change_account.php?return=' + encodeURIComponent(destination) + '&account=' + account_swtich_to;
 								}
 
 								return false;
@@ -62,8 +63,8 @@
 					</li>
 				{% endif %}
 
-				{% for link in extra_links %}
-					<li{% if link.id %}id="{{ link.id }}"{% endif %}>
+				{% for link in PAGE.extralinks %}
+					<li{% if link.id %} id="{{ link.id }}"{% endif %}>
 						<a href="{{ link.url }}"
 							{% if link.title %}
 								title="{{ link.title }}"
@@ -75,15 +76,16 @@
 					</li>
 				{% endfor %}
 
-				<li id="startupapi-navbox-username"><a href="{{ USERSROOTURL }}/edit.php" title="{{ current_user.name }}'s user information">{{ current_user.name }}</a></li>
-				<li id="startupapi-navbox-logout"><a href="{{ USERSROOTURL }}/logout.php">Logout</a></li>
+				<li id="startupapi-navbox-username"><a href="{{ UserConfig.USERSROOTURL }}/edit.php" title="{{ AUTH.current_user.name }}'s user information">{{ AUTH.current_user.name }}</a></li>
+				<li id="startupapi-navbox-logout"><a href="{{ UserConfig.USERSROOTURL }}/logout.php">Logout</a></li>
 			{% else %}
-				<li id="startupapi-navbox-signup"><a href="{{ USERSROOTURL }}/register.php">Sign Up</a></li>
-				<li id="startupapi-navbox-login"><a href="{{ USERSROOTURL }}/login.php">Log in</a></li>
+				<li id="startupapi-navbox-signup"><a href="{{ UserConfig.USERSROOTURL }}/register.php">Sign Up</a></li>
+				<li id="startupapi-navbox-login"><a href="{{ UserConfig.USERSROOTURL }}/login.php">Log in</a></li>
 			{% endif %}
 		</ul>
 
-{% if not nav_pills and show_navbar %}
+{% if not POWERSTRIP.nav_pills and POWERSTRIP.show_navbar %}
 		</div>
 	</div>
 {% endif %}
+<!-- Power Strip End -->

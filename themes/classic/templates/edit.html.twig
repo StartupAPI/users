@@ -1,0 +1,78 @@
+{% extends 'page_with_sidebar.html.twig' %}
+{% macro showErrors(id, errors) %}
+	{% if id in errors|keys and errors[id]|length > 0 %}
+		<div class="alert alert-block alert-error fade-in">
+			<h4 style="margin-bottom: 0.5em">Snap!</h4>
+
+			<ul>
+				{% for field, errorset in errors[id] %}
+					{% for error in errorset %}
+						<li>
+							<label  style="cursor: pointer" for="startupapi-{{id}}-edit-{{field}}">
+								{{error}}
+							</label>
+						</li>
+					{% endfor %}
+				{% endfor %}
+			</ul>
+		</div>
+		{% endif %}
+{% endmacro %}
+{% import _self as page %}
+
+{% block content %}
+<div>
+	{% if not current_module %}
+		<legend>Profile Information</legend>
+
+		{{ page.showErrors('profile-info', errors) }}
+
+		<form class="form-horizontal" action="" method="POST">
+			<fieldset>
+				<div class="control-group{% if 'name' in errors|keys %} error" title="{{ errors['name']|join("\n")}} ?>{% endif %}">
+					<label class="control-label" for="startupapi-profile-info-edit-name">Name</label>
+					<div class="controls">
+						<input id="startupapi-profile-info-edit-name" name="name" type="text" value="{% if 'name' in data|keys %}{{ data.name }}{% else %}{{AUTH.current_user.name}}{% endif %}"/>
+					</div>
+				</div>
+
+				<div class="control-group{% if 'email' in errors|keys %} error" title="{{ errors['email']|join("\n")}} ?>{% endif %}">
+					<label class="control-label" for="startupapi-profile-info-edit-email">Email</label>
+					<div class="controls">
+						<input id="startupapi-profile-info-edit-email" name="email" type="email" value="{% if 'email' in data|keys %}{{ data.email }}{% else %}{{AUTH.current_user.email}}{% endif %}"/>
+						{% if AUTH.current_user.email and not AUTH.current_user.is_email_verified %}
+							<a id="startupapi-usernamepass-edit-verify-email" href="{{ UserConfig.USERSROOTURL }}/verify_email.php">
+								Email address is not verified yet, click here to verify
+							</a>
+						{% endif %}
+					</div>
+				</div>
+
+				<div class="control-group">
+					<div class="controls">
+						<button class="btn btn-primary" type="submit" name="save">Save changes</button>
+					</div>
+				</div>
+			</fieldset>
+
+			<input type="hidden" name="CSRF_NONCE" value="{{ AUTH.CSRF_NONCE }}"/>
+		</form>
+	{% else %}
+		{% if compact_page %}
+			<legend>Connect other accounts</legend>
+			<?php
+		{% endif %}
+
+		{% for module in UserConfig.authentication_modules if compact_page and module.is_compact or not compact_page and module.id == current_module.id %}
+			{{ page.showErrors(module.id, errors) }}
+
+			<div>
+				<a name="{{ module.id }}"></a>
+				<div style="margin-bottom: 2em">
+					{{ module_forms[module.id]|raw }}
+				</div>
+			</div>
+		{% endfor %}
+	{% endif %}
+</div>
+{% endblock %}

@@ -306,11 +306,13 @@ class UserConfig {
 
 	/**
 	 * @var string File system path to header HTML file.
+	 * @deprecated since version 0.7
 	 */
 	public static $header;
 
 	/**
 	 * @var string File system path to footer HTML file.
+	 * @deprecated since version 0.7
 	 */
 	public static $footer;
 
@@ -1091,9 +1093,6 @@ EOD;
 		UserConfig::$privacyPolicyFullURL = UserConfig::$SITEROOTFULLURL . 'privacy_policy.php';
 
 		UserConfig::$supportEmailXMailer = 'Startup API (PHP/' . phpversion() . ')';
-
-		UserConfig::$header = __DIR__ . '/header.php';
-		UserConfig::$footer = __DIR__ . '/footer.php';
 
 		UserConfig::$admin_header = __DIR__ . '/header.php';
 		UserConfig::$admin_footer = __DIR__ . '/footer.php';

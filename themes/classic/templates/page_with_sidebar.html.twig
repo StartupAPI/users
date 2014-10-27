@@ -1,0 +1,57 @@
+{% extends 'page.html.twig' %}
+
+{% block base %}
+<div class="container-fluid" style="margin-top: 1em">
+	<div class="row-fluid">
+		<div class="span3">
+			<div class="well sidebar-nav startupapi-sidebar">
+				<ul class="nav nav-list">
+					<li{% if PAGE.SECTION == 'profile_info'%} class="active"{% endif %}>
+						<a href="{{ UserConfig.USERSROOTURL }}/edit.php">Profile Information</a>
+					</li>
+					<li class="nav-header">Login</li>
+					{% for module in UserConfig.authentication_modules%}
+						<li{% if PAGE.SECTION == 'login_' ~ module.id %} class="active"{% endif %}>
+							<a href="{{ UserConfig.USERSROOTURL }}/edit.php?module={{ module.id }}">
+								{{ module.title }}
+							</a>
+						</li>
+					{% endfor %}
+
+					{% if UserConfig.enableUserInvitations %}
+						<li class="nav-header">Connections</li>
+						<li{% if PAGE.SECTION == 'invitations'%} class="active"{% endif %}>
+							<a href="{{ UserConfig.USERSROOTURL }}/invitations.php">{{ UserConfig.userInvitationSectionTitle }}</a>
+						</li>
+					{% endif %}
+
+					<li class="nav-header">My Account</li>
+					<li{% if PAGE.SECTION == 'account'%} class="active"{% endif %}>
+						<a href="{{ UserConfig.USERSROOTURL }}/manage_account.php">
+							{{ AUTH.current_account.name }}
+						</a>
+					</li>
+					
+					{% if UserConfig.enableGamification %}
+						<li class="nav-header">My achievements</li>
+						<li{% if PAGE.SECTION == 'badges' %} class="active"{% endif %}>
+							<a href="{{ UserConfig.USERSROOTURL }}/badges.php">Badges</a>
+						</li>
+					{% endif %}
+
+					{% if UserConfig.maillist_exists %}
+						<li class="nav-header">Mail preferences</li>
+						<li{% if PAGE.SECTION == 'maillist'%} class="active"{% endif %}>
+							<a href="{{ UserConfig.USERSROOTURL }}/maillist.php">Mail preferences</a>
+						</li>
+					{% endif %}
+				</ul>
+			</div>
+		</div>
+		<div class="span9">
+			{% block content %}
+			{% endblock %}
+		</div>
+	</div>
+</div>
+{% endblock %}

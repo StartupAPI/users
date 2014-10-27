@@ -1,10 +1,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-{% if bootstrapCSS %}
-<link href="{{ bootstrapCSS }}" rel="stylesheet">
+{% if UserConfig.bootstrapCSS %}
+<link href="{{ UserConfig.bootstrapCSS }}" rel="stylesheet">
 {% else %}
-<link href="{{ USERSROOTURL }}/bootstrap2/css/bootstrap.min.css" rel="stylesheet">
+<link href="{{ UserConfig.USERSROOTURL }}/bootstrap2/css/bootstrap.min.css" rel="stylesheet">
 {% endif %}
-<link href="{{ USERSROOTURL }}/bootstrap2/css/bootstrap-responsive.min.css" rel="stylesheet">
-<script src="{{ USERSROOTURL }}/jquery-1.11.1.min.js"></script>
-<script src="{{ USERSROOTURL }}/bootstrap2/js/bootstrap.min.js"></script>
-<link rel="stylesheet" type="text/css" href="{{ USERSROOTURL }}/themes/{{ THEME }}/startupapi.css">
+<link href="{{ UserConfig.USERSROOTURL }}/bootstrap2/css/bootstrap-responsive.min.css" rel="stylesheet">
+<script src="{{ UserConfig.USERSROOTURL }}/jquery-1.11.1.min.js"></script>
+<script src="{{ UserConfig.USERSROOTURL }}/bootstrap2/js/bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css" href="{{ UserConfig.USERSROOTURL }}/themes/{{ UserConfig.theme }}/startupapi.css">
