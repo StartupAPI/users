@@ -11,39 +11,6 @@
  */
 require_once(__DIR__ . '/admin.php');
 
-function phpType($type) {
-	if (substr($type, -2) == '[]') {
-		return phpType(substr($type, 0, -2)) . '[]';
-	}
-
-	if ($type == 'seconds') {
-		return 'int';
-	}
-	if ($type == 'minutes') {
-		return 'int';
-	}
-	if ($type == 'days') {
-		return 'int';
-	}
-	if ($type == 'path') {
-		return 'string';
-	}
-	if ($type == 'url') {
-		return 'string';
-	}
-	if ($type == 'cookie-key') {
-		return 'string';
-	}
-	if ($type == 'secret') {
-		return 'string';
-	}
-	if ($type == 'user-id') {
-		return 'int';
-	}
-
-	return $type;
-}
-
 /**
  * Prints PHP value to be included in a code snippen
  *
@@ -202,7 +169,7 @@ foreach ($config_variables as $section) {
 								<i class="icon-cog"></i>
 								<span class="calltoaction">code</span>
 							</span>
-							<span class="variable-name">UserConfig::$<?php echo $setting['name'] ?> (<?php echo phpType($setting['type']) ?>)</span>
+							<span class="variable-name">UserConfig::$<?php echo $setting['name'] ?> (<?php echo StartupAPI::phpType($setting['type']) ?>)</span>
 						</p>
 					</td>
 
@@ -237,7 +204,7 @@ foreach ($config_variables as $section) {
 /**
  * <?php echo $setting['description'] . "\n" ?>
  *
- * @var <?php echo phpType($setting['type']) . "\n" ?>
+ * @var <?php echo StartupAPI::phpType($setting['type']) . "\n" ?>
  */
 UserConfig::$<?php echo $setting['name'] ?> = <?php codeValue($setting['type'], UserConfig::$$var_name, isset($setting['options']) ? $setting['options'] : null) ?>;</pre>
 					</td>
