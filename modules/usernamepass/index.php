@@ -154,14 +154,14 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 			<fieldset>
 				<legend>Enter your username and password to log in</legend>
 
-				<div class="control-group<?php if (array_key_exists('username', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['username'])) ?><?php } ?>">
+				<div class="control-group">
 					<label class="control-label" for="startupapi-<?php echo $slug ?>-login-username">Username</label>
 					<div class="controls">
 						<input id="startupapi-<?php echo $slug ?>-login-username" name="username" type="text" size="25" required="true"/>
 					</div>
 				</div>
 
-				<div<?php if (UserConfig::$allowRememberMe) {?> style="margin-bottom: 0.5em"<?php } ?> class="control-group<?php if (array_key_exists('pass', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['pass'])) ?><?php } ?>">
+				<div<?php if (UserConfig::$allowRememberMe) {?> style="margin-bottom: 0.5em"<?php } ?> class="control-group">
 					<label class="control-label" for="startupapi-<?php echo $slug ?>-login-pass">Password</label>
 					<div class="controls">
 						<input id="startupapi-<?php echo $slug ?>-login-pass" name="pass" type="password" autocomplete="off"/>
