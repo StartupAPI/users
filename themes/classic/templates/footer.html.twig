@@ -1,0 +1,22 @@
+	<!-- footer starts -->
+	<footer class="footer startupapi-footer">
+		<div class="container">
+			<div class="pull-right">
+				<a href="http://www.startupapi.com/" target="_blank">
+					<img class="startupapi-logo" width="20" height="20" src="{{ USERSROOTURL }}/images/header_icon.png"/>
+					Powered by Startup API
+				</a>
+			</div>
+			<div>
+				{% if APPNAME %}
+					{{ YEAR }}
+					&copy;
+					<a href="{{ SITEROOTURL }}">
+						{{ APPNAME }}
+						</a>
+				{% endif %}
+			</div>
+		</div>
+	</footer>
+</body>
+</html>

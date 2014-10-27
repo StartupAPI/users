@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<title>Users</title>
+		{{ HEAD | raw}}
+	</head>
+
+	<body>
+		<header class="startupapi-header">
+			<div class="startupapi-header-strip pull-right">
+				<?php
+				StartupAPI::power_strip();
+				?>
+			</div>
+			<h1>
+				<a href="{{ SITEROOTURL }}" class="startupapi-header-appname">{{ APPNAME }}</a>
+			</h1>
+		</header>

@@ -348,9 +348,9 @@ class UserConfig {
 	public static $bootstrapCSS = null;
 
 	/**
-	 * @var string If specified, StartupAPI::head() will include this Twitter Bootstrap Theme CSS instead of default one
+	 * @var string If specified, StartupAPI::head() will include this Twitter Bootstrap Theme instead of default one
 	 */
-	public static $bootstrapThemeCSS = null;
+	public static $bootstrapTheme = null;
 
 	/**
 	 * @var string If specified, Admin UI will include this Twitter Bootstrap CSS instead of default one

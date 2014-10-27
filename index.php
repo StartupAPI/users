@@ -251,10 +251,10 @@ if ($code_ready && $dependencies_ready && $config_ready && $database_ready && $a
 		<meta http-equiv="content-type" content="text/html; charset=utf-8">
 		<title>Startup API Installation</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link href="bootstrap3/css/bootstrap.min.css" rel="stylesheet">
-		<link href="bootstrap3/css/bootstrap-theme.min.css" rel="stylesheet">
+		<link href="bootstrap2/css/bootstrap.min.css" rel="stylesheet">
+		<link href="bootstrap2/css/bootstrap-responsive.min.css" rel="stylesheet">
 		<script src="jquery-1.11.1.min.js"></script>
-		<script src="bootstrap3/js/bootstrap.min.js"></script>
+		<script src="bootstrap2/js/bootstrap.min.js"></script>
 
 		<link rel="stylesheet" type="text/css" href="themes/classic/startupapi.css">
 	</head>

@@ -1,4 +1,5 @@
 <?php
+
 require_once(__DIR__ . '/User.php');
 require_once(__DIR__ . '/Plan.php');
 
@@ -65,210 +66,92 @@ class StartupAPI {
 	 * styles, scripts and potentially meta-tags into the head of the pages on the site
 	 */
 	static function head() {
-		$bootstrapThemeCSS = UserConfig::$USERSROOTURL . '/bootstrap3/css/bootstrap-theme.min.css';
-		if (!is_null(UserConfig::$bootstrapThemeCSS)) {
-			$bootstrapThemeCSS = UserConfig::$bootstrapThemeCSS;
-		}
-		?>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap3/css/bootstrap.min.css" rel="stylesheet">
-		<link href="<?php echo $bootstrapThemeCSS ?>" rel="stylesheet">
-		<script src="<?php echo UserConfig::$USERSROOTURL ?>/jquery-1.11.1.min.js"></script>
-		<script src="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap3/js/bootstrap.min.js"></script>
+		echo self::renderHeadHTML();
+	}
 
-		<link rel="stylesheet" type="text/css" href="<?php echo UserConfig::$USERSROOTURL ?>/themes/<?php echo UserConfig::$theme ?>/startupapi.css">
-		<?php
+	/**
+	 * @return string HTML to be output withing <head> tag on the page
+	 */
+	static function renderHeadHTML() {
+		return StartupAPI::$template->render('head_tag.html.twig', array(
+					'USERSROOTURL' => UserConfig::$USERSROOTURL,
+					'SITEROOTURL' => UserConfig::$SITEROOTURL,
+					'YEAR' => date('Y'),
+					'APPNAME' => UserConfig::$appName,
+					'bootstrapCSS' => UserConfig::$bootstrapCSS,
+					'bootstrapTheme' => UserConfig::$bootstrapTheme,
+					'THEME' => UserConfig::$theme
+				));
 	}
 
 	/**
 	 * This finction renders the power strip (navigation bar at the top right corner)
 	 */
 	static function power_strip($nav_pills = null, $show_navbar = null, $inverted_navbar = null, $pull_right = null) {
-		$current_user = User::get();
-		$current_account = null;
+		echo self::renderPowerStrip($nav_pills, $show_navbar, $inverted_navbar, $pull_right);
+	}
 
+	static function renderPowerStrip($nav_pills = null, $show_navbar = null, $inverted_navbar = null, $pull_right = null) {
+		$options = array(
+			'USERSROOTURL' => UserConfig::$USERSROOTURL,
+			'nav_pills' => is_null($nav_pills) ? UserConfig::$powerStripNavPills : $nav_pills,
+			'show_navbar' => is_null($show_navbar) ? UserConfig::$powerStripShowNavbar : $show_navbar,
+			'inverted_navbar' => is_null($inverted_navbar) ? UserConfig::$powerStripInvertedNavbar : $inverted_navbar,
+			'pull_right' => is_null($pull_right) ? UserConfig::$powerStripPullRight : $pull_right,
+			'accountSwitchDestination' => UserConfig::$accountSwitchDestination
+		);
+
+		$current_user = User::get();
+
+		$current_account = null;
 		$accounts = array();
 		if (!is_null($current_user)) {
+			$options['current_user']['name'] = $current_user->getName();
+			$options['is_impersonated'] = $current_user->isImpersonated();
+			$options['is_admin'] = $current_user->isAdmin();
+			$options['is_logged_in'] = TRUE;
+
 			$accounts = Account::getUserAccounts($current_user);
-
 			$current_account = Account::getCurrentAccount($current_user);
+
+			$options['current_account']['name'] = $current_account->getName();
+
+			$current_plan = $current_account->getPlan(); // can be FALSE
+			if ($current_plan) {
+				$options['current_plan']['name'] = $current_plan->getName();
+				$options['current_plan']['description'] = $current_plan->getDescription();
+			}
+		} else {
+			$options['is_logged_in'] = FALSE;
 		}
 
-		/**
-		 * Setting instance defaults
-		 */
-		if (is_null($nav_pills)) {
-			$nav_pills = UserConfig::$powerStripNavPills;
-		}
+		foreach ($accounts as $account) {
+			if (!$account->isTheSameAs($current_account)) {
+				$account_info = array(
+					'name' => $account->getName(),
+					'id' => $account->getID()
+				);
 
-		if (is_null($show_navbar)) {
-			$show_navbar = UserConfig::$powerStripShowNavbar;
-		}
-
-		if (is_null($inverted_navbar)) {
-			$inverted_navbar = UserConfig::$powerStripInvertedNavbar;
-		}
-
-		if (is_null($pull_right)) {
-			$pull_right = UserConfig::$powerStripPullRight;
-		}
-
-		if (!$nav_pills && $show_navbar) {
-			?>
-			<div class="navbar<?php if ($inverted_navbar) { ?> navbar-inverse<?php } ?> <?php if ($pull_right) { ?> pull-right<?php } ?>">
-				<div class="navbar-inner">
-					<?php
+				$plan = $account->getPlan(); // can be FALSE
+				if ($plan) {
+					$account_info['plan']['name'] = $plan->getName();
+					$account_info['plan']['description'] = $plan->getDescription();
 				}
-				?>
-				<ul class="nav<?php if ($nav_pills) { ?> nav-pills<?php } ?>  <?php if ($pull_right) { ?> pull-right<?php } ?>">
-					<?php
-					if (!is_null($current_user)) {
-						if ($current_user->isImpersonated()) {
-							?>
-							<li><span><a class="btn btn-danger" id="startupapi-navbox-impersonating" href="<?php echo UserConfig::$USERSROOTURL ?>/admin/stopimpersonation.php" title="Impersonated by <?php echo UserTools::escape($current_user->getImpersonator()->getName()) ?>">Stop Impersonation</a></span></li>
-							<?php
-						}
 
-						if ($current_user->isAdmin()) {
-							?>
-							<li><a id="startupapi-navbox-admin" href="<?php echo UserConfig::$USERSROOTURL ?>/admin/">Admin</a></li>
-							<?php
-						}
-
-						if (count($accounts) > 1) {
-							$destination = "'+encodeURIComponent(document.location)+'";
-							if (!is_null(UserConfig::$accountSwitchDestination)) {
-								$destination = UserConfig::$accountSwitchDestination;
-							}
-							?>
-							<li class="dropdown">
-								<a href="#" title="Change account" class="dropdown-toggle" data-toggle="dropdown">
-									<?php echo UserTools::escape($current_account->getName()) ?>
-									<?php
-									$current_plan = $current_account->getPlan(); // can be FALSE
-
-									if ($current_plan) {
-										?>
-										<span class="label label-info" style="margin-left: 0.5em" title="<?php echo UserTools::escape($current_plan->getDescription()) ?>">
-											<?php echo UserTools::escape($current_plan->getName()) ?>
-										</span>
-										<?php
-									}
-									?>
-									<b class="caret"></b>
-								</a>
-								<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" id="startupapi-account-switcher">
-									<?php
-									foreach ($accounts as $account) {
-										$is_current = $current_account->isTheSameAs($account);
-
-										if ($is_current) {
-											continue;
-										}
-										?>
-										<li>
-											<a tabindex="-1"
-											   href="#"
-											   <?php
-											   if (!$is_current) {
-												   ?>
-												   data-account-swtich-to="<?php echo $account->getID() ?>"
-												   <?php
-											   }
-											   ?>
-											   >
-												   <?php echo UserTools::escape($account->getName()); ?>
-												   <?php
-												   $plan = $account->getPlan(); // can be FALSE
-
-												   if ($plan) {
-													   ?>
-													<span class="label" style="margin-left: 0.5em" title="<?php echo UserTools::escape($plan->getDescription()) ?>">
-														<?php echo UserTools::escape($plan->getName()) ?>
-													</span>
-													<?php
-												} else {
-													?>
-													<span class="label label-important" style="margin-left: 0.5em" title="No plan set for this account">
-														NO PLAN
-													</span>
-													<?php
-												}
-												?>
-											</a>
-										</li>
-										<?php
-									}
-									?>
-								</ul>
-								<script>
-									$('#startupapi-account-switcher a').click(function(e) {
-										var account_swtich_to = $(this).data('account-swtich-to');
-
-										if (typeof(account_swtich_to) !== 'undefined') {
-											document.location.href = '<?php echo UserConfig::$USERSROOTURL ?>/change_account.php?return=<?php echo $destination ?>&account='+account_swtich_to;
-										}
-
-										return false;
-									});
-								</script>
-							</li>
-							<?php
-						}
-
-						if (!is_null(UserConfig::$onLoginStripLinks)) {
-							$links = call_user_func_array(
-									UserConfig::$onLoginStripLinks, array($current_user, $current_account)
-							);
-
-							foreach ($links as $link) {
-								?>
-								<li
-								<?php
-								if (array_key_exists('id', $link)) {
-									?>
-										id="<?php echo $link['id'] ?>"
-										<?php
-									}
-									?>
-									><a href="<?php echo $link['url'] ?>"
-										<?php
-										if (array_key_exists('title', $link)) {
-											?>
-										title="<?php echo $link['title'] ?>"
-										<?php
-									}
-									if (array_key_exists('target', $link)) {
-										?>
-										target="<?php echo $link['target'] ?>"
-										<?php
-									}
-									?>
-									><?php echo $link['text'] ?></a>
-								</li>
-								<?php
-							}
-						}
-						?>
-
-						<li id="startupapi-navbox-username"><a href="<?php echo UserConfig::$USERSROOTURL ?>/edit.php" title="<?php echo UserTools::escape($current_user->getName()) ?>'s user information"><?php echo UserTools::escape($current_user->getName()) ?></a></li>
-						<li id="startupapi-navbox-logout"><a href="<?php echo UserConfig::$USERSROOTURL ?>/logout.php">Logout</a></li>
-						<?php
-					} else {
-						?>
-						<li id="startupapi-navbox-signup"><a href="<?php echo UserConfig::$USERSROOTURL ?>/register.php">Sign Up</a></li>
-						<li id="startupapi-navbox-login"><a href="<?php echo UserConfig::$USERSROOTURL ?>/login.php">Log in</a></li>
-						<?php
-					}
-					?>
-				</ul>
-				<?php
-				if (!$nav_pills && $show_navbar) {
-					?>
-				</div>
-			</div>
-			<?php
+				$options['accounts'][] = $account_info;
+			}
 		}
+
+		if (!is_null(UserConfig::$onLoginStripLinks)) {
+			$links = call_user_func_array(UserConfig::$onLoginStripLinks, array($current_user, $current_account));
+			if (is_array($links)) {
+				foreach ($links as $link) {
+					$options['extralinks'][] = $link;
+				}
+			}
+		}
+
+		return StartupAPI::$template->render('power_strip.html.twig', $options);
 	}
 
 	/**
@@ -324,7 +207,7 @@ class StartupAPI {
 		Plan::init(UserConfig::$PLANS);
 
 		// Configuring the templating
-		$loader = new Twig_Loader_Filesystem(dirname(__DIR__) . '/templates/');
+		$loader = new Twig_Loader_Filesystem(dirname(__DIR__) . '/themes/' . UserConfig::$theme . '/templates/');
 		$loader->addPath(dirname(__DIR__) . '/admin/templates', 'admin');
 
 		self::$template = new Twig_Environment($loader, UserConfig::$twig_options);
