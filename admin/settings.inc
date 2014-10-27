@@ -82,7 +82,7 @@ $config_variables = array(
 		)
 	),
 	array(
-		'name' => 'Headers, footers and look and feel',
+		'name' => 'Look and feel',
 		'id' => 'lookandfeel',
 		'groups' => array(
 			array(
@@ -91,16 +91,6 @@ $config_variables = array(
 						'description' => 'Application name',
 						'type' => 'string',
 						'name' => 'appName'
-					),
-					array(
-						'description' => 'File system path to header HTML file.',
-						'type' => 'path',
-						'name' => 'header'
-					),
-					array(
-						'description' => 'File system path to header HTML file.',
-						'type' => 'path',
-						'name' => 'footer'
 					),
 					array(
 						'description' => 'File system path to maillist management widget file to be included on profile management page.',
@@ -121,6 +111,11 @@ $config_variables = array(
 						'description' => 'If specified, StartupAPI::head() will include this Twitter Bootstrap CSS instead of default one',
 						'type' => 'url',
 						'name' => 'bootstrapCSS'
+					),
+					array(
+						'description' => 'If specified, StartupAPI::head() will include this Bootswatch Theme instead of default one',
+						'type' => 'string',
+						'name' => 'bootstrapTheme'
 					),
 					array(
 						'description' => 'If specified, Admin UI will include this Twitter Bootstrap CSS instead of default one',
@@ -263,6 +258,12 @@ $config_variables = array(
 						'description' => 'Invitation from administrator required for registration',
 						'type' => 'boolean',
 						'name' => 'adminInvitationOnly',
+						'options' => array('true_string' => 'enabled', 'false_string' => 'disabled')
+					),
+					array(
+						'description' => 'User-to-user invitations',
+						'type' => 'boolean',
+						'name' => 'enableUserInvitations',
 						'options' => array('true_string' => 'enabled', 'false_string' => 'disabled')
 					),
 					array(
