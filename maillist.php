@@ -1,13 +1,18 @@
 <?php
+
 require_once(__DIR__ . '/global.php');
 
-$user = User::require_login();
-
-$SECTION = 'maillist';
-require_once(__DIR__ . '/sidebar_header.php');
-
-if (!is_null(UserConfig::$maillist) && file_exists(UserConfig::$maillist)) {
-	include(UserConfig::$maillist);
+if (!UserConfig::$maillist || !file_exists(UserConfig::$maillist)) {
+	header('Location: ' . UserConfig::$USERSROOTURL . '/edit.php');
+	exit;
 }
 
-require_once(__DIR__ . '/sidebar_footer.php');
+$user = User::require_login();
+$template_info = StartupAPI::getTemplateInfo();
+$template_info['PAGE']['SECTION'] = 'maillist';
+
+if (!is_null(UserConfig::$maillist)) {
+	$template_info['maillist_html'] = file_get_contents(UserConfig::$maillist);
+}
+
+StartupAPI::$template->display('maillist.html.twig', $template_info);

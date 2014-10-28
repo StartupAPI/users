@@ -4,7 +4,7 @@ require_once(__DIR__ . '/global.php');
 require_once(__DIR__ . '/classes/User.php');
 
 if (!UserConfig::$enableGamification || !array_key_exists('name', $_GET)) {
-	header("HTTP/1.0 404 Not Found");
+	header('Location: ' . UserConfig::$USERSROOTURL . '/badges.php');
 	exit;
 }
 
@@ -27,7 +27,7 @@ foreach ($user_badges as $badge_pairs) {
 }
 
 if (!$user_has_this_badge) {
-	header("HTTP/1.0 404 Not Found");
+	header('Location: ' . UserConfig::$USERSROOTURL . '/badges.php');
 	exit;
 }
 
