@@ -10,6 +10,8 @@ if (!UserConfig::$enableGamification || !array_key_exists('name', $_GET)) {
 
 $user = User::require_login();
 
+$template_info = StartupAPI::getTemplateInfo();
+
 $user_badges = $user->getBadges();
 
 $user_has_this_badge = false;
@@ -29,17 +31,13 @@ if (!$user_has_this_badge) {
 	exit;
 }
 
-$SECTION = 'badges';
+// setting section value
+$template_info['PAGE']['SECTION'] = 'badges';
 
-require_once(__DIR__ . '/sidebar_header.php');
+$template_info['slug'] = $badge->getSlug() . ($badge_level > 1 ? '_' . $badge_level : '');
+$template_info['url'] = $badge->getImageURL(UserConfig::$badgeLargeSize, $badge_level);
+$template_info['title'] = $badge->getTitle();
+$template_info['description'] = $badge->getDescription();
+$template_info['call_to_action'] = $badge->getCallToAction($badge_level);
 
-$slug = $badge->getSlug() . ($badge_level > 1 ? '_' . $badge_level : '');
-?>
-<img class="startupapi-badge-large" src="<?php echo $badge->getImageURL(UserConfig::$badgeLargeSize, $badge_level) ?>" title="<?php echo $badge->getTitle() ?>" width="<?php echo UserConfig::$badgeLargeSize ?>" height="<?php echo UserConfig::$badgeLargeSize ?>"/>
-
-<h2><?php echo $badge->getTitle(); ?></h2>
-<p><?php echo $badge->getDescription(); ?></p>
-<p class="startupapi-badge-call-to-action"><?php echo $badge->getCallToAction($badge_level); ?></p>
-
-<?php
-require_once(__DIR__ . '/sidebar_footer.php');
+StartupAPI::$template->display('show_badge.html.twig', $template_info);

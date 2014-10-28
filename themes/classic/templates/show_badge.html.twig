@@ -1,0 +1,9 @@
+{% extends 'page_with_sidebar.html.twig' %}
+
+{% block content %}
+	<img class="startupapi-badge-large" src="{{url}}" title="{{title}}" width="{{UserConfig.badgeLargeSize}}" height="{{UserConfig.badgeLargeSize}}"/>
+
+	<h2>{{title}}</h2>
+	<p>{{description}}</p>
+	<p class="startupapi-badge-call-to-action">{{call_to_action}}</p>
+{% endblock %}
