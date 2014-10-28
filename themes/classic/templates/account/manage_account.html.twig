@@ -1,20 +1,26 @@
-	{%if message %}
-		{%for msg in message %}
-			<h2>{{ msg }}</h2>
-		{%endfor%}
-	{%endif%}
+{% extends 'page_with_sidebar.html.twig' %}
+
+{% block content %}
+	<script>
+		STARTUPAPI.showMessages({
+			"user-removed": { 'class': 'success', 'text': 'User removed'},
+			"user-promoted": { 'class': 'success', 'text': 'User successfully promoted'},
+			"user-demoted": { 'class': 'success', 'text': 'User successfully demoted'},
+			"updated": { 'class': 'success', 'text': 'Account name updated'},
+		});
+	</script>
 
 	{%if not fatal %}
 		<legend>
 			Accounts / <b>{{ account_name }}</b>
 			{%if account_isAdmin and not account_isIndividual %}
-				<a href="{{ USERSROOTURL }}/edit_account.php" class="btn btn-mini"><i class="icon-pencil"></i> edit</a>
+				<a href="{{UserConfig.USERSROOTURL}}/edit_account.php" class="btn btn-mini"><i class="icon-pencil"></i> edit</a>
 			{%endif%}
 		</legend>
 		{%if account_isIndividual %}
 			<p>
-				<form action="{{ USERSROOTURL }}/controller/account.php" method="POST">
-					<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
+				<form action="{{UserConfig.USERSROOTURL}}/controller/account.php" method="POST">
+					<input type="hidden" name="CSRF_NONCE" value="{{ AUTH.CSRF_NONCE }}"/>
 					Individual accout
 					{%if user %}
 						for <i class="icon-user"></i> {{ user.name }}
@@ -46,8 +52,8 @@
 					{%endif%}
 				{%endif%}
 
-				<form action="{{ USERSROOTURL }}/controller/account/account.php" method="POST">
-					<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
+				<form action="{{UserConfig.USERSROOTURL}}/controller/account/account.php" method="POST">
+					<input type="hidden" name="CSRF_NONCE" value="{{ AUTH.CSRF_NONCE }}"/>
 
 					<table class="table table-condensed">
 					{%for user in users %}
@@ -86,7 +92,7 @@
 					{%endfor%}
 					</table>
 					{%if not account_isIndividual %}
-						<a class="btn btn-mini" href="{{ USERSROOTURL }}/invitations.php?joinaccount=yes"><i class="icon-plus"></i> Invite more users</a>
+						<a class="btn btn-mini" href="{{UserConfig.USERSROOTURL}}/invitations.php?joinaccount=yes"><i class="icon-plus"></i> Invite more users</a>
 					{%endif%}
 					<script>
 						$('.remove_button').on('click', function() {
@@ -106,4 +112,5 @@
 				{%endfor%}
 			{%endif%}
 		{%endif%}
-{%endif%}
+	{%endif%}
+{% endblock %}

@@ -1,31 +1,12 @@
 {% extends 'page_with_sidebar.html.twig' %}
-{% macro showErrors(id, errors) %}
-	{% if id in errors|keys and errors[id]|length > 0 %}
-		<div class="alert alert-block alert-error fade-in">
-			<h4 style="margin-bottom: 0.5em">Snap!</h4>
-
-			<ul>
-				{% for field, errorset in errors[id] %}
-					{% for error in errorset %}
-						<li>
-							<label  style="cursor: pointer" for="startupapi-{{id}}-edit-{{field}}">
-								{{error}}
-							</label>
-						</li>
-					{% endfor %}
-				{% endfor %}
-			</ul>
-		</div>
-		{% endif %}
-{% endmacro %}
-{% import _self as page %}
+{% import 'error_messages.html.twig' as errors %}
 
 {% block content %}
 <div>
 	{% if not current_module %}
 		<legend>Profile Information</legend>
 
-		{{ page.showErrors('profile-info', errors) }}
+		{{ errors.showErrors('profile-info', errors) }}
 
 		<form class="form-horizontal" action="" method="POST">
 			<fieldset>
@@ -64,7 +45,7 @@
 		{% endif %}
 
 		{% for module in UserConfig.authentication_modules if compact_page and module.is_compact or not compact_page and module.id == current_module.id %}
-			{{ page.showErrors(module.id, errors) }}
+			{{ errors.showErrors(module.id, errors) }}
 
 			<div>
 				<a name="{{ module.id }}"></a>

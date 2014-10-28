@@ -13,7 +13,7 @@ if (!is_null($account) && $account->getUserRole($current_user) == Account::ROLE_
 		if (!is_null($user) && !$user->isTheSameAs($current_user)) {
 			$account->removeUser($user);
 
-			header('Location: ' . UserConfig::$USERSROOTURL . '/manage_account.php#user-removed');
+			header('Location: ' . UserConfig::$USERSROOTURL . '/manage_account.php#message=user-removed');
 			exit;
 		}
 	}
@@ -36,7 +36,7 @@ if (!is_null($account) && $account->getUserRole($current_user) == Account::ROLE_
 		if (!is_null($user) && !$user->isTheSameAs($current_user)) {
 			$account->setUserRole($user, $admin);
 
-			header('Location: ' . UserConfig::$USERSROOTURL . '/manage_account.php#user-' . ($admin ? 'promoted' : 'demoted'));
+			header('Location: ' . UserConfig::$USERSROOTURL . '/manage_account.php#message=user-' . ($admin ? 'promoted' : 'demoted'));
 			exit;
 		}
 	}

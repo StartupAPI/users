@@ -7,35 +7,36 @@ $user = User::require_login();
 $account = $user->getCurrentAccount();
 
 UserTools::preventCSRF();
-$template_data['CSRF_NONCE'] = UserTools::$CSRF_NONCE;
 
-$template_data['account_isAdmin'] = ($account->getUserRole($user) == Account::ROLE_ADMIN);
+$template_info = StartupAPI::getTemplateInfo();
 
-$template_data['useSubscriptions'] = UserConfig::$useSubscriptions;
+$template_info['account_isAdmin'] = ($account->getUserRole($user) == Account::ROLE_ADMIN);
 
-$template_data['account_id'] = $account->getID();
+$template_info['useSubscriptions'] = UserConfig::$useSubscriptions;
 
-$template_data['account_name'] = $account->getName();
-$template_data['account_isActive'] = $account->isActive();
+$template_info['account_id'] = $account->getID();
 
-$template_data['account_engine'] = is_null($account->getPaymentEngine()) ? 'None' : $account->getPaymentEngine()->getTitle();
+$template_info['account_name'] = $account->getName();
+$template_info['account_isActive'] = $account->isActive();
+
+$template_info['account_engine'] = is_null($account->getPaymentEngine()) ? 'None' : $account->getPaymentEngine()->getTitle();
 
 $next_charge = $account->getNextCharge();
 if (!is_null($next_charge)) {
-	$template_data['account_next_charge'] = preg_replace("/ .*/", "", $next_charge);
+	$template_info['account_next_charge'] = preg_replace("/ .*/", "", $next_charge);
 }
 
 $plan = $account->getPlan(); // can be FALSE
-$template_data['planIsSet'] = $plan ? TRUE : FALSE;
+$template_info['planIsSet'] = $plan ? TRUE : FALSE;
 
 if ($plan) {
-	$template_data['plan_slug'] = $plan->getSlug();
-	$template_data['plan_name'] = $plan->getName();
-	$template_data['plan_description'] = $plan->getDescription();
-	$template_data['plan_base_price'] = $plan->getBasePrice();
-	$template_data['plan_base_period'] = $plan->getBasePeriod();
-	$template_data['plan_details_url'] = $plan->getDetailsURL();
-	$template_data['plan_grace_period'] = $plan->getGracePeriod();
+	$template_info['plan_slug'] = $plan->getSlug();
+	$template_info['plan_name'] = $plan->getName();
+	$template_info['plan_description'] = $plan->getDescription();
+	$template_info['plan_base_price'] = $plan->getBasePrice();
+	$template_info['plan_base_period'] = $plan->getBasePeriod();
+	$template_info['plan_details_url'] = $plan->getDetailsURL();
+	$template_info['plan_grace_period'] = $plan->getGracePeriod();
 }
 
 $account_users = $account->getUsers();
@@ -69,34 +70,29 @@ foreach ($account_users as $user_and_role) {
 	}
 }
 
-$template_data['users'] = $users;
-$template_data['admins'] = $admins;
-$template_data['USERSROOTURL'] = UserConfig::$USERSROOTURL;
+$template_info['users'] = $users;
+$template_info['admins'] = $admins;
 
 if ($account->isIndividual()) {
-	$template_data['account_isIndividual'] = true;
+	$template_info['account_isIndividual'] = true;
 
 	if (count($admins) > 0) {
-		$template_data['user'] = $admins[0];
+		$template_info['user'] = $admins[0];
 	}
 } else {
-	$template_data['account_isIndividual'] = false;
+	$template_info['account_isIndividual'] = false;
 }
 
-$template_data['individual_no_admins'] = false;
-if ($template_data['account_isIndividual'] && count($admins) == 0) {
-	$template_data['individual_no_admins'] = true;
+$template_info['individual_no_admins'] = false;
+if ($template_info['account_isIndividual'] && count($admins) == 0) {
+	$template_info['individual_no_admins'] = true;
 }
 
-$template_data['show_user_list'] = TRUE;
-if ($template_data['account_isIndividual'] && count($admins) == 1 && count($users) == 1) {
-	$template_data['show_user_list'] = FALSE;
+$template_info['show_user_list'] = TRUE;
+if ($template_info['account_isIndividual'] && count($admins) == 1 && count($users) == 1) {
+	$template_info['show_user_list'] = FALSE;
 };
 
+$template_info['PAGE']['SECTION'] = 'account';
 
-$SECTION = 'manage_account';
-require_once(__DIR__ . '/sidebar_header.php');
-
-StartupAPI::$template->display('account/manage_account.html.twig', $template_data);
-
-require_once(__DIR__ . '/sidebar_footer.php');
+StartupAPI::$template->display('account/manage_account.html.twig', $template_info);
