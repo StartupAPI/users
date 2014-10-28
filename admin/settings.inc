@@ -98,11 +98,6 @@ $config_variables = array(
 						'name' => 'maillist'
 					),
 					array(
-						'description' => 'File system path to admin UI header HTML file.',
-						'type' => 'path',
-						'name' => 'admin_header'
-					),
-					array(
 						'description' => 'File system path to admin UI footer HTML file.',
 						'type' => 'path',
 						'name' => 'admin_footer'

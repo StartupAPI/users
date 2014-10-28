@@ -325,11 +325,13 @@ class UserConfig {
 
 	/**
 	 * @var string File system path to admin UI header HTML file.
+	 * @deprecated since version 0.7
 	 */
 	public static $admin_header;
 
 	/**
 	 * @var string File system path to admin UI footer HTML file.
+	 * @deprecated since version 0.7
 	 */
 	public static $admin_footer;
 
@@ -1093,9 +1095,6 @@ EOD;
 		UserConfig::$privacyPolicyFullURL = UserConfig::$SITEROOTFULLURL . 'privacy_policy.php';
 
 		UserConfig::$supportEmailXMailer = 'Startup API (PHP/' . phpversion() . ')';
-
-		UserConfig::$admin_header = __DIR__ . '/header.php';
-		UserConfig::$admin_footer = __DIR__ . '/footer.php';
 
 		// Built in activities
 
