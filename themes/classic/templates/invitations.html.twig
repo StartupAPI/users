@@ -1,0 +1,115 @@
+{% extends 'page_with_sidebar.html.twig' %}
+{% block content %}
+<script>
+	STARTUPAPI.showMessages({
+		sent: { 'class': 'success', 'text': 'Invitations sent'},
+		resent: { 'class': 'success', 'text': 'Invitations sent again'},
+		cancelled: { 'class': 'success', 'text': 'Invitation cancelled'}
+	});
+</script>
+
+<h1>{{UserConfig.userInvitationSectionTitle}}</h1>
+<form class="form-horizontal well" action="" method="POST">
+	<div class="control-group">
+		<div class="controls">
+			Please provide a personal message, name and email of the person you'd like to invite.
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label" for="invitation_name">Name</label>
+		<div class="controls">
+			<input class="span6" type="text" name="invitation_name" id="invitation_name" placeholder="John Smith">
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label" for="invitation_email">Email</label>
+		<div class="controls">
+			<input class="span6" type="email" name="invitation_email" id="invitation_email" placeholder="john.smith@example.com">
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label" for="invitation_note">Message</label>
+		<div class="controls">
+			<textarea class="span6" id="invitation_note" name="invitation_note" rows="3">{{message_placeholder}}</textarea>
+		</div>
+	</div>
+	{% if can_invite_to_account %}
+		<div class="control-group">
+			<div class="controls">
+				<label class="checkbox">
+					<input type="checkbox" class="checkbox" name="invite_to_account" {% if join_account %} checked="checked"{% endif %}/>
+					Invite them to join <b><i>{{AUTH.current_account.name}}</i></b> account
+				</label>
+			</div>
+		</div>
+	{% endif %}
+	<div class="control-group">
+		<div class="controls">
+			<button class="btn btn-primary" name="send">Send invitation</button>
+		</div>
+	</div>
+	<input type="hidden" name="CSRF_NONCE" value="{{ AUTH.CSRF_NONCE }}"/>
+</form>
+
+{% if sent_invitations|length > 0 %}
+	<form action="" method="POST">
+		<h2>Sent Invitations</h2>
+		<table class="table">
+			{% for invitation in sent_invitations %}
+				<tr>
+					<td>
+						<div>
+							Sent
+							<span class="badge{% if invitation.ago < 5 %} badge-success{% endif %}"> {{invitation.ago}}</span>
+							day{% if invitation.ago != 1 %}s{% endif %} ago
+						</div>
+						<div class="invitation_sent_time">
+							{{created}}
+						</div>
+					</td>
+					<td>
+						<b>{{invitation.name}}</b>
+						{% if invitation.email %}
+							&lt;<a target="_blank" href="mailto:{{invitation.email_spaceencoded|raw}}">{{invitation.email}}</a>&gt;
+						{% endif %}
+					</td>
+					<td>
+						<button class="btn btn-mini btn-primary" type="submit" name="resend[{{invitation.code}}]">
+							<i class="icon-white icon-envelope"></i> Re-send
+						</button>
+						<button class="btn btn-mini"
+								type="submit" name="cancel[{{invitation.code}}]"
+								onclick="return confirm('Are you sure you want to cancel this invitation?')">
+							<i class="icon-remove"></i> Cancel Invitation
+						</button>
+					</td>
+				</tr>
+			{% endfor %}
+		</table>
+		<input type="hidden" name="CSRF_NONCE" value="{{ AUTH.CSRF_NONCE }}"/>
+	</form>
+{% endif %}
+
+{% if accepted_invitations|length > 0 %}
+	<h2>Accepted Invitations</h2>
+	<table class="table">
+		<tr>
+			<th>Registered User</th>
+			<th>Sent to</th>
+		</tr>
+		{%for invitation in accepted_invitations %}
+			<tr>
+				<td>
+					<i class="icon-user"></i> {{invitation.invited_name}}
+				</td>
+				<td>
+					<b>{{name}}</b>
+					{% if invitation.email %}
+						&lt;<a target="_blank" href="mailto:{{invitation.email_spaceencoded|raw}}">{{invitation.email}}</a>&gt;
+					{% endif %}
+				</td>
+			</tr>
+		{% endfor %}
+	</table>
+{% endif %}
+{% endblock %}

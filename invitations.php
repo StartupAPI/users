@@ -1,16 +1,21 @@
 <?php
+
 require_once(__DIR__ . '/global.php');
 
 $user = User::require_login();
 
+UserTools::preventCSRF();
+
+$template_info = StartupAPI::getTemplateInfo();
+
 $current_account = null;
-$can_invite_to_account = false;
+$template_info['can_invite_to_account'] = false;
 
 $current_account = $user->getCurrentAccount();
 if (!$current_account->isIndividual()
-	&& $current_account->getUserRole($user) === Account::ROLE_ADMIN
+		&& $current_account->getUserRole($user) === Account::ROLE_ADMIN
 ) {
-	$can_invite_to_account = true;
+	$template_info['can_invite_to_account'] = true;
 }
 
 $errors = array();
@@ -29,7 +34,7 @@ if (array_key_exists('send', $_POST)) {
 	$invitation_note = trim($_POST['invitation_note']);
 
 	$invite_to_account = null;
-	if ($can_invite_to_account && array_key_exists('invite_to_account', $_POST)) {
+	if ($template_info['can_invite_to_account'] && array_key_exists('invite_to_account', $_POST)) {
 		// can only invite to user's current account
 		$invite_to_account = $current_account;
 	}
@@ -71,156 +76,35 @@ if (array_key_exists('cancel', $_POST)) {
 	}
 }
 
-$SECTION = 'invitations';
+$template_info['PAGE']['SECTION'] = 'invitations';
+$template_info['errors'] = $errors;
+$template_info['message_placeholder'] = call_user_func_array(UserConfig::$onRenderUserInvitationMessagePlaceholder, array($user));
+$template_info['join_account'] = array_key_exists('joinaccount', $_GET);
 
-require_once(__DIR__ . '/sidebar_header.php');
-?>
-<script>
-	$(document).ready(function() {
-		var available_messages = {
-			sent: { 'class': 'success', 'text': 'Invitations sent'},
-			cancelled: { 'class': 'success', 'text': 'Invitation cancelled'}
-		};
-	});
-</script>
-
-<h1><?php echo UserConfig::$userInvitationSectionTitle ?></h1>
-<form class="form-horizontal well" action="" method="POST">
-	<div class="control-group">
-		<div class="controls">
-			Please provide a personal message, name and email of the person you'd like to invite.
-		</div>
-	</div>
-	<div class="control-group">
-		<label class="control-label" for="invitation_name">Name</label>
-		<div class="controls">
-			<input class="span6" type="text" name="invitation_name" id="invitation_name" placeholder="John Smith">
-		</div>
-	</div>
-	<div class="control-group">
-		<label class="control-label" for="invitation_email">Email</label>
-		<div class="controls">
-			<input class="span6" type="email" name="invitation_email" id="invitation_email" placeholder="john.smith@example.com">
-		</div>
-	</div>
-	<div class="control-group">
-		<label class="control-label" for="invitation_note">Message</label>
-		<div class="controls">
-			<?php
-			$message = call_user_func_array(UserConfig::$onRenderUserInvitationMessagePlaceholder, array($user));
-			?>
-			<textarea class="span6" id="invitation_note" name="invitation_note" rows="3"><?php echo $message ?></textarea>
-		</div>
-	</div>
-	<?php
-	if ($can_invite_to_account) {
-		?>
-		<div class="control-group">
-			<div class="controls">
-				<label class="checkbox">
-					<input type="checkbox" class="checkbox" name="invite_to_account" <?php if (array_key_exists('joinaccount', $_GET)) { ?> checked="checked"<?php } ?>/>
-					Invite them to join <b><i><?php echo UserTools::escape($current_account->getName()) ?></i></b> account
-				</label>
-			</div>
-		</div>
-		<?php
-	}
-	?>
-	<div class="control-group">
-		<div class="controls">
-			<button class="btn btn-primary" name="send">Send invitation</button>
-		</div>
-	</div>
-	<?php UserTools::renderCSRFNonce(); ?>
-</form>
-<?php
-$invitations = $user->getSentInvitations();
-
-if (count($invitations) > 0) {
-	?>
-	<form action="" method="POST">
-		<h2>Sent Invitations</h2>
-		<table class="table">
-			<?php
-			$now = time();
-
-			foreach ($invitations as $invitation) {
-				$issuer = $invitation->getIssuer();
-				$email = trim($invitation->getSentToEmail());
-				$note = trim($invitation->getNote());
-
-				$created = $invitation->getTimeCreated();
-				$ago = intval(floor(($now - $created) / 86400));
-				?><tr>
-					<td>
-						<div>
-							Sent <span class="badge<?php if ($ago <= 5) { ?> badge-success<?php } ?>"><?php echo $ago ?></span> day<?php echo $ago != 1 ? 's' : '' ?> ago
-						</div>
-						<div class="invitation_sent_time">
-							<?php echo date('M j, h:iA', $created) ?>
-						</div>
-					</td>
-					<td>
-						<b><?php echo UserTools::escape($invitation->getSentToName()) ?></b>
-						<?php
-						if ($email) {
-							?>
-							&lt;<a target="_blank" href="mailto:<?php echo UserTools::spaceencode($email) ?>"><?php echo UserTools::escape($email) ?></a>&gt;
-							<?php
-						}
-						?>
-					</td>
-					<td>
-						<button class="btn btn-mini btn-primary" type="submit" name="resend[<?php echo $invitation->getCode(); ?>]"><i class="icon-white icon-envelope"></i> Re-send</button>
-						<button class="btn btn-mini" type="submit" name="cancel[<?php echo $invitation->getCode(); ?>]" onclick="return confirm('Are you sure you want to cancel this invitation?')"><i class="icon-remove"></i> Cancel Invitation</button>
-					</td>
-				</tr>
-				<?php
-			}
-			?>
-		</table>
-		<?php UserTools::renderCSRFNonce(); ?>
-	</form>
-	<?php
+$now = time();
+foreach ($user->getSentInvitations() as $invitation) {
+	$template_info['sent_invitations'][] = array(
+		'code' => $invitation->getCode(),
+		'email' => trim($invitation->getSentToEmail()),
+		'email_spaceencoded' => UserTools::spaceencode(trim($invitation->getSentToEmail())),
+		'name' => $invitation->getSentToName(),
+		'note' => trim($invitation->getNote()),
+		'created' => date('M j, h:iA', $invitation->getTimeCreated()),
+		'ago' => intval(floor(($now - $invitation->getTimeCreated()) / 86400))
+	);
 }
 
-$invitations = $user->getAcceptedInvitations();
-
-if (count($invitations) > 0) {
-	?>
-	<h2>Accepted Invitations</h2>
-	<table class="table">
-		<tr>
-			<th>Registered User</th>
-			<th>Sent to</th>
-		</tr>
-		<?php
-		foreach ($invitations as $invitation) {
-			$issuer = $invitation->getIssuer();
-			$invited_user = $invitation->getUser();
-			$email = trim($invitation->getSentToEmail());
-			$note = trim($invitation->getNote());
-			?>
-			<tr>
-				<td>
-					<i class="icon-user"></i> <?php echo UserTools::escape($invited_user->getName()) ?>
-				</td>
-				<td>
-					<b><?php echo UserTools::escape($invitation->getSentToName()) ?></b>
-					<?php
-					if ($email) {
-						?>
-						&lt;<a target="_blank" href="mailto:<?php echo UserTools::spaceencode($email) ?>"><?php echo UserTools::escape($email) ?></a>&gt;
-						<?php
-					}
-					?>
-				</td>
-			</tr>
-			<?php
-		}
-		?>
-	</table>
-	<?php
+foreach ($user->getAcceptedInvitations() as $invitation) {
+	$template_info['accepted_invitations'][] = array(
+		'code' => $invitation->getCode(),
+		'invited_name' => $invitation->getUser()->getName(),
+		'email' => trim($invitation->getSentToEmail()),
+		'email_spaceencoded' => UserTools::spaceencode(trim($invitation->getSentToEmail())),
+		'name' => $invitation->getSentToName(),
+		'note' => trim($invitation->getNote()),
+		'created' => date('M j, h:iA', $invitation->getTimeCreated()),
+		'ago' => intval(floor(($now - $invitation->getTimeCreated()) / 86400))
+	);
 }
 
-require_once(__DIR__ . '/sidebar_footer.php');
+StartupAPI::$template->display('invitations.html.twig', $template_info);
