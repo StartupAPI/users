@@ -39,6 +39,14 @@
 					<span class="badge badge-important">NONE</span>
 				{% endif %}
 		</p>
+		{% if UserConfig.useSubscriptions %}
+			<p>
+				<a class="btn btn-mini" href="{{UserConfig.USERSROOTURL}}/subscription_details.php">
+					<i class="icon-list"></i>
+					Subscription details
+				</a>
+			</p>
+			{%endif%}
 		{%endif%}
 
 		{%if show_user_list %}

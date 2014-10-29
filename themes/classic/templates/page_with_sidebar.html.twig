@@ -31,6 +31,18 @@
 							{{ AUTH.current_account.name }}
 						</a>
 					</li>
+					{% if UserConfig.useSubscriptions %}
+					<li{% if PAGE.SECTION == 'subscription_details' %} class="active"{% endif %}>
+						<a href="{{ UserConfig.USERSROOTURL }}/subscription_details.php">
+							Subscription Details
+						</a>
+					</li>
+					<li{% if PAGE.SECTION == 'transaction_log'%} class="active"{% endif %}>
+						<a href="{{ UserConfig.USERSROOTURL }}/transaction_log.php">
+							Transaction Log
+						</a>
+					</li>
+					{% endif %}
 					
 					{% if UserConfig.enableGamification %}
 						<li class="nav-header">My achievements</li>

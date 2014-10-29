@@ -102,7 +102,7 @@ if ($account->getUserRole($user) !== Account::ROLE_ADMIN) {
 	exit;
 }
 
-$template_info['PAGE']['SECTION'] = 'account';
+$template_info['PAGE']['SECTION'] = 'subscription_details';
 $template_info['account_name'] = $account->getName();
 
 StartupAPI::$template->display('account/subscription_details.html.twig', $template_info);

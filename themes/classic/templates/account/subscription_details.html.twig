@@ -3,20 +3,15 @@
 
 {% block content %}
 	<legend>
-		Accounts / <b>{{ account_name }}</b>
-		{%if account_isAdmin and not account_isIndividual %}
-			<a href="{{UserConfig.USERSROOTURL}}/edit_account.php" class="btn btn-mini"><i class="icon-pencil"></i> edit</a>
-		{%endif%}
+		Accounts / <a href="{{UserConfig.USERSROOTURL}}/manage_account.php"><b>{{ account_name }}</b></a> / Subscription Details
 	</legend>
-		<div class="row-fluid">
-			<div class="span12">
-				{% if message %}
-					{% for msg in message %}
-						<div class="alert">{{ msg }}</div>
-					{% endfor %}
-				{% endif %}
+	{% if message %}
+		{% for msg in message %}
+			<div class="alert">{{ msg }}</div>
+		{% endfor %}
+	{% endif %}
 
-				{% if not fatal %}
+	{% if not fatal %}
 		<div>
 			<p>Account Status: {%if account_isActive %}<b class="badge badge-success">Active</b>{%else%}<b class="badge badge-important">Suspended</b>{%endif%}</p>
 		</div>
@@ -88,10 +83,10 @@
 		</div>
 		{%endif%}
 		<div>
-			<i class="icon-list-alt"></i>
-			<a href="{{UserConfig.USERSROOTURL}}/transaction_log.php" >View account transactions</a>
+			<a class="btn btn-mini" href="{{UserConfig.USERSROOTURL}}/transaction_log.php">
+				<i class="icon-list-alt"></i>
+				View account transactions
+			</a>
 		</div>
-				{% endif %}
-			</div>
-		</div>
+	{% endif %}
 {% endblock %}
