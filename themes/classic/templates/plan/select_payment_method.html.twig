@@ -1,105 +1,104 @@
-<div class="container-fluid" style="margin-top: 1em">
-	<div class="row-fluid">
-		<div class="span12">
-			{% for msg in message %}
-			<p class="alert">
-				<button type="button" class="close" data-dismiss="alert">×</button>
-				{{ msg }}
-			</p>
-			{% endfor %}
+{% extends 'page_with_sidebar.html.twig' %}
+{% import 'error_messages.html.twig' as ERR %}
 
-			{% if not fatal %}
-			<h2><a href="{{ USERSROOTURL }}/plans.php">Subscription</a>: {{ plan.name }}</h2>
+{% block content %}
+	{% for msg in message %}
+	<p class="alert">
+		<button type="button" class="close" data-dismiss="alert">×</button>
+		{{ msg }}
+	</p>
+	{% endfor %}
 
-			{% if plan.description %}
-				<p>{{ plan.description }}</p>
-			{% endif %}
+	{% if not fatal %}
+	<legend><a href="{{UserConfig.USERSROOTURL}}/plans.php">Subscription</a> / {{ plan.name }}</legend>
 
-			<form action="" method="POST">
-				<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
+	{% if plan.description %}
+		<p>{{ plan.description }}</p>
+	{% endif %}
 
-				{% if plan.schedules and plan.schedules|length > 0 %}
-					<style>
-					.schedules {
-						max-width: 650px;
-					}
+	<form action="" method="POST">
+		<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
 
-					.schedules .well {
-						border-color: grey;
-					}
+		{% if plan.schedules and plan.schedules|length > 0 %}
+			<style>
+			.schedules {
+				max-width: 650px;
+			}
 
-					.schedules .startupapi-payment-schedule-highlighted {
-						background-color: silver;
-					}
-					</style>
+			.schedules .well {
+				border-color: grey;
+			}
 
-					<div class="schedules">
+			.schedules .startupapi-payment-schedule-highlighted {
+				background-color: silver;
+			}
+			</style>
 
-					{% set n = 0 %}
-					{% for schedule in plan.schedules %}
-						{% set engine_slug = "unknown" %}
+			<div class="schedules">
 
-						{% set well_extra_class = '' %}
+			{% set n = 0 %}
+			{% for schedule in plan.schedules %}
+				{% set engine_slug = "unknown" %}
 
-						{% if next_chosen %}
-							{%if schedule.chosen %}
-								{% set well_extra_class = ' startupapi-payment-schedule-highlighted' %}
-							{% endif %}
-						{% else %}
-							{% if schedule.current %}
-								{% set well_extra_class = ' startupapi-payment-schedule-highlighted' %}
-							{% endif %}
-						{% endif %}
+				{% set well_extra_class = '' %}
 
-						<div class="well{{ well_extra_class }}">
-							<div class="pull-right" style="text-align: right">
-								<h3>${{ schedule.charge_amount}}</h3>
-								<p style="margin-top: 1em">{{ schedule.description }}</p>
+				{% if next_chosen %}
+					{%if schedule.chosen %}
+						{% set well_extra_class = ' startupapi-payment-schedule-highlighted' %}
+					{% endif %}
+				{% else %}
+					{% if schedule.current %}
+						{% set well_extra_class = ' startupapi-payment-schedule-highlighted' %}
+					{% endif %}
+				{% endif %}
 
-								{% for engine in payment_engines %}
-									<button
-										class="btn btn-success"
-										type="submit"
-										name="plan"
-										id="payment-button-{{plan.slug}}-{{schedule.slug}}-{{engine.slug}}"
-										value="{{ plan.slug }}.{{ schedule.slug }}.{{ engine.slug }}"
-										{% if not plan.available
-											or (engine.requires_pre_payment
-												and balance < schedule.charge_amount)
-										%} disabled{% endif %}
-											>
-										{{ engine.button_label }}
-									</button>
-									{% set engine_slug = engine.slug %}
-								{% endfor %}
-							</div>
+				<div class="well{{ well_extra_class }}">
+					<div class="pull-right" style="text-align: right">
+						<h3>${{ schedule.charge_amount}}</h3>
+						<p style="margin-top: 1em">{{ schedule.description }}</p>
 
-							<label {% if engine|length > 1 %}for="payment-button-{{plan.slug}}-{{schedule.slug}}-{{engine_slug}}"{% endif %}
-								{% if schedule.current %} class="userbase-account-current-schedule"{% endif %}
-							>
-								<span class="userbase-account-schedule-name">{{ schedule.name }}</span>
-								<br/>
-								<span class="userbase-account-schedule-details">{{ schedule.description }}</span>
-								{% if next_chosen %}
-									<br/>
-									{%if schedule.current %}
-										<span class="badge badge-important">until {{ next_charge|date("M d, Y") }}</span>
-									{% endif %}
-									{% if schedule.chosen %}
-										<span class="badge badge-success">starting {{ next_charge|date("M d, Y") }}</span>
-									{% endif %}
-								{% endif %}
-							</label>
-
-							<div class="clearfix"></div>
-						</div>
-						{% set n = n + 1 %}
-					{% endfor %}
+						{% for engine in payment_engines %}
+							<button
+								class="btn btn-success"
+								type="submit"
+								name="plan"
+								id="payment-button-{{plan.slug}}-{{schedule.slug}}-{{engine.slug}}"
+								value="{{ plan.slug }}.{{ schedule.slug }}.{{ engine.slug }}"
+								{% if not plan.available
+									or (engine.requires_pre_payment
+										and balance < schedule.charge_amount)
+								%} disabled{% endif %}
+									>
+								{{ engine.button_label }}
+							</button>
+							{% set engine_slug = engine.slug %}
+						{% endfor %}
 					</div>
 
-				{% endif %}
-			</form>
-			{% endif %}
-		</div>
-	</div>
-</div>
+					<label {% if engine|length > 1 %}for="payment-button-{{plan.slug}}-{{schedule.slug}}-{{engine_slug}}"{% endif %}
+						{% if schedule.current %} class="userbase-account-current-schedule"{% endif %}
+					>
+						<span class="userbase-account-schedule-name">{{ schedule.name }}</span>
+						<br/>
+						<span class="userbase-account-schedule-details">{{ schedule.description }}</span>
+						{% if next_chosen %}
+							<br/>
+							{%if schedule.current %}
+								<span class="badge badge-important">until {{ next_charge|date("M d, Y") }}</span>
+							{% endif %}
+							{% if schedule.chosen %}
+								<span class="badge badge-success">starting {{ next_charge|date("M d, Y") }}</span>
+							{% endif %}
+						{% endif %}
+					</label>
+
+					<div class="clearfix"></div>
+				</div>
+				{% set n = n + 1 %}
+			{% endfor %}
+			</div>
+
+		{% endif %}
+	</form>
+	{% endif %}
+{% endblock %}

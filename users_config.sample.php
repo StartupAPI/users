@@ -58,12 +58,6 @@ UserConfig::$mysql_password = '...password...';
 #UserConfig::$DEBUG = true;
 
 /**
- * Set these to point at your header and footer or leave them commented out to use default ones
- */
-#UserConfig::$header = __DIR__.'/header.php';
-#UserConfig::$footer = __DIR__.'/footer.php';
-
-/**
  * Username and password registration configuration
  * just have these lines or comment them out if you don't want regular form registration
  */

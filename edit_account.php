@@ -33,7 +33,7 @@ if (array_key_exists('account_name', $_POST)) {
 }
 
 $template_info['errors'] = $errors;
-$template_info['PAGE']['SECTION'] = 'accounts';
+$template_info['PAGE']['SECTION'] = 'account';
 $template_info['account_name'] = $account->getName();
 
 StartupAPI::$template->display('account/edit_account.html.twig', $template_info);

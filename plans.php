@@ -27,6 +27,8 @@ if ($account->getUserRole($user) !== Account::ROLE_ADMIN) {
 /* ------------------- Handling form submission -------------------------------------- */
 UserTools::preventCSRF();
 
+$template_info = StartupAPI::getTemplateInfo();
+
 session_start();
 
 if (array_key_exists('plan', $_POST)) {
@@ -117,31 +119,31 @@ if (array_key_exists('plan', $_POST)) {
 
 /* ------------------- Preparing data for template ------------------------------------- */
 
-$template_data['account'] = array('name' => $account->getName());
+$template_info['account'] = array('name' => $account->getName());
 
 if (isset($_SESSION['message'])) {
-	$template_data['message'] = $_SESSION['message'];
+	$template_info['message'] = $_SESSION['message'];
 	unset($_SESSION['message']);
 	$fatal = isset($_SESSION['fatal']) ? $_SESSION['fatal'] : 0;
 	unset($_SESSION['fatal']);
 	if ($fatal) {
-		$template_data['fatal'] = 1;
+		$template_info['fatal'] = 1;
 		return;
 	}
 }
 
 if (!$account->isActive()) {
-	$template_data['message'] = array('This account is not active. Please activate it first.');
-	$template_data['fatal'] = 1;
+	$template_info['message'] = array('This account is not active. Please activate it first.');
+	$template_info['fatal'] = 1;
 	return;
 }
 
-$template_data['CSRF_NONCE'] = UserTools::$CSRF_NONCE;
+$template_info['CSRF_NONCE'] = UserTools::$CSRF_NONCE;
 
-$template_data['next_charge'] = $account->getNextCharge();
+$template_info['next_charge'] = $account->getNextCharge();
 
 $balance = $account->getBalance();
-$template_data['balance'] = $balance;
+$template_info['balance'] = $balance;
 $plan_slugs = Plan::getPlanSlugs();
 
 $current_plan = $account->getPlan(); // can be FALSE
@@ -177,7 +179,7 @@ foreach ($plan_slugs as $plan_slug) { # Iterate over all configured plans
 	if (!is_null($account->getNextPlan()) &&
 			$account->getNextPlan()->getSlug() == $this_plan->getSlug()) {
 		$plan['chosen'] = TRUE;
-		$template_data['next_chosen'] = TRUE;
+		$template_info['next_chosen'] = TRUE;
 	} else {
 		$plan['chosen'] = FALSE;
 	}
@@ -212,25 +214,23 @@ foreach ($plan_slugs as $plan_slug) { # Iterate over all configured plans
 
 	// Plan which is being upgraded
 	if ($plan['current']) {
-		$template_data['base_plan'] = $plan;
+		$template_info['base_plan'] = $plan;
 		$base_plan_index = $i;
 	}
 
 	if ($plan['chosen']) {
-		$template_data['base_plan'] = $plan;
+		$template_info['base_plan'] = $plan;
 		$base_plan_index = $i;
 	}
 
 	$i++;
 }
 
-$template_data['plans'] = $plans;
+$template_info['plans'] = $plans;
 
-if (array_key_exists('base_plan', $template_data)) {
-	$template_data['plans'][$base_plan_index]['is_base_plan'] = true;
+if (array_key_exists('base_plan', $template_info)) {
+	$template_info['plans'][$base_plan_index]['is_base_plan'] = true;
 }
-
-$template_data['USERSROOTURL'] = UserConfig::$USERSROOTURL;
 
 $display_template = 'plan/plans.html.twig';
 
@@ -241,9 +241,9 @@ if (array_key_exists('plan', $_GET)) {
 	$selected_plan_slug = Plan::getPlanBySlug($_GET['plan']);
 
 	if ($selected_plan_slug) {
-		foreach ($template_data['plans'] as $plan) {
+		foreach ($template_info['plans'] as $plan) {
 			if ($plan['slug'] == $selected_plan_slug->getSlug()) {
-				$template_data['plan'] = $plan;
+				$template_info['plan'] = $plan;
 				$display_template = 'plan/select_payment_method.html.twig';
 				break;
 			}
@@ -252,7 +252,7 @@ if (array_key_exists('plan', $_GET)) {
 }
 
 foreach (UserConfig::$payment_modules as $payment_engine) {
-	$template_data['payment_engines'][] = array(
+	$template_info['payment_engines'][] = array(
 		'slug' => $payment_engine->getSlug(),
 		'title' => $payment_engine->getTitle(),
 		'button_label' => $payment_engine->getActionButtonLabel(),
@@ -262,9 +262,4 @@ foreach (UserConfig::$payment_modules as $payment_engine) {
 
 /* ------------------- / Preparing data for template -------------------------------------- */
 
-require_once(UserConfig::$header);
-
-StartupAPI::$template->display($display_template, $template_data);
-
-require_once(UserConfig::$footer);
-
+StartupAPI::$template->display($display_template, $template_info);

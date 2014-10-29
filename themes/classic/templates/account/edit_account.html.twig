@@ -1,37 +1,33 @@
 {% extends 'page_with_sidebar.html.twig' %}
-{% import 'error_messages.html.twig' as errors %}
+{% import 'error_messages.html.twig' as ERR %}
 
 {% block content %}
+	<legend>Edit Account Information / <b>{{account_name}}</b></legend>
 
+	{{ ERR.showErrors('edit-account', errors) }}
 
-	<div class="span9">
-		<h2>Edit Account</h2>
+	<form class="form-horizontal" action="" method="POST">
+		<div class="control-group">
+			<label class="control-label" for="startupapi-admin-account-edit-name">Account Name</label>
 
-		{{ errors.showErrors('edit-account', errors) }}
-
-		<form class="form-horizontal" action="" method="POST">
-			<div class="control-group">
-				<label class="control-label" for="startupapi-admin-account-edit-name">Account Name</label>
-
-				<div class="controls">
-					<input type="text"
-						   id="startupapi-admin-account-edit-name"
-						   name="account_name"
-					       value="{{account_name}}"
-						   onfocus="this.value = this.value;">
-					<script>
-						$('#startupapi-admin-account-edit-name').focus();
-					</script>
-				</div>
+			<div class="controls">
+				<input type="text"
+					   id="startupapi-admin-account-edit-name"
+					   name="account_name"
+					   value="{{account_name}}"
+					   onfocus="this.value = this.value;">
+				<script>
+					$('#startupapi-admin-account-edit-name').focus();
+				</script>
 			</div>
+		</div>
 
-			<div class="control-group">
-				<div class="controls">
-					<button type="submit" class="btn btn-primary">Update Account</button>
-					<a class="btn" href="{{UserConfig.USERSROOTURL}}/manage_account.php">Discard Changes</a>
-				</div>
+		<div class="control-group">
+			<div class="controls">
+				<button type="submit" class="btn btn-primary">Update Account</button>
+				<a class="btn" href="{{UserConfig.USERSROOTURL}}/manage_account.php">Discard Changes</a>
 			</div>
-			<input type="hidden" name="CSRF_NONCE" value="{{ AUTH.CSRF_NONCE }}"/>
-		</form>
-	</div>
+		</div>
+		<input type="hidden" name="CSRF_NONCE" value="{{ AUTH.CSRF_NONCE }}"/>
+	</form>
 {% endblock %}

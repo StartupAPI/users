@@ -1,12 +1,12 @@
 {% extends 'page_with_sidebar.html.twig' %}
-{% import 'error_messages.html.twig' as errors %}
+{% import 'error_messages.html.twig' as ERR %}
 
 {% block content %}
 <div>
 	{% if not current_module %}
 		<legend>Profile Information</legend>
 
-		{{ errors.showErrors('profile-info', errors) }}
+		{{ ERR.showErrors('profile-info', errors) }}
 
 		<form class="form-horizontal" action="" method="POST">
 			<fieldset>
@@ -45,7 +45,7 @@
 		{% endif %}
 
 		{% for module in UserConfig.authentication_modules if compact_page and module.is_compact or not compact_page and module.id == current_module.id %}
-			{{ errors.showErrors(module.id, errors) }}
+			{{ ERR.showErrors(module.id, errors) }}
 
 			<div>
 				<a name="{{ module.id }}"></a>

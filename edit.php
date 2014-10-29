@@ -70,7 +70,8 @@ if (array_key_exists('save', $_POST)) {
 		}
 
 		$existing_users = User::getUsersByEmailOrUsername($email);
-		if (!array_key_exists('email', $errors['profile-info']) &&
+
+		if ((!array_key_exists('profile-info', $errors) || !array_key_exists('email', $errors['profile-info'])) &&
 				(count($existing_users) > 0 && !$existing_users[0]->isTheSameAs($user))
 		) {
 			$errors['profile-info']['email'][] = "This email is already used by another user, please enter another email address.";
