@@ -1,4 +1,5 @@
 <?php
+
 require_once(__DIR__ . '/global.php');
 
 require_once(__DIR__ . '/classes/User.php');
@@ -55,33 +56,19 @@ if (array_key_exists('login', $_POST)) {
 	exit;
 }
 
-require_once(UserConfig::$header);
-?>
-<div class="container-fluid" style="margin-top: 1em">
-	<div class="row-fluid">
-		<h2>Log in</h2>
-		<?php
-		foreach (UserConfig::$authentication_modules as $module) {
-			$id = $module->getID();
-			?>
-			<div style="margin-bottom: 2em">
-				<h3 name="<?php echo $id ?>"><?php echo $module->getTitle() ?></h3>
-				<?php
-				if (array_key_exists('module', $_GET) && $id == $_GET['module'] && array_key_exists('error', $_GET)) {
-					?>
-					<div class="alert alert-error">Login failed</div>
-					<?php
-				}
+$template_info = StartupAPI::getTemplateInfo();
 
-				$module->renderLoginForm("?module=$id");
-				?></div>
-			<?php
-		}
-		?>
-	</div>
-</div>
+foreach (UserConfig::$authentication_modules as $module) {
+	$id = $module->getID();
 
-<?php
-require_once(UserConfig::$footer);
+	ob_start();
+	$module->renderLoginForm("?module=$id");
+	$template_info['module_forms'][$id] = ob_get_contents();
+	ob_end_clean();
+}
 
+if (array_key_exists('module', $_GET) && $id == $_GET['module'] && array_key_exists('error', $_GET)) {
+	$template_info['login_failed'][$id] = TRUE;
+}
 
+StartupAPI::$template->display('login.html.twig', $template_info);

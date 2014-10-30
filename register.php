@@ -1,4 +1,5 @@
 <?php
+
 require_once(__DIR__ . '/global.php');
 
 require_once(__DIR__ . '/classes/User.php');
@@ -61,92 +62,54 @@ if (UserConfig::$enableRegistration && array_key_exists('register', $_POST)) {
 	}
 }
 
-require_once(UserConfig::$header);
-?>
-<div id="startupapi-authlist">
-	<h2>Sign up</h2>
-	<?php
-	if (UserConfig::$enableRegistration) {
-		$show_registration_form = true;
-		$invitation_used = null;
+$template_info = StartupAPI::getTemplateInfo();
 
-		if (array_key_exists('invite', $_GET)) {
-			$invitation = Invitation::getByCode($_GET['invite']);
+$show_registration_form = true;
+$invitation_used = null;
 
-			if (!is_null($invitation) && !$invitation->getStatus()) {
-				$invitation_used = $invitation;
-			}
-		}
+if (array_key_exists('invite', $_GET)) {
+	$invitation = Invitation::getByCode($_GET['invite']);
 
-		if (UserConfig::$adminInvitationOnly) {
-			$message = null;
-			$show_registration_form = false;
-
-			if (array_key_exists('invite', $_GET)) {
-				if (is_null($invitation_used)) {
-					$message = 'Invitation code you entered is not valid';
-				} else {
-					$show_registration_form = true;
-				}
-			}
-
-			if (!$show_registration_form) {
-				?>
-				<form id="form" action="" method="GET">
-					<fieldset>
-						<legend><?php echo UserConfig::$invitationRequiredMessage ?></legend>
-						<?php
-						if (!is_null($message)) {
-							?>
-							<div class="alert alert-error"><?php echo $message ?></div>
-							<?php
-						}
-						?>
-						<input name="invite" class="input input-xlarge" value="<?php echo UserTools::escape(array_key_exists('invite', $_GET) ? $_GET['invite'] : '') ?>"/>
-						<button class="btn btn-primary" type="submit">Continue &rarr;</button>
-					</fieldset>
-				</form>
-				<?php
-			}
-		}
-
-		if ($show_registration_form) {
-			foreach (UserConfig::$authentication_modules as $module) {
-				$id = $module->getID();
-				?>
-				<div style="margin-bottom: 2em">
-					<h3 name="<?php echo $id ?>"><?php echo $module->getTitle() ?></h3>
-					<?php
-					if (array_key_exists($id, $errors) && is_array($errors[$id]) && count($errors[$id]) > 0) {
-						?>
-						<div class="alert alert-block alert-error fade-in">
-							<h4 style="margin-bottom: 0.5em">Form errors</h4>
-							<ul>
-								<?php
-								foreach ($errors[$id] as $field => $errorset) {
-									foreach ($errorset as $error) {
-										?><li><label  style="cursor: pointer" for="startupapi-<?php echo $id ?>-registration-<?php echo $field ?>"><?php echo $error ?></label></li><?php
-					}
-				}
-								?>
-							</ul>
-						</div>
-						<?php
-					}
-
-					$module->renderRegistrationForm(true, "?module=$id" . (is_null($invitation_used) ? '' : '&amp;invite=' . urlencode($invitation_used->getCode())), array_key_exists($id, $errors) ? $errors[$id] : array(), $_POST);
-					?></div>
-				<?php
-			}
-		}
-	} else {
-		?>
-		<p><?php echo UserConfig::$registrationDisabledMessage ?></p>
-
-		<p>If you already have an account, you can <a href="<?php echo UserConfig::$USERSROOTURL ?>/login.php">log in here</a>.</p>
-		<?php
+	if (!is_null($invitation) && !$invitation->getStatus()) {
+		$invitation_used = $invitation;
 	}
-	?>
-</div>
-<?php
-require_once(UserConfig::$footer);
+}
+
+if (UserConfig::$adminInvitationOnly) {
+	$show_registration_form = false;
+
+	if (array_key_exists('invite', $_GET)) {
+		if (is_null($invitation_used)) {
+			$template_info['message'] = 'Invitation code you entered is not valid';
+		} else {
+			$show_registration_form = true;
+		}
+	}
+
+	if (array_key_exists('invite', $_GET)) {
+		$template_info['invite_code'] = $_GET['invite'];
+	}
+}
+
+if ($show_registration_form) {
+	foreach (UserConfig::$authentication_modules as $module) {
+		$id = $module->getID();
+		$action_url = "?module=$id";
+
+		if (!is_null($invitation_used)) {
+			$action_url .= '&invite=' . urlencode($invitation_used->getCode());
+		}
+		$module_errors = array_key_exists($id, $errors) ? $errors[$id] : array();
+
+		ob_start();
+		$module->renderRegistrationForm(true, $action_url, $module_errors, $_POST);
+		$template_info['module_forms'][$id] = ob_get_contents();
+		ob_end_clean();
+	}
+
+	$template_info['show_registration_form'] = TRUE;
+}
+
+$template_info['errors'] = $errors;
+
+StartupAPI::$template->display('register.html.twig', $template_info);
