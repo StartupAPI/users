@@ -1,0 +1,16 @@
+{% extends 'page.html.twig' %}
+{% import 'error_messages.html.twig' as ERR %}
+
+{% block content %}
+	<div class="container-fluid" style="margin-top: 1em">
+		<div class="row-fluid">
+			<div class="span12">
+				<h2>{{engine.name}}</h2>
+				{% if engine.logo %}
+				<img src="{{engine.logo}}"/>
+				{% endif %}
+				<a class="btn btn-success btn-large" href="{{UserConfig.USERSROOTFULLURL}}/modules/external_payment/callback.php?{{QUERY_STRING}}&amp;paid=yes">Paid!</a>
+			</div>
+		</div>
+	</div>
+{% endblock %}

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package StartupAPI
  * @subpackage Subscriptions
@@ -16,12 +17,13 @@ UserConfig::$IGNORE_CURRENT_ACCOUNT_PLAN_VERIFICATION = true;
  *
  * It's supposed to send users back when it's done so their plan and schedule can be changed and balance updated
  */
+$template_info = StartupAPI::getTemplateInfo();
+$template_info['QUERY_STRING'] = $_SERVER['QUERY_STRING'];
 
-require_once(UserConfig::$header);
-?>
+if (array_key_exists('engine', $_GET)) {
+	$engine = PaymentEngine::getEngineBySlug($_GET['engine']);
+	$template_info['engine']['name'] = $engine->getTitle();
+	$template_info['engine']['logo'] = $engine->getLogo();
+}
 
-<a class="btn btn-success btn-large" href="<?php echo UserConfig::$USERSROOTFULLURL ?>/modules/external_payment/callback.php?<?php echo htmlentities($_SERVER['QUERY_STRING'])?>&amp;paid=yes">Paid!</a>
-
-<?php
-require_once(UserConfig::$footer);
-
+StartupAPI::$template->display('modules/external_payment/external_page.html.twig', $template_info);
