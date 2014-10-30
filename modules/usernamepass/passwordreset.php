@@ -6,8 +6,7 @@ require_once(dirname(dirname(__DIR__)).'/classes/User.php');
 UsernamePasswordAuthenticationModule::$IGNORE_PASSWORD_RESET = true;
 
 $user = User::get();
-
-$errors = array();
+$template_info = StartupAPI::getTemplateInfo();
 
 if (array_key_exists('save', $_POST))
 {
@@ -33,28 +32,8 @@ if (array_key_exists('save', $_POST))
 	}
 	catch(InputValidationException $ex)
 	{
-		$errors = $ex->getErrors();
+		$template_info['errors']['passwordreset'] = $ex->getErrors();
 	}
 }
 
-require_once(UserConfig::$header);
-
-?>
-<div id="startupapi-passwordreset">
-<h2>Password reset</h2>
-
-<form id="startupapi-passwordreset-form" action="" method="POST">
-<fieldset>
-<legend>Please enter new password</legend>
-<ul>
-<li><label>New password</label><input name="pass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('pass', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape($errors['pass']).'">*</span>' : ''?></li>
-<li><label>Repeat new password</label><input name="repeatpass" type="password" size="25" autocomplete="off"/><?php echo array_key_exists('repeatpass', $errors) ? ' <span class="startup-api-error-message" title="'.UserTools::escape($errors['repeatpass']).'">*</span>' : ''?></li>
-<li><button id="startupapi-passwordreset-button" type="submit" name="save">Save changes</button></li>
-</ul>
-</fieldset>
-</form>
-
-</div>
-
-<?php
-require_once(UserConfig::$footer);
+StartupAPI::$template->display('modules/usernamepass/passwordreset.html.twig', $template_info);
