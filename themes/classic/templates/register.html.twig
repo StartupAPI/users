@@ -1,0 +1,40 @@
+{% extends 'page.html.twig' %}
+{% import 'error_messages.html.twig' as ERR %}
+
+{% block content %}
+	<div id="startupapi-authlist">
+		<h2>Sign up</h2>
+		{% if UserConfig.enableRegistration %}
+			{% if UserConfig.adminInvitationOnly and not show_registration_form %}
+				<form id="form" action="" method="GET">
+					<fieldset>
+						<div>
+							{{UserConfig.invitationRequiredMessage|raw}}
+						</div>
+						{% if message %}
+							<div class="alert alert-error">{{message}}</div>
+						{% endif %}
+						<input name="invite" class="input input-xlarge" value="{{invite_code}}"/>
+						<button class="btn btn-primary" type="submit">Continue &rarr;</button>
+					</fieldset>
+				</form>
+			{% endif %}
+
+			{% if show_registration_form %}
+				{% for module in UserConfig.authentication_modules %}
+					<div style="margin-bottom: 2em">
+						<h3 name="{{module.id}}">{{module.title}}</h3>
+						
+						{{ ERR.showErrors(module.id, errors) }}
+						
+						{{ module_forms[module.id]|raw }}
+					</div>
+				{% endfor %}
+			{% endif %}
+		{% else %}
+			<p>{{UserConfig.registrationDisabledMessage}}</p>
+
+			<p>If you already have an account, you can <a href="{{UserConfig.USERSROOTURL}}/login.php">log in here</a>.</p>
+		{% endif %}
+	</div>
+{% endblock %}
