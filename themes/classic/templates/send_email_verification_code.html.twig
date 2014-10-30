@@ -1,0 +1,23 @@
+{% extends 'page.html.twig' %}
+
+{% block content %}
+	<div class="container-fluid" style="margin-top: 1em">
+		<div class="row-fluid">
+			<div class="span12">
+				{% if email %}
+					<div id="startupapi-sendverificationcode-success">
+						<h3>Verification code sent</h3>
+						<p>Verification code was sent to <span class="startupapi-email-to-verify">{{email}}</span></p>
+						<a class="btn btn-primary" href="{{UserConfig.USERSROOTURL}}/verify_email.php">Click here when you receive it</a>
+					</div>
+				{% else %}
+					<div id="startupapi-sendverificationcode-failure">
+						<h3>No email address provided</h3>
+						<p>You don't have an email set for your profile.</p>
+						<a class="btn btn-primary" href="{{UserConfig.USERSROOTURL}}/edit.php">Click here to add email address.</a>
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+{% endblock %}

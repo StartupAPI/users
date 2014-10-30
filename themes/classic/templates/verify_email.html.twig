@@ -1,0 +1,52 @@
+{% extends 'page.html.twig' %}
+{% import 'error_messages.html.twig' as ERR %}
+
+{% block content %}
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span12">
+				{% if verification_complete %}
+					<div id="startupapi-verifyemail-success">
+						<h3>Thank you for verifying your email address</h3>
+						<p>You successfully verified your email address.</p>
+						<a class="btn btn-primary" href="{{return}}">Click here to continue.</a>
+					</div>
+				{% else %}
+					<div>
+						{{ ERR.showErrors('verify_email', errors) }}
+
+						<h3>Please verify your email address</h3>
+						<p>
+							Confirmation code was sent to
+
+							{% if email %}
+								<span class="startupapi-email-to-verify">{{email}}</span>
+							{% else %}
+								your email address
+							{% endif %}
+							<br/>
+							Please enter it below and click verify button.
+						</p>
+
+						<form class="form well" action="" method="GET">
+							<fieldset>
+								<div class="control-group{% if errors['verify_email']['code'] %} error" title="{{errors['verify_email']['code']}}{% endif %}">
+									<label class="control-label" for="startupapi-code">Confirmation Code</label>
+									<div class="controls">
+										<input id="startupapi-code" name="code" type="text" autocomplete="off"/>
+										<a id="startupapi-verifyemail-resend" href="{{UserConfig.USERSROOTURL}}/send_email_verification_code.php">I never got the code, please resend</a>
+									</div>
+								</div>
+								<div class="control-group">
+									<div class="controls">
+										<button class="btn btn-primary" type="submit">Verify</button>
+									</div>
+								</div>
+							</fieldset>
+						</form>
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+{% endblock %}
