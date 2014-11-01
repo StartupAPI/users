@@ -31,65 +31,17 @@ if (array_key_exists('code', $_GET) && array_key_exists('email', $_GET)) {
 	}
 }
 
-require_once(UserConfig::$header);
-?>
-<div class="container-fluid" style="margin-top: 1em">
-	<div class="row-fluid">
+$template_info = StartupAPI::getTemplateInfo();
 
-		<h2>Log in</h2>
+if (array_key_exists('email', $_GET)) {
+	$template_info['email'] = trim($_GET['email']);
+}
+if (array_key_exists('code', $_GET)) {
+	$template_info['code'] = trim($_GET['code']);
+}
 
-		<p>Confirmation code was sent to <?php echo array_key_exists('email', $_GET) ? UserTools::escape($_GET['email']) : 'your email address' ?> please enter it below and click login button.</p>
-		<?php
-		$slug = 'email';
+$template_info['errors']['emaillogin'] = $errors;
 
-		if (is_array($errors) && count($errors) > 0) {
-			?>
-			<div class="alert alert-block alert-error fade-in">
-				<h4 style="margin-bottom: 0.5em">Snap!</h4>
+#var_export($template_info['errors']); exit;
 
-				<ul>
-					<?php
-					foreach ($errors as $field => $errorset) {
-						foreach ($errorset as $error) {
-							?>
-							<li><label  style="cursor: pointer" for="startupapi-<?php echo $slug ?>-login-<?php echo $field ?>"><?php echo $error ?></label></li>
-							<?php
-						}
-					}
-					?>
-				</ul>
-			</div>
-			<?php
-		}
-		?>
-		<form class="form-horizontal" action="" method="GET">
-			<fieldset>
-				<legend>Enter confirmation code to login</legend>
-
-				<div class="control-group<?php if (array_key_exists('email', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['email'])) ?><?php } ?>">
-					<label class="control-label" for="startupapi-<?php echo $slug ?>-login-email">Email</label>
-					<div class="controls">
-						<input class="input-xlarge" id="startupapi-<?php echo $slug ?>-login-email" name="email" type="email" placeholder="john@example.com"<?php if (array_key_exists('email', $_GET)) { ?> value="<?php echo UserTools::escape($_GET['email']) ?>"<?php } ?>/>
-					</div>
-				</div>
-
-				<div class="control-group<?php if (array_key_exists('code', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['code'])) ?><?php } ?>">
-					<label class="control-label" for="startupapi-<?php echo $slug ?>-login-code">Code</label>
-					<div class="controls">
-						<input class="input-xlarge" id="startupapi-<?php echo $slug ?>-login-code" name="code" type="text"/>
-					</div>
-				</div>
-
-				<div class="control-group">
-					<div class="controls">
-						<button class="btn btn-primary" type="submit" name="login">Login</button>
-					</div>
-				</div>
-			</fieldset>
-		</form>
-
-	</div>
-</div>
-
-<?php
-require_once(UserConfig::$footer);
+StartupAPI::$template->display('modules/email/login.html.twig', $template_info);

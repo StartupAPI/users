@@ -1,0 +1,43 @@
+{% extends 'page.html.twig' %}
+{% import 'error_messages.html.twig' as ERR %}
+
+{% block content %}
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span12">
+				<h2>Log in</h2>
+
+				<p>Confirmation code was sent to {{email|default('your email address')}} please enter it below and click login button.</p>
+				
+				{{ ERR.showErrors('emaillogin', errors) }}
+
+				<form class="form-horizontal" action="" method="GET">
+					<fieldset>
+						<legend>Enter confirmation code to login</legend>
+
+						<div class="control-group{% if errors['emaillogin']['email'] %} error" title="{{errors['emaillogin']['email']|join('\n')}}{% endif %}">
+							<label class="control-label" for="startupapi-email-login-email">Email</label>
+							<div class="controls">
+								<input class="input-xlarge" id="startupapi-email-login-email" name="email" type="email" placeholder="john@example.com"{% if email %} value="{{email}}"{% endif %}/>
+							</div>
+						</div>
+
+						<div class="control-group{% if errors['emaillogin']['code'] %} error" title="{{errors['emaillogin']['code']|join('\n')}}{% endif %}">
+							<label class="control-label" for="startupapi-email-login-code">Code</label>
+							<div class="controls">
+								<input class="input-xlarge" id="startupapi-email-login-code" name="code" type="text"{% if code %} value="{{code}}"{% endif %}/>
+							</div>
+						</div>
+
+						<div class="control-group">
+							<div class="controls">
+								<button class="btn btn-primary" type="submit" name="login">Login</button>
+							</div>
+						</div>
+					</fieldset>
+				</form>
+
+			</div>
+		</div>
+	</div>
+{% endblock %}
