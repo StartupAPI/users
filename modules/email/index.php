@@ -110,9 +110,9 @@ class EmailAuthenticationModule extends AuthenticationModule {
 			<fieldset>
 				<legend>Enter your email address to re-send login link</legend>
 
-				<div class="control-group<?php if (array_key_exists('email', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['email'])) ?><?php } ?>">
+				<div class="control-group">
 					<div class="controls">
-						<input class="input-xlarge" id="startupapi-<?php echo $slug ?>-login-email" name="email" type="email" placeholder="john@example.com"/>
+						<input class="input-xlarge" id="startupapi-emaillogin-login-email" name="email" type="email" placeholder="john@example.com"/>
 					</div>
 				</div>
 

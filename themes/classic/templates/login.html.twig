@@ -1,5 +1,4 @@
 {% extends 'page.html.twig' %}
-{% import 'error_messages.html.twig' as ERR %}
 
 {% block content %}
 	<div class="container-fluid">
@@ -7,8 +6,6 @@
 			<div class="span12">
 				<h2>Log in</h2>
 				{% for module in UserConfig.authentication_modules %}
-					{{ ERR.showErrors(module.id, errors) }}
-
 					<div style="margin-bottom: 2em">
 						<h3 name="{{ module.id }}">{{ module.title }}</h3>
 						{% if login_failed[module.id] %}
