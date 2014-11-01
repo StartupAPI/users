@@ -18,7 +18,7 @@ $current_php_extensions = get_loaded_extensions();
 
 foreach ($required_extensions as $extension) {
 	if (in_array($extension, $current_php_extensions)) {
-		 echo "PHP $extension extension is loaded ... OK\n";
+		echo "PHP $extension extension is loaded ... OK\n";
 	} else {
 		echo("[Missing Dependency] You're using PHP installation which does not have '$extension' extension enabled\n");
 		exit(1);
