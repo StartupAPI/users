@@ -7,7 +7,16 @@
 		<ul class="nav{% if POWERSTRIP.nav_pills %} nav-pills{% endif %}{% if POWERSTRIP.pull_right %} pull-right{% endif %}">
 			{% if AUTH.current_user.is_logged_in %}
 				{% if AUTH.current_user.is_impersonated %}
-					<li><span><a class="btn btn-danger" id="startupapi-navbox-impersonating" href="{{ UserConfig.USERSROOTURL }}/admin/stopimpersonation.php" title="Impersonated by <?php echo UserTools::escape($current_user->getImpersonator()->getName()) ?>">Stop Impersonation</a></span></li>
+					<li>
+						<span>
+							<a class="btn btn-danger"
+							   id="startupapi-navbox-impersonating"
+							   href="{{ UserConfig.USERSROOTURL }}/admin/stopimpersonation.php"
+							   title="Impersonated by {{AUTH.impersonator.name}}">
+								Stop Impersonation
+							</a>
+						</span>
+					</li>
 				{% endif %}
 
 				{% if AUTH.current_user.is_admin %}

@@ -208,9 +208,13 @@ class StartupAPI {
 			$auth_info['current_user']['email'] = $current_user->getEmail();
 			$auth_info['current_user']['is_email_verified'] = $current_user->isEmailVerified();
 			$auth_info['current_user']['is_impersonated'] = $current_user->isImpersonated();
+			if ($current_user->isImpersonated()) {
+				$impersonator = $current_user->getImpersonator();
+				$auth_info['impersonator']['id'] = $impersonator->getID();
+				$auth_info['impersonator']['name'] = $impersonator->getName();
+			}
 			$auth_info['current_user']['is_admin'] = $current_user->isAdmin();
 			$auth_info['current_user']['is_logged_in'] = TRUE;
-
 
 			$current_account = $current_user->getCurrentAccount();
 			$auth_info['current_account']['id'] = $current_account->getID();
