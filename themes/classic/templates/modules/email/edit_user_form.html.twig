@@ -5,15 +5,15 @@
 		<div class="control-group{% if 'name' in errors|keys %} error" title="{{ errors['name']|join("\n")}}{% endif %}">
 			<label class="control-label" for="startupapi-{{slug}}-edit-name">Name</label>
 			<div class="controls">
-				<input class="input-xlarge" id="startupapi-{{slug}}-edit-name" name="name" type="text" value="{% if 'name' in data|keys %}{{ data.name }}{% else %}{{current_user.name}}{% endif %}"/>
+				<input class="input-xlarge" id="startupapi-{{slug}}-edit-name" name="name" type="text" value="{% if 'name' in data|keys %}{{ data.name }}{% else %}{{AUTH.current_user.name}}{% endif %}"/>
 			</div>
 		</div>
 
 		<div class="control-group{% if 'email' in errors|keys %} error" title="{{ errors['email']|join("\n")}} ?>{% endif %}">
 			<label class="control-label" for="startupapi-{{slug}}-edit-email">Email</label>
 			<div class="controls">
-				<input class="input-xlarge" id="startupapi-{{slug}}-edit-email" name="email" type="email" value="{% if 'email' in data|keys %}{{ data.email }}{% else %}{{current_user.email}}{% endif %}"/>
-				{% if current_user.email and not current_user.is_email_verified %}
+				<input class="input-xlarge" id="startupapi-{{slug}}-edit-email" name="email" type="email" value="{% if 'email' in data|keys %}{{ data.email }}{% else %}{{AUTH.current_user.email}}{% endif %}"/>
+				{% if AUTH.current_user.email and not AUTH.current_user.is_email_verified %}
 				<a id="startupapi-{{slug}}-edit-verify-email" href="{{UserConfig.USERSROOTURL}}/verify_email.php">
 					Email address is not verified yet, click here to verify
 				</a>

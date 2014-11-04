@@ -196,37 +196,11 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		$this->renderForm($template_info, $action, 'login');
 	}
 
-	public function renderAutoLogoutForm() {
-		?><html>
-			<head><title>Logging out from Facebook...</title></head>
-			<body>
-				<div id="fb-root"></div>
-				<script src="http://connect.facebook.net/en_US/all.js"></script>
-				<script>
-					// force logout sequence after a long timeout of 5 seconds
-					setTimeout('window.location.href = "<?php echo UserConfig::$USERSROOTFULLURL; ?>/logout.php?autologgedout=<?php echo $this->getID(); ?>"', 5000);
+	public function renderAutoLogoutForm($template_info) {
+		$template_info['slug'] = $this->getID();
+		$template_info['appID'] = $this->appID;
 
-					FB.init({
-						appId  : '<?php echo $this->appID ?>',
-						status : true, // check login status
-						cookie : true, // enable cookies to allow the server to access the session
-						channelURL : '<?php echo UserConfig::$USERSROOTFULLURL; ?>/modules/facebook/channel.php', // channel file
-						oauth  : true // enable OAuth 2.0
-					});
-					FB.getLoginStatus(function(response) {
-						if (response.authResponse) {
-							FB.logout(function(response) {
-								window.location.href = "<?php echo UserConfig::$USERSROOTFULLURL; ?>/logout.php?autologgedout=<?php echo $this->getID(); ?>";
-							});
-						} else {
-							window.location.href = "<?php echo UserConfig::$USERSROOTFULLURL; ?>/logout.php?autologgedout=<?php echo $this->getID(); ?>";
-						}
-					});
-				</script>
-				Logging out from Facebook...
-			</body>
-		</html>
-		<?php
+		return StartupAPI::$template->render("modules/facebook/auto_logout_form.html.twig", $template_info);
 	}
 
 	/**
@@ -238,6 +212,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 	 * @param string $form ID strgin of the form to be rendered
 	 */
 	private function renderForm($template_info, $action, $form) {
+		$template_info['slug'] = $this->getID();
 		$template_info['action'] = $action;
 		$template_info['form'] = $form;
 		$template_info['show_facepile'] = $this->show_facepile;
@@ -287,6 +262,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 				return;
 			}
 
+			$template_info['slug'] = $this->getID();
 			$template_info['action'] = $action;
 			$template_info['errors'] = $errors;
 			$template_info['data'] = $data;

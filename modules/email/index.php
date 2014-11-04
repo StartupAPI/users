@@ -104,7 +104,7 @@ class EmailAuthenticationModule extends AuthenticationModule {
 	}
 
 	public function renderLoginForm($template_info, $action) {
-		$slug = $this->getID();
+		$template_info['slug'] = $this->getID();
 		$template_info['action'] = $action;
 
 		return StartupAPI::$template->render("modules/email/login_form.html.twig", $template_info);
@@ -113,6 +113,7 @@ class EmailAuthenticationModule extends AuthenticationModule {
 	public function renderRegistrationForm($template_info, $full = false, $action = null, $errors = null, $data = null) {
 		$slug = $this->getID();
 
+		$template_info['slug'] = $slug;
 		$template_info['action'] = $action;
 		$template_info['full'] = $full ? TRUE : FALSE;
 		$template_info['errors'] = $errors;
@@ -133,8 +134,7 @@ class EmailAuthenticationModule extends AuthenticationModule {
 	 * @return string Rendered user ediging form for this module
 	 */
 	public function renderEditUserForm($template_info, $action, $errors, $user, $data) {
-		$slug = $this->getID();
-		
+		$template_info['slug'] = $this->getID();
 		$template_info['action'] = $action;
 		$template_info['errors'] = $errors;
 		$template_info['data'] = $data;

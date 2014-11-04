@@ -175,8 +175,10 @@ abstract class AuthenticationModule extends StartupAPIModule {
 	 * Renders auto-logout form
 	 *
 	 * Show a page indicating a logout process and/or logging out user using and API call or something
+	 *
+	 * @param array[] $template_info Array of base information for Twig template
 	 */
-	public function renderAutoLogoutForm() {
+	public function renderAutoLogoutForm($template_info) {
 		// by default modules do not support auto-logout
 	}
 

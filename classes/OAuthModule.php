@@ -548,6 +548,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 			$action = UserConfig::$USERSROOTURL.'/register.php?module='.$this->getID();
 		}
 
+		$template_info['slug'] = $this->getID();
 		$template_info['action'] = $action;
 		$template_info['full'] = $full ? TRUE : FALSE;
 		$template_info['errors'] = $errors;
@@ -615,6 +616,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 			throw new DBPrepareStmtException($db);
 		}
 
+		$template_info['slug'] = $this->getID();
 		$template_info['action'] = $action;
 		$template_info['errors'] = $errors;
 		$template_info['data'] = $data;

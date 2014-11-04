@@ -205,6 +205,7 @@ class StartupAPI {
 		if (!is_null($current_user)) {
 			$auth_info['current_user']['id'] = $current_user->getID();
 			$auth_info['current_user']['name'] = $current_user->getName();
+			$auth_info['current_user']['username'] = $current_user->getUsername();
 			$auth_info['current_user']['email'] = $current_user->getEmail();
 			$auth_info['current_user']['is_email_verified'] = $current_user->isEmailVerified();
 			$auth_info['current_user']['is_impersonated'] = $current_user->isImpersonated();

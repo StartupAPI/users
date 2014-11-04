@@ -556,7 +556,7 @@
 	margin-top: 1em;
 }
 
-#startupapi-usernamepass-edit-verify-email {
+#startupapi-usernamepass-edit-verify-email, #startupapi-email-edit-verify-email {
 	font-size: small;
 	display: block;
 }
