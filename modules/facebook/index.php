@@ -55,8 +55,6 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		$this->secret = $secret;
 		$this->permissions = $permissions;
 
-		// TODO Replace it with immediate FB Connect call:
-		// http://code.google.com/p/userbase/issues/detail?id=16
 		$this->remember = $remember;
 
 		if (is_array($options)) {
@@ -193,14 +191,14 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 			$action = UserConfig::$USERSROOTURL . '/login.php?module=' . $this->getID();
 		}
 
-		$this->renderForm($template_info, $action, 'login');
+		return $this->renderForm($template_info, $action, 'login');
 	}
 
 	public function renderAutoLogoutForm($template_info) {
 		$template_info['slug'] = $this->getID();
 		$template_info['appID'] = $this->appID;
 
-		return StartupAPI::$template->render("modules/facebook/auto_logout_form.html.twig", $template_info);
+		return StartupAPI::$template->display("modules/facebook/auto_logout_form.html.twig", $template_info);
 	}
 
 	/**

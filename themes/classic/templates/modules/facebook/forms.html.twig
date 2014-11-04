@@ -18,7 +18,7 @@
 	<fb:facepile width="450" size="large" max-rows="1"></fb:facepile>
 {% endif %}
 <form style="margin: 0" action="{{action}}" method="POST" name="facebookconnectform">
-<input type="hidden" name="login" value="Connect &gt;&gt;&gt;"/>
+<input type="hidden" name="{{formsubmit}}" value="Connect &gt;&gt;&gt;"/>
 <input type="hidden" name="CSRF_NONCE" value="{{ AUTH.CSRF_NONCE }}"/>
 </form>
 {% if form == 'register' and TOSlinks %}
