@@ -529,7 +529,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 					$module_slug,
 					$access_token,
 					$access_token_expires,
-					$refrest_token))
+					$refresh_token))
 				{
 					throw new DBBindParamException($db, $stmt);
 				}
@@ -544,14 +544,14 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 				throw new DBPrepareStmtException($db);
 			}
 		} else if ($access_token_expires != $current_expires
-				|| $refrest_token != $current_refresh) {
+				|| $refresh_token != $current_refresh) {
 			if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'oauth2_clients
 				SET access_token_expires = ?, refresh_token = ?
 				WHERE oauth2_client_id = ?'))
 			{
 				if (!$stmt->bind_param('ssi',
 					$access_token_expires,
-					$refrest_token,
+					$refresh_token,
 					$oauth2_client_id))
 				{
 					throw new DBBindParamException($db, $stmt);
@@ -637,15 +637,18 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	 * Renders user editing form
 	 *
 	 * Uses self::$connectButtonURL for a button image if supplied
-	 *
+	 * 
+	 * @param array[] $template_info Array of base information for Twig template
 	 * @param string $action Form action URL to post back to
 	 * @param array $errors Array of error messages to display
 	 * @param User $user User object for current user that is being edited
 	 * @param array $data Data submitted to the form
 	 *
+	 * @return string Rendered user ediging form for this module
+	 *
 	 * @throws DBException
 	 */
-	public function renderEditUserForm($action, $errors, $user, $data)
+	public function renderEditUserForm($template_info, $action, $errors, $user, $data)
 	{
 		$db = UserConfig::getDB();
 
@@ -682,28 +685,17 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 			throw new DBPrepareStmtException($db);
 		}
 
-		?>
-		<form style="margin-bottom: 0" action="<?php echo $action?>" method="POST">
-		<?php
-		if (is_null($oauth2_client_id)) {
-			if (is_null($this->connectButtonURL)) {
-				?><input type="submit" class="btn" value="Connect existing <?php echo $this->getTitle() ?> account"/><?php
-			} else {
-				?><input type="image" src="<?php echo UserTools::escape($this->connectButtonURL) ?>"/><?php
-			}
-			?><input type="hidden" name="add" value="add"/><?php
-		} else {
-			?>
-			<div><?php $this->renderUserInfo($serialized_userinfo) ?></div>
-			<input type="hidden" name="oauth2_client_id" value="<?php echo htmlentities($oauth2_client_id) ?>"/>
-			<input class="btn btn-mini" type="submit" name="remove" value="remove" style="font-size: xx-small"/>
-			<?php
-		}
-		?>
-		<input type="hidden" name="save" value="Save"/>
-		<?php UserTools::renderCSRFNonce(); ?>
-		</form>
-		<?php
+		$template_info['action'] = $action;
+		$template_info['errors'] = $errors;
+		$template_info['data'] = $data;
+
+		$template_info['connectButtonURL'] = $this->connectButtonURL;
+		$template_info['title'] = $this->getTitle();
+
+		$template_info['oauth2_client_id'] = $oauth2_client_id;
+		$template_info['rendered_userinfo'] = $this->renderUserInfo($serialized_userinfo);
+
+		return StartupAPI::$template->render("oauth2_edit_user_form.html.twig", $template_info);
 	}
 
 	/**
@@ -817,10 +809,17 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	 * Subclasses can override to add links to user profiles on destination sites, userpics and etc.
 	 *
 	 * @param array $serialized_userinfo Array of user info parameters from provider with "id" and "name" required
+	 *
+	 * @return string Rendered user information HTML
 	 */
 	protected function renderUserInfo($serialized_userinfo) {
 		$user_info = unserialize($serialized_userinfo);
-		echo $user_info['name'];
+		
+		if (array_key_exists('name', $user_info)) {
+			return $user_info['name'];
+		} else {
+			return NULL;
+		}
 	}
 
 	/**
@@ -1011,9 +1010,9 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		}
  
 		$result = curl_exec($ch);
-
+		
 		if (curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200) {
-			throw new OAuth2Exception("OAuth2 call failed: ".curl_error($ch));
+			throw new OAuth2Exception("OAuth2 call failed: " . curl_error($ch) . ' (Code: ' . curl_error($ch, CURLINFO_HTTP_CODE) . ')');
 		}
 		curl_close($ch);
 

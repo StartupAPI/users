@@ -66,19 +66,22 @@ class GithubAuthenticationModule extends OAuth2AuthenticationModule
 		}
 	}
 
-	// YODO make actual github calls, not twitter
 	public function getIdentity($oauth2_client_id) {
 		$credentials = $this->getOAuth2Credentials($oauth2_client_id); 
 
 		try {
 			$result = $credentials->makeOAuth2Request('https://api.github.com/user', 'GET', null, array(
-				'URLOPT_HTTPHEADER' => array('Accept: application/json')
+				CURLOPT_HTTPHEADER => array(
+					'Accept: application/json',
+					'User-Agent: ' . UserConfig::$appName . ' (Startup API v.' . StartupAPI::getVersion() . ')'
+				)
 			));
 		} catch (OAuth2Exception $ex) {
 			return null;
 		}
 
 		$data = json_decode($result, true);
+
 		if (is_null($data)) {
 			switch(json_last_error())
 			{
@@ -107,10 +110,12 @@ class GithubAuthenticationModule extends OAuth2AuthenticationModule
 	}
 
 	protected function renderUserInfo($serialized_userinfo) {
-		$user_info = unserialize($serialized_userinfo);
-		?><a href="http://github.com/<?php echo UserTools::escape($user_info['login']); ?>" target="_blank">@<?php echo UserTools::escape($user_info['login']); ?></a><br/>
-		<a href="http://github.com/<?php echo UserTools::escape($user_info['login']); ?>" target="_blank"><img src="<?php echo UserTools::escape($user_info['avatar_url']); ?>" title="<?php echo UserTools::escape($user_info['name']); ?>" style="max-width: 60px; max-height: 60px"/></a>
-		<?php
+		$template_info = unserialize($serialized_userinfo);
+		if (!is_array($template_info)) {
+			$template_info = array();
+		}
+
+		return StartupAPI::$template->render("modules/github/user_info.html.twig", $template_info);
 	}
 }
 
@@ -120,6 +125,6 @@ class GithubAuthenticationModule extends OAuth2AuthenticationModule
  */
 class GithubUserCredentials extends OAuth2UserCredentials {
 	public function getHTML() {
-		return '<a href="http://github.com/'.UserTools::escape($this->userinfo['login']).'" target="_blank">@'.$this->userinfo['login'].'</a>';
+		return StartupAPI::$template->render("modules/github/credentials.html.twig", $this->userinfo);
 	}
 }

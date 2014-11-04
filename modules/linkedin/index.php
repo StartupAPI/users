@@ -87,10 +87,12 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule {
 	}
 
 	protected function renderUserInfo($serialized_userinfo) {
-		$user_info = unserialize($serialized_userinfo);
-		?><script src="//platform.linkedin.com/in.js" type="text/javascript"></script>
-		<script type="IN/MemberProfile" data-id="<?php echo UserTools::escape($user_info['publicProfileUrl']); ?>" data-format="hover" data-text="<?php echo UserTools::escape($user_info['name']); ?>" data-related="false"></script>
-		<?php
+		$template_info = unserialize($serialized_userinfo);
+		if (!is_array($template_info)) {
+			$template_info = array();
+		}
+
+		return StartupAPI::$template->render("modules/linkedin/user_info.html.twig", $template_info);
 	}
 
 }
@@ -104,7 +106,7 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule {
 class LinkedInUserCredentials extends OAuthUserCredentials {
 
 	public function getHTML() {
-		return '<a href="' . UserTools::escape($this->userinfo['publicProfileUrl']) . '" target="_blank">' . $this->userinfo['name'] . '</a>';
+		return StartupAPI::$template->render("modules/linkedin/credentials.html.twig", $this->userinfo);
 	}
 
 }

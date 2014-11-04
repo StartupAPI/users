@@ -1,0 +1,16 @@
+<form style="margin-bottom: 0" action="{{action}}" method="POST">
+	{% if oauth2_client_id %}
+		<div>{{rendered_userinfo|raw}}</div>
+		<input type="hidden" name="oauth2_client_id" value="{{oauth2_client_id}}"/>
+		<input class="btn btn-mini" type="submit" name="remove" value="remove" style="font-size: xx-small"/>
+	{% else %}
+		{% if connectButtonURL %}
+			<input type="image" src="{{connectButtonURL}}"/>
+		{% else %}
+			<input type="submit" class="btn" value="Connect existing {{title}} account"/>
+		{% endif %}
+	{% endif %}
+	<input type="hidden" name="add" value="add"/>
+	<input type="hidden" name="save" value="Save"/>
+	<input type="hidden" name="CSRF_NONCE" value="{{ AUTH.CSRF_NONCE }}"/>
+</form>

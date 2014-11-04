@@ -1,0 +1,8 @@
+<a href="http://foursquare.com/user/{{id}}" target="_blank">{{name}}</a>
+{% if homeCity %}
+({{homeCity}})
+{% endif %}
+<br/>
+<a href="http://foursquare.com/user/{{id}}" target="_blank">
+	<img src="{{photo.prefix}}60x60{{photo.suffix}}" title="{{name}}" style="max-width: 60px; max-height: 60px"/>
+</a>

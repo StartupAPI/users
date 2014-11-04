@@ -44,12 +44,15 @@ abstract class AuthenticationModule extends StartupAPIModule {
 	 *
 	 * Implementations of this method must render login form
 	 *
+	 * @param array[] $template_info Array of base information for Twig template
 	 * @param string $action Form action URL to post back to
 	 * @param array $errors Array of error messages to display
 	 * @param User $user User object for current user that is being edited
 	 * @param array $data Data submitted to the form
+	 *
+	 * @return string Rendered user ediging form for this module
 	 */
-	abstract public function renderEditUserForm($action, $errors, $user, $data);
+	abstract public function renderEditUserForm($template_info, $action, $errors, $user, $data);
 
 	/**
 	 * Processes login form data

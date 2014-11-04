@@ -1,4 +1,5 @@
 <?php
+
 require_once(__DIR__ . '/global.php');
 require_once(__DIR__ . '/classes/User.php');
 
@@ -99,11 +100,9 @@ if (!is_null($current_module)) {
 			continue;
 		}
 
-		// capturing form HTMLs for each module
-		ob_start();
-		$module->renderEditUserForm("?module=$id", array_key_exists($id, $errors) ? $errors[$id] : array(), $user, $_POST);
-		$template_info['module_forms'][$id] = ob_get_contents();
-		ob_end_clean();
+		$template_info['module_forms'][$id] = $module->renderEditUserForm(
+				$template_info, "?module=$id", array_key_exists($id, $errors) ? $errors[$id] : array(), $user, $_POST
+		);
 	}
 }
 

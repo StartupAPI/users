@@ -166,62 +166,15 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		return StartupAPI::$template->render("modules/usernamepass/registration_form.html.twig", $template_info);
 	}
 
-	public function renderEditUserForm($action, $errors, $user, $data)
+	public function renderEditUserForm($template_info, $action, $errors, $user, $data)
 	{
 		$slug = $this->getID();
-		?>
-			<form class="form-horizontal" action="<?php echo $action; ?>" method="POST">
-				<fieldset>
-					<legend>Update your username and password</legend>
-					<div class="control-group<?php if (array_key_exists('username', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['username'])) ?><?php } ?>">
-						<label class="control-label" for="startupapi-<?php echo $slug ?>-edit-username">Username</label>
-						<div class="controls">
-							<?php
-							$username = $user->getUsername();
 
-							if (is_null($username)) {
-								?>
-								<input id="username" name="startupapi-<?php echo $slug ?>-edit-username" type="text" required="true" value="<?php echo array_key_exists('username', $data) ? UserTools::escape($data['username']) : '' ?>"/>
-								<?php
-							} else {
-								?>
-								<input disabled="disabled" class="input" type="text" title="Sorry, you can't change your username" value="<?php echo UserTools::escape($username) ?>"/>
-							<?php } ?>
-						</div>
-					</div>
+		$template_info['action'] = $action;
+		$template_info['errors'] = $errors;
+		$template_info['data'] = $data;
 
-					<legend>Change password</legend>
-
-					<?php if (!is_null($user->getUsername())) { ?>
-						<div class="control-group<?php if (array_key_exists('currentpass', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['currentpass'])) ?><?php } ?>">
-							<label class="control-label" for="startupapi-<?php echo $slug ?>-edit-currentpass">Current password</label>
-							<div class="controls">
-								<input id="startupapi-<?php echo $slug ?>-edit-currentpass" name="currentpass" type="password" autocomplete="off"/>
-							</div>
-						</div>
-					<?php } ?>
-					<div class="control-group<?php if (array_key_exists('pass', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['pass'])) ?><?php } ?>">
-						<label class="control-label" for="startupapi-<?php echo $slug ?>-edit-pass"><?php if (is_null($user->getUsername())) { ?>Set a<?php } else { ?>New<?php } ?> password</label>
-						<div class="controls">
-							<input id="startupapi-<?php echo $slug ?>-edit-pass" name="pass" type="password" autocomplete="off"/>
-						</div>
-					</div>
-					<div class="control-group<?php if (array_key_exists('repeatpass', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['repeatpass'])) ?><?php } ?>">
-						<label class="control-label" for="startupapi-<?php echo $slug ?>-edit-repeatpass">Repeat new password</label>
-						<div class="controls">
-							<input id="startupapi-<?php echo $slug ?>-edit-repeatpass" name="repeatpass" type="password" autocomplete="off"/>
-						</div>
-					</div>
-
-					<div class="control-group">
-						<div class="controls">
-							<button class="btn btn-primary" type="submit" name="save">Save changes</button>
-						</div>
-					</div>
-				</fieldset>
-				<?php UserTools::renderCSRFNonce(); ?>
-			</form>
-		<?php
+		return StartupAPI::$template->render("modules/usernamepass/edit_user_form.html.twig", $template_info);
 	}
 
 	public function processLogin($data, &$remember)

@@ -1,0 +1,52 @@
+<form class="form-horizontal" action="{{action}}" method="POST">
+	<fieldset>
+		<legend>Update your username and password</legend>
+		<div class="control-group{% if 'username' in errors|keys %} error" title="{{ errors['username']|join("\n")}}{% endif %}">
+			<label class="control-label" for="startupapi-{{slug}}-edit-username">Username</label>
+			<div class="controls">
+				{% if current_user.username %}
+					<input disabled="disabled" class="input" type="text" title="Sorry, you can't change your username" value="{{current_user.username}}"/>
+				{% else %}
+					<input id="username" name="startupapi-{{slug}}-edit-username" type="text" required="true" value="{% if 'username' in data|keys %}{{ data.username }}{% else %}{{current_user.username}}{% endif %}"/>
+				{% endif %}
+			</div>
+		</div>
+
+		<legend>Change password</legend>
+
+		{% if current_user.username %}
+			<div class="control-group{% if 'currentpass' in errors|keys %} error" title="{{ errors['currentpass']|join("\n")}}{% endif %}">
+				<label class="control-label" for="startupapi-{{slug}}-edit-currentpass">Current password</label>
+				<div class="controls">
+					<input id="startupapi-{{slug}}-edit-currentpass" name="currentpass" type="password" autocomplete="off"/>
+				</div>
+			</div>
+		{% endif %}
+		<div class="control-group{% if 'pass' in errors|keys %} error" title="{{ errors['pass']|join("\n")}}{% endif %}">
+			<label class="control-label" for="startupapi-{{slug}}-edit-pass">
+				{% if current_user.username %}
+				Set a
+				{% else %}
+				New
+				{% endif %}
+				password
+			</label>
+			<div class="controls">
+				<input id="startupapi-{{slug}}-edit-pass" name="pass" type="password" autocomplete="off"/>
+			</div>
+		</div>
+		<div class="control-group{% if 'repeatpass' in errors|keys %} error" title="{{ errors['repeatpass']|join("\n")}}{% endif %}">
+			<label class="control-label" for="startupapi-{{slug}}-edit-repeatpass">Repeat new password</label>
+			<div class="controls">
+				<input id="startupapi-{{slug}}-edit-repeatpass" name="repeatpass" type="password" autocomplete="off"/>
+			</div>
+		</div>
+
+		<div class="control-group">
+			<div class="controls">
+				<button class="btn btn-primary" type="submit" name="save">Save changes</button>
+			</div>
+		</div>
+	</fieldset>
+	<input type="hidden" name="CSRF_NONCE" value="{{ AUTH.CSRF_NONCE }}"/>
+</form>

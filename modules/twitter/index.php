@@ -113,10 +113,11 @@ class TwitterAuthenticationModule extends OAuthAuthenticationModule
 	}
 
 	protected function renderUserInfo($serialized_userinfo) {
-		$user_info = unserialize($serialized_userinfo);
-		?><a href="http://twitter.com/<?php echo UserTools::escape($user_info['screen_name']); ?>" target="_blank">@<?php echo UserTools::escape($user_info['screen_name']); ?></a><br/>
-		<a href="http://twitter.com/<?php echo UserTools::escape($user_info['screen_name']); ?>" target="_blank"><img src="<?php echo UserTools::escape($user_info['profile_image_url']); ?>" title="<?php echo UserTools::escape($user_info['name']); ?> (@<?php echo UserTools::escape($user_info['screen_name']); ?>)" style="max-width: 60px; max-height: 60px"/></a>
-		<?php
+		$template_info = unserialize($serialized_userinfo);
+		if (!is_array($template_info)) {
+			$template_info = array();
+		}
+		return StartupAPI::$template->render("modules/twitter/user_info.html.twig", $template_info);
 	}
 }
 
@@ -128,6 +129,6 @@ class TwitterAuthenticationModule extends OAuthAuthenticationModule
  */
 class TwitterUserCredentials extends OAuthUserCredentials {
 	public function getHTML() {
-		return '<a href="http://twitter.com/'.UserTools::escape($this->userinfo['screen_name']).'" target="_blank">@'.$this->userinfo['screen_name'].'</a>';
+		return StartupAPI::$template->render("modules/twitter/credentials.html.twig", $this->userinfo);
 	}
 }

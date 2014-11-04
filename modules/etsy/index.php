@@ -152,11 +152,15 @@ class EtsyAuthenticationModule extends OAuthAuthenticationModule
 	 * Displays user's login name with the link to their Etsy store
 	 *
 	 * @param string $serialized_userinfo Serialized user information array
+	 * 
+	 * @return string Rendered user information HTML
 	 */
 	protected function renderUserInfo($serialized_userinfo) {
-		$user_info = unserialize($serialized_userinfo);
-		?><a href="http://<?php echo UserTools::escape($user_info['name']); ?>.etsy.com/" target="_blank">
-<?php echo UserTools::escape($user_info['name']); ?></a><?php
+		$template_info = unserialize($serialized_userinfo);
+		if (!is_array($template_info)) {
+			$template_info = array();
+		}
+		return StartupAPI::$template->render("modules/etsy/user_info.html.twig", $template_info);
 	}
 }
 
@@ -168,6 +172,6 @@ class EtsyAuthenticationModule extends OAuthAuthenticationModule
  */
 class EtsyUserCredentials extends OAuthUserCredentials {
 	public function getHTML() {
-		return '<a href="http://'.UserTools::escape($this->userinfo['name']).'.etsy.com/" target="_blank">'.UserTools::escape($this->userinfo['name']).'</a>';
+		return StartupAPI::$template->render("modules/etsy/user_info.html.twig", unserialize($this->userinfo));
 	}
 }

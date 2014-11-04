@@ -160,8 +160,10 @@ EOF;
 	}
 
 	protected function renderUserInfo($serialized_userinfo) {
-		$user_info = unserialize($serialized_userinfo);
-		?>@<a href="<?php echo $this->rootURL . UserTools::escape($user_info['screen_name']); ?>" target="_blank"><?php echo UserTools::escape($user_info['screen_name']); ?></a><br/><?php
+		$template_info['user_info'] = unserialize($serialized_userinfo);
+		$template_info['rootURL'] = $this->rootURL;
+		return StartupAPI::$template->render("modules/statusnet/user_info.html.twig", $template_info);
+
 	}
 
 	/**
@@ -193,6 +195,6 @@ EOF;
  */
 class StatusNetUserCredentials extends OAuthUserCredentials {
 	public function getHTML() {
-		return '@<a href="'.$this->rootURL . UserTools::escape($this->userinfo['screen_name']).'" target="_blank">'.$this->userinfo['screen_name'].'</a>';
+		return StartupAPI::$template->render("modules/statusnet/credentials.html.twig", $this->userinfo);
 	}
 }

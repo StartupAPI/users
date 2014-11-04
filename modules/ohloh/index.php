@@ -98,9 +98,12 @@ EOF;
 	}
 
 	protected function renderUserInfo($serialized_userinfo) {
-		$user_info = unserialize($serialized_userinfo);
-		?><a href="http://www.ohloh.net/accounts/<?php echo UserTools::escape($user_info['id']); ?>" target="_blank"><?php echo UserTools::escape($user_info['name']); ?></a>
-		<?php
+		$template_info = unserialize($serialized_userinfo);
+		if (!is_array($template_info)) {
+			$template_info = array();
+		}
+
+		return StartupAPI::$template->render("modules/ohloh/user_info.html.twig", $template_info);
 	}
 
 }
@@ -114,7 +117,7 @@ EOF;
 class OhlohUserCredentials extends OAuthUserCredentials {
 
 	public function getHTML() {
-		return '<a href="http://www.ohloh.net/accounts/' . UserTools::escape($user_info['id']) . '" target="_blank">@' . $this->userinfo['name'] . '</a>';
+		return StartupAPI::$template->render("modules/ohloh/credentials.html.twig", $this->userinfo);
 	}
 
 }

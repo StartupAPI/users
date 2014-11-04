@@ -125,21 +125,12 @@ class FoursquareAuthenticationModule extends OAuth2AuthenticationModule
 	}
 
 	protected function renderUserInfo($serialized_userinfo) {
-		$user_info = unserialize($serialized_userinfo);
-
-		$homeCity = $user_info['homeCity'];
-
-		?><a href="http://foursquare.com/user/<?php echo UserTools::escape($user_info['id']); ?>" target="_blank"><?php echo UserTools::escape($user_info['name']); ?></a>
-		<?php
-		if (!is_null($homeCity)) {
-			?>
-			(<?php echo UserTools::escape($homeCity); ?>)
-			<?php
+		$template_info = unserialize($serialized_userinfo);
+		if (!is_array($template_info)) {
+			$template_info = array();
 		}
-		?>
-		<br/>
-		<a href="http://foursquare.com/user/<?php echo UserTools::escape($user_info['id']); ?>" target="_blank"><img src="<?php echo UserTools::escape($user_info['photo']['prefix'] . '60x60' . $user_info['photo']['suffix']); ?>" title="<?php echo UserTools::escape($user_info['name']); ?>" style="max-width: 60px; max-height: 60px"/></a>
-		<?php
+
+		return StartupAPI::$template->render("modules/foursquare/user_info.html.twig", $template_info);
 	}
 }
 
@@ -149,6 +140,6 @@ class FoursquareAuthenticationModule extends OAuth2AuthenticationModule
  */
 class FoursquareUserCredentials extends OAuth2UserCredentials {
 	public function getHTML() {
-		return '<a href="http://foursquare.com/user/'.UserTools::escape($this->userinfo['id']).'" target="_blank">'.$this->userinfo['name'].'</a>';
+		return StartupAPI::$template->render("modules/foursquare/credentials.html.twig", $this->userinfo);
 	}
 }

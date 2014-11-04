@@ -252,22 +252,33 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 			ob_end_clean();
 		}
 
-		return StartupAPI::$template->render("modules/facebook/login_form.html.twig", $template_info);
+		return StartupAPI::$template->render("modules/facebook/forms.html.twig", $template_info);
 	}
 
-	public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null) {
+	public function renderRegistrationForm($template_info, $full = false, $action = null, $errors = null, $data = null) {
 		if (is_null($action)) {
 			$action = UserConfig::$USERSROOTURL . '/register.php?module=' . $this->getID();
 		}
 
-		$this->renderForm($template_info, $action, 'register');
+		return $this->renderForm($template_info, $action, 'register');
 	}
 
-	public function renderEditUserForm($action, $errors, $user, $data) {
+	/**
+	 * Renders user editing form
+	 *
+	 * @param array[] $template_info Array of base information for Twig template
+	 * @param string $action Form action URL to post back to
+	 * @param array $errors Array of error messages to display
+	 * @param User $user User object for current user that is being edited
+	 * @param array $data Data submitted to the form
+	 *
+	 * @return string Rendered user ediging form for this module
+	 */
+	public function renderEditUserForm($template_info, $action, $errors, $user, $data) {
 		$fb_id = $user->getFacebookID();
 
 		if (is_null($fb_id)) {
-			$this->renderForm($action, 'connect');
+			return $this->renderForm($template_info, $action, 'connect');
 		} else {
 			try {
 				$me = $this->api('/me?fields=id,name,email,link');
@@ -275,20 +286,15 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 				UserTools::debug("Can't get /me API data: " . $e);
 				return;
 			}
-			?>
-			<table><tr>
-					<td rowspan="2"><a href="<?php echo UserTools::escape($me['link']) ?>" target="_blank"><img src="http://graph.facebook.com/<?php echo $fb_id ?>/picture" style="border: 0; max-width: 100px; max-height: 100px" title="<?php echo UserTools::escape($me['name']) ?>"></a></td>
-					<td><a href="<?php echo UserTools::escape($me['link']) ?>" target="_blank"><?php echo UserTools::escape($me['name']) ?></a></td>
-				</tr><tr>
-					<td>
-						<form style="margin: 0" action="<?php echo $action ?>" method="POST" name="facebookusereditform">
-							<input type="hidden" name="save" value="Save &gt;&gt;&gt;"/>
-							<input class="btn btn-mini" type="submit" name="remove" value="remove" style="font-size: xx-small"/>
-							<?php UserTools::renderCSRFNonce(); ?>
-						</form>
-					</td>
-				</tr></table>
-			<?php
+
+			$template_info['action'] = $action;
+			$template_info['errors'] = $errors;
+			$template_info['data'] = $data;
+			
+			$template_info['me'] = $me;
+			$template_info['fb_id'] = $fb_id;
+
+			return StartupAPI::$template->render("modules/facebook/edit_user_form.html.twig", $template_info);
 		}
 	}
 
@@ -552,7 +558,7 @@ class FacebookUserCredentials extends UserCredentials {
 	}
 
 	public function getHTML() {
-		return "<a href=\"http://www.facebook.com/profile.php?id=$this->fb_id\">$this->fb_id</a>";
+		return StartupAPI::$template->render("modules/facebook/credentials.html.twig", array('fb_id' => $this->fb_id));
 	}
 
 }

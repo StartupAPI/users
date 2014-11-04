@@ -97,9 +97,12 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 	}
 
 	protected function renderUserInfo($serialized_userinfo) {
-		$user_info = unserialize($serialized_userinfo);
-		?><a href="<?php echo UserTools::escape($user_info['link']); ?>" target="_blank"><?php echo UserTools::escape($user_info['name']); ?></a><br/>
-		<img src="<?php echo UserTools::escape($user_info['photo_url']); ?>" style="max-width: 60px; max-height: 60px"/><?php
+		$template_info = unserialize($serialized_userinfo);
+		if (!is_array($template_info)) {
+			$template_info = array();
+		}
+
+		return StartupAPI::$template->render("modules/linkedin/user_info.html.twig", $template_info);
 	}
 }
 
@@ -111,6 +114,6 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
  */
 class MeetupUserCredentials extends OAuthUserCredentials {
 	public function getHTML() {
-		return '<a href="'.UserTools::escape($this->userinfo['link']).'" target="_blank">'.$this->userinfo['name'].'</a>';
+		return StartupAPI::$template->render("modules/github/credentials.html.twig", $this->userinfo);
 	}
 }

@@ -121,47 +121,25 @@ class EmailAuthenticationModule extends AuthenticationModule {
 		return StartupAPI::$template->render("modules/email/registration_form.html.twig", $template_info);
 	}
 
-	/*
+	/**
 	 * Renders user editing form
 	 *
-	 * Parameters:
-	 * $action - form action to post back to
-	 * $errors - error messages to display
-	 * $user - user object for current user that is being edited
-	 * $data - data submitted to the form
+	 * @param array[] $template_info Array of base information for Twig template
+	 * @param string $action Form action to post back to
+	 * @param array[] $errors Error messages to display
+	 * @param User $user User object for current user that is being edited
+	 * @param mixed[] $data Data submitted to the form
+	 *
+	 * @return string Rendered user ediging form for this module
 	 */
-
-	public function renderEditUserForm($action, $errors, $user, $data) {
+	public function renderEditUserForm($template_info, $action, $errors, $user, $data) {
 		$slug = $this->getID();
-		?>
-		<form class="form-horizontal" action="<?php echo $action ?>" method="POST">
-			<fieldset>
-				<legend>Update your name and email</legend>
+		
+		$template_info['action'] = $action;
+		$template_info['errors'] = $errors;
+		$template_info['data'] = $data;
 
-				<div class="control-group<?php if (array_key_exists('name', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['name'])) ?><?php } ?>">
-					<label class="control-label" for="startupapi-<?php echo $slug ?>-edit-name">Name</label>
-					<div class="controls">
-						<input class="input-xlarge" id="startupapi-<?php echo $slug ?>-edit-name" name="name" type="text" value="<?php echo UserTools::escape(array_key_exists('name', $data) ? $data['name'] : $user->getName()) ?>"/>
-					</div>
-				</div>
-
-				<div class="control-group<?php if (array_key_exists('email', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['email'])) ?><?php } ?>">
-					<label class="control-label" for="startupapi-<?php echo $slug ?>-edit-email">Email</label>
-					<div class="controls">
-						<input class="input-xlarge" id="startupapi-<?php echo $slug ?>-edit-email" name="email" type="email" value="<?php echo UserTools::escape(array_key_exists('email', $data) ? $data['email'] : $user->getEmail()) ?>"/>
-						<?php if ($user->getEmail() && !$user->isEmailVerified()) { ?><a id="startupapi-<?php echo $slug ?>-edit-verify-email" href="<?php echo UserConfig::$USERSROOTURL ?>/verify_email.php">Email address is not verified yet, click here to verify</a><?php } ?>
-					</div>
-				</div>
-
-				<div class="control-group">
-					<div class="controls">
-						<button class="btn btn-primary" type="submit" name="save">Save</button>
-					</div>
-				</div>
-			</fieldset>
-			<?php UserTools::renderCSRFNonce(); ?>
-		</form>
-		<?php
+		return StartupAPI::$template->render("modules/email/edit_user_form.html.twig", $template_info);
 	}
 
 	/**
