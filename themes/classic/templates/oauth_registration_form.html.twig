@@ -1,0 +1,15 @@
+{% if full %}
+<p>Sign in using your existing account with <b>{{serviceName}}</b>.</p>
+{% endif %}
+
+{{TOSlinks}}
+
+<form class="form-inline" action="{{action}}" method="POST">
+	<input type="hidden" name="register" value="register"/>
+	{% if signUpButtonURL %}
+	<input type="image" src="{{signUpButtonURL}}"/>
+	{% else %}
+	<input type="submit" class="btn" value="Register using {{serviceName}}"/>
+	{% endif %}
+</form>
+<?php

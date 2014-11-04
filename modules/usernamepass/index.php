@@ -154,71 +154,16 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		return StartupAPI::$template->render("modules/usernamepass/login_form.html.twig", $template_info);
 	}
 
-	public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null)
+	public function renderRegistrationForm($template_info, $full = false, $action = null, $errors = null, $data = null)
 	{
 		$slug = $this->getID();
-		?>
-		<form class="form-horizontal" action="<?php echo $action; ?>" method="POST">
-			<fieldset>
-				<legend>Enter your information to create an account</legend>
 
-				<div class="control-group<?php if (array_key_exists('username', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['username'])) ?><?php } ?>">
-					<label class="control-label" for="startupapi-<?php echo $slug ?>-registration-username">Username</label>
-					<div class="controls">
-						<input id="startupapi-<?php echo $slug ?>-registration-username" name="username" type="text" size="25" required="true" value="<?php echo array_key_exists('username', $data) ? UserTools::escape($data['username']) : '' ?>"/>
-					</div>
-				</div>
+		$template_info['action'] = $action;
+		$template_info['full'] = $full ? TRUE : FALSE;
+		$template_info['errors'] = $errors;
+		$template_info['data'] = $data;
 
-				<div class="control-group<?php if (array_key_exists('pass', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['pass'])) ?><?php } ?>">
-					<label class="control-label" for="startupapi-<?php echo $slug ?>-registration-pass">Set a password</label>
-					<div class="controls">
-						<input id="startupapi-<?php echo $slug ?>-registration-pass" name="pass" type="password" autocomplete="off"/>
-					</div>
-				</div>
-
-				<div class="control-group<?php if (array_key_exists('repeatpass', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['repeatpass'])) ?><?php } ?>">
-					<label class="control-label" for="startupapi-<?php echo $slug ?>-registration-repeatpass">Repeat new password</label>
-					<div class="controls">
-						<input id="startupapi-<?php echo $slug ?>-registration-repeatpass" name="repeatpass" type="password" autocomplete="off"/>
-					</div>
-				</div>
-
-				<div class="control-group<?php if (array_key_exists('name', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['name'])) ?><?php } ?>">
-					<label class="control-label" for="startupapi-<?php echo $slug ?>-registration-name">Name</label>
-					<div class="controls">
-						<input id="startupapi-<?php echo $slug ?>-registration-name" name="name" type="text" value="<?php echo UserTools::escape(array_key_exists('name', $data) ? $data['name'] : '') ?>"/>
-					</div>
-				</div>
-
-				<div class="control-group<?php if (array_key_exists('email', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['email'])) ?><?php } ?>">
-					<label class="control-label" for="startupapi-<?php echo $slug ?>-registration-email">Email</label>
-					<div class="controls">
-						<input id="startupapi-<?php echo $slug ?>-registration-email" name="email" type="email" value="<?php echo UserTools::escape(array_key_exists('email', $data) ? $data['email'] : '') ?>"/>
-					</div>
-				</div>
-
-				<?php
-				if (!is_null(UserConfig::$currentTOSVersion) && is_callable(UserConfig::$onRenderTOSLinks)) {
-					?>
-					<div  style="margin-bottom: 0" class="control-group">
-						<div class="controls">
-						<?php
-						call_user_func(UserConfig::$onRenderTOSLinks);
-						?>
-						</div>
-					</div>
-					<?php
-				}
-				?>
-
-				<div class="control-group">
-					<div class="controls">
-						<button class="btn btn-primary" type="submit" name="register">Register</button> <a class="btn" href="<?php echo UserConfig::$USERSROOTURL ?>/login.php">or login here</a>
-					</div>
-				</div>
-			</fieldset>
-		</form>
-		<?php
+		return StartupAPI::$template->render("modules/usernamepass/registration_form.html.twig", $template_info);
 	}
 
 	public function renderEditUserForm($action, $errors, $user, $data)

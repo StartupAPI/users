@@ -1,0 +1,53 @@
+<form class="form-horizontal" action="{{action}}" method="POST">
+	<fieldset>
+		<legend>Enter your information to create an account</legend>
+
+		<div class="control-group{% if 'username' in errors|keys %} error" title="{{ errors['username']|join("\n")}}{% endif %}">
+			<label class="control-label" for="startupapi-{{slug}}-registration-username">Username</label>
+			<div class="controls">
+				<input id="startupapi-{{slug}}-registration-username" name="username" type="text" size="25" required="true" value="{% if 'username' in data|keys %}{{ data.username }}{% endif %}"/>
+			</div>
+		</div>
+
+		<div class="control-group{% if 'pass' in errors|keys %} error" title="{{ errors['pass']|join("\n")}}{% endif %}">
+			<label class="control-label" for="startupapi-{{slug}}-registration-pass">Set a password</label>
+			<div class="controls">
+				<input id="startupapi-{{slug}}-registration-pass" name="pass" type="password" autocomplete="off"/>
+			</div>
+		</div>
+
+		<div class="control-group{% if 'resetpass' in errors|keys %} error" title="{{ errors['resetpass']|join("\n")}}{% endif %}">
+			<label class="control-label" for="startupapi-{{slug}}-registration-repeatpass">Repeat new password</label>
+			<div class="controls">
+				<input id="startupapi-{{slug}}-registration-repeatpass" name="repeatpass" type="password" autocomplete="off"/>
+			</div>
+		</div>
+
+		<div class="control-group{% if 'name' in errors|keys %} error" title="{{ errors['name']|join("\n")}}{% endif %}">
+			<label class="control-label" for="startupapi-{{slug}}-registration-name">Name</label>
+			<div class="controls">
+				<input id="startupapi-{{slug}}-registration-name" name="name" type="text" value="{% if 'name' in data|keys %}{{ data.name }}{% endif %}"/>
+			</div>
+		</div>
+
+		<div class="control-group{% if 'email' in errors|keys %} error" title="{{ errors['email']|join("\n")}}{% endif %}">
+			<label class="control-label" for="startupapi-{{slug}}-registration-email">Email</label>
+			<div class="controls">
+				<input id="startupapi-{{slug}}-registration-email" name="email" type="email" value="{% if 'email' in data|keys %}{{ data.email }}{% endif %}"/>
+			</div>
+		</div>
+
+		{% if TOSlinks %}
+		<div style="margin-bottom: 0" class="control-group">
+			<div class="controls">{{TOSlinks}}</div>
+		</div>
+		{% endif %}
+
+
+		<div class="control-group">
+			<div class="controls">
+				<button class="btn btn-primary" type="submit" name="register">Register</button> <a class="btn" href="{{UserConfig.USERSROOTURL}}/login.php">or login here</a>
+			</div>
+		</div>
+	</fieldset>
+</form>

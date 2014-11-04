@@ -101,10 +101,9 @@ if ($show_registration_form) {
 		}
 		$module_errors = array_key_exists($id, $errors) ? $errors[$id] : array();
 
-		ob_start();
-		$module->renderRegistrationForm(true, $action_url, $module_errors, $_POST);
-		$template_info['module_forms'][$id] = ob_get_contents();
-		ob_end_clean();
+		$template_info['module_forms'][$id] = $module->renderRegistrationForm(
+				$template_info, true, $action_url, $module_errors, $_POST
+		);
 	}
 
 	$template_info['show_registration_form'] = TRUE;

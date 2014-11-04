@@ -110,51 +110,15 @@ class EmailAuthenticationModule extends AuthenticationModule {
 		return StartupAPI::$template->render("modules/email/login_form.html.twig", $template_info);
 	}
 
-	public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null) {
+	public function renderRegistrationForm($template_info, $full = false, $action = null, $errors = null, $data = null) {
 		$slug = $this->getID();
-		?>
-		<form class="form-horizontal" action="<?php echo $action ?>" method="POST">
-			<fieldset>
-				<legend>Enter your name and email address to sign up</legend>
 
-				<div class="control-group<?php if (array_key_exists('name', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['name'])) ?><?php } ?>">
-					<label class="control-label" for="startupapi-<?php echo $slug ?>-registration-name">Name</label>
-					<div class="controls">
-						<input class="input-xlarge" id="startupapi-<?php echo $slug ?>-registration-name" name="name" type="text" value="<?php echo UserTools::escape(array_key_exists('name', $data) ? $data['name'] : '') ?>"/>
-					</div>
-				</div>
+		$template_info['action'] = $action;
+		$template_info['full'] = $full ? TRUE : FALSE;
+		$template_info['errors'] = $errors;
+		$template_info['data'] = $data;
 
-				<div class="control-group<?php if (array_key_exists('email', $errors)) { ?> error" title="<?php echo UserTools::escape(implode("\n", $errors['email'])) ?><?php } ?>">
-					<label class="control-label" for="startupapi-<?php echo $slug ?>-registration-email">Email</label>
-					<div class="controls">
-						<input class="input-xlarge" id="startupapi-<?php echo $slug ?>-registration-email" name="email" type="email" placeholder="john@example.com"/>
-					</div>
-				</div>
-
-				<?php
-				if (!is_null(UserConfig::$currentTOSVersion) && is_callable(UserConfig::$onRenderTOSLinks)) {
-					?>
-					<div style="margin-bottom: 0" class="control-group">
-						<div class="controls">
-						<?php
-						call_user_func(UserConfig::$onRenderTOSLinks);
-						?>
-						</div>
-					</div>
-					<?php
-				}
-				?>
-
-				<div class="control-group">
-					<div class="controls">
-						<button class="btn btn-primary" type="submit" name="register">Sign up</button>
-						<?php if (UserConfig::$enableRegistration) { ?><a class="btn" href="<?php echo UserConfig::$USERSROOTURL ?>/login.php">or re-send login link</a><?php } ?>
-					</div>
-				</div>
-
-			</fieldset>
-		</form>
-		<?php
+		return StartupAPI::$template->render("modules/email/registration_form.html.twig", $template_info);
 	}
 
 	/*

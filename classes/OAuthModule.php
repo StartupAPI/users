@@ -535,38 +535,36 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 	 *
 	 * Uses self::$signUpButtonURL for a button image if supplied
 	 *
+	 * @param array[] $template_info Array of base information for Twig template
 	 * @param boolean $full Whatever or not to display a short version of the form or full
 	 * @param string $action Action URL the form should submit data to
 	 * @param array $errors An array of error messages to be displayed to the user on error
 	 * @param array $data An array of data passed by a form on previous submission to display back to user
 	 */
-	public function renderRegistrationForm($full = false, $action = null, $errors = null , $data = null)
+	public function renderRegistrationForm($template_info, $full = false, $action = null, $errors = null , $data = null)
 	{
 		if (is_null($action))
 		{
 			$action = UserConfig::$USERSROOTURL.'/register.php?module='.$this->getID();
 		}
 
-		if ($full)
-		{
-		?>
-			<p>Sign in using your existing account with <b><?php echo UserTools::escape($this->serviceName)?></b>.</p>
-		<?php
+		$template_info['action'] = $action;
+		$template_info['full'] = $full ? TRUE : FALSE;
+		$template_info['errors'] = $errors;
+		$template_info['data'] = $data;
+
+		if (UserConfig::$currentTOSVersion && is_callable(UserConfig::$onRenderTOSLinks)) {
+			ob_start();
+			call_user_func(UserConfig::$onRenderTOSLinks);
+			$template_info['TOSlinks'] = ob_get_contents();
+			ob_end_clean();
 		}
 
-		if (!is_null(UserConfig::$currentTOSVersion) && is_callable(UserConfig::$onRenderTOSLinks)) {
-			call_user_func(UserConfig::$onRenderTOSLinks);
-		}
-		?>
-		<form class="form-inline" action="<?php echo $action?>" method="POST">
-		<input type="hidden" name="register" value="register"/>
-		<?php if (is_null($this->signUpButtonURL)) { ?>
-		<input type="submit" value="Register using <?php echo UserTools::escape($this->serviceName)?>"/>
-		<?php } else { ?>
-		<input type="image" src="<?php echo UserTools::escape($this->signUpButtonURL) ?>"/>
-		<?php } ?>
-		</form>
-		<?php
+		$template_info['serviceName'] = $this->serviceName;
+		$template_info['signUpButtonURL'] = $this->signUpButtonURL;
+
+		// using same template for OAuth and OAuth2
+		return StartupAPI::$template->render("oauth_registration_form.html.twig", $template_info);
 	}
 
 	/**

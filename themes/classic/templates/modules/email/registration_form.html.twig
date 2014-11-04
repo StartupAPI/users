@@ -1,0 +1,35 @@
+<form class="form-horizontal" action="{{action}}" method="POST">
+	<fieldset>
+		<legend>Enter your name and email address to sign up</legend>
+
+		<div class="control-group{% if 'name' in errors|keys %} error" title="{{ errors['name']|join("\n")}}{% endif %}">
+			<label class="control-label" for="startupapi-{{slug}}-registration-name">Name</label>
+			<div class="controls">
+				<input class="input-xlarge" id="startupapi-{{slug}}-registration-name" name="name" type="text" value="{% if 'name' in data|keys %}{{ data.name }}{% endif %}"/>
+			</div>
+		</div>
+
+		<div class="control-group{% if 'email' in errors|keys %} error" title="{{ errors['email']|join("\n")}} ?>{% endif %}">
+			<label class="control-label" for="startupapi-{{slug}}-registration-email">Email</label>
+			<div class="controls">
+				<input class="input-xlarge" id="startupapi-{{slug}}-registration-email" name="email" type="email" placeholder="john@example.com"/>
+			</div>
+		</div>
+
+		{% if TOSlinks %}
+		<div style="margin-bottom: 0" class="control-group">
+			<div class="controls">{{TOSlinks}}</div>
+		</div>
+		{% endif %}
+
+		<div class="control-group">
+			<div class="controls">
+				<button class="btn btn-primary" type="submit" name="register">Sign up</button>
+				{% if UserConfig.enableRegistration %}
+				<a class="btn" href="{{UserConfig.USERSROOTURL}}/login.php">or re-send login link</a>
+				{% endif %}
+			</div>
+		</div>
+
+	</fieldset>
+</form>

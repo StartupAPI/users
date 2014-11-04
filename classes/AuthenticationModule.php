@@ -31,12 +31,13 @@ abstract class AuthenticationModule extends StartupAPIModule {
 	 *
 	 * Implementations of this method must render registration form
 	 *
+	 * @param array[] $template_info Array of base information for Twig template
 	 * @param boolean $full Whatever or not to display a short version of the form or full
 	 * @param string $action Action URL the form should submit data to
 	 * @param array $errors An array of error messages to be displayed to the user on error
 	 * @param array $data An array of data passed by a form on previous submission to display back to user
 	 */
-	abstract public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null);
+	abstract public function renderRegistrationForm($template_info, $full = false, $action = null, $errors = null, $data = null);
 
 	/**
 	 * Renders user editing form
