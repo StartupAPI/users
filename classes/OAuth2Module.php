@@ -584,19 +584,16 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	 *
 	 * @param string $action Action URL the form should submit data to
 	 */
-	public function renderLoginForm($action)
+	public function renderLoginForm($template_info, $action)
 	{
-		?>
-		<p>Sign in using your existing account with <b><?php echo UserTools::escape($this->serviceName)?></b>.</p>
-		<form class="form-inline" action="<?php echo $action?>" method="POST">
-		<input type="hidden" name="login" value="login"/>
-		<?php if (is_null($this->logInButtonURL)) { ?>
-		<input type="submit" class="btn" value="Log in using <?php echo UserTools::escape($this->serviceName)?>"/>
-		<?php } else { ?>
-		<input type="image" src="<?php echo UserTools::escape($this->logInButtonURL) ?>" value="login"/>
-		<?php } ?>
-		</form>
-		<?php
+		$slug = $this->getID();
+		$template_info['slug'] = $slug;
+		$template_info['action'] = $action;
+		$template_info['serviceName'] = $this->serviceName;
+		$template_info['logInButtonURL'] = $this->logInButtonURL;
+
+		// using same template for OAuth and OAuth2
+		return StartupAPI::$template->render("oauth_login_form.html.twig", $template_info);
 	}
 
 	/**

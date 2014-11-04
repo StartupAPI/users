@@ -188,12 +188,12 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		return $dailyregs;
 	}
 
-	public function renderLoginForm($action) {
+	public function renderLoginForm($template_info, $action) {
 		if (is_null($action)) {
 			$action = UserConfig::$USERSROOTURL . '/login.php?module=' . $this->getID();
 		}
 
-		$this->renderForm($action, 'login');
+		$this->renderForm($template_info, $action, 'login');
 	}
 
 	public function renderAutoLogoutForm() {
@@ -237,108 +237,22 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 	 * @param string $action Submit URL to be used by the form
 	 * @param string $form ID strgin of the form to be rendered
 	 */
-	private function renderForm($action, $form) {
-		if ($form == 'login') {
-			$formsubmit = 'login';
-			$buttonspritestyle = 'background-position: 0px -22px; width: 147px; height: 22px;';
-			$buttontitle = 'Login with Facebook';
-		} else if ($form == 'register') {
-			$formsubmit = 'register';
-			$buttonspritestyle = 'background-position: 0px 0px; width: 200px; height: 22px;';
-			$buttontitle = 'Quick Sign-up using Facebook';
-		} else if ($form == 'connect') {
-			$formsubmit = 'save';
-			$buttonspritestyle = 'background-position: 0px -44px; width: 230px; height: 22px;';
-			$buttontitle = 'Connect to your Facebook Account';
-		}
-		?><div id="fb-root"></div>
+	private function renderForm($template_info, $action, $form) {
+		$template_info['action'] = $action;
+		$template_info['form'] = $form;
+		$template_info['show_facepile'] = $this->show_facepile;
+		$template_info['appID'] = $this->appID;
+		$template_info['permissions'] = $this->permissions;
+		$template_info['permissions_string'] = implode(',', $this->permissions);
 
-		<?php if ($this->show_facepile && $form == 'register') { ?>
-			<fb:facepile width="450" size="large" max-rows="1"></fb:facepile>
-		<?php } ?>
-		<form style="margin: 0" action="<?php echo $action ?>" method="POST" name="facebookconnectform">
-			<input type="hidden" name="<?php echo $formsubmit ?>" value="Connect &gt;&gt;&gt;"/>
-		<?php UserTools::renderCSRFNonce(); ?>
-		</form>
-		<?php
-		if ($form == 'register' && !is_null(UserConfig::$currentTOSVersion) && is_callable(UserConfig::$onRenderTOSLinks)) {
+		if (UserConfig::$currentTOSVersion && is_callable(UserConfig::$onRenderTOSLinks)) {
+			ob_start();
 			call_user_func(UserConfig::$onRenderTOSLinks);
+			$template_info['TOSlinks'] = ob_get_contents();
+			ob_end_clean();
 		}
-		?>
-		<a class="startupapi-fb-connect" href="#" onclick="UserBaseFBConnectButtonClicked(); return false;"><span style="background-image: url(<?php echo UserConfig::$USERSROOTURL ?>/modules/facebook/facebook-sprite.png); <?php echo $buttonspritestyle ?> display: block; cursor: hand; margin-top: 0.3em" title="<?php echo $buttontitle ?>"></span></a>
 
-		<script>
-			var UserBaseFBFormType = <?php echo json_encode($form) ?>;
-
-			var UserBaseFBConnectButtonClicked = function() {
-				// FB is not loaded yet
-			};
-
-			window.fbAsyncInit = function() {
-				// permissions required by this instance of UserBase
-				var required_perms = <?php echo json_encode($this->permissions); ?>;
-				var required_perms_string = <?php echo json_encode(implode(',', $this->permissions)); ?>;
-
-				FB.init({
-					appId  : '<?php echo $this->appID ?>',
-					status : true, // check login status
-					cookie : true, // enable cookies to allow the server to access the session
-					oauth  : true, // enable OAuth 2.0
-					xfbml  : true, // parse XFBML
-					channelURL : '<?php echo UserConfig::$USERSROOTFULLURL; ?>/modules/facebook/channel.php' // channel file
-				});
-
-				// Auto-login if user is connected already
-				FB.getLoginStatus(function(r) {
-					if(r.status === 'connected') {
-						// if permissions are nor required, submit the form now
-						if (required_perms.length === 0) {
-							document.facebookconnectform.submit();
-							return;
-						}
-
-						FB.api('/me/permissions', function(response) {
-							if (response && response.data && response.data.length > 0) {
-								var perms = response.data[0];
-
-								var i = required_perms.length;
-								while (i--) {
-									// do not submit form if at least one
-									// required permission is not found
-									if (perms[required_perms[i]] !== 1) {
-										return;
-									}
-								}
-
-								document.facebookconnectform.submit();
-								return;
-							}
-						});
-
-					}
-				});
-
-				// when button is clicked popu-up a dialog
-				UserBaseFBConnectButtonClicked = function() {
-					// it will only have 'connected' status if permissions match
-					FB.login(function(response) {
-						if (response.status === 'connected') {
-							document.facebookconnectform.submit();
-							return;
-						}
-					}, {scope: required_perms_string});
-				};
-			};
-
-			(function() {
-				var e = document.createElement('script');
-				e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
-				e.async = true;
-				document.getElementById('fb-root').appendChild(e);
-			}());
-
-		</script>
-		<?php
+		return StartupAPI::$template->render("modules/facebook/login_form.html.twig", $template_info);
 	}
 
 	public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null) {
@@ -346,7 +260,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 			$action = UserConfig::$USERSROOTURL . '/register.php?module=' . $this->getID();
 		}
 
-		$this->renderForm($action, 'register');
+		$this->renderForm($template_info, $action, 'register');
 	}
 
 	public function renderEditUserForm($action, $errors, $user, $data) {
@@ -370,7 +284,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 						<form style="margin: 0" action="<?php echo $action ?>" method="POST" name="facebookusereditform">
 							<input type="hidden" name="save" value="Save &gt;&gt;&gt;"/>
 							<input class="btn btn-mini" type="submit" name="remove" value="remove" style="font-size: xx-small"/>
-			<?php UserTools::renderCSRFNonce(); ?>
+							<?php UserTools::renderCSRFNonce(); ?>
 						</form>
 					</td>
 				</tr></table>

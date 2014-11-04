@@ -103,28 +103,11 @@ class EmailAuthenticationModule extends AuthenticationModule {
 		return $conns;
 	}
 
-	public function renderLoginForm($action) {
+	public function renderLoginForm($template_info, $action) {
 		$slug = $this->getID();
-		?>
-		<form action="<?php echo $action ?>" method="POST">
-			<fieldset>
-				<legend>Enter your email address to re-send login link</legend>
+		$template_info['action'] = $action;
 
-				<div class="control-group">
-					<div class="controls">
-						<input class="input-xlarge" id="startupapi-emaillogin-login-email" name="email" type="email" placeholder="john@example.com"/>
-					</div>
-				</div>
-
-				<div class="control-group">
-					<div class="controls">
-						<button class="btn btn-primary" type="submit" name="login">Re-send login link</button>
-						<?php if (UserConfig::$enableRegistration) { ?><a class="btn" href="<?php echo UserConfig::$USERSROOTURL ?>/register.php">or sign up here</a><?php } ?>
-					</div>
-				</div>
-			</fieldset>
-		</form>
-		<?php
+		return StartupAPI::$template->render("modules/email/login_form.html.twig", $template_info);
 	}
 
 	public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null) {

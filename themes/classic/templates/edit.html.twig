@@ -41,7 +41,6 @@
 	{% else %}
 		{% if compact_page %}
 			<legend>Connect other accounts</legend>
-			<?php
 		{% endif %}
 
 		{% for module in UserConfig.authentication_modules if compact_page and module.is_compact or not compact_page and module.id == current_module.id %}

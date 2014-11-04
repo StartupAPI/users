@@ -1,0 +1,40 @@
+<form class="form-horizontal" action="{{action}}" method="POST">
+	<fieldset>
+		<legend>Enter your username and password to log in</legend>
+
+		<div class="control-group">
+			<label class="control-label" for="startupapi-{{slug}}-login-username">Username</label>
+			<div class="controls">
+				<input id="startupapi-{{slug}}-login-username" name="username" type="text" size="25" required="true"/>
+			</div>
+		</div>
+
+		<div{% if UserConfig.allowRememberMe %} style="margin-bottom: 0.5em"{% endif %} class="control-group">
+			<label class="control-label" for="startupapi-{{slug}}-login-pass">Password</label>
+			<div class="controls">
+				<input id="startupapi-{{slug}}-login-pass" name="pass" type="password" autocomplete="off"/>
+				<a id="startupapi-usernamepass-login-forgotpass" href="{{UserConfig.USERSROOTURL}}/modules/usernamepass/forgotpassword.php">Forgot password?</a>
+			</div>
+		</div>
+
+		{% if UserConfig.allowRememberMe %}
+		<div style="margin-bottom: 0.5em" class="control-group">
+			<div class="controls">
+				<label class="checkbox">
+					<input type="checkbox" name="remember" value="yes"{% if UserConfig.rememberMeDefault %} checked{% endif %}/>
+						   remember me
+				</label>
+			</div>
+		</div>
+		{% endif %}
+
+		<div class="control-group">
+			<div class="controls">
+				<button class="btn btn-primary" type="submit" name="login">Login</button>
+				{% if UserConfig.enableRegistration %}
+					<a class="btn" href="{{UserConfig.USERSROOTURL}}/register.php">or sign up here</a>
+				{% endif %}
+			</div>
+		</div>
+	</fieldset>
+</form>

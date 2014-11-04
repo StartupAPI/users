@@ -1,0 +1,20 @@
+<form action="{{action}}" method="POST">
+	<fieldset>
+		<legend>Enter your email address to re-send login link</legend>
+
+		<div class="control-group">
+			<div class="controls">
+				<input class="input-xlarge" id="startupapi-emaillogin-login-email" name="email" type="email" placeholder="john@example.com"/>
+			</div>
+		</div>
+
+		<div class="control-group">
+			<div class="controls">
+				<button class="btn btn-primary" type="submit" name="login">Re-send login link</button>
+				{% if UserConfig.enableRegistration %}
+				<a class="btn" href="{{UserConfig.USERSROOTURL}}/register.php">or sign up here</a>
+				{% endif %}
+			</div>
+		</div>
+	</fieldset>
+</form>

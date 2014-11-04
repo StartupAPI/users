@@ -61,10 +61,7 @@ $template_info = StartupAPI::getTemplateInfo();
 foreach (UserConfig::$authentication_modules as $module) {
 	$id = $module->getID();
 
-	ob_start();
-	$module->renderLoginForm("?module=$id");
-	$template_info['module_forms'][$id] = ob_get_contents();
-	ob_end_clean();
+	$template_info['module_forms'][$id] = $module->renderLoginForm($template_info, "?module=$id");
 }
 
 if (array_key_exists('module', $_GET) && $id == $_GET['module'] && array_key_exists('error', $_GET)) {

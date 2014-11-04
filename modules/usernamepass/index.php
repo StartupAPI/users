@@ -146,49 +146,12 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		return $dailyregs;
 	}
 
-	public function renderLoginForm($action)
+	public function renderLoginForm($template_info, $action)
 	{
 		$slug = $this->getID();
-		?>
-		<form class="form-horizontal" action="<?php echo $action; ?>" method="POST">
-			<fieldset>
-				<legend>Enter your username and password to log in</legend>
-
-				<div class="control-group">
-					<label class="control-label" for="startupapi-<?php echo $slug ?>-login-username">Username</label>
-					<div class="controls">
-						<input id="startupapi-<?php echo $slug ?>-login-username" name="username" type="text" size="25" required="true"/>
-					</div>
-				</div>
-
-				<div<?php if (UserConfig::$allowRememberMe) {?> style="margin-bottom: 0.5em"<?php } ?> class="control-group">
-					<label class="control-label" for="startupapi-<?php echo $slug ?>-login-pass">Password</label>
-					<div class="controls">
-						<input id="startupapi-<?php echo $slug ?>-login-pass" name="pass" type="password" autocomplete="off"/>
-						<a id="startupapi-usernamepass-login-forgotpass" href="<?php echo UserConfig::$USERSROOTURL?>/modules/usernamepass/forgotpassword.php">Forgot password?</a></li>
-					</div>
-				</div>
-
-				<?php if (UserConfig::$allowRememberMe) {?>
-				<div style="margin-bottom: 0.5em" class="control-group">
-					<div class="controls">
-						<label class="checkbox">
-							<input type="checkbox" name="remember" value="yes"<?php if (UserConfig::$rememberMeDefault) {?> checked<?php }?>/>
-							remember me
-						</label>
-					</div>
-				</div>
-				<?php }?>
-
-				<div class="control-group">
-					<div class="controls">
-						<button class="btn btn-primary" type="submit" name="login">Login</button>
-						<?php if (UserConfig::$enableRegistration) {?><a class="btn" href="<?php echo UserConfig::$USERSROOTURL?>/register.php">or sign up here</a><?php } ?>
-					</div>
-				</div>
-			</fieldset>
-		</form>
-		<?php
+		$template_info['slug'] = $slug;
+		$template_info['action'] = $action;
+		return StartupAPI::$template->render("modules/usernamepass/login_form.html.twig", $template_info);
 	}
 
 	public function renderRegistrationForm($full = false, $action = null, $errors = null, $data = null)

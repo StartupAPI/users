@@ -1,0 +1,9 @@
+<p>Sign in using your existing account with <b>{{serviceName}}</b>.</p>
+<form class="form-inline" action="{{action}}" method="POST">
+	<input type="hidden" name="login" value="login"/>
+	{% if logInButtonURL %}
+	<input type="image" src="{{logInButtonURL}}" value="login"/>
+	{% else %}
+	<input type="submit" class="btn" value="Log in using {{serviceName}}"/>
+	{% endif %}
+</form>
