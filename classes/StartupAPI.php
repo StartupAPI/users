@@ -292,7 +292,8 @@ class StartupAPI {
 			'UserConfig' => $config_info,
 			'AUTH' => $auth_info,
 			'PAGE' => $page_info,
-			'POWERSTRIP' => $powerstrip_info
+			'POWERSTRIP' => $powerstrip_info,
+			'APP' => UserConfig::$app_global_template_variables
 		);
 	}
 
