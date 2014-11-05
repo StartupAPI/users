@@ -3,7 +3,9 @@ require_once(dirname(dirname(__DIR__)).'/global.php');
 
 $user = User::require_login();
 
-session_start();
+if (!session_id()) {
+	session_start();
+}
 
 if(isset($_SESSION['message'])) {
   $template_data['message'] = $_SESSION['message'];

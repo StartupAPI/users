@@ -29,7 +29,9 @@ UserTools::preventCSRF();
 
 $template_info = StartupAPI::getTemplateInfo();
 
-session_start();
+if (!session_id()) {
+	session_start();
+}
 
 if (array_key_exists('plan', $_POST)) {
 	$data = explode('.', $_REQUEST['plan']);

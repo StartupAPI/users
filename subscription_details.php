@@ -10,7 +10,9 @@ $user = User::require_login();
 $account = Account::getCurrentAccount($user);
 $template_info = StartupAPI::getTemplateInfo();
 
-session_start();
+if (!session_id()) {
+	session_start();
+}
 
 if (isset($_SESSION['message'])) {
 	$template_info['message'] = $_SESSION['message'];
