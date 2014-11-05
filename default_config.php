@@ -346,6 +346,11 @@ class UserConfig {
 	public static $theme = 'classic';
 
 	/**
+	 * @var string Folder with local theme overrides
+	 */
+	public static $theme_override = null;
+
+	/**
 	 * @var string If specified, StartupAPI::head() will include this Twitter Bootstrap CSS instead of default one
 	 * @deprecated since 0.7 Now using Bootstrap 3 which has separate theme file, main bootstrap file is no longer modifiable
 	 */

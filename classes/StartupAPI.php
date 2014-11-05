@@ -148,8 +148,26 @@ class StartupAPI {
 		// Initializing more structures based on user configurations
 		Plan::init(UserConfig::$PLANS);
 
+
+		// Local theme overrides
+		if (!is_null(UserConfig::$theme_override) && file_exists(UserConfig::$theme_override . '/templates/')) {
+			$template_folders[] = UserConfig::$theme_override . '/templates/';
+		}
+
+		// requested theme
+		$template_folders[] = dirname(__DIR__) . '/themes/' . UserConfig::$theme . '/templates/';
+
+		// determining the parent theme
+		$theme_definition_file = dirname(__DIR__) . '/themes/' . UserConfig::$theme . '/theme.json';
+		if (file_exists($theme_definition_file)) {
+			$theme = json_decode(file_get_contents($theme_definition_file), TRUE);
+			if (array_key_exists('parent', $theme)) {
+				$template_folders[] = dirname(__DIR__) . '/themes/' . $theme['parent'] . '/templates/';
+			}
+		}
+
 		// Configuring the templating
-		$loader = new Twig_Loader_Filesystem(dirname(__DIR__) . '/themes/' . UserConfig::$theme . '/templates/');
+		$loader = new Twig_Loader_Filesystem($template_folders);
 		$loader->addPath(dirname(__DIR__) . '/admin/templates', 'admin');
 
 		self::$template = new Twig_Environment($loader, UserConfig::$twig_options);
