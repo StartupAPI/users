@@ -255,7 +255,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		} else {
 			try {
 				$me = $this->api('/me?fields=id,name,email,link');
-			} catch (FacebookApiException $e) {
+			} catch (Exception $e) {
 				UserTools::debug("Can't get /me API data: " . $e);
 				return;
 			}
@@ -320,14 +320,19 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 			throw new InputValidationException('No facebook user id', 0, $errors);
 		}
 
-		$permissions = $this->api('/me/permissions');
-		UserTools::debug('User permissions: ' . var_export($permissions, true));
-		foreach ($this->permissions as $perm) {
-			if (!array_key_exists($perm, $permissions['data'][0]) || $permissions['data'][0][$perm] !== 1) {
-				// looks like not all required permissions were granted
-				UserTools::debug("Can't login - not enough permissions granted");
-				return null;
+		try {
+			$permissions = $this->api('/me/permissions');
+			UserTools::debug('User permissions: ' . var_export($permissions, true));
+			foreach ($this->permissions as $perm) {
+				if (!array_key_exists($perm, $permissions['data'][0]) || $permissions['data'][0][$perm] !== 1) {
+					// looks like not all required permissions were granted
+					UserTools::debug("Can't login - not enough permissions granted");
+					return null;
+				}
 			}
+		} catch (Exception $e) {
+			UserTools::debug("Can't get FB /me/permissions API data: " . $e);
+			return null;
 		}
 
 		$user = User::getUserByFacebookID($fbuser);
@@ -371,7 +376,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 
 		try {
 			$me = $this->api('/me?fields=id,name,email,link');
-		} catch (FacebookApiException $e) {
+		} catch (Exception $e) {
 			UserTools::debug("Can't get /me API data: " . $e);
 			return null;
 		}
@@ -436,7 +441,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		if (!$user->getEmail()) {
 			try {
 				$me = $this->api('/me?fields=email');
-			} catch (FacebookApiException $e) {
+			} catch (Exception $e) {
 				UserTools::debug("Can't get /me API data: " . $e);
 				return null;
 			}
