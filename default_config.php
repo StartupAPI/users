@@ -338,12 +338,12 @@ class UserConfig {
 	/**
 	 * @var array[] Array of available theme slugs
 	 */
-	public static $available_themes = array('classic');
+	public static $available_themes = array('classic', 'awesome');
 
 	/**
 	 * @var string Theme slug for current theme
 	 */
-	public static $theme = 'classic';
+	public static $theme = 'awesome';
 
 	/**
 	 * @var string Folder with local theme overrides
