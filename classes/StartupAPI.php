@@ -161,7 +161,7 @@ class StartupAPI {
 		$theme_definition_file = dirname(__DIR__) . '/themes/' . UserConfig::$theme . '/theme.json';
 		if (file_exists($theme_definition_file)) {
 			$theme = json_decode(file_get_contents($theme_definition_file), TRUE);
-			if (array_key_exists('parent', $theme)) {
+			if (is_array($theme) && array_key_exists('parent', $theme)) {
 				$template_folders[] = dirname(__DIR__) . '/themes/' . $theme['parent'] . '/templates/';
 			}
 		}
