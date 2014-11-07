@@ -305,6 +305,11 @@ class UserConfig {
 	public static $appName;
 
 	/**
+	 * @var string Application icon URL (20x20)
+	 */
+	public static $appIconURL;
+
+	/**
 	 * @var string File system path to header HTML file.
 	 * @deprecated since version 0.7
 	 */
@@ -389,7 +394,7 @@ class UserConfig {
 	/**
 	 * @var boolean Show power strip as Bootstrap nav pills instead of navbar
 	 */
-	public static $powerStripNavPills = true;
+	public static $powerStripNavPills = false;
 
 	/**
 	 * @var boolean Align power strip to the right

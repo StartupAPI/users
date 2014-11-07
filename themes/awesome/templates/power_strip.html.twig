@@ -1,0 +1,128 @@
+{% if not POWERSTRIP.nav_pills and POWERSTRIP.show_navbar %}
+<!--
+Set UserConfig::$powerStripShowNavbar to FALSE if you want to use your own navbar around power strip
+You can also swith navbar to "pills" mode (no navbar) by setting UserConfig::$powerStripNavPills to TRUE
+-->
+<!-- Navnar -->
+<nav class="navbar {% if POWERSTRIP.inverted_navbar %}navbar-inverse{% else %}navbar-default{% endif %}" role="navigation">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="{{ UserConfig.SITEROOTURL }}">
+				{% if UserConfig.appIconURL %}
+					<img class="startupapi-logo" width="20" height="20" hspace="5" src="{{ UserConfig.appIconURL }}"/>
+				{% elseif UserConfig.appName %}
+					{{UserConfig.appName}}
+				{% else %}
+					<img class="startupapi-logo" width="20" height="20" hspace="5" src="{{ UserConfig.USERSROOTURL }}/images/header_icon.png"/>
+				{% endif %}
+			</a>
+		</div>
+		<div id="navbar" class="navbar-collapse collapse">
+			<!-- // app navigation
+			<ul class="nav navbar-nav">
+				<li><a href="#">Dashboard</a></li>
+			</ul>
+			-->
+{% endif %}
+
+<!-- Power Strip Start -->
+<ul class="nav navbar-nav {% if POWERSTRIP.nav_pills %} nav-pills{% endif %}{% if POWERSTRIP.pull_right %} navbar-right{% endif %}">
+	{% if AUTH.current_user.is_logged_in %}
+		{% if AUTH.current_user.is_admin %}
+			<li><a id="startupapi-navbox-admin" href="{{ UserConfig.USERSROOTURL }}/admin/">Admin</a></li>
+		{% endif %}
+
+		{% if AUTH.accounts|length > 1 %}
+			<li class="dropdown">
+				<a href="#" title="Change account" class="dropdown-toggle" data-toggle="dropdown">
+					{{ AUTH.current_account.name }}
+					{% if AUTH.current_plan %}
+						<span class="label label-default" style="margin-left: 0.5em" title="{{ AUTH.current_plan.description }}">
+							{{ AUTH.current_plan.name }}
+						</span>
+					{% endif %}
+					<b class="caret"></b>
+				</a>
+				<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" id="startupapi-account-switcher">
+					{% for account in AUTH.accounts %}
+						<li>
+							<a tabindex="-1" href="#" data-account-swtich-to="{{ account.id }}">
+								{{ account.name }}
+								{% if account.plan %}
+									<span class="label label-default" style="margin-left: 0.5em" title="{{ account.plan.description }}">
+										{{ account.plan.name }}
+									</span>
+								{% else%}
+									<span class="label label-warning" style="margin-left: 0.5em" title="No plan set for this account">
+										NO PLAN
+									</span>
+								{% endif %}
+							</a>
+						</li>
+					{% endfor %}
+				</ul>
+				<script>
+					$('#startupapi-account-switcher a').click(function(e) {
+						var account_swtich_to = $(this).data('account-swtich-to');
+
+						{% if UserConfig.accountSwitchDestination %}
+							var destination = {{ UserConfig.accountSwitchDestination|json_encode()|raw}};
+						{% else %}
+							var destination = document.location;
+						{% endif %}
+
+						if (typeof(account_swtich_to) !== 'undefined') {
+							document.location.href = '{{ UserConfig.USERSROOTURL }}/change_account.php?return=' + encodeURIComponent(destination) + '&account=' + account_swtich_to;
+						}
+
+						return false;
+					});
+				</script>
+			</li>
+		{% endif %}
+
+		{% for link in PAGE.extralinks %}
+			<li{% if link.id %} id="{{ link.id }}"{% endif %}>
+				<a href="{{ link.url }}"
+					{% if link.title %}
+						title="{{ link.title }}"
+					{% endif %}
+					{% if link.target %}
+						target="{{ link.target }}"
+					{% endif %}
+				>{{ link.text }}</a>
+			</li>
+		{% endfor %}
+
+		<li id="startupapi-navbox-username"><a href="{{ UserConfig.USERSROOTURL }}/edit.php" title="{{ AUTH.current_user.name }}'s user information">{{ AUTH.current_user.name }}</a></li>
+		<li id="startupapi-navbox-logout"><a href="{{ UserConfig.USERSROOTURL }}/logout.php">Logout</a></li>
+	{% else %}
+		<li id="startupapi-navbox-signup"><a href="{{ UserConfig.USERSROOTURL }}/register.php">Sign Up</a></li>
+		<li id="startupapi-navbox-login"><a href="{{ UserConfig.USERSROOTURL }}/login.php">Log in</a></li>
+	{% endif %}
+</ul>
+
+{% if AUTH.current_user.is_logged_in and AUTH.current_user.is_impersonated %}
+<form class="nav navbar-form {% if POWERSTRIP.nav_pills %} nav-pills{% endif %}{% if POWERSTRIP.pull_right %} navbar-right{% endif %}">
+	<a class="btn btn-danger"
+	   id="startupapi-navbox-impersonating"
+	   href="{{ UserConfig.USERSROOTURL }}/admin/stopimpersonation.php"
+	   title="Impersonated by {{AUTH.impersonator.name}}">
+		Stop Impersonation
+	</a>
+</form>
+{% endif %}
+<!-- Power Strip End -->
+
+{% if not POWERSTRIP.nav_pills and POWERSTRIP.show_navbar %}
+		</div>
+	</div>
+</nav>
+<!-- Navbar ends -->
+{% endif %}

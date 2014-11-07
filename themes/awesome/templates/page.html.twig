@@ -5,46 +5,37 @@
 	<title>{% block title %}Users - {{UserConfig.appName}}{% endblock %}</title>
 	{% include 'head_tag.html.twig' %}
 </head>
-
 <body>
-	<header class="startupapi-header">
-		<div class="startupapi-header-strip pull-right">
-			{% include 'power_strip.html.twig' %}
-		</div>
-		<h1>
-			<a href="{{ UserConfig.SITEROOTURL }}" class="startupapi-header-appname">{{ UserConfig.appName }}</a>
-		</h1>
-	</header>
-	<!-- header ends -->
+{% include 'power_strip.html.twig' %}
+<!-- header ends -->
 
-	{% block base %}
-		<div id="startupapi-message" class="hide">
-			<div class="alert alert-block hide">
-				<button type="button" class="close" data-dismiss="alert">&times;</button>
-				<div id="startupapi-message_copy"></div>
-			</div>
+{% block base %}
+	<div id="startupapi-message" class="hide">
+		<div class="alert alert-block hide">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<div id="startupapi-message_copy"></div>
 		</div>
-		{% block content %}
-		{% endblock %}
-	{% endblock %}
+	</div>
+	{% block content %}{% endblock %}
+{% endblock %}
 
-	<!-- footer starts -->
-	<footer class="footer startupapi-footer">
-		<div class="container">
-			<div class="pull-right">
-				<a href="http://www.startupapi.com/" target="_blank">
-					<img class="startupapi-logo" width="20" height="20" src="{{ UserConfig.USERSROOTURL }}/images/header_icon.png"/>
-					Powered by Startup API
-				</a>
-			</div>
-			<div>
-				{% if UserConfig.appName %}
-					{{ PAGE.YEAR }}
-					&copy;
-					<a href="{{ UserConfig.SITEROOTURL }}">{{ UserConfig.appName }}</a>
-				{% endif %}
-			</div>
+<!-- footer starts -->
+<footer class="footer startupapi-footer panel-footer">
+	<div class="container">
+		<div class="pull-right">
+			<a href="http://www.startupapi.com/" target="_blank">
+				<img class="startupapi-logo" width="20" height="20" hspace="5" src="{{ UserConfig.USERSROOTURL }}/images/header_icon.png"/>
+				Powered by Startup API
+			</a>
 		</div>
-	</footer>
+		{% if UserConfig.appName %}
+		<div>
+			{{PAGE.YEAR}} &copy;
+			<a href="{{UserConfig.SITEROOTURL}}">{{UserConfig.appName}}</a>
+		</div>
+		{% endif %}
+	</div>
+</footer>
+<!-- footer ends -->
 </body>
 </html>

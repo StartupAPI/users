@@ -93,6 +93,11 @@ $config_variables = array(
 						'name' => 'appName'
 					),
 					array(
+						'description' => 'Application icon URL (20x20)',
+						'type' => 'string',
+						'name' => 'appIconURL'
+					),
+					array(
 						'description' => 'File system path to maillist management widget file to be included on profile management page.',
 						'type' => 'path',
 						'name' => 'maillist'
