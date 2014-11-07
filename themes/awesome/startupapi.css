@@ -1,15 +1,25 @@
+/*
+ * Top nav
+*/
 .navbar {
 	border-radius: 0;
+	margin-bottom: 0;
 }
 
 footer.startupapi-footer {
-	position: absolute;
-	bottom: 0;
-	width: 100%;
-	height: 60px;
-
 	clear: both;
 	padding: 2em;
 	padding-bottom: 4em;
 	margin-top: 2em;
+}
+
+/*
+ * Sidebar
+*/
+.nav-stacked {
+	margin: 1em 0 0.5em 0;
+}
+
+.nav-stacked > .nav-header {
+	font-weight: bold;
 }
