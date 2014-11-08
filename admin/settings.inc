@@ -118,6 +118,12 @@ $config_variables = array(
 						'name' => 'bootstrapTheme'
 					),
 					array(
+						'description' => 'Bootstrap themes available',
+						'type' => 'string[]',
+						'name' => 'availableBootstrapThemes'
+					),
+
+					array(
 						'description' => 'If specified, Admin UI will include this Twitter Bootstrap CSS instead of default one',
 						'type' => 'url',
 						'name' => 'bootstrapAdminCSS'

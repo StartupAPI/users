@@ -10,12 +10,16 @@ footer.startupapi-footer {
 	clear: both;
 	padding: 2em;
 	padding-bottom: 4em;
-	margin-top: 2em;
 }
 
 /*
  * Sidebar
 */
+.sidebar {
+	border-radius: 0;
+	margin-bottom: 0;
+}
+
 .nav-stacked {
 	margin: 1em 0 0.5em 0;
 }

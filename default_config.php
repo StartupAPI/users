@@ -367,6 +367,29 @@ class UserConfig {
 	public static $bootstrapCSS = null;
 
 	/**
+	 * @var string[] Bootstrap themes available
+	 */
+	public static $availableBootstrapThemes = array(
+		'cerulean',
+		'cosmo',
+		'custom',
+		'cyborg',
+		'darkly',
+		'flatly',
+		'journal',
+		'lumen',
+		'paper',
+		'readable',
+		'sandstone',
+		'simplex',
+		'slate',
+		'spacelab',
+		'superhero',
+		'united',
+		'yeti'
+	);
+
+	/**
 	 * @var string If specified, StartupAPI::head() will include this Twitter Bootstrap Theme instead of default one
 	 */
 	public static $bootstrapTheme = null;
@@ -676,7 +699,6 @@ class UserConfig {
 	 */
 	public static $createPersonalAccountsIfInvitedToGroupAccount = false;
 
-
 	/**
 	 * Bypasses required account plan verification flag if set to true
 	 *
@@ -789,12 +811,12 @@ class UserConfig {
 	 * <code>
 	 * UserConfig::$PLANS = array(
 	 * 	'PLAN_FREE' => array(
-	 *			'id' => 0,
-	 *			'name' => 'Free account',
-	 *			'description' => 'Free access with basic functionality',
-	 *			'capabilities' => array(
-	 *				'individual' => true
-	 *			)
+	 * 			'id' => 0,
+	 * 			'name' => 'Free account',
+	 * 			'description' => 'Free access with basic functionality',
+	 * 			'capabilities' => array(
+	 * 				'individual' => true
+	 * 			)
 	 * 	)
 	 * );
 	 * </code>
@@ -825,7 +847,6 @@ class UserConfig {
 	 * @var string
 	 */
 	public static $default_schedule_slug = 'default';
-
 
 	/* ========================================================================
 	 *
@@ -1055,10 +1076,10 @@ EOD;
 		$account_message = '';
 
 		/*
-		if (!is_null($account)) {
-			$account_message = $account->getName() . ' on ';
-		}
-		*/
+		  if (!is_null($account)) {
+		  $account_message = $account->getName() . ' on ';
+		  }
+		 */
 
 		return "Invitation to $account_message$app from $issuer_name";
 	}
