@@ -1,0 +1,56 @@
+{% extends AUTH.current_user.is_logged_in ? 'page_with_sidebar.html.twig' : 'page.html.twig' %}
+{% import 'error_messages.html.twig' as ERR %}
+
+{% block content %}
+{% if not AUTH.current_user.is_logged_in %}
+<div class="container-fluid">
+{% endif %}
+	{% if verification_complete %}
+		<div class="page-header">
+			<h1>Thank you for verifying your email address</h1>
+		</div>
+		<p>You successfully verified your email address.</p>
+
+		<div class="form-group">
+			<a class="btn btn-primary" href="{{return}}">Click here to continue.</a>
+		</div>
+	{% else %}
+		<div class="page-header">
+			<h1>Please verify your email address</h1>
+		</div>
+		<form class="form col-sm-11 col-md-8" action="" method="GET">
+			{{ ERR.showErrors('verify_email', errors) }}
+
+			<p>
+				Confirmation code was sent to
+				{% if email %}
+					<strong>{{email}}</strong>
+				{% else %}
+					your email address
+				{% endif %}
+				<br/>
+				Please enter it below and click verify button.
+			</p>
+
+			<div class="form-group{% if errors['verify_email']['code'] %} has-error" title="{{errors['verify_email']['code']}}{% endif %}">
+				<label class="control-label" for="startupapi-code">Confirmation Code</label>
+				<div class="input-group">
+					<input class="form-control" id="startupapi-code" name="code" type="text" autocomplete="off"/>
+					<span class="input-group-btn">
+						<button class="btn btn-primary" type="submit">Verify</button>
+					</span>
+				</div>
+				<p class="help-block">
+					<span class="glyphicon glyphicon-envelope"></span>
+					<a href="{{ UserConfig.USERSROOTURL }}/send_email_verification_code.php">
+						I never got the code, please resend
+					</a>
+				</p>
+			</div>
+		</form>
+	{% endif %}
+
+{% if not AUTH.current_user.is_logged_in %}
+</div>
+{% endif %}
+{% endblock %}

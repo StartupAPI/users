@@ -1,5 +1,5 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
-{% if UserConfig.bootstrapTheme %}
+{% if UserConfig.bootstrapTheme and UserConfig.bootstrapTheme != 'default' %}
 <link href="{{ UserConfig.USERSROOTURL }}/bootswatch/{{ UserConfig.bootstrapTheme }}/bootstrap.min.css" rel="stylesheet">
 {% else %}
 <link href="{{ UserConfig.USERSROOTURL }}/bootstrap3/css/bootstrap.min.css" rel="stylesheet">

@@ -1,10 +1,28 @@
 {% macro showErrors(id, errors) %}
 	{% if id in errors|keys and errors[id]|length > 0 %}
-		<div class="alert alert-block alert-error fade-in">
-			<h4 style="margin-bottom: 0.5em">Snap!</h4>
-
+		<div class="alert alert-danger" style="margin-top: 15px">
+			<h4>Snap!</h4>
 			<ul>
 				{% for field, errorset in errors[id] %}
+					{% for error in errorset %}
+						<li>
+							<label  style="cursor: pointer" for="startupapi-{{id}}-edit-{{field}}">
+								{{error}}
+							</label>
+						</li>
+					{% endfor %}
+				{% endfor %}
+			</ul>
+		</div>
+		{% endif %}
+{% endmacro %}
+
+{% macro showModuleErrors(id, errors) %}
+	{% if errors|length > 0 %}
+		<div class="alert alert-danger" style="margin-top: 15px">
+			<h4>Snap!</h4>
+			<ul>
+				{% for field, errorset in errors %}
 					{% for error in errorset %}
 						<li>
 							<label  style="cursor: pointer" for="startupapi-{{id}}-edit-{{field}}">

@@ -1,0 +1,46 @@
+<form action="{{action}}" method="POST">
+	<div class="panel {% if oauth_user_id %}panel-success{% elseif errors %}panel-danger{% else %}panel-default{% endif %}">
+		<a name="{{ module.id }}"></a>
+		<div class="panel-heading">
+			{{module.title}}
+			{% if oauth_user_id %}
+				<button class="btn btn-xs btn-danger pull-right" type="submit" name="remove">
+					<span class="glyphicon glyphicon-remove"></span>
+					Disconnect
+				</button>
+			{% endif %}
+		</div>
+		<div class="panel-body">
+			{% if errors %}
+				<div class="alert alert-danger" style="margin-top: 15px">
+					{% for field, errorset in errors %}
+						{% for error in errorset %}
+							<div>{{error}}</div>
+						{% endfor %}
+					{% endfor %}
+				</div>
+			{% endif %}
+
+			{% if oauth_user_id %}
+				<div class="media">
+					<div class="media-body">
+						<h4 class="media-heading">{{rendered_userinfo|raw}}</h4>
+					</div>
+					<input type="hidden" name="oauth_user_id" value="{{oauth_user_id}}"/>
+				</div>
+			{% else %}
+				{% if connectButtonURL %}
+					<input type="image" src="{{connectButtonURL}}"/>
+				{% else %}
+					<button class="btn btn-xs" type="submit">
+						<span class="glyphicon glyphicon-plus"></span>
+						Connect your {{title}} account
+					</button>
+				{% endif %}
+				<input type="hidden" name="add" value="add"/>
+			{% endif %}
+			<input type="hidden" name="save" value="Save"/>
+			<input type="hidden" name="CSRF_NONCE" value="{{AUTH.CSRF_NONCE}}"/>
+		</div>
+	</div>
+</form>

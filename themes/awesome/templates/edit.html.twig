@@ -1,0 +1,71 @@
+{% extends 'page_with_sidebar.html.twig' %}
+{% block content %}
+
+{% if not current_module %}
+	<div class="page-header">
+		<h1>Profile Information</h1>
+	</div>
+
+	{{ ERR.showErrors('profile-info', errors) }}
+
+	<form class="form-horizontal" role="form" action="" method="POST">
+		<div class="form-group{% if 'name' in errors['profile-info']|keys %} has-error" title="{{ errors['profile-info']['name']|join("\n")}}{% endif %}">
+			<label class="col-sm-1 control-label" for="startupapi-profile-info-edit-name">Name</label>
+			<div class="col-sm-8 col-md-7 col-lg-5">
+				<input id="startupapi-profile-info-edit-name" class="form-control" name="name" type="text" value="{% if 'name' in data|keys %}{{ data.name }}{% else %}{{AUTH.current_user.name}}{% endif %}"/>
+			</div>
+		</div>
+
+		<div class="form-group
+			 has-feedback{% if 'email' in errors['profile-info']|keys %}
+			 has-error"
+			 title="{{ errors['profile-info']['email']|join("\n")}}{% endif %}
+			">
+			<label class="col-sm-1 control-label" for="startupapi-profile-info-edit-email">Email</label>
+			<div class="col-sm-8 col-md-7 col-lg-5">
+				<input id="startupapi-profile-info-edit-email" class="form-control" name="email" type="email" value="{% if 'email' in data|keys %}{{ data.email }}{% else %}{{AUTH.current_user.email}}{% endif %}"/>
+				{% if AUTH.current_user.email and not AUTH.current_user.is_email_verified %}
+				<div class="has-warning">
+				<p class="help-block">
+					<span class="glyphicon glyphicon-warning-sign"></span>
+					<a href="{{ UserConfig.USERSROOTURL }}/verify_email.php">
+						Email address is not verified yet, click here to verify
+					</a>
+				</p>
+				</div>
+				{% else %}
+				<span class="glyphicon glyphicon-ok form-control-feedback"></span>
+				{% endif %}
+			</div>
+		</div>
+
+		<div class="form-group">
+			<div class="col-sm-offset-1 col-sm-8 col-md-7 col-lg-5">
+				<button class="btn btn-primary" type="submit" name="save">Save Changes</button>
+			</div>
+		</div>
+		<input type="hidden" name="CSRF_NONCE" value="{{ AUTH.CSRF_NONCE }}"/>
+	</form>
+{% else %}
+	{% if compact_page %}
+	<div class="page-header">
+		<h1>Connected accounts</h1>
+	</div>
+	{% endif %}
+
+	{% for module in UserConfig.authentication_modules if compact_page and module.is_compact or not compact_page and module.id == current_module.id %}
+		{% if compact_page %}
+		<div class="row">
+			<div class="col-sm-10 col-md-8 col-lg-6">
+		{% endif %}
+
+		{{ module_forms[module.id]|raw }}
+
+		{% if compact_page %}
+			</div>
+		</div>
+		{% endif %}
+	{% endfor %}
+{% endif %}
+
+{% endblock %}

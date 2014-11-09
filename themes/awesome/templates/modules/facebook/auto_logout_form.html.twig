@@ -1,0 +1,29 @@
+<html>
+	<head><title>Logging out from Facebook...</title></head>
+	<body>
+		<div id="fb-root"></div>
+		<script src="http://connect.facebook.net/en_US/all.js"></script>
+		<script>
+			// force logout sequence after a long timeout of 5 seconds
+			setTimeout('window.location.href = "{{UserConfig.USERSROOTFULLURL}}/logout.php?autologgedout={{slug}}"', 5000);
+
+			FB.init({
+				appId  : '{{appID}}',
+				status : true, // check login status
+				cookie : true, // enable cookies to allow the server to access the session
+				channelURL : '{{UserConfig.USERSROOTFULLURL}}/modules/facebook/channel.php', // channel file
+				oauth  : true // enable OAuth 2.0
+			});
+			FB.getLoginStatus(function(response) {
+				if (response.authResponse) {
+					FB.logout(function(response) {
+						window.location.href = "{{UserConfig.USERSROOTFULLURL}}/logout.php?autologgedout={{slug}}";
+					});
+				} else {
+					window.location.href = "{{UserConfig.USERSROOTFULLURL}}/logout.php?autologgedout={{slug}}";
+				}
+			});
+		</script>
+		Logging out from Facebook...
+	</body>
+</html>
