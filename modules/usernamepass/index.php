@@ -14,7 +14,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 {
 	public function getID()
 	{
-		return "userpass";
+		return "usernamepass";
 	}
 
 	public function getLegendColor()
@@ -292,11 +292,11 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 
 		$has_username = !is_null($user->getUsername());
 
+		$username = null;
+
 		// only validate username if user didn't specify it yet
-		if (!$has_username)
-		{
-			if (array_key_exists('username', $data))
-			{
+		if (!$has_username) {
+			if (array_key_exists('username', $data)) {
 				$username = strtolower(trim(mb_convert_encoding($data['username'], 'UTF-8')));
 
 				if (strlen($username) < 2)
@@ -313,20 +313,17 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 				{
 					$errors['username'][] = "Username must start with the letter and contain only latin letters, digits or '.' symbols";
 				}
-			}
-			else
-			{
+			} else {
 				$errors['username'][] = "No username passed";
 			}
-		}
 
-		if (!$has_username)
-		{
-			$existing_users = User::getUsersByEmailOrUsername($username);
-			if (!array_key_exists('username', $errors) &&
-				(count($existing_users) > 0 && !$existing_users[0]->isTheSameAs($user))
-			) {
-				$errors['username'][] = "This username is already used, please pick another one";
+			if (!is_null($username)) {
+				$existing_users = User::getUsersByEmailOrUsername($username);
+				if (!array_key_exists('username', $errors) &&
+					(count($existing_users) > 0 && !$existing_users[0]->isTheSameAs($user))
+				) {
+					$errors['username'][] = "This username is already used, please pick another one";
+				}
 			}
 		}
 
@@ -376,7 +373,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 				}
 				else
 				{
-					$errors['pass'][] = 'You must set password when setting username and email';
+					$errors['pass'][] = 'You must set password when setting username';
 				}
 			}
 		}
