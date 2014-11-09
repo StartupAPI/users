@@ -10,14 +10,14 @@
 
 		<form class="form-horizontal" action="" method="POST">
 			<fieldset>
-				<div class="control-group{% if 'name' in errors|keys %} error" title="{{ errors['name']|join("\n")}} ?>{% endif %}">
+				<div class="control-group{% if 'name' in errors['profile-info']|keys %} error" title="{{ errors['profile-info']['name']|join("\n")}}{% endif %}">
 					<label class="control-label" for="startupapi-profile-info-edit-name">Name</label>
 					<div class="controls">
 						<input id="startupapi-profile-info-edit-name" name="name" type="text" value="{% if 'name' in data|keys %}{{ data.name }}{% else %}{{AUTH.current_user.name}}{% endif %}"/>
 					</div>
 				</div>
 
-				<div class="control-group{% if 'email' in errors|keys %} error" title="{{ errors['email']|join("\n")}} ?>{% endif %}">
+				<div class="control-group{% if 'email' in errors['profile-info']|keys %} error" title="{{ errors['profile-info']['email']|join("\n")}}{% endif %}">
 					<label class="control-label" for="startupapi-profile-info-edit-email">Email</label>
 					<div class="controls">
 						<input id="startupapi-profile-info-edit-email" name="email" type="email" value="{% if 'email' in data|keys %}{{ data.email }}{% else %}{{AUTH.current_user.email}}{% endif %}"/>

@@ -7,7 +7,7 @@
 				{% if AUTH.current_user.username %}
 					<input disabled="disabled" class="input" type="text" title="Sorry, you can't change your username" value="{{AUTH.current_user.username}}"/>
 				{% else %}
-					<input id="username" name="startupapi-{{slug}}-edit-username" type="text" required="true" value="{% if 'username' in data|keys %}{{ data.username }}{% else %}{{AUTH.current_user.username}}{% endif %}"/>
+					<input id="startupapi-{{slug}}-edit-username" name="username" type="text" required="true" value="{% if 'username' in data|keys %}{{ data.username }}{% else %}{{AUTH.current_user.username}}{% endif %}"/>
 				{% endif %}
 			</div>
 		</div>
@@ -25,9 +25,9 @@
 		<div class="control-group{% if 'pass' in errors|keys %} error" title="{{ errors['pass']|join("\n")}}{% endif %}">
 			<label class="control-label" for="startupapi-{{slug}}-edit-pass">
 				{% if AUTH.current_user.username %}
-				Set a
-				{% else %}
 				New
+				{% else %}
+				Set a
 				{% endif %}
 				password
 			</label>
