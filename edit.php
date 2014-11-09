@@ -92,6 +92,12 @@ if (array_key_exists('save', $_POST)) {
 	}
 }
 
+if (array_key_exists('error', $_GET) && $_GET['error'] == 'failed') {
+	$errors[$current_module->getID()]['login']['error'] = 'Login failed';
+}
+
+$template_info['errors'] = $errors;
+
 if (!is_null($current_module)) {
 	foreach (UserConfig::$authentication_modules as $module) {
 		$id = $module->getID();
@@ -100,12 +106,13 @@ if (!is_null($current_module)) {
 			continue;
 		}
 
+		$template_info['module']['id'] = $id;
+		$template_info['module']['title'] = $module->getTitle();
+
 		$template_info['module_forms'][$id] = $module->renderEditUserForm(
 				$template_info, "?module=$id", array_key_exists($id, $errors) ? $errors[$id] : array(), $user, $_POST
 		);
 	}
 }
-
-$template_info['errors'] = $errors;
 
 StartupAPI::$template->display('edit.html.twig', $template_info);
