@@ -27,3 +27,8 @@ footer.startupapi-footer {
 .nav-stacked > .nav-header {
 	font-weight: bold;
 }
+
+#startupapi-message {
+	display: none;
+	margin-top: 1em;
+}
