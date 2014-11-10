@@ -1,0 +1,24 @@
+{% extends 'page_with_sidebar.html.twig' %}
+
+{% block content %}
+<div class="page-header">
+	<h1>My Badges</h1>
+</div>
+	{% for badge in badges %}
+	{% if badge.slug %}
+		<a href="{{ UserConfig.USERSROOTURL }}/show_badge.php?name={{ badge.slug }}">
+			<img class="startupapi-badge"
+				 src="{{ badge.url }}"
+				 title="{{ badge.title }}"
+				 width="{{ badge.size }}"
+				 height="{{ badge.size }}"/>
+		</a>
+	{% else %}
+		<img class="startupapi-badge"
+			 src="{{ badge.placeholder_url }}"
+			 title="Hint: {{ badge.hint }}"
+			 width="{{ badge.size }}"
+			 height="{{ badge.size }}"/>
+	{% endif %}
+	{% endfor %}
+{% endblock %}
