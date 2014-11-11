@@ -1,0 +1,9 @@
+{% extends 'page_with_sidebar.html.twig' %}
+
+{% block content %}
+	<div class="page-header">
+		<h1>Email preferences</h1>
+	</div>
+
+	{{maillist_html|raw}}
+{% endblock %}
