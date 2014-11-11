@@ -421,19 +421,19 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 		if (array_key_exists('pass', $data) ||
 			array_key_exists('repeatpass', $data))
 		{
-			if (array_key_exists('pass', $data) && array_key_exists('repeatpass', $data) && $data['pass'] !== $data['repeatpass'])
-			{
-				$errors['repeatpass'] = 'Passwords don\'t match';
-			}
-
 			if (array_key_exists('pass', $data) && strlen($data['pass']) < 6)
 			{
-				$errors['pass'] = 'Passwords must be at least 6 characters long';
+				$errors['pass'][] = 'Passwords must be at least 6 characters long';
+			}
+
+			if (array_key_exists('pass', $data) && array_key_exists('repeatpass', $data) && $data['pass'] !== $data['repeatpass'])
+			{
+				$errors['repeatpass'][] = 'Passwords don\'t match';
 			}
 		}
 		else
 		{
-			$errors['pass'] = 'Passwords must be specified';
+			$errors['pass'][] = 'Passwords must be specified';
 		}
 
 		if (count($errors) > 0)

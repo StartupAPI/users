@@ -6,14 +6,14 @@
 		<div class="row-fluid">
 			<div class="span12">
 				{% if verification_complete %}
-					<div id="startupapi-verifyemail-success">
+					<div id="startupapi-{{slug}}-success">
 						<h3>Thank you for verifying your email address</h3>
 						<p>You successfully verified your email address.</p>
 						<a class="btn btn-primary" href="{{return}}">Click here to continue.</a>
 					</div>
 				{% else %}
 					<div>
-						{{ ERR.showErrors('verify_email', errors) }}
+						{{ ERR.showModuleErrors(slug, errors) }}
 
 						<h3>Please verify your email address</h3>
 						<p>
@@ -30,11 +30,11 @@
 
 						<form class="form well" action="" method="GET">
 							<fieldset>
-								<div class="control-group{% if errors['verify_email']['code'] %} error" title="{{errors['verify_email']['code']}}{% endif %}">
+								<div class="control-group{% if 'code' in errors|keys %} error" title="{{errors['code']|join("\n")}}{% endif %}">
 									<label class="control-label" for="startupapi-code">Confirmation Code</label>
 									<div class="controls">
 										<input id="startupapi-code" name="code" type="text" autocomplete="off"/>
-										<a id="startupapi-verifyemail-resend" href="{{UserConfig.USERSROOTURL}}/send_email_verification_code.php">I never got the code, please resend</a>
+										<a id="startupapi-{{slug}}-resend" href="{{UserConfig.USERSROOTURL}}/send_email_verification_code.php">I never got the code, please resend</a>
 									</div>
 								</div>
 								<div class="control-group">

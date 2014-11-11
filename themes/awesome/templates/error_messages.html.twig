@@ -6,7 +6,7 @@
 				{% for field, errorset in errors[id] %}
 					{% for error in errorset %}
 						<li>
-							<label  style="cursor: pointer" for="startupapi-{{id}}-edit-{{field}}">
+							<label  style="cursor: pointer" for="startupapi-{{id}}-{{field}}">
 								{{error}}
 							</label>
 						</li>
@@ -25,7 +25,7 @@
 				{% for field, errorset in errors %}
 					{% for error in errorset %}
 						<li>
-							<label  style="cursor: pointer" for="startupapi-{{id}}-edit-{{field}}">
+							<label  style="cursor: pointer" for="startupapi-{{id}}-{{field}}">
 								{{error}}
 							</label>
 						</li>

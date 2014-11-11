@@ -45,4 +45,7 @@ $template_info = StartupAPI::getTemplateInfo();
 if (array_key_exists('status', $_GET) && $_GET['status'] == 'sent') {
 	$template_info['sent'] = TRUE;
 }
+
+$template_info['slug'] = 'usernamepass';
+
 StartupAPI::$template->display('modules/usernamepass/forgotpassword.html.twig', $template_info);

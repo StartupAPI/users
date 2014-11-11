@@ -1,0 +1,21 @@
+{% extends AUTH.current_user.is_logged_in ? 'page_with_sidebar.html.twig' : 'page.html.twig' %}
+
+{% block content %}
+	<div class="container-fluid" style="margin-top: 1em">
+		<div class="row-fluid">
+			{% if email %}
+				<div class="page-header">
+					<h1>Verification code sent</h1>
+				</div>
+				<p>Verification code was sent to <span class="startupapi-email-to-verify">{{email}}</span></p>
+				<p><a class="btn btn-primary" href="{{UserConfig.USERSROOTURL}}/verify_email.php">Click here when you receive it</a></p>
+			{% else %}
+				<div class="page-header">
+					<h1>No email address provided</h1>
+				</div>
+				<p>You don't have an email set for your profile.</p>
+				<p><a class="btn btn-primary" href="{{UserConfig.USERSROOTURL}}/edit.php">Click here to add email address</a></p>
+			{% endif %}
+		</div>
+	</div>
+{% endblock %}

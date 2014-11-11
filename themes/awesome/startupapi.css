@@ -32,3 +32,22 @@ footer.startupapi-footer {
 	display: none;
 	margin-top: 1em;
 }
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 3em;
+}
+footer.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 3em;
+  background-color: #f5f5f5;
+}

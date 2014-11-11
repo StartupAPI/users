@@ -40,6 +40,7 @@ if (array_key_exists('code', $_GET)) {
 	$template_info['code'] = trim($_GET['code']);
 }
 
+$template_info['slug'] = 'emaillogin';
 $template_info['errors']['emaillogin'] = $errors;
 
 #var_export($template_info['errors']); exit;

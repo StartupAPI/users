@@ -15,5 +15,6 @@ if (!is_null($email)) {
 
 $template_info = StartupAPI::getTemplateInfo();
 $template_info['email'] = $email;
+$template_info['PAGE']['SECTION'] = 'profile_info';
 
 StartupAPI::$template->display('send_email_verification_code.html.twig', $template_info);

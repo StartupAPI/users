@@ -32,8 +32,10 @@ if (array_key_exists('save', $_POST))
 	}
 	catch(InputValidationException $ex)
 	{
-		$template_info['errors']['passwordreset'] = $ex->getErrors();
+		$template_info['errors'] = $ex->getErrors();
 	}
 }
+
+$template_info['slug'] = 'usernamepass';
 
 StartupAPI::$template->display('modules/usernamepass/passwordreset.html.twig', $template_info);
