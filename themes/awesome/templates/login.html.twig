@@ -9,7 +9,7 @@
 		<div style="margin-bottom: 2em">
 			<h3 name="{{ module.id }}">{{ module.title }}</h3>
 			{% if login_failed[module.id] %}
-				<div class="alert alert-error">Login failed</div>
+				<div class="alert alert-danger">Login failed</div>
 			{% endif %}
 			<div style="margin-bottom: 2em">
 				{{ module_forms[module.id]|raw }}
