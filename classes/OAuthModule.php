@@ -554,13 +554,6 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		$template_info['errors'] = $errors;
 		$template_info['data'] = $data;
 
-		if (UserConfig::$currentTOSVersion && is_callable(UserConfig::$onRenderTOSLinks)) {
-			ob_start();
-			call_user_func(UserConfig::$onRenderTOSLinks);
-			$template_info['TOSlinks'] = ob_get_contents();
-			ob_end_clean();
-		}
-
 		$template_info['serviceName'] = $this->serviceName;
 		$template_info['signUpButtonURL'] = $this->signUpButtonURL;
 

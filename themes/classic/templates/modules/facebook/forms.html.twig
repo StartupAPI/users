@@ -21,8 +21,8 @@
 <input type="hidden" name="{{formsubmit}}" value="Connect &gt;&gt;&gt;"/>
 <input type="hidden" name="CSRF_NONCE" value="{{ AUTH.CSRF_NONCE }}"/>
 </form>
-{% if form == 'register' and TOSlinks %}
-	{{TOSlinks}}
+{% if form == 'register' and PAGE.TOSlinks %}
+	{{PAGE.TOSlinks|raw}}
 {% endif %}
 <a class="startupapi-fb-connect" href="#" onclick="UserBaseFBConnectButtonClicked(); return false;">
 	<span style="background-image: url({{UserConfig.USERSROOTURL}}/modules/facebook/facebook-sprite.png); {{buttonspritestyle}} display: block; cursor: hand; margin-top: 0.3em" title="{{buttontitle}}"></span>

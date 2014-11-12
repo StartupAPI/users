@@ -23,7 +23,7 @@
 			">
 			<label class="col-sm-1 control-label" for="startupapi-profile-info-email">Email</label>
 			<div class="col-sm-8 col-md-7 col-lg-5">
-				<input id="startupapi-profile-info-email" class="form-control" name="email" type="email" value="{% if 'email' in data|keys %}{{ data.email }}{% else %}{{AUTH.current_user.email}}{% endif %}"/>
+				<input id="startupapi-profile-info-email" class="form-control" name="email" type="email" placeholder="john@example.com" value="{% if 'email' in data|keys %}{{ data.email }}{% else %}{{AUTH.current_user.email}}{% endif %}"/>
 				{% if AUTH.current_user.email and not AUTH.current_user.is_email_verified %}
 				<div class="has-warning">
 				<p class="help-block">

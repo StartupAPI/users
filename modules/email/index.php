@@ -195,7 +195,7 @@ class EmailAuthenticationModule extends AuthenticationModule {
 	}
 
 	/**
-	 * REgisters a user, but instead of logging them in, sends a link to their email address for clicking back
+	 * Registers a user, but instead of logging them in, sends a link to their email address for clicking back
 	 *
 	 * @param array $data Form data
 	 * @param boolean $remember Remember user or not
@@ -242,6 +242,10 @@ class EmailAuthenticationModule extends AuthenticationModule {
 		$user = User::createNewWithoutCredentials($this, $name, $email);
 		$user->recordActivity(USERBASE_ACTIVITY_REGISTER_EMAIL);
 //		$user->sendConfirmationEmail();
+
+		header('Location: ' . UserConfig::$USERSROOTURL . '/modules/email/login.php?module=email&message=linksent&email=' . rawurlencode($email));
+		exit;
+
 		return null;
 	}
 

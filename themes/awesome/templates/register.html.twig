@@ -1,0 +1,42 @@
+{% extends 'page.html.twig' %}
+{% import 'error_messages.html.twig' as ERR %}
+
+{% block content %}
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="page-header">
+			<h1>Sign up</h1>
+		</div>
+		{% if UserConfig.enableRegistration %}
+			{% if UserConfig.adminInvitationOnly and not show_registration_form %}
+				<form class="form" id="form" action="" method="GET">
+					<div>
+						{{UserConfig.invitationRequiredMessage|raw}}
+					</div>
+					{% if message %}
+						<div class="alert alert-danger">{{message}}</div>
+					{% endif %}
+					<input name="invite" class="form-input" value="{{invite_code}}"/>
+					<button class="btn btn-primary" type="submit">Continue &rarr;</button>
+				</form>
+			{% endif %}
+
+			{% if show_registration_form %}
+				{% for module in UserConfig.authentication_modules %}
+					<div style="margin-bottom: 2em">
+						<h3 name="{{module.id}}">{{module.title}}</h3>
+
+						{{ ERR.showErrors(module.id, errors) }}
+
+						{{ module_forms[module.id]|raw }}
+					</div>
+				{% endfor %}
+			{% endif %}
+		{% else %}
+			<p>{{UserConfig.registrationDisabledMessage}}</p>
+
+			<p>If you already have an account, you can <a href="{{UserConfig.USERSROOTURL}}/login.php">log in here</a>.</p>
+		{% endif %}
+	</div>
+</div>
+{% endblock %}

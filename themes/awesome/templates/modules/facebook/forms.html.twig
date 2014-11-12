@@ -21,8 +21,8 @@
 <input type="hidden" name="{{formsubmit}}" value="Connect &gt;&gt;&gt;"/>
 <input type="hidden" name="CSRF_NONCE" value="{{ AUTH.CSRF_NONCE }}"/>
 </form>
-{% if form == 'register' and TOSlinks %}
-	{{TOSlinks}}
+{% if form == 'register' and PAGE.TOSlinks %}
+	{{PAGE.TOSlinks|raw}}
 {% endif %}
 
 {% if form == 'connect' %}

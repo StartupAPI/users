@@ -271,6 +271,13 @@ class StartupAPI {
 			'YEAR' => date('Y')
 		);
 
+		if (UserConfig::$currentTOSVersion && is_callable(UserConfig::$onRenderTOSLinks)) {
+			ob_start();
+			call_user_func(UserConfig::$onRenderTOSLinks);
+			$page_info['TOSlinks'] = ob_get_contents();
+			ob_end_clean();
+		}
+
 		if (!is_null(UserConfig::$onLoginStripLinks)) {
 			$links = call_user_func_array(UserConfig::$onLoginStripLinks, array($current_user, $current_account));
 			if (is_array($links)) {

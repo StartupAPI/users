@@ -218,13 +218,6 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		$template_info['permissions'] = $this->permissions;
 		$template_info['permissions_string'] = implode(',', $this->permissions);
 
-		if (UserConfig::$currentTOSVersion && is_callable(UserConfig::$onRenderTOSLinks)) {
-			ob_start();
-			call_user_func(UserConfig::$onRenderTOSLinks);
-			$template_info['TOSlinks'] = ob_get_contents();
-			ob_end_clean();
-		}
-
 		return StartupAPI::$template->render("modules/facebook/forms.html.twig", $template_info);
 	}
 
