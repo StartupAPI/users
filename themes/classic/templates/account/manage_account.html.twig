@@ -21,7 +21,7 @@
 			<p>
 				<form action="{{UserConfig.USERSROOTURL}}/controller/account.php" method="POST">
 					<input type="hidden" name="CSRF_NONCE" value="{{ AUTH.CSRF_NONCE }}"/>
-					Individual accout
+					Individual account
 					{%if user %}
 						for <i class="icon-user"></i> {{ user.name }}
 					{%endif%}
