@@ -1,0 +1,36 @@
+{% extends 'page_with_sidebar.html.twig' %}
+{% import 'error_messages.html.twig' as ERR %}
+
+{% block content %}
+	<div class="page-header">
+		<h1>
+			Edit Account Info / <b>{{account_name}}</b>
+		</h1>
+	</div>
+
+	{{ ERR.showErrors('edit-account', errors) }}
+
+	<form class="form" action="" method="POST">
+		<div class="row">
+			<div class="form-group col-sm-8 col-md-6 col-lg-4">
+				<label class="control-label" for="startupapi-admin-account-edit-name">Account Name</label>
+
+				<input class="form-control"
+					   type="text"
+					   id="startupapi-admin-account-edit-name"
+					   name="account_name"
+					   value="{{account_name}}"
+					   onfocus="this.value = this.value;">
+				<script>
+					$('#startupapi-admin-account-edit-name').focus();
+				</script>
+			</div>
+		</div>
+
+		<div class="form-group">
+				<button type="submit" class="btn btn-primary">Update Account</button>
+				<a class="btn btn-default" href="{{UserConfig.USERSROOTURL}}/manage_account.php">Discard Changes</a>
+		</div>
+		<input type="hidden" name="CSRF_NONCE" value="{{ AUTH.CSRF_NONCE }}"/>
+	</form>
+{% endblock %}
