@@ -1,0 +1,141 @@
+{% extends 'page_with_sidebar.html.twig' %}
+
+{% block content %}
+	<script>
+		STARTUPAPI.showMessages({
+			"user-removed": { 'class': 'success', 'text': 'User removed'},
+			"user-promoted": { 'class': 'success', 'text': 'User successfully promoted'},
+			"user-demoted": { 'class': 'success', 'text': 'User successfully demoted'},
+			"updated": { 'class': 'success', 'text': 'Account name updated'},
+		});
+	</script>
+
+	<div class="page-header">
+		<h1>
+			Accounts / <b>{{ account_name }}</b>
+			{% if account_isAdmin and not account_isIndividual %}
+				<a href="{{UserConfig.USERSROOTURL}}/edit_account.php" class="btn btn-default btn-xs">
+					<i class="glyphicon glyphicon-pencil"></i> Edit
+				</a>
+			{%endif%}
+		</h1>
+	</div>
+	{% if account_isIndividual %}
+		<form action="{{UserConfig.USERSROOTURL}}/controller/account.php" method="POST">
+			<input type="hidden" name="CSRF_NONCE" value="{{ AUTH.CSRF_NONCE }}"/>
+			Individual account
+			{% if user %}
+				for <i class="glyphicon glyphicon-user"></i> {{ user.name }}
+			{% endif %}
+		</form>
+	{%endif%}
+
+	{% if account_isAdmin %}
+	<div>
+		Status:
+		{% if account_isActive %}
+			<b class="label label-success">Active</b>
+		{%else%}
+			<b class="badge badge-important">Suspended</b>
+		{%endif%}
+
+		Plan:
+		{% if planIsSet %}
+			<span class="label label-info"><i class="glyphicon glyphicon-briefcase"></i> {{ plan_name }}</span>
+		{% else %}
+			<span class="label label-danger">NONE</span>
+		{% endif %}
+
+		{% if UserConfig.useSubscriptions %}
+			<a class="btn btn-default btn-xs" href="{{UserConfig.USERSROOTURL}}/subscription_details.php">
+				<i class="glyphicon glyphicon-list"></i>
+				Subscription details
+			</a>
+		{%endif%}
+	</div>
+	{%endif%}
+
+	{% if show_user_list %}
+		{% if account_isAdmin %}
+			<h3>Account Users</h3>
+			{% if account_isIndividual %}
+				{% if individual_no_admins %}
+					<p class="alert alert-danger">Attention, individual account has no admin user set</p>
+				{%else%}
+					<p class="alert alert-danger">Attention, multiple users are defined for an individual account</p>
+				{%endif%}
+			{%endif%}
+
+			<form action="{{UserConfig.USERSROOTURL}}/controller/account/account.php" method="POST">
+				<input type="hidden" name="CSRF_NONCE" value="{{ AUTH.CSRF_NONCE }}"/>
+
+				<table class="table table-striped">
+				{%for user in users %}
+					<tr>
+						<td>
+							<i class="glyphicon glyphicon-user"></i>
+							{{ user.name }}
+
+							{% if user.self %}
+							(it's you)
+							{% endif %}
+						</td>
+						<td>
+							{% if user.admin %}
+								<span class="label label-danger pull-right">admin</span>
+							{%endif%}
+						</td>
+
+						{% if user.self %}
+							<td>
+								<button class="btn btn-danger btn-xs disabled" disabled>
+									<i class="glyphicon glyphicon-circle-arrow-down"></i> Demote
+								</button>
+							</td>
+							<td>
+								<button class="btn btn-default btn-xs pull-right disabled" disabled>
+									<i class="glyphicon glyphicon-remove"></i> Remove
+								</button>
+							</td>
+
+						{%else%}
+							<td>
+								{% if user.admin %}
+									<button class="btn btn-xs btn-danger{% if user.self %} disabled{%endif%}" name="demote_user" value="{{ user.id }}">
+										<i class="glyphicon glyphicon-circle-arrow-down"></i> Demote
+									</button>
+								{%else%}
+									<button class="btn btn-default btn-xs{% if user.self %} disabled{%endif%}" name="promote_user" value="{{ user.id }}">
+										<i class="glyphicon glyphicon-circle-arrow-up"></i> Promote
+									</button>
+								{%endif%}
+							</td>
+							<td>
+								<button class="btn btn-default btn-xs pull-right remove_button" name="remove_user" value="{{ user.id }}"><i class="glyphicon glyphicon-remove"></i> Remove</button>
+							</td>
+						{%endif%}
+					</tr>
+				{%endfor%}
+				</table>
+				{% if not account_isIndividual %}
+					<a class="btn btn-default btn-xs" href="{{UserConfig.USERSROOTURL}}/invitations.php?joinaccount=yes"><i class="glyphicon glyphicon-plus"></i> Invite more users</a>
+				{%endif%}
+				<script>
+					$('.remove_button').on('click', function() {
+						 return confirm('Are you sure you want to remove this user?');
+					});
+				</script>
+			</form>
+		{%else%}
+			<h3>Administrators</h3>
+			{%for user in users %}
+				{% if user.admin %}
+					<div>
+						<i class="glyphicon glyphicon-user"></i>
+						{{ user.name }}
+					</div>
+				{%endif%}
+			{%endfor%}
+		{%endif%}
+	{%endif%}
+{% endblock %}
