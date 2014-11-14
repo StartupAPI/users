@@ -81,6 +81,7 @@ code:
 test:	cleantest runtests
 
 runtests:
+	npm install
 	nohup phantomjs --webdriver=4444 --cookies-file=tests/run/cookies.txt &
 	sleep 1
 	-node tests/test.js http://howdoable.lc/users/ tests/run/
@@ -90,3 +91,6 @@ runtests:
 cleantest:
 	rm -rf tests/run/
 	rm -f nohup.out
+
+distclean: cleantest
+	rm -rf node_modules/
