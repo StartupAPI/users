@@ -77,3 +77,16 @@ apigen:
 code:
 	php phptidy/phptidy.php replace
 	find . -name '*.phptidybak~' | xargs -n10 rm
+
+test:	cleantest runtests
+
+runtests:
+	nohup phantomjs --webdriver=4444 --cookies-file=tests/run/cookies.txt &
+	sleep 1
+	-node tests/test.js http://howdoable.lc/users/ tests/run/
+	-killall phantomjs
+	open tests/run/*.png
+
+cleantest:
+	rm -rf tests/run/
+	rm -f nohup.out

@@ -4,3 +4,6 @@ tags
 cache
 .phptidy-cache
 .DS_Store
+node_modules
+tests/run/
+nohup.out

@@ -1,0 +1,14 @@
+{
+  "name": "StartupAPI",
+  "author": "Sergey Chernyshev",
+  "version": "0.1.0",
+  "devDependencies": {
+    "webdriverio": "~2.3.0",
+    "phantomjs": ">=1.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:StartupAPI/users.git"
+  }
+}
+
