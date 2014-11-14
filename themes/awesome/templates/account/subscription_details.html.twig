@@ -1,0 +1,113 @@
+{% extends 'page_with_sidebar.html.twig' %}
+{% import 'error_messages.html.twig' as ERR %}
+
+{% block content %}
+	<div class="page-header">
+		<h1>
+			Accounts /
+			<a href="{{UserConfig.USERSROOTURL}}/manage_account.php"><b>{{ account_name }}</b></a> /
+			Subscription Details
+		</h1>
+	</div>
+
+	{% if message %}
+		{% for msg in message %}
+			<div class="alert">{{ msg }}</div>
+		{% endfor %}
+	{% endif %}
+
+	{% if not fatal %}
+		<div>
+			<p>
+				Account Status:
+				{% if account_isActive %}
+					<b class="label label-success">Active</b>
+				{% else %}
+					<b class="lavel label-important">Suspended</b>
+				{% endif %}
+			</p>
+		</div>
+
+		<div>
+			<h3>Plan</h3>
+			<p>
+				Name:
+				<b>{{ plan_name }}</b>
+				<a class="btn btn-default btn-xs" href="{{UserConfig.USERSROOTURL}}/plans.php">
+					<i class="glyphicon glyphicon-pencil"></i>
+					Change
+				</a>
+			</p>
+			
+			<p>Description: {{ plan_description }}</p>
+			
+			{% if plan_details_url %}
+				<p>Details: <a href="{{ plan_details_url }}">{{ plan_details_url }}</a></p>
+			{% endif %}
+			{%if plan_downgrade_to_name %}
+				<p>Plan automatically downgrades to: <b>{{ plan_downgrade_to_name }}</b>
+					if payment is due more than {{ plan_grace_period }} day(s)</p>
+			{%endif%}
+			{%if schedule_name %}
+				<p>Payment Schedule: <b>{{ schedule_name }}</b></p>
+				<p>Payment Schedule description: {{ schedule_description }}</p>
+				<p>Charge Amount: <b>${{ "%.2f"|format(schedule_charge_amount) }}</b></p>
+				<p>Charge Period: <b>{{ schedule_charge_period }}</b> days</p>
+			{%endif%}
+		</div>
+		<div>
+			<h3>Payments</h3>
+			{%if charges|length > 0 or balance < 0 %}
+				<p>Account charges</p>
+				<ul>
+					{% set total = 0 %}
+					{% for c in charges %}
+						<li>{{ c.datetime }} ${{ c.amount }}</li>
+						{% set total = total + c.amount %}
+					{% endfor %}
+				</ul>
+				<p>Total debt: <b>${{ "%.2f"|format(total) }}</b></p>
+			{%else%}
+				<p>Account Balance: <b>${{ "%.2f"|format(balance) }}</b></p>
+			{%endif%}
+		</div>
+		{%if account_next_charge %}
+			<div>
+				<p>Next charge: <b>{{ account_next_charge }}</b></p>
+			</div>
+		{% endif %}
+		{%if next_plan_name and next_plan_name != plan_name %}
+			<div>
+				<p>After this date following plan used:</p>
+				<p>Plan Name: <b>{{next_plan_name}}</b></p>
+				<p>Plan Description: {{next_plan_description}}</p>
+				<p>Plan Details: <a href="{{plan_details_url}}">{{next_plan_details_url}}</a></p>
+
+			</div>
+		{%endif%}
+		{%if next_schedule_name and next_plan_name == plan_name %}
+			<p>After this date following schedule used:</p>
+		{%endif%}
+		{%if next_schedule_name %}
+			<p>Payment Schedule: <b>{{next_schedule_name}}</b></p>
+			<p>Payment Schedule description: {{next_schedule_description}}</p>
+			<p>Charge Amount: <b>${{next_schedule_charge_amount}}</b></p>
+			<p>Charge Period: <b>{{next_schedule_charge_period}}</b> days</p>
+		{%endif%}
+		{%if next_schedule_name or next_plan_name %}
+			<p>You can <a href="{{UserConfig.USERSROOTURL}}/controller/account/cancel.php"
+						  onclick="return confirm('Sure to cancel request?')">[cancel]</a> switching to this plan/schedule</p>
+		{%endif%}
+		{%if payment_engine %}
+		<div>
+			<p>Payments processed by: <b>{{ payment_engine }}</b></p>
+		</div>
+		{%endif%}
+		<div>
+			<a class="btn btn-default btn-xs" href="{{UserConfig.USERSROOTURL}}/transaction_log.php">
+				<i class="glyphicon glyphicon-list-alt"></i>
+				View account transactions
+			</a>
+		</div>
+	{% endif %}
+{% endblock %}

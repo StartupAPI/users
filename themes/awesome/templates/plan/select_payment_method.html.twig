@@ -1,0 +1,121 @@
+{% extends AUTH.current_user.is_logged_in ? 'page_with_sidebar.html.twig' : 'page.html.twig' %}
+{% import 'error_messages.html.twig' as ERR %}
+
+{% block content %}
+	{% for msg in message %}
+	<p class="alert alert-danger">
+		<button type="button" class="close" data-dismiss="alert">×</button>
+		{{ msg }}
+	</p>
+	{% endfor %}
+
+	{% if not fatal %}
+	<div class="page-header">
+		<h1>
+			<a href="{{UserConfig.USERSROOTURL}}/plans.php">Subscription</a> /
+			{{ plan.name }}
+		</h1>
+	</div>
+
+	{% if plan.description %}
+		<p>{{ plan.description }}</p>
+	{% endif %}
+
+	<form action="" method="POST">
+		<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
+
+		{% if plan.schedules and plan.schedules|length > 0 %}
+			<style>
+			.schedules {
+				max-width: 650px;
+			}
+
+			.schedules .well {
+				border-color: grey;
+			}
+
+			.schedules .startupapi-payment-schedule-highlighted {
+				background-color: silver;
+			}
+			</style>
+
+			<div class="schedules">
+
+			{% set n = 0 %}
+			{% for schedule in plan.schedules %}
+				{% set engine_slug = "unknown" %}
+
+				{% set well_extra_class = '' %}
+
+				{% if next_chosen %}
+					{%if schedule.chosen %}
+						{% set well_extra_class = ' startupapi-payment-schedule-highlighted' %}
+					{% endif %}
+				{% else %}
+					{% if schedule.current %}
+						{% set well_extra_class = ' startupapi-payment-schedule-highlighted' %}
+					{% endif %}
+				{% endif %}
+
+				<div class="well{{ well_extra_class }}">
+					<div class="pull-right" style="text-align: right">
+						{% set months_in_period = (schedule.charge_period / 30)|round(0, 'floor') %}
+						{% set dollars = (schedule.charge_amount / months_in_period)|round(0, 'floor') %}
+						{% set cents = ((schedule.charge_amount / months_in_period)|round(2, 'ceil') - dollars) * 100 %}
+						<h2>
+							${{dollars}}{% if cents > 0 %}<sup><small>{{cents}}</small></sup>{% endif %}
+							/
+							month
+						</h2>
+						<p style="margin-top: 1em">
+							{{ schedule.description }}
+							{% if months_in_period > 1 %}
+								: ${{ schedule.charge_amount}}
+							{% endif %}
+						</p>
+
+						{% for engine in payment_engines %}
+							<button
+								class="btn btn-success"
+								type="submit"
+								name="plan"
+								id="payment-button-{{plan.slug}}-{{schedule.slug}}-{{engine.slug}}"
+								value="{{ plan.slug }}.{{ schedule.slug }}.{{ engine.slug }}"
+								{% if not plan.available
+									or (engine.requires_pre_payment
+										and balance < schedule.charge_amount)
+								%} disabled{% endif %}
+									>
+								{{ engine.button_label }}
+							</button>
+							{% set engine_slug = engine.slug %}
+						{% endfor %}
+					</div>
+
+					<label {% if engine|length > 1 %}for="payment-button-{{plan.slug}}-{{schedule.slug}}-{{engine_slug}}"{% endif %}
+						{% if schedule.current %} class="userbase-account-current-schedule"{% endif %}
+					>
+						<span class="userbase-account-schedule-name">{{ schedule.name }}</span>
+						<br/>
+						<span class="userbase-account-schedule-details">{{ schedule.description }}</span>
+						{% if next_chosen %}
+							<br/>
+							{%if schedule.current %}
+								<span class="label label-important">until {{ next_charge|date("M d, Y") }}</span>
+							{% endif %}
+							{% if schedule.chosen %}
+								<span class="label label-success">starting {{ next_charge|date("M d, Y") }}</span>
+							{% endif %}
+						{% endif %}
+					</label>
+
+					<div class="clearfix"></div>
+				</div>
+				{% set n = n + 1 %}
+			{% endfor %}
+			</div>
+
+		{% endif %}
+	</form>
+	{% endif %}
+{% endblock %}

@@ -28,6 +28,7 @@ if ($account->getUserRole($user) !== Account::ROLE_ADMIN) {
 UserTools::preventCSRF();
 
 $template_info = StartupAPI::getTemplateInfo();
+$template_info['account_name'] = $account->getName();
 
 if (!session_id()) {
 	session_start();

@@ -106,6 +106,7 @@ You can also swith navbar to "pills" mode (no navbar) by setting UserConfig::$po
 		<li id="startupapi-navbox-signup"><a href="{{ UserConfig.USERSROOTURL }}/register.php">Sign Up</a></li>
 		<li id="startupapi-navbox-login"><a href="{{ UserConfig.USERSROOTURL }}/login.php">Log in</a></li>
 	{% endif %}
+
 </ul>
 
 {% if AUTH.current_user.is_logged_in and AUTH.current_user.is_impersonated %}

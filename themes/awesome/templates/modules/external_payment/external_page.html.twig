@@ -1,0 +1,15 @@
+{% extends 'page.html.twig' %}
+
+{% block content %}
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="page-header">
+				<h1>{{engine.name}}</h1>
+			</div>
+			{% if engine.logo %}
+			<img src="{{engine.logo}}"/>
+			{% endif %}
+			<a class="btn btn-success btn-lg" href="{{UserConfig.USERSROOTFULLURL}}/modules/external_payment/callback.php?{{QUERY_STRING}}&amp;paid=yes">Paid!</a>
+		</div>
+	</div>
+{% endblock %}

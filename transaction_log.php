@@ -59,7 +59,7 @@ $from_to = (is_null($date['from']) ? '' : '&from='.$date['from']).(is_null($date
 $template_info['from_to'] = $from_to;
 
 # Pagination
-$perpage = 20;
+$perpage = 5;
 $page = isset($_REQUEST['page']) ? intval($_REQUEST['page']) : 0;
 $offset = $page * $perpage;
 $template_info['perpage'] = $perpage;

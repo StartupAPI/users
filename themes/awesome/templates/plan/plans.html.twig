@@ -1,0 +1,207 @@
+{% extends 'page_with_sidebar.html.twig' %}
+{% import 'error_messages.html.twig' as ERR %}
+
+{% block content %}
+	{% for msg in message %}
+	<p class="alert alert-danger">
+		<button type="button" class="close" data-dismiss="alert">×</button>
+		{{ msg }}
+	</p>
+	{% endfor %}
+
+	{% if not fatal %}
+	<div class="page-header">
+		<h1>
+			Accounts /
+			<a href="{{UserConfig.USERSROOTURL}}/manage_account.php"><b>{{ account_name }}</b></a> /
+			Choose Plan
+		</h1>
+	</div>
+
+	<style>
+		.userbase-account-plan-container {
+			float: left;
+		}
+		.userbase-account-plan-element {
+			float: left;
+		}
+		.userbase-account-spacer {
+			clear: both;
+		}
+		.userbase-account-top-paragraph {
+			margin-top: 0px;
+		}
+		.userbase-account-plan-title {
+			font-size: x-large;
+			margin-bottom: 0;
+		}
+		.userbase-account-plan-base-price {
+			margin-top: 0;
+			font-weight: normal;
+		}
+		label.userbase-account-current-schedule .userbase-account-schedule-name {
+			font-weight: bold;
+		}
+		label.userbase-account-current-plan .userbase-account-plan-name {
+			font-weight: bold;
+		}
+		table.userbase-account-plans-table  {
+			border-width: 2px;
+			border-spacing: 0px;
+			border-style: solid;
+			border-color: black;
+			border-collapse: separate;
+		}
+		table.userbase-account-plans-table th {
+			border-width: 1px;
+			padding: 1em;
+			border-style: solid;
+			border-color: gray;
+		}
+		table.userbase-account-plans-table td {
+			border-width: 1px;
+			padding: 1em;
+			border-style: solid;
+			border-color: gray;
+		}
+		td.userbase-account-pay-button, td.userbase-account-next-plan-dates {
+			text-align: center;
+		}
+		table.userbase-account-plans-table th.userbase-account-plan-current {
+			background-color: silver;
+		}
+		table.userbase-account-plans-table td.userbase-account-plan-current {
+			background-color: silver;
+		}
+		table.userbase-account-plans-table tr.userbase-account-schedule-selector {
+			vertical-align: top;
+		}
+
+		table.userbase-account-plan-schedules {
+		}
+		table.userbase-account-plan-schedules td {
+			vertical-align: top;
+			padding: 0.2em;
+			border: 0;
+		}
+		.userbase-account-schedule-name {
+			font-size: large;
+		}
+		.userbase-account-schedule-details {
+			color: gray;
+		}
+	</style>
+
+	<form action="" method="POST">
+		{% set next_chosen = false %}
+		{% set show_chosen = false %}
+		{% set plan_change_mode = false %}
+		{% set col = 0 %}
+
+		{% for plan in plans %}
+			{% if plan.current or plan.chosen %}
+				{% set plan_change_mode = true %}
+			{% endif %}
+			{% if plan.chosen %}
+				{% set next_chosen = true %}
+			{% endif %}
+			{% if next_chosen and (plan.current or plan.chosen) and not (plan.current and plan.chosen) %}
+				{% set show_chosen = true %}
+			{% endif %}
+			{% if plan.schedules | length > 0 %}
+				{% for schedule in plan.schedules %}
+					{% if schedule.chosen %}
+						{% set next_chosen = true %}
+					{% endif %}
+				{% endfor %}
+			{% endif %}
+		{% endfor %}
+
+		<input type="hidden" name="CSRF_NONCE" value="{{ CSRF_NONCE }}"/>
+
+		<table class="userbase-account-plans-table">
+			{% set col = 0 %}
+			<tr>
+				{% for plan in plans %}
+				<th {% if plan.is_base_plan %} class="userbase-account-plan-current"{% endif %}>
+					<h3>
+						{% if plan.details_url %}
+						<a href="{{ plan.details_url }}">{{ plan.name }}</a>
+						{% else %}
+							{{ plan.name }}
+						{% endif %}
+					</h3>
+					<p class="userbase-account-plan-base-price">
+						{% if plan.base_price %}
+							${{ plan.base_price }} / {{ plan.base_period }}
+						{% else %}
+							free
+						{% endif %}
+					</p>
+
+					{% set col = col + 1 %}
+				</th>
+				{% endfor %}
+			</tr>
+
+			{% set col = 0 %}
+			<tr>
+				{% for plan in plans %}
+				<td{% if plan.is_base_plan %} class="userbase-account-plan-current"{% endif %}>
+					{{ plan.description }}
+				</td>
+				{% set col = col + 1 %}
+				{% endfor %}
+			</tr>
+
+			{% set col = 0 %}
+			<tr>
+				{% for plan in plans %}
+					<td class="userbase-account-pay-button {% if plan.is_base_plan %} userbase-account-plan-current{% endif %}">
+						{% if plan.available %}
+							{% set button_label = 'Sign Up' %}
+							{% if plan_change_mode %}
+								{% if next_chosen and plan.chosen or not next_chosen and plan.current %}
+									{% set button_label = 'Change Settings' %}
+								{% else %}
+									{% if plan.base_price > base_plan.base_price %}
+										{% set button_label = 'Upgrade' %}
+									{% else %}
+										{% set button_label = 'Downgrade' %}
+									{% endif %}
+								{% endif %}
+							{% endif %}
+
+							{% if plan.schedules and plan.schedules|length > 0 %}
+								<a class="btn btn-default" href="?plan={{ plan.slug }}">{{ button_label }}</a>
+							{% else %}
+								<button class="btn btn-default" name="plan" value="{{ plan.slug }}">{{ button_label }}</button>
+							{% endif %}
+						{% else %}
+							<input class="btn btn-default disabled" type="button" value="Coming soon"/>
+						{% endif %}
+					</td>
+					{% set col = col + 1 %}
+				{% endfor %}
+			</tr>
+
+			{% if show_chosen %}
+				{% set col = 0 %}
+				<tr>
+					{% for plan in plans %}
+						<td class="userbase-account-next-plan-dates{% if plan.is_base_plan %} userbase-account-plan-current{% endif %}">
+							{% if plan.current %}
+								<span class="label label-warning">until {{ next_charge|date("M d, Y")}}</span>
+							{% endif %}
+							{% if plan.chosen %}
+								<span class="label label-success">starting {{ next_charge|date("M d, Y")}}</span>
+							{% endif %}
+						</td>
+						{% set col = col + 1 %}
+					{% endfor %}
+				</tr>
+			{% endif %}
+		</table>
+	</form>
+	{% endif %}
+{% endblock %}
