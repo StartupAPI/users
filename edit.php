@@ -110,7 +110,7 @@ if (!is_null($current_module)) {
 		$template_info['module']['title'] = $module->getTitle();
 
 		$template_info['module_forms'][$id] = $module->renderEditUserForm(
-				$template_info, "?module=$id", array_key_exists($id, $errors) ? $errors[$id] : array(), $user, $_POST
+				$template_info, "?module=$id", $errors, $user, $_POST
 		);
 	}
 }

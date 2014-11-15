@@ -263,7 +263,7 @@ class EmailAuthenticationModule extends AuthenticationModule {
 	 *
 	 * @throws InputValidationException
 	 *
-	 * @todo ACtually implement checking if email is real
+	 * @todo Actually implement checking if email is real
 	 */
 	public function processEditUser($user, $data) {
 		$errors = array();

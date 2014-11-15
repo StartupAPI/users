@@ -32,7 +32,7 @@ if (array_key_exists('save', $_POST))
 	}
 	catch(InputValidationException $ex)
 	{
-		$template_info['errors'] = $ex->getErrors();
+		$template_info['errors']['usernamepass'] = $ex->getErrors();
 	}
 }
 

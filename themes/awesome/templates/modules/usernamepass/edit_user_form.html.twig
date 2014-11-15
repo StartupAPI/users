@@ -3,10 +3,10 @@
 	<h1>Update your username and password</h1>
 </div>
 
-{{ ERR.showModuleErrors(module.id, errors) }}
+{{ ERR.showErrors(slug, errors) }}
 
 <form class="form-horizontal" action="{{action}}" method="POST"role="form">
-	<div class="form-group{% if 'username' in errors|keys %} has-error" title="{{ errors['username']|join("\n")}}{% endif %}">
+	<div class="form-group{{ ERR.group(slug, 'username', errors) }}">
 		<label class="col-sm-4 col-md-3 control-label" for="startupapi-{{slug}}-username">Username</label>
 		<div class="col-sm-7 col-md-6 col-lg-4">
 			{% if AUTH.current_user.username %}
@@ -18,7 +18,7 @@
 	</div>
 
 	{% if AUTH.current_user.username %}
-		<div class="form-group{% if 'currentpass' in errors|keys %} has-error" title="{{ errors['currentpass']|join("\n")}}{% endif %}">
+		<div class="form-group{{ ERR.group(slug, 'currentpass', errors) }}">
 			<label class="col-sm-4 col-md-3 control-label" for="startupapi-{{slug}}-currentpass">Current password</label>
 			<div class="col-sm-7 col-md-6 col-lg-4">
 				<input class="form-control" required id="startupapi-{{slug}}-currentpass" name="currentpass" type="password" autocomplete="off"/>
@@ -26,7 +26,7 @@
 		</div>
 	{% endif %}
 
-	<div class="form-group{% if 'pass' in errors|keys %} has-error" title="{{ errors['pass']|join("\n")}}{% endif %}">
+	<div class="form-group{{ ERR.group(slug, 'pass', errors) }}">
 		<label class="col-sm-4 col-md-3 control-label" for="startupapi-{{slug}}-pass">
 			{% if AUTH.current_user.username %}
 			New
@@ -40,7 +40,7 @@
 		</div>
 	</div>
 
-	<div class="form-group{% if 'repeatpass' in errors|keys %} has-error" title="{{ errors['repeatpass']|join("\n")}}{% endif %}">
+	<div class="form-group{{ ERR.group(slug, 'repeatpass', errors) }}">
 		<label class="col-sm-4 col-md-3 control-label" for="startupapi-{{slug}}-repeatpass">Repeat new password</label>
 		<div class="col-sm-7 col-md-6 col-lg-4">
 			<input class="form-control"{% if AUTH.current_user.username %} required{%endif%} id="startupapi-{{slug}}-repeatpass" name="repeatpass" type="password" autocomplete="off"/>

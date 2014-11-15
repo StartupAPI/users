@@ -17,21 +17,4 @@
 		{% endif %}
 {% endmacro %}
 
-{% macro showModuleErrors(id, errors) %}
-	{% if errors|length > 0 %}
-		<div class="alert alert-danger" style="margin-top: 15px">
-			<h4>Snap!</h4>
-			<ul>
-				{% for field, errorset in errors %}
-					{% for error in errorset %}
-						<li>
-							<label  style="cursor: pointer" for="startupapi-{{id}}-{{field}}">
-								{{error}}
-							</label>
-						</li>
-					{% endfor %}
-				{% endfor %}
-			</ul>
-		</div>
-		{% endif %}
-{% endmacro %}
+{% macro group(id, field, errors) %}{% if field in errors[id]|keys %} has-error" title="{{ errors[id][field]|join("\n")}}{% endif %}{% endmacro %}

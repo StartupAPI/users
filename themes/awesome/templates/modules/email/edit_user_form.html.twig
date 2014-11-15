@@ -3,20 +3,20 @@
 	<h1>Update your name and email</h1>
 </div>
 
-{{ ERR.showModuleErrors(module.id, errors) }}
+{{ ERR.showErrors(slug, errors) }}
 
 <form class="form-horizontal" action="{{action}}" method="POST">
-	<div class="form-group{% if 'name' in errors|keys %} has-error" title="{{ errors['name']|join("\n")}}{% endif %}">
+	<div class="form-group{{ ERR.group(slug, 'name', errors) }}">
 		<label class="col-sm-1 control-label" for="startupapi-{{slug}}-name">Name</label>
 		<div class="col-sm-8 col-md-7 col-lg-5">
-			<input class="form-control" id="startupapi-{{slug}}-name" name="name" type="text" value="{% if 'name' in data|keys %}{{ data.name }}{% else %}{{AUTH.current_user.name}}{% endif %}"/>
+			<input class="form-control" required id="startupapi-{{slug}}-name" name="name" type="text" value="{% if 'name' in data|keys %}{{ data.name }}{% else %}{{AUTH.current_user.name}}{% endif %}"/>
 		</div>
 	</div>
 
-	<div class="form-group{% if 'email' in errors|keys %} has-error" title="{{ errors['email']|join("\n")}} ?>{% endif %}">
+	<div class="form-group{{ ERR.group(slug, 'email', errors) }}">
 		<label class="col-sm-1 control-label" for="startupapi-{{slug}}-email">Email</label>
 		<div class="col-sm-8 col-md-7 col-lg-5">
-			<input class="form-control" id="startupapi-{{slug}}-email" name="email" type="email" value="{% if 'email' in data|keys %}{{ data.email }}{% else %}{{AUTH.current_user.email}}{% endif %}"/>
+			<input class="form-control" required id="startupapi-{{slug}}-email" name="email" type="email" value="{% if 'email' in data|keys %}{{ data.email }}{% else %}{{AUTH.current_user.email}}{% endif %}"/>
 			{% if AUTH.current_user.email and not AUTH.current_user.is_email_verified %}
 				<div class="has-warning">
 					<p class="help-block">

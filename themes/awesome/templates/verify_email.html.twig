@@ -19,7 +19,7 @@
 			<h1>Please verify your email address</h1>
 		</div>
 		<form class="form col-sm-11 col-md-8" action="" method="GET">
-			{{ ERR.showModuleErrors(slug, errors) }}
+			{{ ERR.showErrors(slug, errors) }}
 
 			<p>
 				Confirmation code was sent to
@@ -32,10 +32,10 @@
 				Please enter it below and click verify button.
 			</p>
 
-			<div class="form-group{% if 'code' in errors|keys %} has-error" title="{{errors.code|join("\n")}}{% endif %}">
+			<div class="form-group{{ ERR.group(slug, 'code', errors) }}">
 				<label class="control-label" for="startupapi-{{slug}}-code">Confirmation Code</label>
 				<div class="input-group">
-					<input class="form-control" id="startupapi-{{slug}}-code" name="code" type="text" autocomplete="off"/>
+					<input class="form-control" required id="startupapi-{{slug}}-code" name="code" type="text" autocomplete="off"/>
 					<span class="input-group-btn">
 						<button class="btn btn-primary" type="submit">Verify</button>
 					</span>

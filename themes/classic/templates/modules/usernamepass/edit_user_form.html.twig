@@ -1,7 +1,8 @@
+{% import 'error_messages.html.twig' as ERR %}
 <form class="form-horizontal" action="{{action}}" method="POST">
 	<fieldset>
 		<legend>Update your username and password</legend>
-		<div class="control-group{% if 'username' in errors|keys %} error" title="{{ errors['username']|join("\n")}}{% endif %}">
+		<div class="control-group{{ ERR.group(slug, 'username', errors) }}">
 			<label class="control-label" for="startupapi-{{slug}}-edit-username">Username</label>
 			<div class="controls">
 				{% if AUTH.current_user.username %}
@@ -15,14 +16,14 @@
 		<legend>Change password</legend>
 
 		{% if AUTH.current_user.username %}
-			<div class="control-group{% if 'currentpass' in errors|keys %} error" title="{{ errors['currentpass']|join("\n")}}{% endif %}">
+			<div class="control-group{{ ERR.group(slug, 'currentpass', errors) }}">
 				<label class="control-label" for="startupapi-{{slug}}-edit-currentpass">Current password</label>
 				<div class="controls">
 					<input id="startupapi-{{slug}}-edit-currentpass" name="currentpass" type="password" autocomplete="off"/>
 				</div>
 			</div>
 		{% endif %}
-		<div class="control-group{% if 'pass' in errors|keys %} error" title="{{ errors['pass']|join("\n")}}{% endif %}">
+		<div class="control-group{{ ERR.group(slug, 'pass', errors) }}">
 			<label class="control-label" for="startupapi-{{slug}}-edit-pass">
 				{% if AUTH.current_user.username %}
 				New
@@ -35,7 +36,7 @@
 				<input id="startupapi-{{slug}}-edit-pass" name="pass" type="password" autocomplete="off"/>
 			</div>
 		</div>
-		<div class="control-group{% if 'repeatpass' in errors|keys %} error" title="{{ errors['repeatpass']|join("\n")}}{% endif %}">
+		<div class="control-group{{ ERR.group(slug, 'repeatpass', errors) }}">
 			<label class="control-label" for="startupapi-{{slug}}-edit-repeatpass">Repeat new password</label>
 			<div class="controls">
 				<input id="startupapi-{{slug}}-edit-repeatpass" name="repeatpass" type="password" autocomplete="off"/>

@@ -9,17 +9,17 @@ $user = User::get();
 $email = is_null($user) ? null : $user->getEmail();
 
 $template_info = StartupAPI::getTemplateInfo();
+$template_info['slug'] = 'verify_email';
 
 if (array_key_exists('code', $_GET)) {
 	if (User::verifyEmailLinkCode($_GET['code'], $user)) {
 		$template_info['verification_complete'] = true;
 	} else {
-		$template_info['errors']['code'][] = 'Invalid code';
+		$template_info['errors'][$template_info['slug']]['code'][] = 'Invalid code';
 	}
 }
 
 $template_info['email'] = $email;
-$template_info['slug'] = 'verify_email';
 
 $template_info['return'] = User::getReturn();
 User::clearReturn();

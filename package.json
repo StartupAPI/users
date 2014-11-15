@@ -4,11 +4,13 @@
   "version": "0.1.0",
   "devDependencies": {
     "webdriverio": "~2.3.0",
-    "phantomjs": ">=1.8"
+    "phantomjs": ">=1.8",
+    "chai": "~1.10.0",
+    "chai-webdriver": "~0.9.4",
+    "selenium-webdriver": "~2.44.0"
   },
   "repository": {
     "type": "git",
     "url": "git@github.com:StartupAPI/users.git"
   }
 }
-

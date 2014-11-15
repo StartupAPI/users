@@ -13,8 +13,6 @@
 					</div>
 				{% else %}
 					<div>
-						{{ ERR.showModuleErrors(slug, errors) }}
-
 						<h3>Please verify your email address</h3>
 						<p>
 							Confirmation code was sent to
@@ -28,12 +26,14 @@
 							Please enter it below and click verify button.
 						</p>
 
+						{{ ERR.showErrors(slug, errors) }}
+
 						<form class="form well" action="" method="GET">
 							<fieldset>
-								<div class="control-group{% if 'code' in errors|keys %} error" title="{{errors['code']|join("\n")}}{% endif %}">
+								<div class="control-group{{ ERR.group(slug, 'code', errors) }}">
 									<label class="control-label" for="startupapi-code">Confirmation Code</label>
 									<div class="controls">
-										<input id="startupapi-code" name="code" type="text" autocomplete="off"/>
+										<input id="startupapi-{{slug}}-edit-code" required name="code" type="text" autocomplete="off"/><br>
 										<a id="startupapi-{{slug}}-resend" href="{{UserConfig.USERSROOTURL}}/send_email_verification_code.php">I never got the code, please resend</a>
 									</div>
 								</div>

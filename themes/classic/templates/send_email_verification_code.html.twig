@@ -7,7 +7,7 @@
 				{% if email %}
 					<div id="startupapi-sendverificationcode-success">
 						<h3>Verification code sent</h3>
-						<p>Verification code was sent to <span class="startupapi-email-to-verify">{{email}}</span></p>
+						<p>Verification code was sent to <b>{{email}}</b></p>
 						<a class="btn btn-primary" href="{{UserConfig.USERSROOTURL}}/verify_email.php">Click here when you receive it</a>
 					</div>
 				{% else %}
