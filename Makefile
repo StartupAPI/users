@@ -81,10 +81,11 @@ code:
 test:	cleantest runtests
 
 runtests:
+	mkdir -p tests/run
 	npm install
-	nohup phantomjs --webdriver=4444 --cookies-file=tests/run/cookies.txt &
+	nohup phantomjs --webdriver=4444 &
 	sleep 1
-	-node tests/test.js http://howdoable.lc/users/ tests/run/
+	-node tests/test.js http://howdoable.lc/users tests/run
 	-killall phantomjs
 	open tests/run/*.png
 

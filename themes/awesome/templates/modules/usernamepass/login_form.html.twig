@@ -29,7 +29,8 @@
 
 	<div class="form-group">
 		<div class="col-sm-offset-2 col-md-offset-1 col-sm-7 col-md-6 col-lg-4">
-			<button class="btn btn-primary" type="submit" name="login">Login</button>
+			<input type="hidden" name="login">
+			<button class="btn btn-primary" type="submit">Login</button>
 			{% if UserConfig.enableRegistration %}
 				<a class="btn btn-default" href="{{UserConfig.USERSROOTURL}}/register.php">or sign up here</a>
 			{% endif %}

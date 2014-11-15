@@ -1,13 +1,13 @@
 // Use webdriverjs to create a Selenium Client
 var client = require('webdriverio').remote({
-    desiredCapabilities: {
-        // You may choose other browsers
-        // http://code.google.com/p/selenium/wiki/DesiredCapabilities
-        browserName: 'chrome'
-    },
-    // webdriverjs has a lot of output which is generally useless
-    // However, if anything goes wrong, remove this to see more details
-    logLevel: 'silent'
+	desiredCapabilities: {
+		// You may choose other browsers
+		// http://code.google.com/p/selenium/wiki/DesiredCapabilities
+		browserName: 'chrome'
+	},
+	// webdriverjs has a lot of output which is generally useless
+	// However, if anything goes wrong, remove this to see more details
+	logLevel: 'silent'
 });
 
 var base_url = process.argv[2];
@@ -25,14 +25,17 @@ client.init()
 		.record()
 		.setValue('#startupapi-usernamepass-username', user)
 		.setValue('#startupapi-usernamepass-pass', pw)
+		.pause(20)
 		.record()
-		.submitForm('#startupapi-usernamepass-username')
-		.pause(3000)
+		.submitForm('#startupapi-usernamepass-pass')
+		.pause(1000)
 		.call(cb);
-	})	
-	.setViewportSize({width: 1280, height: 1024}, false)
+	})
+	.setViewportSize({
+		width: 1280,
+		height: 1024
+	}, false)
 	.login(base_url + '/login.php', 'sergeychernyshev', 'bogus')
-	.record()
 	.url(base_url + '/edit.php')
 	.record()
 	.end();
