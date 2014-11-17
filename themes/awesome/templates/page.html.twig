@@ -19,23 +19,32 @@
 	{% block content %}{% endblock %}
 {% endblock %}
 
+{% block footer %}
 <!-- footer starts -->
-<footer class="footer panel-footer">
+<footer class="footer navbar {% if POWERSTRIP.inverted_navbar %}navbar-inverse{% else %}navbar-default{% endif %}">
 	<div class="container">
-		<div class="pull-right">
-			<a href="http://www.startupapi.com/" target="_blank">
-				<img class="startupapi-logo" width="20" height="20" hspace="5" src="{{ UserConfig.USERSROOTURL }}/images/header_icon.png"/>
-				Powered by Startup API
-			</a>
-		</div>
+		<ul class="nav navbar-nav navbar-right">
+			<li>
+				<a href="http://www.startupapi.com/" target="_blank">
+					<img class="startupapi-logo" width="20" height="20" hspace="5" src="{{ UserConfig.USERSROOTURL }}/images/header_icon.png"/>
+					Powered by Startup API
+				</a>
+			</li>
+		</ul>
 		{% if UserConfig.appName %}
-		<div>
-			{{PAGE.YEAR}} &copy;
-			<a href="{{UserConfig.SITEROOTURL}}">{{UserConfig.appName}}</a>
-		</div>
+			<ul class="nav navbar-nav">
+				<li>
+					<a href="{{UserConfig.SITEROOTURL}}">
+						{{PAGE.YEAR}} &copy;
+						{{UserConfig.appName}}
+					</a>
+				</li>
+			</ul>
 		{% endif %}
 	</div>
 </footer>
 <!-- footer ends -->
+{% endblock %}
+
 </body>
 </html>
