@@ -1,4 +1,6 @@
 {% extends 'page_with_sidebar.html.twig' %}
+{% import 'error_messages.html.twig' as ERR %}
+
 {% block content %}
 <script>
 	STARTUPAPI.showMessages({
@@ -15,22 +17,25 @@
 			Please provide a personal message, name and email of the person you'd like to invite.
 		</div>
 	</div>
-	<div class="control-group">
-		<label class="control-label" for="invitation_name">Name</label>
+
+	{{ ERR.showErrors('invitations', errors) }}
+
+	<div class="control-group{{ ERR.group('invitations', 'name', errors) }}">
+		<label class="control-label" for="startupapi-invitations-edit-name">Name</label>
 		<div class="controls">
-			<input class="span6" type="text" name="invitation_name" id="invitation_name" placeholder="John Smith">
+			<input class="span6" type="text" required name="invitation_name" id="startupapi-invitations-edit-name" placeholder="John Smith">
 		</div>
 	</div>
-	<div class="control-group">
-		<label class="control-label" for="invitation_email">Email</label>
+	<div class="control-group{{ ERR.group('invitations', 'email', errors) }}">
+		<label class="control-label" for="startupapi-invitations-edit-invitation_email">Email</label>
 		<div class="controls">
-			<input class="span6" type="email" name="invitation_email" id="invitation_email" placeholder="john.smith@example.com">
+			<input class="span6" type="email" required name="invitation_email" id="startupapi-invitations-edit-email" placeholder="john.smith@example.com">
 		</div>
 	</div>
 	<div class="control-group">
 		<label class="control-label" for="invitation_note">Message</label>
 		<div class="controls">
-			<textarea class="span6" id="invitation_note" name="invitation_note" rows="3">{{message_placeholder}}</textarea>
+			<textarea class="span6" id="startupapi-invitations-edit-_note" name="invitation_note" rows="3">{{message_placeholder}}</textarea>
 		</div>
 	</div>
 	{% if can_invite_to_account %}

@@ -77,7 +77,7 @@ if (array_key_exists('cancel', $_POST)) {
 }
 
 $template_info['PAGE']['SECTION'] = 'invitations';
-$template_info['errors'] = $errors;
+$template_info['errors']['invitations'] = $errors;
 $template_info['message_placeholder'] = call_user_func_array(UserConfig::$onRenderUserInvitationMessagePlaceholder, array($user));
 $template_info['join_account'] = array_key_exists('joinaccount', $_GET);
 

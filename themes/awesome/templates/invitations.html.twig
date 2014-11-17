@@ -19,16 +19,19 @@
 				Please provide a personal message, name and email of the person you'd like to invite.
 			</div>
 		</div>
-		<div class="form-group">
+
+		{{ ERR.showErrors('invitations', errors) }}
+
+		<div class="form-group{{ ERR.group('invitations', 'name', errors) }}">
 			<label class="control-label" for="invitation_name">Name</label>
 			<div class="controls">
-				<input class="form-control" type="text" name="invitation_name" id="invitation_name" placeholder="John Smith">
+				<input class="form-control" required type="text" name="invitation_name" id="invitation_name" placeholder="John Smith">
 			</div>
 		</div>
-		<div class="form-group">
+		<div class="form-group{{ ERR.group('invitations', 'email', errors) }}">
 			<label class="control-label" for="invitation_email">Email</label>
 			<div class="controls">
-				<input class="form-control" type="email" name="invitation_email" id="invitation_email" placeholder="john.smith@example.com">
+				<input class="form-control" required type="email" name="invitation_email" id="invitation_email" placeholder="john.smith@example.com">
 			</div>
 		</div>
 		<div class="form-group">
