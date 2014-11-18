@@ -81,6 +81,11 @@ class UserConfig {
 	 */
 	public static $DEBUG_SHOW_ARGS = false;
 
+	/**
+	 * @var boolean Enable / disable developer tools in the UI
+	 */
+	public static $DEVMODE = false;
+
 	/* ========================================================================
 	 *
 	 * Paths and URLs
@@ -372,7 +377,6 @@ class UserConfig {
 	public static $availableBootstrapThemes = array(
 		'cerulean',
 		'cosmo',
-		'custom',
 		'cyborg',
 		'darkly',
 		'flatly',

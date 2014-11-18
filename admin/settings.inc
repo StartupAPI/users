@@ -75,7 +75,13 @@ $config_variables = array(
 						'description' => 'Debug messages in log files',
 						'type' => 'boolean',
 						'name' => 'DEBUG',
-						'options' => array('true_string' => 'eabledn', 'false_string' => 'disabled')
+						'options' => array('true_string' => 'enabled', 'false_string' => 'disabled')
+					),
+					array(
+						'description' => 'Enable / disable developer tools in the UI',
+						'type' => 'boolean',
+						'name' => 'DEVMODE',
+						'options' => array('true_string' => 'enabled', 'false_string' => 'disabled')
 					)
 				)
 			)

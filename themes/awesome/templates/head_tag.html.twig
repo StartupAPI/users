@@ -1,9 +1,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 {% if UserConfig.bootstrapTheme and UserConfig.bootstrapTheme != 'default' %}
-<link href="{{ UserConfig.USERSROOTURL }}/bootswatch/{{ UserConfig.bootstrapTheme }}/bootstrap.min.css" rel="stylesheet">
+	{% set startupapi_bootstrap_css = UserConfig.USERSROOTURL ~ '/bootswatch/' ~ UserConfig.bootstrapTheme ~ '/bootstrap.min.css' %}
 {% else %}
-<link href="{{ UserConfig.USERSROOTURL }}/bootstrap3/css/bootstrap.min.css" rel="stylesheet">
+	{% set startupapi_bootstrap_css = UserConfig.USERSROOTURL ~ '/bootstrap3/css/bootstrap.min.css' %}
 {% endif %}
+
+<link{% if UserConfig.DEVMODE %} id="startupapi-dev-theme-switcher"{% endif %} href="{{startupapi_bootstrap_css}}" rel="stylesheet">
+
 <script src="{{ UserConfig.USERSROOTURL }}/jquery-1.11.1.min.js"></script>
 <script src="{{ UserConfig.USERSROOTURL }}/bootstrap3/js/bootstrap.min.js"></script>
 <script src="{{ UserConfig.USERSROOTURL }}/startupapi.js"></script>
