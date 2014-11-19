@@ -33,110 +33,110 @@ You can also swith navbar to "pills" mode (no navbar) by setting UserConfig::$po
 
 <!-- Power Strip Start -->
 <ul class="nav navbar-nav {% if POWERSTRIP.nav_pills %} nav-pills{% endif %}{% if POWERSTRIP.pull_right %} navbar-right{% endif %}">
-	{% if AUTH.current_user.is_logged_in %}
-		{% if UserConfig.DEVMODE %}
-			<li class="dropdown">
-				<a href="#" title="Change Bootstrap Theme" class="dropdown-toggle" data-toggle="dropdown">
-					<span class="label label-warning">
-						theme:
-						<span id="startupapi-bootstrap-theme-switcher-current">
-							{{ UserConfig.bootstrapTheme|default("default")}}
-						</span>
+	{% if UserConfig.DEVMODE %}
+		<li class="dropdown">
+			<a href="#" title="Change Bootstrap Theme" class="dropdown-toggle" data-toggle="dropdown">
+				<span class="label label-warning">
+					theme:
+					<span id="startupapi-bootstrap-theme-switcher-current">
+						{{ UserConfig.bootstrapTheme|default("default")}}
 					</span>
-				</a>
+				</span>
+			</a>
 
-				<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" id="startupapi-bootstrap-theme-switcher">
-					<li {% if not UserConfig.bootstrapTheme %} class="active"{% endif %}>
-						<a tabindex="-1" href="#" data-theme-swtich-to="default">Default</a>
+			<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" id="startupapi-bootstrap-theme-switcher">
+				<li {% if not UserConfig.bootstrapTheme %} class="active"{% endif %}>
+					<a tabindex="-1" href="#" data-theme-swtich-to="default">Default</a>
+				</li>
+				<li role="presentation" class="divider"></li>
+				<li role="presentation" class="dropdown-header">Bootswatch Themes</li>
+				{% for theme in UserConfig.availableBootstrapThemes %}
+					<li data-toggle="popover"
+						data-trigger="hover"
+						data-html="true"
+						data-content="<img src='{{UserConfig.USERSROOTURL}}/bootswatch/{{ theme }}/thumbnail.png' style='width: 15em'/>"
+						{% if UserConfig.bootstrapTheme == theme %} class="active"{% endif %}>
+						<a tabindex="-1" href="#" data-theme-swtich-to="{{ theme }}">
+							{{ theme }}
+						</a>
 					</li>
-					<li role="presentation" class="divider"></li>
-					<li role="presentation" class="dropdown-header">Bootswatch Themes</li>
-					{% for theme in UserConfig.availableBootstrapThemes %}
-						<li data-toggle="popover"
-							data-trigger="hover"
-							data-html="true"
-							data-content="<img src='{{UserConfig.USERSROOTURL}}/bootswatch/{{ theme }}/thumbnail.png' style='width: 15em'/>"
-							{% if UserConfig.bootstrapTheme == theme %} class="active"{% endif %}>
-							<a tabindex="-1" href="#" data-theme-swtich-to="{{ theme }}">
-								{{ theme }}
-							</a>
-						</li>
-					{% endfor %}
-				</ul>
-				<script>
-				(function() {
-					var themes = {{UserConfig.availableBootstrapThemes|json_encode|raw}};
-					themes.unshift('default');
-					
-					$('[data-toggle="popover"]').popover();
+				{% endfor %}
+			</ul>
+			<script>
+			(function() {
+				var themes = {{UserConfig.availableBootstrapThemes|json_encode|raw}};
+				themes.unshift('default');
 
-					var switchToTheme = function(theme_swtich_to) {
-						var bootstrap_css_url = '{{UserConfig.USERSROOTURL}}/bootstrap3/css/bootstrap.min.css';
+				$('[data-toggle="popover"]').popover();
 
-						if (theme_swtich_to !== 'default') {
-							bootstrap_css_url = '{{UserConfig.USERSROOTURL}}/bootswatch/' + theme_swtich_to + '/bootstrap.min.css';
-						}
+				var switchToTheme = function(theme_swtich_to) {
+					var bootstrap_css_url = '{{UserConfig.USERSROOTURL}}/bootstrap3/css/bootstrap.min.css';
 
-						$('#startupapi-dev-theme-switcher').attr('href', bootstrap_css_url);
+					if (theme_swtich_to !== 'default') {
+						bootstrap_css_url = '{{UserConfig.USERSROOTURL}}/bootswatch/' + theme_swtich_to + '/bootstrap.min.css';
+					}
 
-						$('#startupapi-bootstrap-theme-switcher-current').text(theme_swtich_to);
+					$('#startupapi-dev-theme-switcher').attr('href', bootstrap_css_url);
 
-						$('#startupapi-bootstrap-theme-switcher li').each(function(num, el) {
-							$(el).removeClass('active');
-							if ($(el).find('a').data('theme-swtich-to') == theme_swtich_to) {
-								$(el).addClass('active');
-							}
-						});
+					$('#startupapi-bootstrap-theme-switcher-current').text(theme_swtich_to);
 
-						// hoping to trigger repaint with a new CSS
-						setTimeout(function() {
-							$('body').height;
-						}, 1000);
-					};
-
-					$('#startupapi-bootstrap-theme-switcher a').click(function(e) {
-						var theme_swtich_to = $(this).data('theme-swtich-to');
-
-						if (typeof(theme_swtich_to) !== 'undefined') {
-							switchToTheme(theme_swtich_to);
-						}
-
-						$('#startupapi-bootstrap-theme-switcher').dropdown('toggle');
-						
-						return false;
-					});
-
-					$(document).keypress(function(event) {
-						if (event.which == 63234 || event.which == 63235) {
-							var current = $('#startupapi-bootstrap-theme-switcher-current').text().trim();
-
-							var index = $.inArray(current, themes);
-
-							// next
-							if (event.which == 63235) {
-								index++;
-
-								if (index >= themes.length - 1) {
-									index = 0;
-								}
-							}
-
-							// prev
-							if (event.which == 63234) {
-								index--;
-								if (index < 0) {
-									index = themes.length - 1;
-								}
-							}
-
-							switchToTheme(themes[index]);
-							event.preventDefault();
+					$('#startupapi-bootstrap-theme-switcher li').each(function(num, el) {
+						$(el).removeClass('active');
+						if ($(el).find('a').data('theme-swtich-to') == theme_swtich_to) {
+							$(el).addClass('active');
 						}
 					});
-				})();
-				</script>
-		{% endif %}
 
+					// hoping to trigger repaint with a new CSS
+					setTimeout(function() {
+						$('body').height;
+					}, 1000);
+				};
+
+				$('#startupapi-bootstrap-theme-switcher a').click(function(e) {
+					var theme_swtich_to = $(this).data('theme-swtich-to');
+
+					if (typeof(theme_swtich_to) !== 'undefined') {
+						switchToTheme(theme_swtich_to);
+					}
+
+					$('#startupapi-bootstrap-theme-switcher').dropdown('toggle');
+
+					return false;
+				});
+
+				$(document).keypress(function(event) {
+					if (event.which == 63234 || event.which == 63235) {
+						var current = $('#startupapi-bootstrap-theme-switcher-current').text().trim();
+
+						var index = $.inArray(current, themes);
+
+						// next
+						if (event.which == 63235) {
+							index++;
+
+							if (index >= themes.length - 1) {
+								index = 0;
+							}
+						}
+
+						// prev
+						if (event.which == 63234) {
+							index--;
+							if (index < 0) {
+								index = themes.length - 1;
+							}
+						}
+
+						switchToTheme(themes[index]);
+						event.preventDefault();
+					}
+				});
+			})();
+			</script>
+	{% endif %}
+
+	{% if AUTH.current_user.is_logged_in %}
 		{% if AUTH.current_user.is_admin %}
 			<li><a id="startupapi-navbox-admin" href="{{ UserConfig.USERSROOTURL }}/admin/">Admin</a></li>
 		{% endif %}
