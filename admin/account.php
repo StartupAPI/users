@@ -226,6 +226,6 @@ $BREADCRUMB_EXTRA = $account->getName();
 
 require_once(__DIR__ . '/header.php');
 
-StartupAPI::$template->display('@admin/account.html.twig', $template_data);
+StartupAPI::$template->display('@startupapi-admin/account.html.twig', $template_data);
 
 require_once(__DIR__ . '/footer.php');

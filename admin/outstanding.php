@@ -33,6 +33,6 @@ $ADMIN_SECTION = 'outstanding';
 
 require_once(__DIR__.'/header.php');
 
-StartupAPI::$template->display('@admin/outstanding.html.twig', $template_data);
+StartupAPI::$template->display('@startupapi-admin/outstanding.html.twig', $template_data);
 
 require_once(__DIR__.'/footer.php');

@@ -92,7 +92,7 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule {
 			$template_info = array();
 		}
 
-		return StartupAPI::$template->render("modules/linkedin/user_info.html.twig", $template_info);
+		return StartupAPI::$template->render("@startupapi/modules/linkedin/user_info.html.twig", $template_info);
 	}
 
 }
@@ -106,7 +106,7 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule {
 class LinkedInUserCredentials extends OAuthUserCredentials {
 
 	public function getHTML() {
-		return StartupAPI::$template->render("modules/linkedin/credentials.html.twig", $this->userinfo);
+		return StartupAPI::$template->render("@startupapi/modules/linkedin/credentials.html.twig", $this->userinfo);
 	}
 
 }

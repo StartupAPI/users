@@ -160,7 +160,7 @@ class EtsyAuthenticationModule extends OAuthAuthenticationModule
 		if (!is_array($template_info)) {
 			$template_info = array();
 		}
-		return StartupAPI::$template->render("modules/etsy/user_info.html.twig", $template_info);
+		return StartupAPI::$template->render("@startupapi/modules/etsy/user_info.html.twig", $template_info);
 	}
 }
 
@@ -172,6 +172,6 @@ class EtsyAuthenticationModule extends OAuthAuthenticationModule
  */
 class EtsyUserCredentials extends OAuthUserCredentials {
 	public function getHTML() {
-		return StartupAPI::$template->render("modules/etsy/user_info.html.twig", unserialize($this->userinfo));
+		return StartupAPI::$template->render("@startupapi/modules/etsy/user_info.html.twig", unserialize($this->userinfo));
 	}
 }

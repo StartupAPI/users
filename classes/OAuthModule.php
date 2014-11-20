@@ -527,7 +527,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		$template_info['logInButtonURL'] = $this->logInButtonURL;
 
 		// using same template for OAuth and OAuth2
-		return StartupAPI::$template->render("oauth_login_form.html.twig", $template_info);
+		return StartupAPI::$template->render("@startupapi/oauth_login_form.html.twig", $template_info);
 	}
 
 	/**
@@ -558,7 +558,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		$template_info['signUpButtonURL'] = $this->signUpButtonURL;
 
 		// using same template for OAuth and OAuth2
-		return StartupAPI::$template->render("oauth_registration_form.html.twig", $template_info);
+		return StartupAPI::$template->render("@startupapi/oauth_registration_form.html.twig", $template_info);
 	}
 
 	/**
@@ -620,7 +620,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		$template_info['oauth_user_id'] = $oauth_user_id;
 		$template_info['rendered_userinfo'] = $this->renderUserInfo($serialized_userinfo);
 
-		return StartupAPI::$template->render("oauth_edit_user_form.html.twig", $template_info);
+		return StartupAPI::$template->render("@startupapi/oauth_edit_user_form.html.twig", $template_info);
 	}
 
 	/**

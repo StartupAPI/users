@@ -130,7 +130,7 @@ class FoursquareAuthenticationModule extends OAuth2AuthenticationModule
 			$template_info = array();
 		}
 
-		return StartupAPI::$template->render("modules/foursquare/user_info.html.twig", $template_info);
+		return StartupAPI::$template->render("@startupapi/modules/foursquare/user_info.html.twig", $template_info);
 	}
 }
 
@@ -140,6 +140,6 @@ class FoursquareAuthenticationModule extends OAuth2AuthenticationModule
  */
 class FoursquareUserCredentials extends OAuth2UserCredentials {
 	public function getHTML() {
-		return StartupAPI::$template->render("modules/foursquare/credentials.html.twig", $this->userinfo);
+		return StartupAPI::$template->render("@startupapi/modules/foursquare/credentials.html.twig", $this->userinfo);
 	}
 }

@@ -235,7 +235,7 @@ if (array_key_exists('base_plan', $template_info)) {
 	$template_info['plans'][$base_plan_index]['is_base_plan'] = true;
 }
 
-$display_template = 'plan/plans.html.twig';
+$display_template = '@startupapi/plan/plans.html.twig';
 
 /*
  * If plan was selected, show schedule and payment engine selection UI
@@ -247,7 +247,7 @@ if (array_key_exists('plan', $_GET)) {
 		foreach ($template_info['plans'] as $plan) {
 			if ($plan['slug'] == $selected_plan_slug->getSlug()) {
 				$template_info['plan'] = $plan;
-				$display_template = 'plan/select_payment_method.html.twig';
+				$display_template = '@startupapi/plan/select_payment_method.html.twig';
 				break;
 			}
 		}

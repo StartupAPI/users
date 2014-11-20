@@ -103,7 +103,7 @@ EOF;
 			$template_info = array();
 		}
 
-		return StartupAPI::$template->render("modules/ohloh/user_info.html.twig", $template_info);
+		return StartupAPI::$template->render("@startupapi/modules/ohloh/user_info.html.twig", $template_info);
 	}
 
 }
@@ -117,7 +117,7 @@ EOF;
 class OhlohUserCredentials extends OAuthUserCredentials {
 
 	public function getHTML() {
-		return StartupAPI::$template->render("modules/ohloh/credentials.html.twig", $this->userinfo);
+		return StartupAPI::$template->render("@startupapi/modules/ohloh/credentials.html.twig", $this->userinfo);
 	}
 
 }

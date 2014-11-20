@@ -117,7 +117,7 @@ class TwitterAuthenticationModule extends OAuthAuthenticationModule
 		if (!is_array($template_info)) {
 			$template_info = array();
 		}
-		return StartupAPI::$template->render("modules/twitter/user_info.html.twig", $template_info);
+		return StartupAPI::$template->render("@startupapi/modules/twitter/user_info.html.twig", $template_info);
 	}
 }
 
@@ -129,6 +129,6 @@ class TwitterAuthenticationModule extends OAuthAuthenticationModule
  */
 class TwitterUserCredentials extends OAuthUserCredentials {
 	public function getHTML() {
-		return StartupAPI::$template->render("modules/twitter/credentials.html.twig", $this->userinfo);
+		return StartupAPI::$template->render("@startupapi/modules/twitter/credentials.html.twig", $this->userinfo);
 	}
 }

@@ -198,7 +198,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		$template_info['slug'] = $this->getID();
 		$template_info['appID'] = $this->appID;
 
-		return StartupAPI::$template->display("modules/facebook/auto_logout_form.html.twig", $template_info);
+		return StartupAPI::$template->display("@startupapi/modules/facebook/auto_logout_form.html.twig", $template_info);
 	}
 
 	/**
@@ -218,7 +218,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		$template_info['permissions'] = $this->permissions;
 		$template_info['permissions_string'] = implode(',', $this->permissions);
 
-		return StartupAPI::$template->render("modules/facebook/forms.html.twig", $template_info);
+		return StartupAPI::$template->render("@startupapi/modules/facebook/forms.html.twig", $template_info);
 	}
 
 	public function renderRegistrationForm($template_info, $full = false, $action = null, $errors = null, $data = null) {
@@ -261,7 +261,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 			$template_info['me'] = $me;
 			$template_info['fb_id'] = $fb_id;
 
-			return StartupAPI::$template->render("modules/facebook/edit_user_form.html.twig", $template_info);
+			return StartupAPI::$template->render("@startupapi/modules/facebook/edit_user_form.html.twig", $template_info);
 		}
 	}
 
@@ -530,7 +530,7 @@ class FacebookUserCredentials extends UserCredentials {
 	}
 
 	public function getHTML() {
-		return StartupAPI::$template->render("modules/facebook/credentials.html.twig", array('fb_id' => $this->fb_id));
+		return StartupAPI::$template->render("@startupapi/modules/facebook/credentials.html.twig", array('fb_id' => $this->fb_id));
 	}
 
 }

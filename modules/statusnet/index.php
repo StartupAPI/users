@@ -162,7 +162,7 @@ EOF;
 	protected function renderUserInfo($serialized_userinfo) {
 		$template_info['user_info'] = unserialize($serialized_userinfo);
 		$template_info['rootURL'] = $this->rootURL;
-		return StartupAPI::$template->render("modules/statusnet/user_info.html.twig", $template_info);
+		return StartupAPI::$template->render("@startupapi/modules/statusnet/user_info.html.twig", $template_info);
 
 	}
 
@@ -195,6 +195,6 @@ EOF;
  */
 class StatusNetUserCredentials extends OAuthUserCredentials {
 	public function getHTML() {
-		return StartupAPI::$template->render("modules/statusnet/credentials.html.twig", $this->userinfo);
+		return StartupAPI::$template->render("@startupapi/modules/statusnet/credentials.html.twig", $this->userinfo);
 	}
 }

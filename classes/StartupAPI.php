@@ -171,7 +171,7 @@ class StartupAPI {
 		foreach ($template_folders as $folder) {
 			$loader->addPath($folder, 'startupapi');
 		}
-		$loader->addPath(dirname(__DIR__) . '/admin/templates', 'admin');
+		$loader->addPath(dirname(__DIR__) . '/admin/templates', 'startupapi-admin');
 
 		self::$template = new Twig_Environment($loader, UserConfig::$twig_options);
 	}

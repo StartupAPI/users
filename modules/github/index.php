@@ -115,7 +115,7 @@ class GithubAuthenticationModule extends OAuth2AuthenticationModule
 			$template_info = array();
 		}
 
-		return StartupAPI::$template->render("modules/github/user_info.html.twig", $template_info);
+		return StartupAPI::$template->render("@startupapi/modules/github/user_info.html.twig", $template_info);
 	}
 }
 
@@ -125,6 +125,6 @@ class GithubAuthenticationModule extends OAuth2AuthenticationModule
  */
 class GithubUserCredentials extends OAuth2UserCredentials {
 	public function getHTML() {
-		return StartupAPI::$template->render("modules/github/credentials.html.twig", $this->userinfo);
+		return StartupAPI::$template->render("@startupapi/modules/github/credentials.html.twig", $this->userinfo);
 	}
 }
