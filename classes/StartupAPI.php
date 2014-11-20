@@ -73,7 +73,7 @@ class StartupAPI {
 	 * @return string HTML to be output withing <head> tag on the page
 	 */
 	static function renderHeadHTML() {
-		return StartupAPI::$template->render('head_tag.html.twig', self::getTemplateInfo());
+		return StartupAPI::$template->render('@startupapi/head_tag.html.twig', self::getTemplateInfo());
 	}
 
 	/**
@@ -93,7 +93,7 @@ class StartupAPI {
 				))
 		);
 
-		return StartupAPI::$template->render('power_strip.html.twig', $template_info);
+		return StartupAPI::$template->render('@startupapi/power_strip.html.twig', $template_info);
 	}
 
 	/**
@@ -167,7 +167,10 @@ class StartupAPI {
 		}
 
 		// Configuring the templating
-		$loader = new Twig_Loader_Filesystem($template_folders);
+		$loader = new Twig_Loader_Filesystem(__DIR__);
+		foreach ($template_folders as $folder) {
+			$loader->addPath($folder, 'startupapi');
+		}
 		$loader->addPath(dirname(__DIR__) . '/admin/templates', 'admin');
 
 		self::$template = new Twig_Environment($loader, UserConfig::$twig_options);

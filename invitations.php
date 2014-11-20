@@ -107,4 +107,4 @@ foreach ($user->getAcceptedInvitations() as $invitation) {
 	);
 }
 
-StartupAPI::$template->display('invitations.html.twig', $template_info);
+StartupAPI::$template->display('@startupapi/invitations.html.twig', $template_info);

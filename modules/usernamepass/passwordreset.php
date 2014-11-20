@@ -38,4 +38,4 @@ if (array_key_exists('save', $_POST))
 
 $template_info['slug'] = 'usernamepass';
 
-StartupAPI::$template->display('modules/usernamepass/passwordreset.html.twig', $template_info);
+StartupAPI::$template->display('@startupapi/modules/usernamepass/passwordreset.html.twig', $template_info);

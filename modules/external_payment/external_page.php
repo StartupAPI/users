@@ -26,4 +26,4 @@ if (array_key_exists('engine', $_GET)) {
 	$template_info['engine']['logo'] = $engine->getLogo();
 }
 
-StartupAPI::$template->display('modules/external_payment/external_page.html.twig', $template_info);
+StartupAPI::$template->display('@startupapi/modules/external_payment/external_page.html.twig', $template_info);

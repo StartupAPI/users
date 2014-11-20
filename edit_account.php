@@ -36,4 +36,4 @@ $template_info['errors'] = $errors;
 $template_info['PAGE']['SECTION'] = 'account';
 $template_info['account_name'] = $account->getName();
 
-StartupAPI::$template->display('account/edit_account.html.twig', $template_info);
+StartupAPI::$template->display('@startupapi/account/edit_account.html.twig', $template_info);

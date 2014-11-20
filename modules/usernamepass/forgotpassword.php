@@ -48,4 +48,4 @@ if (array_key_exists('status', $_GET) && $_GET['status'] == 'sent') {
 
 $template_info['slug'] = 'usernamepass';
 
-StartupAPI::$template->display('modules/usernamepass/forgotpassword.html.twig', $template_info);
+StartupAPI::$template->display('@startupapi/modules/usernamepass/forgotpassword.html.twig', $template_info);

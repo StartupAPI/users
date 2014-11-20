@@ -111,4 +111,4 @@ if ($show_registration_form) {
 
 $template_info['errors'] = $errors;
 
-StartupAPI::$template->display('register.html.twig', $template_info);
+StartupAPI::$template->display('@startupapi/register.html.twig', $template_info);

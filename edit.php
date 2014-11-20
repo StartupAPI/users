@@ -115,4 +115,4 @@ if (!is_null($current_module)) {
 	}
 }
 
-StartupAPI::$template->display('edit.html.twig', $template_info);
+StartupAPI::$template->display('@startupapi/edit.html.twig', $template_info);

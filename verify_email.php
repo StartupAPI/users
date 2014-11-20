@@ -29,4 +29,4 @@ if (is_null($template_info['return'])) {
 }
 $template_info['PAGE']['SECTION'] = 'profile_info';
 
-StartupAPI::$template->display('verify_email.html.twig', $template_info);
+StartupAPI::$template->display('@startupapi/verify_email.html.twig', $template_info);

@@ -95,4 +95,4 @@ if ($template_info['account_isIndividual'] && count($admins) == 1 && count($user
 
 $template_info['PAGE']['SECTION'] = 'account';
 
-StartupAPI::$template->display('account/manage_account.html.twig', $template_info);
+StartupAPI::$template->display('@startupapi/account/manage_account.html.twig', $template_info);

@@ -15,4 +15,4 @@ if (!is_null(UserConfig::$maillist)) {
 	$template_info['maillist_html'] = file_get_contents(UserConfig::$maillist);
 }
 
-StartupAPI::$template->display('maillist.html.twig', $template_info);
+StartupAPI::$template->display('@startupapi/maillist.html.twig', $template_info);

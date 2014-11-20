@@ -45,4 +45,4 @@ $template_info['errors']['emaillogin'] = $errors;
 
 #var_export($template_info['errors']); exit;
 
-StartupAPI::$template->display('modules/email/login.html.twig', $template_info);
+StartupAPI::$template->display('@startupapi/modules/email/login.html.twig', $template_info);

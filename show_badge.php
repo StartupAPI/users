@@ -40,4 +40,4 @@ $template_info['title'] = $badge->getTitle();
 $template_info['description'] = $badge->getDescription();
 $template_info['call_to_action'] = $badge->getCallToAction($badge_level);
 
-StartupAPI::$template->display('show_badge.html.twig', $template_info);
+StartupAPI::$template->display('@startupapi/show_badge.html.twig', $template_info);

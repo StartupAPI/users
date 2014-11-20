@@ -3,13 +3,13 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 	<title>{% block title %}Users - {{UserConfig.appName}}{% endblock %}</title>
-	{% include 'head_tag.html.twig' %}
+	{% include '@startupapi/head_tag.html.twig' %}
 </head>
 
 <body>
 	<header class="startupapi-header">
 		<div class="startupapi-header-strip pull-right">
-			{% include 'power_strip.html.twig' %}
+			{% include '@startupapi/power_strip.html.twig' %}
 		</div>
 		<h1>
 			<a href="{{ UserConfig.SITEROOTURL }}" class="startupapi-header-appname">{{ UserConfig.appName }}</a>

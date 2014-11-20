@@ -86,4 +86,4 @@ $template_info['log'] = $log;
 // setting section value
 $template_info['PAGE']['SECTION'] = 'transaction_log';
 
-StartupAPI::$template->display('account/transaction_log.html.twig', $template_info);
+StartupAPI::$template->display('@startupapi/account/transaction_log.html.twig', $template_info);

@@ -1,5 +1,5 @@
 {% extends AUTH.current_user.is_logged_in ? 'page_with_sidebar.html.twig' : 'page.html.twig' %}
-{% import 'error_messages.html.twig' as ERR %}
+{% import '@startupapi/error_messages.html.twig' as ERR %}
 
 {% block content %}
 	{% for msg in message %}

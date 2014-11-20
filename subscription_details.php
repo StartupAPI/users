@@ -107,4 +107,4 @@ if ($account->getUserRole($user) !== Account::ROLE_ADMIN) {
 $template_info['PAGE']['SECTION'] = 'subscription_details';
 $template_info['account_name'] = $account->getName();
 
-StartupAPI::$template->display('account/subscription_details.html.twig', $template_info);
+StartupAPI::$template->display('@startupapi/account/subscription_details.html.twig', $template_info);

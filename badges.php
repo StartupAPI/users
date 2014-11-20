@@ -40,4 +40,4 @@ foreach ($available_badges as $badge) {
 	$template_info['badges'][] = $badge_info;
 }
 
-StartupAPI::$template->display('badges.html.twig', $template_info);
+StartupAPI::$template->display('@startupapi/badges.html.twig', $template_info);

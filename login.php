@@ -68,4 +68,4 @@ if (array_key_exists('module', $_GET) && $id == $_GET['module'] && array_key_exi
 	$template_info['login_failed'][$id] = TRUE;
 }
 
-StartupAPI::$template->display('login.html.twig', $template_info);
+StartupAPI::$template->display('@startupapi/login.html.twig', $template_info);
