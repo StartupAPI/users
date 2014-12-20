@@ -1,4 +1,4 @@
-{% extends AUTH.current_user.is_logged_in ? 'page_with_sidebar.html.twig' : 'page.html.twig' %}
+{% extends AUTH.current_user.is_logged_in ? '@startupapi/page_with_sidebar.html.twig' : '@startupapi/page.html.twig' %}
 
 {% block content %}
 	<div class="container-fluid" style="margin-top: 1em">

@@ -1,4 +1,4 @@
-{% extends AUTH.current_user.is_logged_in ? 'page_with_sidebar.html.twig' : 'page.html.twig' %}
+{% extends AUTH.current_user.is_logged_in ? '@startupapi/page_with_sidebar.html.twig' : '@startupapi/page.html.twig' %}
 {% import '@startupapi/error_messages.html.twig' as ERR %}
 
 {% block content %}
