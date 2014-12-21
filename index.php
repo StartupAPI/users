@@ -90,6 +90,28 @@ $submodules = array(
 		'url' => 'https://github.com/rviscomi/trunk8',
 		'ready' => true
 	),
+	array(
+		'path' => __DIR__ . '/masonry/',
+		'file' => __DIR__ . '/masonry/dist/masonry.pkgd.min.js',
+		'name' => 'Masonry JavaScript library',
+		'description' => 'Cascading grid layout library. Masonry works by placing elements in optimal position based on available vertical space, sort of like a mason fitting stones in a wall. You’ve probably seen it in use all over the Internet.',
+		'git-repo' => 'https://github.com/desandro/masonry.git',
+		'github-user' => 'desandro',
+		'github-repo' => 'masonry',
+		'url' => 'https://github.com/desandro/masonry',
+		'ready' => true
+	),
+	array(
+		'path' => __DIR__ . '/imagesloaded/',
+		'file' => __DIR__ . '/imagesloaded/imagesloaded.pkgd.min.js',
+		'name' => 'imagesLoaded JavaScript library',
+		'description' => 'JavaScript is all like "You images done yet or what?"',
+		'git-repo' => 'https://github.com/desandro/imagesloaded.git',
+		'github-user' => 'desandro',
+		'github-repo' => 'imagesloaded',
+		'url' => 'https://github.com/desandro/imagesloaded',
+		'ready' => true
+	),
 );
 
 $code_none_ready = true;

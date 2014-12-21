@@ -96,10 +96,7 @@ require_once(__DIR__ . '/header.php');
 	foreach ($module_categories as $category_slug => $module_category) {
 		$category_modules = array();
 		foreach ($builtin_modules as $module_slug => $module) {
-			if ($module['category_slug'] == $category_slug
-					&& ($show_experimental
-					|| !array_key_exists('experimental', $module)
-					|| !$module['experimental'])
+			if ($module['category_slug'] == $category_slug && ($show_experimental || !array_key_exists('experimental', $module) || !$module['experimental'])
 			) {
 				$category_modules[$module_slug] = $module;
 			}
@@ -254,16 +251,26 @@ require_once(__DIR__ . '/header.php');
 	}
 	?>
 </div>
-<script src="<?php echo UserConfig::$USERSROOTURL ?>/masonry/jquery.masonry.min.js"></script>
-<script>
-	$('.modules').masonry({
-		columnWidth: function( containerWidth ) {
-			if (containerWidth > 800) {
-				return containerWidth / 2;
-			} else {
-				return containerWidth;
-			}
+<style>
+	.modules .startupapi-module {
+		width: 44%;
+	}
+
+	@media (max-width: 800px) {
+		.modules .startupapi-module {
+			width: 100%;
 		}
+	}
+</style>
+<script src="<?php echo UserConfig::$USERSROOTURL ?>/imagesloaded/imagesloaded.pkgd.min.js"></script>
+<script src="<?php echo UserConfig::$USERSROOTURL ?>/masonry/dist/masonry.pkgd.min.js"></script>
+<script>
+	$('.modules').imagesLoaded(function () {
+		$('.modules').masonry({
+			columnWidth: '.startupapi-module',
+			itemSelector: '.startupapi-module',
+			gutter: 20
+		});
 	});
 </script>
 <?php
