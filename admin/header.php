@@ -87,12 +87,6 @@ if (!isset($BREADCRUMB_EXTRA)) {
 		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap2/css/bootstrap-responsive.min.css" rel="stylesheet">
 		<script src="<?php echo UserConfig::$USERSROOTURL ?>/jquery-1.11.1.min.js"></script>
 		<script src="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap2/js/bootstrap.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="<?php echo UserConfig::$USERSROOTURL ?>/themes/<?php echo UserConfig::$theme ?>/startupapi.css">
-		<style>
-			.startupapi-sidebar.affix {
-				top: 4em;
-			}
-		</style>
 	</head>
 	<body>
 		<div class="navbar">
