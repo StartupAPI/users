@@ -60,7 +60,7 @@ else
 	zip -r StartupAPI_${v}.zip StartupAPI_${v}
 	rm -rf StartupAPI_${v}
 
-	echo "Upload files to GitHub: https://github.com/StartupAPI/users/releases/edit/REL_${subst .,_,${v}}"
+	echo "Upload files to GitHub: https://github.com/StartupAPI/users/releases/new?tag=REL_${subst .,_,${v}}"
 endif
 
 docs:	documentation
