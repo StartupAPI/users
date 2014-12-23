@@ -52,10 +52,21 @@ UserConfig::$mysql_password = '...password...';
  */
 #UserConfig::$requireVerifiedEmail = true;
 
+/**
+ * StartupAPI theme
+ */
+#UserConfig::$theme = 'awesome'; // uncomment to enable Bootstrap3-based theme
+
 /*
  * Uncomment next line to enable debug messages in error_log
  */
 #UserConfig::$DEBUG = true;
+
+/**
+ * Enables developer tools beyond simple debugging
+ * like Bootswatch theme switcher in 'awesome' theme, for example
+ */
+#UserConfig::$DEVMODE = TRUE;
 
 /**
  * Username and password registration configuration

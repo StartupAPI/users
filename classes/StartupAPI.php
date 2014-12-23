@@ -31,7 +31,7 @@ class StartupAPI {
 	/**
 	 * @var string Startup API pre-release version string
 	 */
-	private static $pre_release_version = 'dev';
+	private static $pre_release_version = null;
 
 	/**
 	 * @var string Startup API build version string
