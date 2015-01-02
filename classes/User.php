@@ -2842,7 +2842,7 @@ class User {
 	/**
 	 * Gets all accounts associated with the user
 	 *
-	 * @return array Array of User, role pairs
+	 * @return array Array of Account, role pairs
 	 *
 	 * @throws DBException
 	 * @throws StartupAPIException

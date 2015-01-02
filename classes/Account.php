@@ -299,7 +299,7 @@ class Account {
 	 *
 	 * @param User $user User we need accounts for
 	 *
-	 * @return array Array of User, role pairs
+	 * @return array Array of Account, role pairs
 	 *
 	 * @throws DBException
 	 * @throws StartupAPIException

@@ -2,6 +2,7 @@
 
 require_once(__DIR__ . '/User.php');
 require_once(__DIR__ . '/API/v1/User.php');
+require_once(__DIR__ . '/API/v1/Accounts.php');
 
 require_once(__DIR__ . '/Plan.php');
 
@@ -185,6 +186,7 @@ class StartupAPI {
 
 	private static function _registerEndpoints() {
 		UserConfig::$api['/startupapi/v1/user'] = new StartupAPI\API\v1\User();
+		UserConfig::$api['/startupapi/v1/accounts'] = new StartupAPI\API\v1\Accounts();
 	}
 
 	/**
