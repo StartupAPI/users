@@ -854,6 +854,24 @@ class UserConfig {
 
 	/* ========================================================================
 	 *
+	 * API - related configurations
+	 *
+	 * ===================================================================== */
+
+	/**
+	 *
+	 * @var StartupAPIEndpoint[] Associative array of endpoints
+	 *		with keys of endpoint paths and values of StartupAPIEndpoint implementations
+	 */
+	public static $api = null;
+
+	/**
+	 * @var boolean Exposed core StartupAPI methods in API (true by default)
+	 */
+	public static $enable_startupapi_apis = true;
+
+	/* ========================================================================
+	 *
 	 * Some global functions and default hooks, as well as static initializer
 	 *
 	 * ===================================================================== */

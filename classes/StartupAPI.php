@@ -1,6 +1,8 @@
 <?php
 
 require_once(__DIR__ . '/User.php');
+require_once(__DIR__ . '/API/v1/User.php');
+
 require_once(__DIR__ . '/Plan.php');
 
 require_once(dirname(__DIR__) . '/twig/lib/Twig/Autoloader.php');
@@ -90,7 +92,7 @@ class StartupAPI {
 				'show_navbar' => is_null($show_navbar) ? UserConfig::$powerStripShowNavbar : $show_navbar,
 				'inverted_navbar' => is_null($inverted_navbar) ? UserConfig::$powerStripInvertedNavbar : $inverted_navbar,
 				'pull_right' => is_null($pull_right) ? UserConfig::$powerStripPullRight : $pull_right
-				))
+			))
 		);
 
 		return StartupAPI::$template->render('@startupapi/power_strip.html.twig', $template_info);
@@ -174,6 +176,15 @@ class StartupAPI {
 		$loader->addPath(dirname(__DIR__) . '/admin/templates', 'startupapi-admin');
 
 		self::$template = new Twig_Environment($loader, UserConfig::$twig_options);
+
+		// StartupAPI apis
+		if (UserConfig::$enable_startupapi_apis) {
+			self::_registerEndpoints();
+		}
+	}
+
+	private static function _registerEndpoints() {
+		UserConfig::$api['/startupapi/v1/user'] = new StartupAPI\API\v1\User();
 	}
 
 	/**
@@ -207,12 +218,12 @@ class StartupAPI {
 			}
 		}
 		$config_info['authentication_modules'] = array_map(function($module) {
-					return array(
-						'id' => $module->getID(),
-						'title' => $module->getTitle(),
-						'is_compact' => $module->isCompact()
-					);
-				}, UserConfig::$authentication_modules);
+			return array(
+				'id' => $module->getID(),
+				'title' => $module->getTitle(),
+				'is_compact' => $module->isCompact()
+			);
+		}, UserConfig::$authentication_modules);
 		$config_info['maillist_exists'] = UserConfig::$maillist && file_exists(UserConfig::$maillist);
 
 		// AUTH
@@ -460,4 +471,3 @@ class DBExecuteStmtException extends DBException {
 class DBPrepareStmtException extends DBException {
 
 }
-
