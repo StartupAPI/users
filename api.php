@@ -25,7 +25,41 @@ if (!is_array(UserConfig::$api) || !array_key_exists($_GET['call'], UserConfig::
 $endpoint = UserConfig::$api[$_GET['call']];
 
 // parameters come from query string
-$params = $_GET;
+$query = $_SERVER['QUERY_STRING'];
+$params = array();
+foreach (explode('&', $query) as $pair) {
+	list($key, $value) = explode('=', $pair);
+
+	$key = urldecode($key);
+
+	// support PHP arrays as well
+	if (substr($key, -2) == '[]') {
+		$key = substr($key, 0, strlen($key) - 2);
+	}
+
+	// if empty parameter name is passed, throw an error
+	if ($key == '') {
+		header('HTTP/1.0 400 Bad Request');
+		?>
+		<h1>400 Bad Request</h1>
+		<p>Parameter name is required: <b><span style="font-style: italic; color: red">name</span>=<?php echo rawurlencode($value) ?></b></p>
+		<?php
+		exit;
+	}
+
+	$value = urldecode($value);
+
+	if (array_key_exists($key, $params)) {
+		// convert existing value to array if not an array yet
+		if (!is_array($params[$key])) {
+			$params[$key] = array($params[$key]);
+		}
+		$params[$key][] = $value;
+	} else {
+		$params[$key] = $value;
+	}
+}
+
 unset($params['call']); // except for the call parameter
 
 if (!is_subclass_of($endpoint, '\StartupAPI\API\StartupAPIEndpoint')) {
@@ -36,6 +70,8 @@ if (!is_subclass_of($endpoint, '\StartupAPI\API\StartupAPIEndpoint')) {
 	<?php
 	exit;
 }
+
+header('Content-type: application/json');
 
 try {
 	// default output format is JSON
@@ -48,6 +84,24 @@ try {
 } catch (\StartupAPI\API\UnauthenticatedException $ex) {
 	header('HTTP/1.0 401 Authentication Required');
 	header('WWW-Authenticate: FormBased');
+	$response = array(
+		'meta' => array(
+			'success' => false,
+			'error' => $ex->getMessage(),
+			'error_code' => $ex->getCode()
+		)
+	);
+} catch (\StartupAPI\API\UnauthorizedException $ex) {
+	header('HTTP/1.0 403 Forbidden');
+	$response = array(
+		'meta' => array(
+			'success' => false,
+			'error' => $ex->getMessage(),
+			'error_code' => $ex->getCode()
+		)
+	);
+} catch (\StartupAPI\API\RequiredParameterException $ex) {
+	header('HTTP/1.0 400 Parameter Required');
 	$response = array(
 		'meta' => array(
 			'success' => false,
