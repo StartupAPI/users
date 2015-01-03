@@ -154,7 +154,7 @@ You can also swith navbar to "pills" mode (no navbar) by setting UserConfig::$po
 					<b class="caret"></b>
 				</a>
 				<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" id="startupapi-account-switcher">
-					{% for account in AUTH.accounts %}
+					{% for account in AUTH.accounts if not account.current %}
 						<li>
 							<a tabindex="-1" href="#" data-account-swtich-to="{{ account.id }}">
 								{{ account.name }}

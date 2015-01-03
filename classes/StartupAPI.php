@@ -263,20 +263,22 @@ class StartupAPI {
 
 			$accounts = Account::getUserAccounts($current_user);
 			foreach ($accounts as $account) {
-				if (!$account->isTheSameAs($current_account)) {
-					$account_info = array(
-						'name' => $account->getName(),
-						'id' => $account->getID()
-					);
+				$account_info = array(
+					'name' => $account->getName(),
+					'id' => $account->getID()
+				);
 
-					$plan = $account->getPlan(); // can be FALSE
-					if ($plan) {
-						$account_info['plan']['name'] = $plan->getName();
-						$account_info['plan']['description'] = $plan->getDescription();
-					}
-
-					$auth_info['accounts'][] = $account_info;
+				$plan = $account->getPlan(); // can be FALSE
+				if ($plan) {
+					$account_info['plan']['name'] = $plan->getName();
+					$account_info['plan']['description'] = $plan->getDescription();
 				}
+
+				if ($account->isTheSameAs($current_account)) {
+					$account_info['current'] = true;
+				}
+
+				$auth_info['accounts'][] = $account_info;
 			}
 		} else {
 			$auth_info['current_user']['is_logged_in'] = FALSE;
