@@ -8,8 +8,40 @@ if (!array_key_exists('call', $_GET)) {
 	?>
 	<h1>400 Bad Request</h1>
 	<p>Required parameter: <b>call</b></p>
-	<p>Example: <a href="?call=/startupapi/v1/user">api.php?<b>call</b>=<i>/startupapi/v1/user</i></a></p>
 	<?php
+	$user = StartupAPI::getUser();
+	if (!is_null($user) && $user->isAdmin()) {
+		?>
+		<p>
+			Available endpoints:
+			<?php
+			$namespaces = array();
+			foreach (UserConfig::$api as $call => $endpoint) {
+				list($ignore, $namespace, $ignore) = explode('/', $call, 3);
+
+				$namespaces[$namespace][] = $call;
+			}
+
+			foreach ($namespaces as $namespace => $calls) {
+				?>
+			<h2><?php echo $namespace; ?></h2>
+			<ul>
+				<?php
+				foreach ($calls as $call) {
+					?>
+					<li>
+						<a href="?call=<?php echo $call ?>">api.php?<b>call</b>=<i><?php echo $call ?></i></a>
+					</li>
+					<?php
+				}
+				?>
+			</ul>
+			<?php
+		}
+		?>
+		</p>
+		<?php
+	}
 	exit;
 }
 
