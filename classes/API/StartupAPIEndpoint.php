@@ -20,7 +20,7 @@ abstract class StartupAPIEndpoint {
 	/**
 	 * @var string Description of the endpoint
 	 */
-	private $description;
+	protected $description;
 
 	/**
 	 * @var StartupAPIEndpointParamType[] Associative array of name => type pairs that define parameters
@@ -31,7 +31,7 @@ abstract class StartupAPIEndpoint {
 	 *
 	 * @return string Description of the endpoint
 	 */
-	public function getDocumentation() {
+	public function getEndpointDescription() {
 		return $this->description;
 	}
 
@@ -50,7 +50,7 @@ abstract class StartupAPIEndpoint {
 	 * @param mixed[] $values Associative array of parameter values for this call
 	 * @return mixed Returns a response PHP data structure
 	 */
-	public function call($values) {
+	protected function call($values) {
 		$missing_params = $this->params;
 
 		// check all passed parameters
@@ -76,8 +76,36 @@ abstract class StartupAPIEndpoint {
 
 }
 
-abstract class StartupAPIPublicEndpoint extends StartupAPIEndpoint {
+/*
+ * Interfaces this endpoint supports
+ */
 
+interface EndpointAllowsRead {
+
+	public function read($values);
+
+	public function getReadDescription();
+}
+
+interface EndpointAllowsUpdate {
+
+	public function update($values);
+
+	public function getUpdateDescription();
+}
+
+interface EndpointAllowsCreate {
+
+	public function create($values);
+
+	public function getCreateDescription();
+}
+
+interface EndpointAllowsDelete {
+
+	public function delete($values);
+
+	public function getDeleteDescription();
 }
 
 abstract class StartupAPIAuthenticatedEndpoint extends StartupAPIEndpoint {
@@ -90,8 +118,7 @@ abstract class StartupAPIAuthenticatedEndpoint extends StartupAPIEndpoint {
 	 * @return User Returns currently authenticated user
 	 * @throws UnauthenticatedException
 	 */
-	public function call($values) {
-		// @TODO run authentication here
+	protected function call($values) {
 		parent::call($values);
 
 		$user = \StartupAPI::getUser();
@@ -182,6 +209,31 @@ class UnauthorizedException extends APIException {
 
 	function __construct($message = "Request forbidden") {
 		parent::__construct($message, 403);
+	}
+
+}
+
+class MethodNotAllowedException extends APIException {
+
+	private $method = null;
+
+	/**
+	 * @param string $method HTTP Method
+	 * @param string $message Exception message
+	 * @param int $code Exception code
+	 * @param Exception $previous previous exception
+	 */
+	function __construct($method = null, $message = "HTTP Method not allowed", $code = null, $previous = null) {
+		parent::__construct($message, $code, $previous);
+
+		$this->method = $method;
+		if (!is_null($this->method)) {
+			$this->message = $message . ": $method";
+		}
+	}
+
+	private function getMethod() {
+		return $this->method;
 	}
 
 }

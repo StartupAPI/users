@@ -24,7 +24,7 @@ class StartupAPI {
 	/**
 	 * @var int Startup API minor version - to be incremented automatically when asked for
 	 */
-	private static $minor_version = 7;
+	private static $minor_version = 8;
 
 	/**
 	 * @var int	Startup API patch level (version number) - to be incremented automatically when build script is ran
@@ -34,7 +34,7 @@ class StartupAPI {
 	/**
 	 * @var string Startup API pre-release version string
 	 */
-	private static $pre_release_version = null;
+	private static $pre_release_version = 'dev';
 
 	/**
 	 * @var string Startup API build version string

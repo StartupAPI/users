@@ -17,9 +17,9 @@ if (!array_key_exists('call', $_GET)) {
 			<?php
 			$namespaces = array();
 			foreach (UserConfig::$api as $call => $endpoint) {
-				list($ignore, $namespace, $ignore) = explode('/', $call, 3);
+				list($ignore, $namespace, $ignore2) = explode('/', $call, 3);
 
-				$namespaces[$namespace][] = $call;
+				$namespaces[$namespace][] = array($call, $endpoint);
 			}
 
 			foreach ($namespaces as $namespace => $calls) {
@@ -27,10 +27,57 @@ if (!array_key_exists('call', $_GET)) {
 			<h2><?php echo $namespace; ?></h2>
 			<ul>
 				<?php
-				foreach ($calls as $call) {
+				foreach ($calls as $pair) {
+					$call = $pair[0];
+					$endpoint = $pair[1];
 					?>
 					<li>
-						<a href="?call=<?php echo $call ?>">api.php?<b>call</b>=<i><?php echo $call ?></i></a>
+						<h3><?php echo $endpoint->getEndpointDescription() ?></h3>
+						<a href="?call=<?php echo $call; ?>"><?php echo UserConfig::$USERSROOTFULLURL ?>/api.php?call=<b><?php echo $call; ?></b></a>
+						<p>Methods:</p>
+						<ul>
+							<?php
+							if ($endpoint instanceof \StartupAPI\API\EndpointAllowsRead) {
+								?>
+								<li>
+									<dl>
+										<dt>GET<dt>
+										<dd><?php echo $endpoint->getReadDescription(); ?></dd>
+									</dl>
+								</li>
+								<?php
+							}
+							if ($endpoint instanceof \StartupAPI\API\EndpointAllowsCreate) {
+								?>
+								<li>
+									<dl>
+										<dt>PUT<dt>
+										<dd><?php echo $endpoint->getCreateDescription(); ?></dd>
+									</dl>
+								</li>
+								<?php
+							}
+							if ($endpoint instanceof \StartupAPI\API\EndpointAllowsUpdate) {
+								?>
+								<li>
+									<dl>
+										<dt>POST<dt>
+										<dd><?php echo $endpoint->getUpdateDescription(); ?></dd>
+									</dl>
+								</li>
+								<?php
+							}
+							if ($endpoint instanceof \StartupAPI\API\EndpointAllowsDelete) {
+								?>
+								<li>
+									<dl>
+										<dt>DELETE<dt>
+										<dd><?php echo $endpoint->getDeleteDescription(); ?></dd>
+									</dl>
+								</li>
+							<?php }
+							?>
+						</ul>
 					</li>
 					<?php
 				}
@@ -106,12 +153,49 @@ if (!is_subclass_of($endpoint, '\StartupAPI\API\StartupAPIEndpoint')) {
 header('Content-type: application/json');
 
 try {
+	if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+		if ($endpoint instanceof \StartupAPI\API\EndpointAllowsRead) {
+			$result = $endpoint->read($params);
+		} else {
+			throw new \StartupAPI\API\MethodNotAllowedException('GET');
+		}
+	} else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+		if ($endpoint instanceof \StartupAPI\API\EndpointAllowsUpdate) {
+			$result = $endpoint->update($params);
+		} else {
+			throw new \StartupAPI\API\MethodNotAllowedException('POST');
+		}
+	} else if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
+		if ($endpoint instanceof \StartupAPI\API\EndpointAllowsCreate) {
+			$result = $endpoint->create($params);
+		} else {
+			throw new \StartupAPI\API\MethodNotAllowedException('PUT');
+		}
+	} else if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
+		if ($endpoint instanceof \StartupAPI\API\EndpointAllowsDelete) {
+			$result = $endpoint->delete($params);
+		} else {
+			throw new \StartupAPI\API\MethodNotAllowedException('DELETE');
+		}
+	} else {
+		throw new \StartupAPI\API\MethodNotAllowedException();
+	}
+
 	// default output format is JSON
 	$response = array(
 		'meta' => array(
 			'success' => true
 		),
-		'result' => $endpoint->call($params)
+		'result' => $result
+	);
+} catch (\StartupAPI\API\MethodNotAllowedException $ex) {
+	header('HTTP/1.0 405 Method not allowed');
+	$response = array(
+		'meta' => array(
+			'success' => false,
+			'error' => $ex->getMessage(),
+			'error_code' => $ex->getCode()
+		)
 	);
 } catch (\StartupAPI\API\UnauthenticatedException $ex) {
 	header('HTTP/1.0 401 Authentication Required');

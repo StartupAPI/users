@@ -14,11 +14,15 @@ require_once(dirname(__DIR__) . '/StartupAPIEndpoint.php');
  * @package StartupAPI
  * @subpackage API
  */
-class Accounts extends \StartupAPI\API\StartupAPIAuthenticatedEndpoint {
+class Accounts extends \StartupAPI\API\StartupAPIAuthenticatedEndpoint  implements \StartupAPI\API\EndpointAllowsRead {
 
-	private $description = "Returns a lis of accounts for currently authenticated user";
+	protected $description = "User's Accounts";
 
-	public function call($values) {
+	public function getReadDescription() {
+		return "Returns a list of accounts for currently authenticated user";
+	}
+
+	public function read($values) {
 		$user = parent::call($values);
 
 		$accounts = $user->getAccounts();

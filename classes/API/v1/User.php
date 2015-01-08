@@ -18,9 +18,9 @@ require_once(dirname(dirname(__DIR__)) . '/Account.php');
  * @package StartupAPI
  * @subpackage API
  */
-class User extends \StartupAPI\API\StartupAPIAuthenticatedEndpoint {
+class User extends \StartupAPI\API\StartupAPIAuthenticatedEndpoint implements \StartupAPI\API\EndpointAllowsRead {
 
-	private $description = "Returns currently authenticated user";
+	protected $description = "Users";
 
 	public function __construct() {
 		$this->params = array(
@@ -28,7 +28,11 @@ class User extends \StartupAPI\API\StartupAPIAuthenticatedEndpoint {
 		);
 	}
 
-	public function call($values) {
+	public function getReadDescription() {
+		return "Returns currently authenticated user";
+	}
+
+	public function read($values) {
 		$user = parent::call($values);
 
 		if (array_key_exists('id', $values)) {
