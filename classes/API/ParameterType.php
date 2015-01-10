@@ -14,7 +14,7 @@ namespace StartupAPI\API;
  * @package StartupAPI
  * @subpackage API
  */
-class StartupAPIEndpointParamType {
+class ParameterType {
 
 	/**
 	 * @var boolean Makes this parameter optional

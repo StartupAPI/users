@@ -6,8 +6,8 @@ namespace StartupAPI\API\v1;
  * @package StartupAPI
  * @subpackage API
  */
-require_once(dirname(__DIR__) . '/StartupAPIEndpoint.php');
-require_once(dirname(__DIR__) . '/StartupAPIEndpointParamType.php');
+require_once(dirname(__DIR__) . '/Endpoint.php');
+require_once(dirname(__DIR__) . '/ParameterType.php');
 
 require_once(dirname(dirname(__DIR__)) . '/User.php');
 require_once(dirname(dirname(__DIR__)) . '/Account.php');
@@ -18,21 +18,17 @@ require_once(dirname(dirname(__DIR__)) . '/Account.php');
  * @package StartupAPI
  * @subpackage API
  */
-class User extends \StartupAPI\API\StartupAPIAuthenticatedEndpoint implements \StartupAPI\API\EndpointAllowsRead {
-
-	protected $description = "Users";
+class User extends \StartupAPI\API\AuthenticatedEndpoint {
 
 	public function __construct() {
+		parent::__construct('/v1/user', "Returns currently authenticated user");
+
 		$this->params = array(
-			'id' => new \StartupAPI\API\StartupAPIEndpointParamType(true)
+			'id' => new \StartupAPI\API\ParameterType(true)
 		);
 	}
 
-	public function getReadDescription() {
-		return "Returns currently authenticated user";
-	}
-
-	public function read($values) {
+	public function call($values) {
 		$user = parent::call($values);
 
 		if (array_key_exists('id', $values)) {
@@ -59,7 +55,7 @@ class User extends \StartupAPI\API\StartupAPIAuthenticatedEndpoint implements \S
 					throw new \StartupAPI\API\UnauthorizedException("You are not allowed to request information about this user");
 				}
 			} else {
-				return null;
+				throw new \StartupAPI\API\ObjectNotFoundException("No such user");
 			}
 		}
 

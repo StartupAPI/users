@@ -1,8 +1,6 @@
 <?php
 
 require_once(__DIR__ . '/User.php');
-require_once(__DIR__ . '/API/v1/User.php');
-require_once(__DIR__ . '/API/v1/Accounts.php');
 
 require_once(__DIR__ . '/Plan.php');
 
@@ -180,13 +178,8 @@ class StartupAPI {
 
 		// StartupAPI apis
 		if (UserConfig::$enable_startupapi_apis) {
-			self::_registerEndpoints();
+			\StartupAPI\API\Endpoint::registerCoreEndpoints();
 		}
-	}
-
-	private static function _registerEndpoints() {
-		UserConfig::$api['/startupapi/v1/user'] = new StartupAPI\API\v1\User();
-		UserConfig::$api['/startupapi/v1/accounts'] = new StartupAPI\API\v1\Accounts();
 	}
 
 	/**

@@ -6,7 +6,7 @@ namespace StartupAPI\API\v1;
  * @package StartupAPI
  * @subpackage API
  */
-require_once(dirname(__DIR__) . '/StartupAPIEndpoint.php');
+require_once(dirname(__DIR__) . '/Endpoint.php');
 
 /**
  * Returns currently authenticated user
@@ -14,15 +14,13 @@ require_once(dirname(__DIR__) . '/StartupAPIEndpoint.php');
  * @package StartupAPI
  * @subpackage API
  */
-class Accounts extends \StartupAPI\API\StartupAPIAuthenticatedEndpoint  implements \StartupAPI\API\EndpointAllowsRead {
+class Accounts extends \StartupAPI\API\AuthenticatedEndpoint {
 
-	protected $description = "User's Accounts";
-
-	public function getReadDescription() {
-		return "Returns a list of accounts for currently authenticated user";
+	public function __construct() {
+		parent::__construct('/v1/accounts', 'Returns a list of accounts for currently authenticated user');
 	}
 
-	public function read($values) {
+	public function call($values) {
 		$user = parent::call($values);
 
 		$accounts = $user->getAccounts();
