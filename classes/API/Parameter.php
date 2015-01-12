@@ -14,7 +14,17 @@ namespace StartupAPI\API;
  * @package StartupAPI
  * @subpackage API
  */
-class ParameterType {
+class Parameter {
+
+	/**
+	 * @var string Parameter description
+	 */
+	private $description;
+
+	/**
+	 * @var string Sample value to be shown in call examples
+	 */
+	private $sample_value;
 
 	/**
 	 * @var boolean Makes this parameter optional
@@ -27,11 +37,29 @@ class ParameterType {
 	private $multiple = false;
 
 	/**
+	 * @param string $description Parameter description
+	 * @param boolean $optional Make this parameter optional
 	 * @param boolean $multiple Allow multiple instances of the same parameter
 	 */
-	public function __construct($optional = false, $multiple = false) {
+	public function __construct($description, $sample_value, $optional = false, $multiple = false) {
+		$this->description = $description;
+		$this->sample_value = $sample_value;
 		$this->optional = $optional ? true : false;
 		$this->multiple = $multiple ? true : false;
+	}
+
+	/**
+	 * @return string Parameter description
+	 */
+	public function getDescription() {
+		return $this->description;
+	}
+
+	/**
+	 * @return string Sample parameter value
+	 */
+	public function getSampleValue() {
+		return $this->sample_value;
 	}
 
 	/**
@@ -39,6 +67,13 @@ class ParameterType {
 	 */
 	public function isOptional() {
 		return $this->optional;
+	}
+
+	/**
+	 * @return boolean True if multiple values for this parameter are allowed
+	 */
+	public function allowsMultipleValues() {
+		return $this->multiple;
 	}
 
 	/**

@@ -47,7 +47,7 @@ abstract class Endpoint {
 	protected $description;
 
 	/**
-	 * @var ParameterType[] Associative array of name => type pairs that define parameters
+	 * @var Parameter[] Associative array of name => type pairs that define parameters
 	 */
 	protected $params = array();
 
@@ -96,7 +96,7 @@ abstract class Endpoint {
 	}
 
 	/**
-	 * @return ParameterType[] Associative array of name => type pairs that define parameters
+	 * @return Parameter[] Associative array of name => type pairs that define parameters
 	 */
 	public function getParams() {
 		return $this->params;

@@ -6,6 +6,33 @@ if (!array_key_exists('call', $_GET)) {
 	// (for public methods or if user is authenticated, with private methods and so on)
 	header('HTTP/1.0 400 Bad Request');
 	?>
+	<style>
+		code {
+			font-family: monospace,"Courier New";
+			background-color: #f9f9f9;
+			padding: 0.2em;
+		}
+
+		dl {
+			margin-bottom: 2em;
+		}
+
+		dt {
+			margin-bottom: 0.3em;
+		}
+
+		dd {
+			margin-bottom: 0.5em;
+		}
+
+		b.call {
+			color: green;
+		}
+
+		b.param {
+			color: blue;
+		}
+	</style>
 	<h1>400 Bad Request</h1>
 	<p>Required parameter: <b>call</b></p>
 	<?php
@@ -30,22 +57,78 @@ if (!array_key_exists('call', $_GET)) {
 							<?php
 							foreach ($endpoints as $method => $endpoint) {
 								$call = "/$namespace_slug$endpoint_slug";
-								?>
-								<dt style="font">
-								<?php echo $method; ?>
-								<?php
-								if ($method == 'GET') {
-									?>
-									<a href="?call=<?php echo $call; ?>"><?php echo UserConfig::$USERSROOTFULLURL ?>/api.php?call=<b><?php echo $call; ?></b></a>
-									<?php
-								} else {
-									echo UserConfig::$USERSROOTFULLURL;
-									?>/api.php?call=<b><?php echo $call; ?></b>
-									<?php
+
+								$params = $endpoint->getParams();
+
+								$sample_params_urlencoded = '';
+								if (count($params) > 0) {
+									foreach ($params as $name => $param) {
+										if (!$param->isOptional()) {
+											$sample_params_urlencoded .= '<b class="param">' . $name . '</b>=';
+											$sample_params_urlencoded .= urldecode($param->getSampleValue());
+										}
+									}
+
+									if (!empty($sample_params_urlencoded)) {
+										$sample_params_urlencoded = '&amp;' . $sample_params_urlencoded;
+									}
 								}
 								?>
+								<dt>
+								<code>
+									<?php echo $method; ?>
+									<?php
+									if ($method == 'GET') {
+										?>
+										<a href="?call=<?php echo $call . strip_tags($sample_params_urlencoded) ?>"><?php echo UserConfig::$USERSROOTFULLURL ?>/api.php?call=<b class="call"><?php echo $call ?></b><?php echo $sample_params_urlencoded ?></a>
+										<?php
+									} else {
+										echo UserConfig::$USERSROOTFULLURL;
+										?>/api.php?call=<b class="call"><?php echo $call; ?></b>
+										<?php
+									}
+									?>
+								</code>
 								</dt>
-								<dd><?php echo $endpoint->getDescription(); ?></dd>
+								<dd>
+									<?php echo $endpoint->getDescription(); ?>
+									<?php
+									if (count($params) > 0) {
+										?>
+										<h4>Parameters:</h4>
+										<dl>
+											<?php
+											foreach ($params as $name => $param) {
+												?>
+												<dt>
+												<code><?php echo $name; ?></code>
+												<?php
+												if ($param->isOptional()) {
+													?> (optional)<?php
+												} else {
+													?> (required)<?php
+												}
+												?>
+												</dt>
+												<dd>
+													<?php
+													echo $param->getDescription();
+
+													if ($param->allowsMultipleValues()) {
+														?>
+														(allows multiple values)
+														<?php
+													}
+													?>
+												</dd>
+												<?php
+											}
+											?>
+										</dl>
+										<?php
+									}
+									?>
+								</dd>
 								<?php
 							}
 							?>

@@ -7,7 +7,7 @@ namespace StartupAPI\API\v1;
  * @subpackage API
  */
 require_once(dirname(__DIR__) . '/Endpoint.php');
-require_once(dirname(__DIR__) . '/ParameterType.php');
+require_once(dirname(__DIR__) . '/Parameter.php');
 
 require_once(dirname(dirname(__DIR__)) . '/User.php');
 require_once(dirname(dirname(__DIR__)) . '/Account.php');
@@ -21,10 +21,10 @@ require_once(dirname(dirname(__DIR__)) . '/Account.php');
 class User extends \StartupAPI\API\AuthenticatedEndpoint {
 
 	public function __construct() {
-		parent::__construct('/v1/user', "Returns currently authenticated user");
+		parent::__construct('/v1/user', "Returns currently authenticated user or user specified by 'id' parameter");
 
 		$this->params = array(
-			'id' => new \StartupAPI\API\ParameterType(true)
+			'id' => new \StartupAPI\API\Parameter("User ID", 1, true, true)
 		);
 	}
 
