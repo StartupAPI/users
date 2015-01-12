@@ -117,15 +117,27 @@ abstract class Endpoint {
 	 * @param string $call_slug
 	 */
 	public static function getEndpoint($method, $call_slug) {
-		list($ignore, $namespace_slug, $endpoint_slug) = explode('/', $call_slug, 3);
+		$parts = explode('/', $call_slug, 3);
+
+		if (!is_array($parts) || !isset($parts[1]) || !isset($parts[2])) {
+			throw new \StartupAPI\API\MalformedCallSlugException($call_slug);
+		}
+
+		$namespace_slug = $parts[1];
+		$endpoint_slug = $parts[2];
+
 		$endpoint_slug = "/$endpoint_slug";
 
 		if (!array_key_exists($namespace_slug, self::$endpoints_by_method)) {
-			return null;
+			throw new \StartupAPI\API\NamespaceNotFoundException($namespace_slug);
 		}
 
 		if (!array_key_exists($method, self::$endpoints_by_method[$namespace_slug])) {
 			throw new \StartupAPI\API\MethodNotAllowedException($method);
+		}
+
+		if (!array_key_exists($endpoint_slug, self::$endpoints_by_method[$namespace_slug][$method])) {
+			throw new \StartupAPI\API\CallNotFoundException($method, $call_slug);
 		}
 
 		return self::$endpoints_by_method[$namespace_slug][$method][$endpoint_slug];
@@ -139,20 +151,69 @@ abstract class Endpoint {
 	}
 
 	/**
+	 * Helper function to parse strings of parameters from query string or request body
+	 *
+	 * @param string $urlencoded_string URL-encoded string of parameters
+	 * @param mixed[] $params Associative array of parameters to merge decoded values into
+	 * @return mixed[] Associative array of parameters
+	 */
+	public static function parseURLEncoded($urlencoded_string, $params = array()) {
+
+		foreach (explode('&', $urlencoded_string) as $pair) {
+			$key_value = explode('=', $pair);
+
+			if (!is_array($key_value) || !isset($key_value[0]) || !isset($key_value[1])) {
+				continue;
+			}
+
+			$key = $key_value[0];
+			$value = $key_value[1];
+
+			$key = urldecode($key);
+
+			// support PHP arrays as well
+			if (substr($key, -2) == '[]') {
+				$key = substr($key, 0, strlen($key) - 2);
+			}
+
+			// if empty parameter name is passed, just ignore it
+			if ($key == '') {
+				continue;
+			}
+
+			$value = urldecode($value);
+
+			if (array_key_exists($key, $params)) {
+				// convert existing value to array if not an array yet
+				if (!is_array($params[$key])) {
+					$params[$key] = array($params[$key]);
+				}
+				$params[$key][] = $value;
+			} else {
+				$params[$key] = $value;
+			}
+		}
+
+		return $params;
+	}
+
+	/**
 	 * Core method that implements the API Endpoint.
 	 * Performs parameter type validation, needs to be overriden
 	 * and called by all implementations.
 	 *
 	 * @param mixed[] $values Associative array of parameter values for this call
+	 * @param string|null $raw_request_body Raw request body (for POST/PUT requests)
+	 *
 	 * @return mixed Returns a response PHP data structure
 	 */
-	protected function call($values) {
+	protected function call($values, $raw_request_body = null) {
 		$missing_params = $this->params;
 
 		// check all passed parameters
 		foreach ($values as $name => $value) {
 			if (!array_key_exists($name, $this->params)) {
-				throw new UnknownParameterException("Unknown parameter: $name");
+				throw new UnknownParameterException($name);
 			}
 
 			if (!$this->params[$name]->validate($value)) {
@@ -182,7 +243,7 @@ abstract class AuthenticatedEndpoint extends Endpoint {
 	 * @return User Returns currently authenticated user
 	 * @throws UnauthenticatedException
 	 */
-	protected function call($values) {
+	protected function call($values, $raw_request_body = null) {
 		parent::call($values);
 
 		$user = \StartupAPI::getUser();
@@ -218,10 +279,44 @@ class InvalidParameterValueException extends APIException {
 
 }
 
+abstract class BadRequestException extends APIException {
+
+}
+
+/**
+ * Thrown when we can't parse "call" parameter
+ */
+class MalformedCallSlugException extends APIException {
+
+	private $call_slug;
+
+	/**
+	 * @param string $name Parameter name
+	 * @param string $message Exception message
+	 * @param int $code Exception code
+	 * @param Exception $previous previous exception
+	 */
+	function __construct($call_slug, $message = "Malformed call slug") {
+		parent::__construct($message);
+
+		$this->call_slug = $call_slug;
+		$this->message = $message . ": $call_slug";
+	}
+
+	private function getCallSlug() {
+		return $this->call_slug;
+	}
+
+}
+
+abstract class BadParameterException extends BadRequestException {
+
+}
+
 /**
  * Thrown when parameter is required
  */
-class RequiredParameterException extends APIException {
+class RequiredParameterException extends BadParameterException {
 
 	private $name;
 
@@ -247,10 +342,19 @@ class RequiredParameterException extends APIException {
 /**
  * Thrown when parameter passed is not defined for endpoint
  */
-class UnknownParameterException extends APIException {
+class UnknownParameterException extends BadParameterException {
 
-	function __construct($message = "Unknown parameter", $code = null, $previous = null) {
-		parent::__construct($message, $code, $previous);
+	private $param_name;
+
+	function __construct($param_name, $message = "Unknown parameter") {
+		parent::__construct($message);
+
+		$this->param_name = $param_name;
+		$this->message = $message . ": $param_name";
+	}
+
+	private function getParameterName() {
+		return $this->param_name;
 	}
 
 }
@@ -324,6 +428,26 @@ class ObjectNotFoundException extends NotFoundException {
 }
 
 /**
+ * Thrown when API namespace is not found
+ */
+class NamespaceNotFoundException extends NotFoundException {
+
+	private $namespace_slug;
+
+	function __construct($namespace_slug, $message = "API Namespace not found") {
+		parent::__construct($message);
+
+		$this->namespace_slug = $namespace_slug;
+		$this->message = $message . ": $namespace_slug";
+	}
+
+	private function getNamespaceSlug() {
+		return $this->namespace_slug;
+	}
+
+}
+
+/**
  * Thrown when there is no such endpoint (for a method used)
  */
 class CallNotFoundException extends NotFoundException {
@@ -341,9 +465,7 @@ class CallNotFoundException extends NotFoundException {
 
 		$this->method = $method;
 		$this->call_slug = $call_slug;
-		if (!is_null($this->method)) {
-			$this->message = $message . ": $method $call_slug";
-		}
+		$this->message = $message . ": $method $call_slug";
 	}
 
 	private function getMethod() {

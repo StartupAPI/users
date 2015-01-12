@@ -66,38 +66,13 @@ if (!array_key_exists('call', $_GET)) {
 
 // parameters come from query string
 $query = $_SERVER['QUERY_STRING'];
-$params = array();
-foreach (explode('&', $query) as $pair) {
-	list($key, $value) = explode('=', $pair);
+$params = \StartupAPI\API\Endpoint::parseURLEncoded($query);
 
-	$key = urldecode($key);
 
-	// support PHP arrays as well
-	if (substr($key, -2) == '[]') {
-		$key = substr($key, 0, strlen($key) - 2);
-	}
+$raw_request_body = file_get_contents('php://input');
 
-	// if empty parameter name is passed, throw an error
-	if ($key == '') {
-		header('HTTP/1.0 400 Bad Request');
-		?>
-		<h1>400 Bad Request</h1>
-		<p>Parameter name is required: <b><span style="font-style: italic; color: red">name</span>=<?php echo rawurlencode($value) ?></b></p>
-		<?php
-		exit;
-	}
-
-	$value = urldecode($value);
-
-	if (array_key_exists($key, $params)) {
-		// convert existing value to array if not an array yet
-		if (!is_array($params[$key])) {
-			$params[$key] = array($params[$key]);
-		}
-		$params[$key][] = $value;
-	} else {
-		$params[$key] = $value;
-	}
+if (!empty($raw_request_body) && strtolower($_SERVER['CONTENT_TYPE']) == 'application/x-www-form-urlencoded') {
+	$params = \StartupAPI\API\Endpoint::parseURLEncoded($raw_request_body, $params);
 }
 
 unset($params['call']); // except for the call parameter
@@ -110,9 +85,10 @@ try {
 	// default output format is JSON
 	$response = array(
 		'meta' => array(
-			'success' => true
+			'success' => true,
+			'params' => $params
 		),
-		'result' => $endpoint->call($params)
+		'result' => $endpoint->call($params, $raw_request_body)
 	);
 } catch (\StartupAPI\API\NotFoundException $ex) {
 	header('HTTP/1.0 404 Not Found');
@@ -151,8 +127,8 @@ try {
 			'error_code' => $ex->getCode()
 		)
 	);
-} catch (\StartupAPI\API\RequiredParameterException $ex) {
-	header('HTTP/1.0 400 Parameter Required');
+} catch (\StartupAPI\API\BadParameterException $ex) {
+	header('HTTP/1.0 400 Bad Parameter');
 	$response = array(
 		'meta' => array(
 			'success' => false,

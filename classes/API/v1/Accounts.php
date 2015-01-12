@@ -20,7 +20,7 @@ class Accounts extends \StartupAPI\API\AuthenticatedEndpoint {
 		parent::__construct('/v1/accounts', 'Returns a list of accounts for currently authenticated user');
 	}
 
-	public function call($values) {
+	public function call($values, $raw_request_body = null) {
 		$user = parent::call($values);
 
 		$accounts = $user->getAccounts();

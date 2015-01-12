@@ -28,7 +28,7 @@ class User extends \StartupAPI\API\AuthenticatedEndpoint {
 		);
 	}
 
-	public function call($values) {
+	public function call($values, $raw_request_body = null) {
 		$user = parent::call($values);
 
 		if (array_key_exists('id', $values)) {
