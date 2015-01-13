@@ -8,8 +8,11 @@
 namespace StartupAPI\API;
 
 // APIs Endpoints to be registered
+require_once(__DIR__ . '/v1/Login.php');
 require_once(__DIR__ . '/v1/User.php');
 require_once(__DIR__ . '/v1/Accounts.php');
+
+require_once(dirname(__DIR__) . '/AuthenticationModule.php');
 
 /**
  * StartupAPI API Endpoint class
@@ -71,6 +74,9 @@ abstract class Endpoint {
 		$namespace = new EndpointNameSpace(
 				'startupapi', 'StartupAPI', 'Startup API core endpoints'
 		);
+		if (!is_null(\AuthenticationModule::get('usernamepass'))) {
+			self::register($namespace, 'POST', new \StartupAPI\API\v1\Login());
+		}
 		self::register($namespace, 'GET', new \StartupAPI\API\v1\User());
 		self::register($namespace, 'GET', new \StartupAPI\API\v1\Accounts());
 	}
