@@ -57,11 +57,19 @@ class MrClay_CookieStorage {
         return str_replace('=', '', base64_encode(hash('ripemd160', $input, true)));
     }
     
+    public static function padkey($key, $bits = 256)
+    {
+        $keylen = round($bits / 8);
+        $currlen = strlen($key);
+        $newkey = (($currlen < $keylen) ? str_pad($key, $keylen, '0', STR_PAD_RIGHT) : substr($key, 0, $keylen));
+        return $newkey;
+    }
+
     public static function encrypt($key, $str)
     {
         $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);  
         $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);  
-        $data = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $str, MCRYPT_MODE_ECB, $iv);
+        $data = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, self::padkey($key, 256), $str, MCRYPT_MODE_ECB, $iv);
         return base64_encode($data);
     }
     
@@ -70,9 +78,10 @@ class MrClay_CookieStorage {
         if (false === ($data = base64_decode($data))) {
             return false;
         }
+
         $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);  
         $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);  
-        return mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $data, MCRYPT_MODE_ECB, $iv);
+        return mcrypt_decrypt(MCRYPT_RIJNDAEL_256, self::padkey($key, 256), $data, MCRYPT_MODE_ECB, $iv);
     }
 
     public function getDefaults()
