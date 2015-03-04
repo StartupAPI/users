@@ -7,6 +7,8 @@
 
 namespace StartupAPI\API;
 
+require_once(__DIR__ . '/EndpointNamespace.php');
+
 // APIs Endpoints to be registered
 require_once(__DIR__ . '/v1/Login.php');
 require_once(__DIR__ . '/v1/User.php');
