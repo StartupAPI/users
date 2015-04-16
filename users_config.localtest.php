@@ -24,7 +24,7 @@ UserConfig::$SESSION_SECRET= 'cslcslmcsvhimocwiopmcgwmphoigcfhmiocfs;imocsfgijmo
 /**
  * Database connectivity
  */
-UserConfig::$mysql_db = 'startupapi';
+UserConfig::$mysql_db = 'startupapi_test';
 UserConfig::$mysql_user = 'startupapi';
 UserConfig::$mysql_password = 'just a test';
 #UserConfig::$mysql_host = 'localhost';
