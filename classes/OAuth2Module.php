@@ -63,6 +63,11 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	 */
 	protected $oAuth2ExtraParameters = array();
 
+	/**
+	 * @var boolean Sets application/x-www-form-urlencoded for access token request, otherwise uses multipart/form-data
+	 */
+	protected $oAuth2AccessTokenRequestFormURLencoded = FALSE;
+
 	/**************************************************************************
 	 *
 	 * Look and feel
@@ -249,6 +254,8 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		$module_slug = $this->getID();
 
 		$query = 'INSERT INTO '.UserConfig::$mysql_prefix.'oauth2_clients (module_slug) VALUES (?)';
+		error_log($query);
+		error_log(UserConfig::$DEBUG);
 		UserTools::debug($query);
 
 		if ($stmt = $db->prepare($query))
@@ -467,7 +474,12 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		curl_setopt($ch, CURLOPT_POST, TRUE); 
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE); 
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/json'));
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $params); 
+
+		if ($this->oAuth2AccessTokenRequestFormURLencoded) {
+			curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+		} else {
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+		}
 
 		$result = curl_exec($ch);
 
@@ -538,7 +550,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 			throw new DBPrepareStmtException($db);
 		}
 
-		if (is_null($oauth2_client_id)) {
+		if (!$oauth2_client_id) {
 			$query = 'INSERT INTO '.UserConfig::$mysql_prefix.'oauth2_clients
                                 (module_slug, access_token, access_token_expires, refresh_token)
                                 VALUES (?, ?, ?, ?)';
@@ -1043,7 +1055,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		$result = curl_exec($ch);
 		
 		if (curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200) {
-			throw new OAuth2Exception("OAuth2 call failed: " . curl_error($ch) . ' (Code: ' . curl_error($ch, CURLINFO_HTTP_CODE) . ')');
+			throw new OAuth2Exception("OAuth2 call failed: " . curl_error($ch) . ' (Code: ' . curl_getinfo($ch, CURLINFO_HTTP_CODE) . ')');
 		}
 		curl_close($ch);
 

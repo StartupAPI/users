@@ -32,6 +32,8 @@ class AmazonAuthenticationModule extends OAuth2AuthenticationModule
 				array(9054, "Registered using Amazon account", 1),
 			)
 		);
+
+		$this->oAuth2AccessTokenRequestFormURLencoded = TRUE;
 	}
 
 	public function getID()
