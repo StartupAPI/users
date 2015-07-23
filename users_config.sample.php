@@ -76,6 +76,33 @@ UserConfig::loadModule('usernamepass');
 new UsernamePasswordAuthenticationModule();
 
 /**
+ * Google OAuth2 Authentication configuration
+ * Google OAuth2 docs: https://developers.google.com/identity/protocols/OAuth2
+ *
+ * Register your app here: https://console.developers.google.com/project
+ * Go to APIs & Auth -> Consent Screen and fill out app name and URL as well as other fields
+ * Go to APIs & Auth -> Credentials and create new client ID, add OAuth2 callback URL
+ *			https://<yourhost>/<path_to_startupapi>oauth2_callback.php?module=google
+ *
+ * And then uncomment lines below and copy Client ID and Client Secret
+ * Optional 3rd parameter is an array of API scopes you need authorization for.
+ *	See Google's explanation for scopes here: https://developers.google.com/+/web/api/rest/oauth#authorization-scopes
+ * 	See up-to-date list of APIs and scopes here: https://developers.google.com/oauthplayground/
+ *	(One of /Google Contacts API scope is required and is included by default)
+ */
+#UserConfig::loadModule('google_oauth');
+#new GoogleOAuthAuthenticationModule(
+#	'...OAuth2.client.id.goes.here...',
+#	'...OAuth2.clientsecret.goes.here...',
+#	array(
+#		'profile',
+#		'email',
+#		'https://www.googleapis.com/auth/plus.login',
+#		'https://www.googleapis.com/auth/plus.profile.emails.read'
+#	)
+#);
+
+/**
  * Facebook Connect configuration
  * Register your app here: https://developers.facebook.com/apps
  * Click "Edit settings" -> "Website with Facebook Login" and enter your site's URL
@@ -110,38 +137,6 @@ new UsernamePasswordAuthenticationModule();
 # Identi.ca's simplified setup (get your keys here: http://identi.ca/settings/oauthapps)
 #UserConfig::loadModule('statusnet');
 #new StatusNetAuthenticationModule('...identi.ca.api.key.goes.here...', '...identi.ca.api.secret.goes.here...');
-
-/**
- * Google OAuth Authentication configuration
- * Register your app here: https://www.google.com/accounts/ManageDomains
- * Add URL for your site, verify it using one of the methods provided
- * And then uncomment lines below and copy API Key and App Secret
- * Optional 3rd parameter is an array of API scopes you need authorization for.
- * 	See up-to-date list of scopes here: http://code.google.com/apis/gdata/faq.html#AuthScopes
- *	(Google Contacts API scope is required and is included by default)
- */
-#UserConfig::loadModule('google_oauth');
-#new GoogleOAuthAuthenticationModule(
-#	'...OAuth.key.goes.here...',
-#	'...OAuth.secret.goes.here...',
-#	array(
-#		'https://www.google.com/analytics/feeds/',		// Google Analytics Data API
-#		'http://www.google.com/base/feeds/',			// Google Base Data API
-#		'https://sites.google.com/feeds/',			// Google Sites Data API
-#		'http://www.blogger.com/feeds/',			// Blogger Data API
-#		'http://www.google.com/books/feeds/',			// Book Search Data API
-#		'https://www.google.com/calendar/feeds/',		// Calendar Data API
-#		'https://docs.google.com/feeds/',			// Documents List Data API
-#		'http://finance.google.com/finance/feeds/',		// Finance Data API
-#		'https://mail.google.com/mail/feed/atom/',		// Gmail Atom feed
-#		'http://maps.google.com/maps/feeds/',			// Maps Data API
-#		'http://picasaweb.google.com/data/',			// Picasa Web Albums Data API
-#		'http://www.google.com/sidewiki/feeds/',		// Sidewiki Data API
-#		'https://spreadsheets.google.com/feeds/',		// Spreadsheets Data API
-#		'http://www.google.com/webmasters/tools/feeds/',	// Webmaster Tools API
-#		'http://gdata.youtube.com'				// YouTube Data API
-#	)
-#);
 
 /**
  * Meetup Authentication configuration
