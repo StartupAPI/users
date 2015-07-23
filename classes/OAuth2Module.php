@@ -222,7 +222,11 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 			);
 
 			if (!is_null($this->oAuth2Scope)) {
-				$params['scope'] = $this->oAuth2Scope;
+				if (is_array($this->oAuth2Scope)) {
+					$params['scope'] = implode(' ', $this->oAuth2Scope);
+				} else {
+					$params['scope'] = $this->oAuth2Scope;
+				}
 			}
 
 			$login_link = $this->oAuth2LoginLink . '?' . http_build_query($params);

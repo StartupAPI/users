@@ -3,7 +3,7 @@ require_once(dirname(dirname(__DIR__)).'/classes/OAuth2Module.php');
 
 /**
  * First register an app here: https://console.developers.google.com/project
- * Google OAuth(2) docs: https://developers.google.com/identity/protocols/OAuth2
+ * Google OAuth2 docs: https://developers.google.com/identity/protocols/OAuth2
  * 
  * @package StartupAPI
  * @subpackage AuthenticationGoogle\
@@ -13,7 +13,7 @@ class GoogleAuthenticationModule extends OAuth2AuthenticationModule
 	protected $userCredentialsClass = 'GoogleUserCredentials';
 
 	public function __construct($oAuth2ClientID, $oAuth2ClientSecret,
-		$scopes = 'https://www.googleapis.com/auth/userinfo.email'
+		$scopes = 'profile'
 	) {
 		parent::__construct(
 			'Google',
