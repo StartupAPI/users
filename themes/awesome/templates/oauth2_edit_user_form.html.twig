@@ -1,5 +1,5 @@
 <form action="{{action}}" method="POST">
-	<div class="panel {% if oauth2_user_id %}panel-success{% elseif errors %}panel-danger{% else %}panel-default{% endif %}">
+	<div class="panel {% if oauth2_user_id %}panel-success{% elseif errors and errors[module.id] %}panel-danger{% else %}panel-default{% endif %}">
 		<a name="{{ module.id }}"></a>
 		<div class="panel-heading">
 			{{module.title}}
@@ -11,9 +11,9 @@
 			{% endif %}
 		</div>
 		<div class="panel-body">
-			{% if errors %}
+			{% if errors and errors[module.id] %}
 				<div class="alert alert-danger" style="margin-top: 15px">
-					{% for field, errorset in errors %}
+					{% for errorset in errors[module.id] %}
 						{% for error in errorset %}
 							<div>{{error}}</div>
 						{% endfor %}

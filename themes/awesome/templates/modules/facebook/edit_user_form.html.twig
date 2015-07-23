@@ -1,5 +1,5 @@
 <form action="{{action}}" method="POST" name="facebookusereditform">
-	<div class="panel {% if errors %}panel-danger{% else %}panel-success{% endif %}">
+	<div class="panel {% if errors and errors[module.id] %}panel-danger{% else %}panel-success{% endif %}">
 		<a name="{{ module.id }}"></a>
 		<div class="panel-heading">
 			<button class="btn btn-xs btn-danger pull-right" type="submit" name="remove">
