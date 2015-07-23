@@ -249,8 +249,6 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		$module_slug = $this->getID();
 
 		$query = 'INSERT INTO '.UserConfig::$mysql_prefix.'oauth2_clients (module_slug) VALUES (?)';
-		error_log($query);
-		error_log(UserConfig::$DEBUG);
 		UserTools::debug($query);
 
 		if ($stmt = $db->prepare($query))
@@ -469,6 +467,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		curl_setopt($ch, CURLOPT_POST, TRUE); 
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE); 
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/json'));
+		curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
 
 		if ($this->oAuth2AccessTokenRequestFormURLencoded) {
 			curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
@@ -477,9 +476,11 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		}
 
 		$result = curl_exec($ch);
+		UserTools::debug("Request: " . var_export(curl_getinfo($ch, CURLINFO_HEADER_OUT), true));
+		UserTools::debug("Response: $result");
 
 		if (curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200) {
-			throw new OAuth2Exception("OAuth2 call failed: ".curl_error($ch));
+			throw new OAuth2Exception("OAuth2 call failed: " . curl_error($ch) . ' (Code: ' . curl_getinfo($ch, CURLINFO_HTTP_CODE) . ')');
 		}
 		curl_close($ch);
 
@@ -502,7 +503,9 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		$expires_in = array_key_exists('expires_in', $result) ? $result['expires_in'] : null;
 		$token_type = array_key_exists('token_type', $result) ? $result['token_type'] : 'bearer';
 
-		if ($token_type != 'bearer') {
+		UserTools::debug("Token type: $token_type");
+
+		if (strtolower($token_type) != 'bearer') {
 			// we pnly support bearer tokens right now, MAC token support will come later
 			return null;
 		}
@@ -544,6 +547,8 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		{
 			throw new DBPrepareStmtException($db);
 		}
+
+		UserTools::debug("Found OAuth2 clien ID: " . var_export($oauth2_client_ID));
 
 		if (!$oauth2_client_id) {
 			$query = 'INSERT INTO '.UserConfig::$mysql_prefix.'oauth2_clients
@@ -723,6 +728,8 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 
 		$template_info['oauth2_client_id'] = $oauth2_client_id;
 		$template_info['rendered_userinfo'] = $this->renderUserInfo($serialized_userinfo);
+
+		UserTools::debug("Template info: " . var_export($template_info, true));
 
 		return StartupAPI::$template->render("@startupapi/oauth2_edit_user_form.html.twig", $template_info);
 	}
@@ -1055,6 +1062,8 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 			));
 			$separator = '&';
 		}
+
+		UserTools::debug("URL: $url");
 
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);

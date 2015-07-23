@@ -1,9 +1,9 @@
 <form action="{{action}}" method="POST">
-	<div class="panel {% if oauth2_user_id %}panel-success{% elseif errors and errors[module.id] %}panel-danger{% else %}panel-default{% endif %}">
+	<div class="panel {% if oauth2_client_id %}panel-success{% elseif errors and errors[module.id] %}panel-danger{% else %}panel-default{% endif %}">
 		<a name="{{ module.id }}"></a>
 		<div class="panel-heading">
 			{{module.title}}
-			{% if oauth2_user_id %}
+			{% if oauth2_client_id %}
 				<button class="btn btn-xs btn-danger pull-right" type="submit" name="remove">
 					<span class="glyphicon glyphicon-remove"></span>
 					Disconnect
@@ -21,13 +21,9 @@
 				</div>
 			{% endif %}
 
-			{% if oauth2_user_id %}
-				<div class="media">
-					<div class="media-body">
-						<h4 class="media-heading">{{rendered_userinfo|raw}}</h4>
-					</div>
-					<input type="hidden" name="oauth2_user_id" value="{{oauth2_user_id}}"/>
-				</div>
+			{% if oauth2_client_id %}
+				{{rendered_userinfo|raw}}
+				<input type="hidden" name="oauth2_client_id" value="{{oauth2_client_id}}"/>
 			{% else %}
 				{% if connectButtonURL %}
 					<input type="image" src="{{connectButtonURL}}"/>

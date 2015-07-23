@@ -34,7 +34,7 @@ class GoogleAuthenticationModule extends OAuth2AuthenticationModule
 			)
 		);
 
-		$this->oAuth2AccessTokenParamName = 'oauth_token';
+		$this->oAuth2AccessTokenRequestFormURLencoded = TRUE;
 	}
 
 	public function getID()
@@ -100,28 +100,24 @@ class GoogleAuthenticationModule extends OAuth2AuthenticationModule
 			return null;
 		}
 
-		if (array_key_exists('meta', $data) &&
-			array_key_exists('code', $data['meta']) &&
-			$data['meta']['code'] !== 200
-		) {
+		if (array_key_exists('error', $data)) {
+			UserTools::debug("Got errors from /people/me API call: " . var_export($data['error'], true));
 			return null;
 		}
 
-		if (array_key_exists('response', $data)) {
-			$user_info = $data;
-			if (array_key_exists('id', $user_info) &&
-				array_key_exists('displayNAme', $user_info)
-			) {
-				$user_info['name'] = $user_info['displayName'];
-			}
-
-			if (array_key_exists('emails', $user_info) && count($user_info['emails'] > 0)) {
-				$user_info['email'] = $user_info['emails'][0]['value'];
-			}
-			return $user_info;
+		$user_info = $data;
+		if (array_key_exists('id', $user_info) && array_key_exists('displayName', $user_info)
+		) {
+			$user_info['name'] = $user_info['displayName'];
+		} else {
+			UserTools::debug("Don't have ID or displayName: " . var_export($user_info, true));
+			return null;
 		}
 
-		return null;
+		if (array_key_exists('emails', $user_info) && count($user_info['emails'] > 0)) {
+			$user_info['email'] = $user_info['emails'][0]['value'];
+		}
+		return $user_info;
 	}
 
 	protected function renderUserInfo($serialized_userinfo) {
