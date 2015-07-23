@@ -12,7 +12,7 @@ class AmazonAuthenticationModule extends OAuth2AuthenticationModule
 {
 	protected $userCredentialsClass = 'AmazonUserCredentials';
 
-	public function __construct($oAuth2ClientID, $oAuth2ClientSecret, $scopes = 'profile')
+	public function __construct($oAuth2ClientID, $oAuth2ClientSecret, $scopes = 'profile profile:user_id postal_code')
 	{
 		parent::__construct(
 			'Amazon',
@@ -22,9 +22,9 @@ class AmazonAuthenticationModule extends OAuth2AuthenticationModule
 			'https://www.amazon.com/ap/oa',
 			'https://api.amazon.com/auth/o2/token',
 			$scopes,
-			NULL,
-			NULL,
-			NULL,
+			UserConfig::$USERSROOTURL.'/modules/amazon/login-button.png',
+			UserConfig::$USERSROOTURL.'/modules/amazon/login-button.png',
+			UserConfig::$USERSROOTURL.'/modules/amazon/login-button.png',
 			array(
 				array(9051, "Logged in using Amazon account", 1),
 				array(9052, "Added Amazon account", 1),
@@ -73,6 +73,20 @@ class AmazonAuthenticationModule extends OAuth2AuthenticationModule
 
 		error_log("OAuth Credentials: " . var_export($credentials, true));
 
+		// verifying the token
+		try {
+			$result = $credentials->makeOAuth2Request('https://api.amazon.com/auth/o2/tokeninfo', 'GET', null, array(
+				CURLOPT_HTTPHEADER => array(
+					'Accept: application/json',
+					'User-Agent: ' . UserConfig::$appName . ' (Startup API v.' . StartupAPI::getVersion() . ')'
+				)
+			));
+		} catch (OAuth2Exception $ex) {
+			error_log("Error verifying access token: " . $ex->getMessage());
+			return null;
+		}
+
+		// getting profile information
 		try {
 			$result = $credentials->makeOAuth2Request('https://api.amazon.com/user/profile', 'GET', null, array(
 				CURLOPT_HTTPHEADER => array(

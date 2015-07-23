@@ -68,6 +68,11 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	 */
 	protected $oAuth2AccessTokenRequestFormURLencoded = FALSE;
 
+	/**
+	 * @var boolean Send access token as HTTP header instead of query string parameter
+	 */
+	protected $oAuth2SendAccessTokenAsHeader = FALSE;
+
 	/**************************************************************************
 	 *
 	 * Look and feel
@@ -220,17 +225,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 				$params['scope'] = $this->oAuth2Scope;
 			}
 
-			$login_link = $this->oAuth2LoginLink . '?';
-
-			$first = true;
-			foreach ($params as $key => $value) {
-				if (!$first) {
-					$login_link .= '&';
-				}
-				$login_link .= rawurlencode($key) . '=' . rawurlencode($value);
-
-				$first = false;
-			}
+			$login_link = $this->oAuth2LoginLink . '?' . http_build_query($params);
 
 			//  redirect to the authorization page, they will redirect back
 			header('Location: ' . $login_link);
@@ -1026,33 +1021,54 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	 *
 	 * @return array Response data (code=>int, headers=>array(), body=>string)
 	 */
-	public function makeOAuth2Request($credentials, $request, $method = 'GET', $request_params = array(), $curlopt = array()) {
-		$first_separator = strpos('?', $request) ? '&' : '?';
-		$url = $request . $first_separator . $this->oAuth2AccessTokenParamName .
-			'=' . rawurlencode($credentials->getAccessToken()); 
+	public function makeOAuth2Request($credentials, $url, $method = 'GET', $request_params = array(), $curlopt = array())
+	{
+		$ch = curl_init();
 
-		$params = array_merge($this->oAuth2ExtraParameters, $this->oAuth2ExtraParameters);
+		$separator = strpos('?', $url) ? '&' : '?';
 
-		if ($method == 'GET') {
-			foreach ($params as $key => $value) {
-				$url .= '&' . rawurlencode($key) . '=' . rawurlencode($value);
+		if (!is_array($request_params)) {
+			$request_params = array();
+		}
+		if (!is_array($curlopt)) {
+			$curlopt = array();
+		}
+		$params = array_merge($request_params, $this->oAuth2ExtraParameters);
+
+		// always pass access_token as a query string parameter
+		if (count($params)) {
+			if ($method == 'GET') {
+				$url .= $separator . http_build_query($params);
+				$separator = '&';
+			} else if ($method == 'POST') {
+				$curlopt[CURLOPT_POST] = TRUE;
+				$curlopt[CURLOPT_POSTFIELDS] = $params;
 			}
-		} else if ($method == 'POST') {
-			curl_setopt($ch, CURLOPT_POST, TRUE);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $params); 
 		}
 
-		$ch = curl_init();
+		// use bearer tocken or query string
+		if ($this->oAuth2SendAccessTokenAsHeader) {
+			$curlopt[CURLOPT_HTTPHEADER][] = 'Authorization: Bearer ' . $credentials->getAccessToken();
+		} else {
+			$url .= $separator . http_build_query(array(
+				$this->oAuth2AccessTokenParamName => $credentials->getAccessToken()
+			));
+			$separator = '&';
+		}
+
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($ch, CURLOPT_HEADER, FALSE);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE); 
+		curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
 
 		if (is_array($curlopt)) {
 			curl_setopt_array($ch, $curlopt);
 		}
  
 		$result = curl_exec($ch);
+		UserTools::debug("Request: " . var_export(curl_getinfo($ch, CURLINFO_HEADER_OUT), true));
+		UserTools::debug("Response: $result");
 		
 		if (curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200) {
 			throw new OAuth2Exception("OAuth2 call failed: " . curl_error($ch) . ' (Code: ' . curl_getinfo($ch, CURLINFO_HTTP_CODE) . ')');
