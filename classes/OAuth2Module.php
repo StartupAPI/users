@@ -63,6 +63,16 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	 */
 	protected $oAuth2ExtraParameters = array();
 
+	/**
+	 * @var boolean Sets application/x-www-form-urlencoded for access token request, otherwise uses multipart/form-data
+	 */
+	protected $oAuth2AccessTokenRequestFormURLencoded = FALSE;
+
+	/**
+	 * @var boolean Send access token as HTTP header instead of query string parameter
+	 */
+	protected $oAuth2SendAccessTokenAsHeader = FALSE;
+
 	/**************************************************************************
 	 *
 	 * Look and feel
@@ -215,17 +225,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 				$params['scope'] = $this->oAuth2Scope;
 			}
 
-			$login_link = $this->oAuth2LoginLink . '?';
-
-			$first = true;
-			foreach ($params as $key => $value) {
-				if (!$first) {
-					$login_link .= '&';
-				}
-				$login_link .= rawurlencode($key) . '=' . rawurlencode($value);
-
-				$first = false;
-			}
+			$login_link = $this->oAuth2LoginLink . '?' . http_build_query($params);
 
 			//  redirect to the authorization page, they will redirect back
 			header('Location: ' . $login_link);
@@ -248,7 +248,12 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 
 		$module_slug = $this->getID();
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'oauth2_clients (module_slug) VALUES (?)'))
+		$query = 'INSERT INTO '.UserConfig::$mysql_prefix.'oauth2_clients (module_slug) VALUES (?)';
+		error_log($query);
+		error_log(UserConfig::$DEBUG);
+		UserTools::debug($query);
+
+		if ($stmt = $db->prepare($query))
 		{
 			if (!$stmt->bind_param('s', $module_slug))
 			{
@@ -290,9 +295,12 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		$module_slug = $this->getID();
 
 		// updating new recently created entry
-		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'oauth2_clients
-			SET identity = ?, userinfo = ?
-			WHERE oauth2_client_id = ?'))
+		$query = 'UPDATE '.UserConfig::$mysql_prefix.'oauth2_clients
+                        SET identity = ?, userinfo = ?
+                        WHERE oauth2_client_id = ?';
+		UserTools::debug($query);
+
+		if ($stmt = $db->prepare($query))
 		{
 			if (!$stmt->bind_param('ssi', $server_unique_id, $serialized_userinfo, $oauth2_client_id))
 			{
@@ -311,8 +319,11 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		}
 
 		// Inserting new link between user and their oauth2 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'user_oauth2_identity
-			(user_id, oauth2_client_id) VALUES (?, ?)'))
+		$query = 'INSERT INTO '.UserConfig::$mysql_prefix.'user_oauth2_identity
+                        (user_id, oauth2_client_id) VALUES (?, ?)';
+		UserTools::debug($query);
+
+		if ($stmt = $db->prepare($query))
 		{
 			if (!$stmt->bind_param('ii', $user_id, $oauth2_client_id))
 			{
@@ -341,7 +352,10 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	public function deleteOAuth2Client($oauth2_client_id) {
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.'oauth2_clients WHERE oauth2_client_id = ?'))
+		$query = 'DELETE FROM '.UserConfig::$mysql_prefix.'oauth2_clients WHERE oauth2_client_id = ?';
+		UserTools::debug($query);
+
+		if ($stmt = $db->prepare($query))
 		{
 			if (!$stmt->bind_param('i', $oauth2_client_id))
 			{
@@ -381,12 +395,14 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 
 		$user_id = null;
 		$old_oauth2_client_id = null;
+
 		$query = 'SELECT i.oauth2_client_id, i.user_id
 			FROM '.UserConfig::$mysql_prefix.'user_oauth2_identity i
 			INNER JOIN '.UserConfig::$mysql_prefix.'oauth2_clients c
 				on i.oauth2_client_id = c.oauth2_client_id
 			WHERE c.module_slug = ? AND c.identity = ?';
-		
+		UserTools::debug($query);
+
 		if ($stmt = $db->prepare($query))
 		{
 			if (!$stmt->bind_param('ss', $module_slug, $server_unique_id))
@@ -453,7 +469,12 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		curl_setopt($ch, CURLOPT_POST, TRUE); 
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE); 
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/json'));
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $params); 
+
+		if ($this->oAuth2AccessTokenRequestFormURLencoded) {
+			curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+		} else {
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+		}
 
 		$result = curl_exec($ch);
 
@@ -495,9 +516,13 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		$oauth2_client_id = null;
 		$current_expires = null;
 		$current_refresh = null;
-		if ($stmt = $db->prepare('SELECT oauth2_client_id, access_token_expires, refresh_token
+
+		$query = 'SELECT oauth2_client_id, access_token_expires, refresh_token
 			FROM '.UserConfig::$mysql_prefix.'oauth2_clients 
-			WHERE module_slug = ? AND access_token = ?'))
+			WHERE module_slug = ? AND access_token = ?';
+		UserTools::debug($query);
+
+		if ($stmt = $db->prepare($query))
 		{
 			if (!$stmt->bind_param('ss', $module_slug, $access_token))
 			{
@@ -520,10 +545,13 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 			throw new DBPrepareStmtException($db);
 		}
 
-		if (is_null($oauth2_client_id)) {
-			if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'oauth2_clients
-				(module_slug, access_token, access_token_expires, refresh_token)
-				VALUES (?, ?, ?, ?)'))
+		if (!$oauth2_client_id) {
+			$query = 'INSERT INTO '.UserConfig::$mysql_prefix.'oauth2_clients
+                                (module_slug, access_token, access_token_expires, refresh_token)
+                                VALUES (?, ?, ?, ?)';
+			UserTools::debug($query);
+
+			if ($stmt = $db->prepare($query))
 			{
 				if (!$stmt->bind_param('ssis',
 					$module_slug,
@@ -545,9 +573,12 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 			}
 		} else if ($access_token_expires != $current_expires
 				|| $refresh_token != $current_refresh) {
-			if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'oauth2_clients
-				SET access_token_expires = ?, refresh_token = ?
-				WHERE oauth2_client_id = ?'))
+			$query = 'UPDATE '.UserConfig::$mysql_prefix.'oauth2_clients
+                                SET access_token_expires = ?, refresh_token = ?
+                                WHERE oauth2_client_id = ?';
+			UserTools::debug($query);
+
+			if ($stmt = $db->prepare($query))
 			{
 				if (!$stmt->bind_param('ssi',
 					$access_token_expires,
@@ -652,11 +683,14 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		$oauth2_client_id = null;
 		$serialized_userinfo = null;
 
-		if ($stmt = $db->prepare('SELECT c.oauth2_client_id, c.userinfo
+		$query = 'SELECT c.oauth2_client_id, c.userinfo
 			FROM '.UserConfig::$mysql_prefix.'user_oauth2_identity i
 			INNER JOIN '.UserConfig::$mysql_prefix.'oauth2_clients c
 				ON i.oauth2_client_id = c.oauth2_client_id
-			WHERE i.user_id = ? AND c.module_slug = ?'))
+			WHERE i.user_id = ? AND c.module_slug = ?';
+		UserTools::debug($query);
+
+		if ($stmt = $db->prepare($query))
 		{
 			if (!$stmt->bind_param('is', $user_id, $module_slug))
 			{
@@ -711,9 +745,12 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 
 		$serialized_userinfo = null;
 
-		if ($stmt = $db->prepare('SELECT userinfo, access_token, access_token_expires, refresh_token
+		$query = 'SELECT userinfo, access_token, access_token_expires, refresh_token
 			FROM '.UserConfig::$mysql_prefix.'oauth2_clients
-			WHERE oauth2_client_id = ?'))
+			WHERE oauth2_client_id = ?';
+		UserTools::debug($query);
+
+		if ($stmt = $db->prepare($query))
 		{
 			if (!$stmt->bind_param('i', $oauth2_client_id))
 			{
@@ -761,12 +798,15 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		$oauth2_client_id = null;
 		$serialized_userinfo = null;
 
-		if ($stmt = $db->prepare('SELECT c.oauth2_client_id, c.userinfo,
+		$query = 'SELECT c.oauth2_client_id, c.userinfo,
 			c.access_token, c.access_token_expires, c.refresh_token
 			FROM '.UserConfig::$mysql_prefix.'user_oauth2_identity i
 			INNER JOIN '.UserConfig::$mysql_prefix.'oauth2_clients c
 				on i.oauth2_client_id = c.oauth2_client_id
-			WHERE i.user_id = ? AND c.module_slug = ?'))
+			WHERE i.user_id = ? AND c.module_slug = ?';
+		UserTools::debug($query);
+
+		if ($stmt = $db->prepare($query))
 		{
 			if (!$stmt->bind_param('is', $user_id, $module_slug))
 			{
@@ -936,10 +976,13 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 
 		$conns = 0;
 
-		if ($stmt = $db->prepare('SELECT count(*) AS conns
+		$query = 'SELECT count(*) AS conns
 			FROM '.UserConfig::$mysql_prefix.'users u
 			LEFT JOIN '.UserConfig::$mysql_prefix.'user_oauth2_identity oa ON u.id = oa.user_id
-			WHERE oa.oauth2_client_id IS NOT NULL AND oa.module = ?'))
+			WHERE oa.oauth2_client_id IS NOT NULL AND oa.module = ?';
+		UserTools::debug($query);
+
+		if ($stmt = $db->prepare($query))
 		{
 			if (!$stmt->bind_param('s', $module_id))
 			{
@@ -978,36 +1021,57 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	 *
 	 * @return array Response data (code=>int, headers=>array(), body=>string)
 	 */
-	public function makeOAuth2Request($credentials, $request, $method = 'GET', $request_params = array(), $curlopt = array()) {
-		$first_separator = strpos('?', $request) ? '&' : '?';
-		$url = $request . $first_separator . $this->oAuth2AccessTokenParamName .
-			'=' . rawurlencode($credentials->getAccessToken()); 
+	public function makeOAuth2Request($credentials, $url, $method = 'GET', $request_params = array(), $curlopt = array())
+	{
+		$ch = curl_init();
 
-		$params = array_merge($this->oAuth2ExtraParameters, $this->oAuth2ExtraParameters);
+		$separator = strpos('?', $url) ? '&' : '?';
 
-		if ($method == 'GET') {
-			foreach ($params as $key => $value) {
-				$url .= '&' . rawurlencode($key) . '=' . rawurlencode($value);
+		if (!is_array($request_params)) {
+			$request_params = array();
+		}
+		if (!is_array($curlopt)) {
+			$curlopt = array();
+		}
+		$params = array_merge($request_params, $this->oAuth2ExtraParameters);
+
+		// always pass access_token as a query string parameter
+		if (count($params)) {
+			if ($method == 'GET') {
+				$url .= $separator . http_build_query($params);
+				$separator = '&';
+			} else if ($method == 'POST') {
+				$curlopt[CURLOPT_POST] = TRUE;
+				$curlopt[CURLOPT_POSTFIELDS] = $params;
 			}
-		} else if ($method == 'POST') {
-			curl_setopt($ch, CURLOPT_POST, TRUE);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $params); 
 		}
 
-		$ch = curl_init();
+		// use bearer tocken or query string
+		if ($this->oAuth2SendAccessTokenAsHeader) {
+			$curlopt[CURLOPT_HTTPHEADER][] = 'Authorization: Bearer ' . $credentials->getAccessToken();
+		} else {
+			$url .= $separator . http_build_query(array(
+				$this->oAuth2AccessTokenParamName => $credentials->getAccessToken()
+			));
+			$separator = '&';
+		}
+
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($ch, CURLOPT_HEADER, FALSE);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE); 
+		curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
 
 		if (is_array($curlopt)) {
 			curl_setopt_array($ch, $curlopt);
 		}
  
 		$result = curl_exec($ch);
+		UserTools::debug("Request: " . var_export(curl_getinfo($ch, CURLINFO_HEADER_OUT), true));
+		UserTools::debug("Response: $result");
 		
 		if (curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200) {
-			throw new OAuth2Exception("OAuth2 call failed: " . curl_error($ch) . ' (Code: ' . curl_error($ch, CURLINFO_HTTP_CODE) . ')');
+			throw new OAuth2Exception("OAuth2 call failed: " . curl_error($ch) . ' (Code: ' . curl_getinfo($ch, CURLINFO_HTTP_CODE) . ')');
 		}
 		curl_close($ch);
 
