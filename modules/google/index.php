@@ -6,7 +6,7 @@ require_once(dirname(dirname(__DIR__)).'/classes/OAuth2Module.php');
  * Google OAuth2 docs: https://developers.google.com/identity/protocols/OAuth2
  * 
  * @package StartupAPI
- * @subpackage AuthenticationGoogle\
+ * @subpackage Authentication\Google
  */
 class GoogleAuthenticationModule extends OAuth2AuthenticationModule
 {

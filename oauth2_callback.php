@@ -42,7 +42,12 @@ try
 		throw new StartupAPIException('No identity returned');
 	}
 
+	UserTools::debug("Current User: " . var_export($current_user, true));
+	UserTools::debug("Identity: " . var_export($identity, true));
+
 	$user = $module->getUserByOAuth2Identity($identity, $oauth2_client_id);
+
+	UserTools::debug("User: " . var_export($user, true));
 
 	if (is_null($current_user)) {
 		// if user is not logged in yet, it means we're logging them in
@@ -73,7 +78,7 @@ try
 		$module->recordAddActivity($current_user);
 	}
 } catch (Exception $e) {
-	error_log($e->getMessage());
+	UserTools::debug("Exception when coming back from the server" . $e->getMessage());
 
 	// we should delete temporary OAuth2 client ID
 	if (!is_null($oauth2_client_id)) {

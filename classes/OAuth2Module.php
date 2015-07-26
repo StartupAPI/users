@@ -429,7 +429,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		}
 
 		// nobody registered with this identity yet
-		if (is_null($user_id)) {
+		if (!$user_id) {
 			return null;
 		}
 
