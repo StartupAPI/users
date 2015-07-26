@@ -133,7 +133,7 @@ class InstagramAuthenticationModule extends OAuth2AuthenticationModule
  * @package StartupAPI
  * @subpackage Authentication\Instagram
  */
-class GoogleUserCredentials extends OAuth2UserCredentials {
+class InstagramUserCredentials extends OAuth2UserCredentials {
 	public function getHTML() {
 		return StartupAPI::$template->render("@startupapi/modules/instagram/credentials.html.twig", $this->userinfo);
 	}
