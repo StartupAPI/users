@@ -9,7 +9,7 @@ One of main goals for the project is to allow fast idea-to-product cycle so we a
 It is distributed under [MIT license](http://opensource.org/licenses/MIT) distributed with the code in [LICENSE-MIT](https://github.com/StartupAPI/users/blob/master/LICENSE-MIT) file.
 
 ## Installation
-[Installation](http://startupapi.org/Startup_API/Installation) instructions and the rest of the documentation are available on project wiki at [StartupAPI.org](http://startupapi.org/)
+[Installation](https://github.com/StartupAPI/users/wiki/Installation) instructions and the rest of the documentation are available on [project wiki](https://github.com/StartupAPI/users/wiki)
 
 ## Problems and Questions
 
