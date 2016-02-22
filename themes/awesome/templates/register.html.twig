@@ -10,14 +10,18 @@
 		{% if UserConfig.enableRegistration %}
 			{% if UserConfig.adminInvitationOnly and not show_registration_form %}
 				<form class="form" id="form" action="" method="GET">
-					<div>
+					<label class="control-label" for="invite_code">
 						{{UserConfig.invitationRequiredMessage|raw}}
-					</div>
+					</label>
 					{% if message %}
 						<div class="alert alert-danger">{{message}}</div>
 					{% endif %}
-					<input name="invite" class="form-input" value="{{invite_code}}"/>
-					<button class="btn btn-primary" type="submit">Continue &rarr;</button>
+					<div class="input-group col-xs-12 col-sm-8 col-md-6">
+						<input type="text" required id="invite_code" name="invite" class="form-control" value="{{invite_code}}" aria-label="Invite code with continue button"/>
+						<div class="input-group-btn">
+							<button class="btn btn-primary" type="submit">Continue</button>
+						</div>
+					</div>
 				</form>
 			{% endif %}
 
