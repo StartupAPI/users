@@ -23,7 +23,7 @@
 <!-- footer starts -->
 <footer class="footer navbar {% if POWERSTRIP.inverted_navbar %}navbar-inverse{% else %}navbar-default{% endif %}">
 	<div class="container">
-		<ul class="nav navbar-nav navbar-right">
+		<ul class="nav navbar-nav pull-right">
 			<li>
 				<a href="http://www.startupapi.com/" target="_blank">
 					<img class="startupapi-logo" width="20" height="20" hspace="5" src="{{ UserConfig.USERSROOTURL }}/images/header_icon.png"/>
@@ -32,7 +32,7 @@
 			</li>
 		</ul>
 		{% if UserConfig.appName %}
-			<ul class="nav navbar-nav">
+			<ul class="nav navbar-nav pull-left">
 				<li>
 					<a href="{{UserConfig.SITEROOTURL}}">
 						{{PAGE.YEAR}} &copy;
