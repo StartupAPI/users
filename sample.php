@@ -1,28 +1,37 @@
 <?php
 require_once(__DIR__.'/users/users.php');
 
-// get user if logged in or require user to login
-$user = User::get();
-#$user = User::require_login();
+/**
+ * Get User object or null if user is not logged in
+ */
+$current_user = StartupAPI::getUser();
+
+/**
+ * Get User object or redirect to login page if user is not logged in
+ */
+#$current_user = StartupAPI::requireLogin();
 
 // You can work with users, but it's recommended to work with accounts instead
-if (!is_null($user)) {
+if (!is_null($current_user)) {
 	// if user is logged in, get user's accounts
-	$accounts = Account::getUserAccounts($user);
+	$accounts = Account::getUserAccounts($current_user);
 
 	// get current account user works with
-	$current_account = Account::getCurrentAccount($user);
+	$current_account = Account::getCurrentAccount($current_user);
 }
 ?>
 <html>
-<head><title>Sample page</title></head>
+<head>
+	<title>Sample page</title>
+	<?php StartupAPI::head() ?>
+</head>
 <body>
 <div style="float: right"><?php StartupAPI::power_strip() ?></div>
 <?php
 
-if (!is_null($user)) {
+if (!is_null($current_user)) {
 ?>
-<h1>Welcome, <?php echo $user->getName() ?>!</h1>
+<h1>Welcome, <?php echo $current_user->getName() ?>!</h1>
 
 <p>You successfully logged in.</p>
 <?php
