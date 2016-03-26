@@ -26,7 +26,7 @@ if (!is_null($current_user)) {
 	<?php StartupAPI::head() ?>
 </head>
 <body>
-<div style="float: right"><?php StartupAPI::power_strip() ?></div>
+<?php StartupAPI::power_strip() ?>
 <?php
 
 if (!is_null($current_user)) {
