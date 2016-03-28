@@ -43,3 +43,9 @@ footer.footer {
   width: 100%;
   /* Set the fixed height of the footer here */
 }
+
+@media (max-width: 360px) {
+	footer .startupapi-poweredby {
+		display: none;
+	}
+}
