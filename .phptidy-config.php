@@ -14,7 +14,8 @@ $project_files_exclude_regexes = array(
 	"|^docs/|",
 	"|^tags/|",
 	"|^oauth-php/|",
-	"|^modules/facebook/php-sdk/|",
+	"|^modules/facebook/facebook-php-sdk/|",
+	"|^php-bootstrap/|",
 	"|^dbupgrade/|",
 	"|^phptidy/|",
 	"|^twig/|"
