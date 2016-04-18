@@ -5,7 +5,7 @@ $ADMIN_SECTION = 'bymodule';
 require_once(__DIR__.'/header.php');
 ?>
 <script type='text/javascript' src='swfobject/swfobject/swfobject.js'></script>
-<script type='text/javascript' src='http://www.google.com/jsapi'></script>
+<script type='text/javascript' src='//www.google.com/jsapi'></script>
 <script type='text/javascript'>
 google.load('visualization', '1', {'packages':['annotatedtimeline', 'corechart']});
 google.setOnLoadCallback(function() {
