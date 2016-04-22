@@ -34,3 +34,6 @@
 [submodule "imagesloaded"]
 	path = imagesloaded
 	url = git://github.com/desandro/imagesloaded.git
+[submodule "swiftmailer"]
+	path = swiftmailer
+	url = git://github.com/swiftmailer/swiftmailer.git

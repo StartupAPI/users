@@ -10,6 +10,7 @@ require_once(__DIR__ . '/classes/Feature.php');
 require_once(__DIR__ . '/classes/Badge.php');
 require_once(__DIR__ . '/classes/StartupAPIModule.php');
 require_once(__DIR__ . '/tools.php');
+require_once(__DIR__ . '/swiftmailer/lib/swift_required.php');
 
 /**
  * This class contains a bunch of static variables defining how Startup API instance
@@ -620,10 +621,28 @@ class UserConfig {
 	 *
 	 * ===================================================================== */
 
+   /**
+    * @var Swift_Mailer Transactional mailer object
+    */
+	public static $mailer;
+
 	/**
 	 * @var string Name and email to send invitations from (e.g. 'User Support <support@example.com>')
+	 * @deprecated
 	 */
 	public static $supportEmailFrom = 'User Support <support@example.com>';
+
+	/**
+	 * Name to send invitations from (e.g. 'User Support')
+	 * @var string
+	 */
+	public static $supportEmailFromName = 'User Support';
+
+	/**
+	 * Email to send invitations from (e.g. 'support@example.com')
+	 * @var string
+	 */
+	public static $supportEmailFromEmail = 'support@example.com';
 
 	/**
 	 * @var string Reply-To email address for return emails
@@ -1146,6 +1165,9 @@ EOD;
 		UserConfig::$privacyPolicyFullURL = UserConfig::$SITEROOTFULLURL . 'privacy_policy.php';
 
 		UserConfig::$supportEmailXMailer = 'Startup API (PHP/' . phpversion() . ')';
+
+		// Instantiating email sending object
+		UserConfig::$mailer = Swift_Mailer::newInstance(Swift_MailTransport::newInstance());
 
 		// Built in activities
 

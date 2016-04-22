@@ -9,10 +9,6 @@ if (array_key_exists('recover', $_POST)) {
 
 	$subject = UserConfig::$passwordRecoveryEmailSubject;
 
-	$headers = 'From: ' . UserConfig::$supportEmailFrom . "\r\n" .
-			'Reply-To: ' . UserConfig::$supportEmailReplyTo . "\r\n" .
-			'X-Mailer: ' . UserConfig::$supportEmailXMailer;
-
 	if (!is_null(UserConfig::$onRenderTemporaryPasswordEmail)) {
 		$baseurl = UserConfig::$USERSROOTFULLURL . '/login.php';
 
@@ -24,10 +20,19 @@ if (array_key_exists('recover', $_POST)) {
 			$name_enc = urlencode($username);
 
 			$email = $user->getEmail();
+			$name = $user->getName();
 
-			$message = call_user_func_array(UserConfig::$onRenderTemporaryPasswordEmail, array($baseurl, $username, $temppass));
+			$message_body = call_user_func_array(UserConfig::$onRenderTemporaryPasswordEmail, array($baseurl, $username, $temppass));
 
-			mail($email, $subject, $message, $headers);
+			$message = Swift_Message::newInstance($subject, $message_body);
+			$message->setFrom(array(UserConfig::$supportEmailFromEmail => UserConfig::$supportEmailFromName));
+			$message->setTo(array($email => $name));
+			$message->setReplyTo(array(UserConfig::$supportEmailReplyTo));
+
+			$headers = $message->getHeaders();
+			$headers->addTextHeader('X-Mailer', UserConfig::$supportEmailXMailer);
+
+			UserConfig::$mailer->send($message);
 		}
 
 		// We always report "sent" to avoid information disclosure

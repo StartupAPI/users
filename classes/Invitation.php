@@ -423,15 +423,20 @@ class Invitation {
 	 */
 	public function send() {
 		$email = $this->getSentToEmail();
+		$name = $this->getSentToName();
 
-		$message = call_user_func_array(UserConfig::$onRenderInvitationEmailMessage, array($this));
+		$message_body = call_user_func_array(UserConfig::$onRenderInvitationEmailMessage, array($this));
 		$subject = call_user_func_array(UserConfig::$onRenderInvitationEmailSubject, array($this));
 
-		$headers = 'From: ' . UserConfig::$supportEmailFrom . "\r\n" .
-				'Reply-To: ' . UserConfig::$supportEmailReplyTo . "\r\n" .
-				'X-Mailer: ' . UserConfig::$supportEmailXMailer;
+		$message = Swift_Message::newInstance($subject, $message_body);
+		$message->setFrom(array(UserConfig::$supportEmailFromEmail => UserConfig::$supportEmailFromName));
+		$message->setTo(array($email => $name));
+		$message->setReplyTo(array(UserConfig::$supportEmailReplyTo));
 
-		mail($email, $subject, $message, $headers);
+		$headers = $message->getHeaders();
+		$headers->addTextHeader('X-Mailer', UserConfig::$supportEmailXMailer);
+
+		UserConfig::$mailer->send($message);
 	}
 
 	/**

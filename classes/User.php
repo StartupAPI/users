@@ -6,6 +6,7 @@ require_once(__DIR__ . '/Badge.php');
 require_once(__DIR__ . '/CookieStorage.php');
 require_once(__DIR__ . '/CampaignTracker.php');
 require_once(__DIR__ . '/Invitation.php');
+require_once(dirname(__DIR__) . '/swiftmailer/lib/swift_required.php');
 
 /**
  * This class represents a registerd user in the system
@@ -639,6 +640,7 @@ class User {
 	 */
 	public function sendEmailVerificationCode() {
 		$email = $this->getEmail();
+		$name = $this->getName();
 
 		// Silently fail to avoid email discovery
 		if (is_null($email)) {
@@ -667,15 +669,19 @@ class User {
 
 		$verification_link = UserConfig::$USERSROOTFULLURL . '/verify_email.php?code=' . urlencode($code);
 
-		$message = call_user_func_array(UserConfig::$onRenderVerificationCodeEmail, array($verification_link, $code));
+		$message_body = call_user_func_array(UserConfig::$onRenderVerificationCodeEmail, array($verification_link, $code));
 
 		$subject = UserConfig::$emailVerificationSubject;
 
-		$headers = 'From: ' . UserConfig::$supportEmailFrom . "\r\n" .
-				'Reply-To: ' . UserConfig::$supportEmailReplyTo . "\r\n" .
-				'X-Mailer: ' . UserConfig::$supportEmailXMailer;
+		$message = Swift_Message::newInstance($subject, $message_body);
+		$message->setFrom(array(UserConfig::$supportEmailFromEmail => UserConfig::$supportEmailFromName));
+		$message->setTo(array($email => $name));
+		$message->setReplyTo(array(UserConfig::$supportEmailReplyTo));
 
-		mail($email, $subject, $message, $headers);
+		$headers = $message->getHeaders();
+		$headers->addTextHeader('X-Mailer', UserConfig::$supportEmailXMailer);
+
+		UserConfig::$mailer->send($message);
 	}
 
 	/**
