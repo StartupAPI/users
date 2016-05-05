@@ -64,6 +64,8 @@ class CampaignTracker
 			return;
 		}
 
+		self::$campaign = $campaign;
+
 		$storage = new MrClay_CookieStorage(array(
 			'secret' => UserConfig::$SESSION_SECRET,
 			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,

@@ -239,27 +239,27 @@ require_once(__DIR__ . '/header.php');
 		<?php
 	}
 
-	if (array_key_exists('cmp_name', $campaign)) {
+	if (array_key_exists('cmp_name', $campaign) && !is_null($campaign['cmp_name'])) {
 		?>
 		<p>Name: <b><?php echo UserTools::escape($campaign['cmp_name']) ?></b></p>
 		<?php
 	}
-	if (array_key_exists('cmp_source', $campaign)) {
+	if (array_key_exists('cmp_source', $campaign) && !is_null($campaign['cmp_source'])) {
 		?>
 		<p>Source: <b><?php echo UserTools::escape($campaign['cmp_source']) ?></b></p>
 		<?php
 	}
-	if (array_key_exists('cmp_medium', $campaign)) {
+	if (array_key_exists('cmp_medium', $campaign) && !is_null($campaign['cmp_medium'])) {
 		?>
 		<p>Medium: <b><?php echo UserTools::escape($campaign['cmp_medium']) ?></b></p>
 		<?php
 	}
-	if (array_key_exists('cmp_keywords', $campaign)) {
+	if (array_key_exists('cmp_keywords', $campaign) && !is_null($campaign['cmp_keywords'])) {
 		?>
 		<p>Keywords: <b><?php echo UserTools::escape($campaign['cmp_keywords']) ?></b></p>
 		<?php
 	}
-	if (array_key_exists('cmp_content', $campaign)) {
+	if (array_key_exists('cmp_content', $campaign) && !is_null($campaign['cmp_content'])) {
 		?>
 		<p>Content: <b><?php echo UserTools::escape($campaign['cmp_content']) ?></b></p>
 		<?php

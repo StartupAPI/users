@@ -29,6 +29,9 @@ if (count($campaigns) > 0) {
 	</div>
 	<?php
 	foreach ($tables as $slug => $header) {
+		if (!array_key_exists($slug, $campaigns)) {
+			continue;
+		}
 		?>
 		<div class="span9">
 			<h3><?php echo $header ?></h3>

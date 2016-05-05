@@ -2,6 +2,7 @@
 
 require_once(__DIR__ . '/User.php');
 require_once(__DIR__ . '/Plan.php');
+require_once(__DIR__ . '/CampaignTracker.php');
 
 require_once(__DIR__ . '/API/Endpoint.php');
 
@@ -181,6 +182,10 @@ class StartupAPI {
 		if (UserConfig::$enable_startupapi_apis) {
 			\StartupAPI\API\Endpoint::registerCoreEndpoints();
 		}
+
+		// do this on each page view where StartupAPI code is executed
+		CampaignTracker::preserveReferer();
+		CampaignTracker::recordCampaignVariables();
 	}
 
 	/**

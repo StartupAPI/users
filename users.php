@@ -11,9 +11,5 @@ require_once(__DIR__.'/classes/Plan.php');
 require_once(__DIR__.'/classes/Account.php');
 require_once(__DIR__.'/classes/Cohort.php');
 require_once(__DIR__.'/classes/Feature.php');
-require_once(__DIR__.'/classes/CampaignTracker.php');
 
-// do this on each page view (where user.php is included)
-CampaignTracker::preserveReferer();
-CampaignTracker::recordCampaignVariables();
 User::updateReturnActivity(); // only if user is logged in
