@@ -135,7 +135,7 @@ class StartupAPI {
 	/**
 	 * This function is called after all configuration is loaded to initialize the system.
 	 */
-	static function _init() {
+	static function init() {
 		/**
 		 * Legacy configuration options support
 		 */

@@ -20,7 +20,7 @@ class TransactionLogger {
 	 *
 	 * @throws Exception
 	 */
-	public static function Log($account_id, $engine_slug, $amount, $message) {
+	public static function log($account_id, $engine_slug, $amount, $message) {
 
 		$db = UserConfig::getDB();
 

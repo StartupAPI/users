@@ -331,7 +331,7 @@ class Plan {
 	 * @param string $old_schedule_slug Old payment schedule slug
 	 * @param string $old_engine_slug Old payment engine slug
 	 */
-	public function activate_hook($account_id, $old_plan_slug, $old_schedule_slug, $old_engine_slug) {
+	public function activateHook($account_id, $old_plan_slug, $old_schedule_slug, $old_engine_slug) {
 
 		if (!is_callable($this->account_activate_hook)) {
 			return;
@@ -353,7 +353,7 @@ class Plan {
 	 * @param string $new_schedule_slug New payment schedule slug
 	 * @param string $new_engine_slug New payment engine slug
 	 */
-	public function deactivate_hook($account_id, $new_plan_slug, $new_schedule_slug, $new_engine_slug) {
+	public function deactivateHook($account_id, $new_plan_slug, $new_schedule_slug, $new_engine_slug) {
 
 		if (!is_callable($this->account_deactivate_hook)) {
 			return;
