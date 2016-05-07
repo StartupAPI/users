@@ -204,13 +204,6 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	 * @throws StartupAPIException
 	 */
 	protected function startOAuth2Flow() {
-		$storage = new MrClay_CookieStorage(array(
-			'secret' => UserConfig::$SESSION_SECRET,
-			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
-			'path' => UserConfig::$SITEROOTURL,
-			'httponly' => true
-		));
-
 		try
 		{
 			$callback = UserConfig::$USERSROOTFULLURL.'/oauth2_callback.php?module='.$this->getID();
