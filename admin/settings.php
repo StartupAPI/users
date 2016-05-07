@@ -4,8 +4,6 @@
  *
  * Eventually it'll be converted to settings wizard
  *
- * @todo Add type and value validation and report wrongly-configured values, (e.g. non-existing folders or type mismatches)
- *
  * @package StartupAPI
  * @subpackage Admin
  */
