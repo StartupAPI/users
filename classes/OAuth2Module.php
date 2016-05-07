@@ -287,8 +287,6 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		$server_unique_id = $identity['id'];
 		$serialized_userinfo = serialize($identity);
 
-		$module_slug = $this->getID();
-
 		// updating new recently created entry
 		$query = 'UPDATE u_oauth2_clients
                         SET identity = ?, userinfo = ?
@@ -432,8 +430,6 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 			// let's re-map from old oauth2_client_id to new one
 			// deleting old one first
 			$this->deleteOAuth2Client($old_oauth2_client_id);
-
-			$serialized_userinfo = serialize($identity);
 
 			$this->addUserOAuth2Identity($user, $identity, $oauth2_client_id);
 		}
