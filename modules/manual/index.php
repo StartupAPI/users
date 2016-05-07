@@ -91,8 +91,7 @@ class ManualPaymentEngine extends PaymentEngine {
 
 		$db = UserConfig::getDB();
 
-		if (!($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix .
-				'transaction_details_' . $this->getSlug() .
+		if (!($stmt = $db->prepare('INSERT INTO u_transaction_details_' . $this->getSlug() .
 				' (transaction_id, operator_id, funds_source, comment) VALUES(?,?,?,?)'))) {
 			throw new DBPrepareStmtException($db);
 		}
@@ -124,9 +123,9 @@ class ManualPaymentEngine extends PaymentEngine {
 
 		$db = UserConfig::getDB();
 
-		if (!($stmt = $db->prepare('SELECT operator_id, funds_source, comment FROM ' .
-				UserConfig::$mysql_prefix . 'transaction_details_' . $this->getSlug() .
-				' WHERE transaction_id = ?'))) {
+		if (!($stmt = $db->prepare('SELECT operator_id, funds_source, comment ' .
+				'FROM u_transaction_details_' . $this->getSlug() . ' ' .
+				'WHERE transaction_id = ?'))) {
 			throw new DBPrepareStmtException($db);
 		}
 

@@ -115,7 +115,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 
 		$userid = $user->getID();
 
-		if ($stmt = $db->prepare('SELECT fb_id FROM ' . UserConfig::$mysql_prefix . 'users WHERE id = ?')) {
+		if ($stmt = $db->prepare('SELECT fb_id FROM u_users WHERE id = ?')) {
 			if (!$stmt->bind_param('i', $userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -144,7 +144,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 
 		$conns = 0;
 
-		if ($stmt = $db->prepare('SELECT count(*) AS conns FROM ' . UserConfig::$mysql_prefix . 'users WHERE fb_id IS NOT NULL')) {
+		if ($stmt = $db->prepare('SELECT count(*) AS conns FROM u_users WHERE fb_id IS NOT NULL')) {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
@@ -166,7 +166,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 
 		$dailyregs = array();
 
-		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, count(*) AS regs FROM ' . UserConfig::$mysql_prefix . 'users WHERE fb_id IS NOT NULL GROUP BY regdate')) {
+		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, count(*) AS regs FROM u_users WHERE fb_id IS NOT NULL GROUP BY regdate')) {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}

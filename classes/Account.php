@@ -104,8 +104,8 @@ class Account {
 		$account = null;
 
 		if (!($stmt = $db->prepare('SELECT name, plan_slug, schedule_slug, engine_slug,
-			active, next_charge, next_plan_slug, next_schedule_slug, next_engine_slug FROM ' .
-				UserConfig::$mysql_prefix . 'accounts WHERE id = ?'))) {
+			active, next_charge, next_plan_slug, next_schedule_slug, next_engine_slug
+			FROM u_accounts WHERE id = ?'))) {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -154,9 +154,9 @@ class Account {
 
 		if (!($stmt = $db->prepare(
 				'SELECT a.id, a.name, a.plan_slug, a.schedule_slug, a.engine_slug, a.active, ' .
-				'a.next_charge, a.next_plan_slug, a.next_schedule_slug, a.next_engine_slug, au.role  FROM ' .
-				UserConfig::$mysql_prefix . 'accounts a INNER JOIN ' .
-				UserConfig::$mysql_prefix . 'account_users au ON a.id = au.account_id ' .
+				'a.next_charge, a.next_plan_slug, a.next_schedule_slug, a.next_engine_slug, au.role ' .
+				'FROM u_accounts a ' .
+				'INNER JOIN u_account_users au ON a.id = au.account_id ' .
 				'WHERE au.user_id = ?'))) {
 			throw new DBPrepareStmtException($db);
 		}
@@ -212,7 +212,7 @@ class Account {
 		if (!($stmt = $db->prepare(
 				'SELECT id, name, plan_slug, schedule_slug, engine_slug, active,
 					next_charge, next_plan_slug, next_schedule_slug, next_engine_slug
-					FROM ' . UserConfig::$mysql_prefix . 'accounts
+					FROM u_accounts
 					LIMIT ?, ?'
 				))) {
 			throw new DBPrepareStmtException($db);
@@ -261,7 +261,7 @@ class Account {
 		if (!($stmt = $db->prepare(
 				'SELECT id, name, plan_slug, schedule_slug, engine_slug, active,
 					next_charge, next_plan_slug, next_schedule_slug, next_engine_slug
-					FROM ' . UserConfig::$mysql_prefix . 'accounts
+					FROM u_accounts
 					WHERE INSTR(name, ?) > 0
 					LIMIT ?, ?'
 				))) {
@@ -311,9 +311,9 @@ class Account {
 
 		if (!($stmt = $db->prepare(
 				'SELECT a.id, a.name, a.plan_slug, a.schedule_slug, a.engine_slug, a.active, ' .
-				'a.next_charge, a.next_plan_slug, a.next_schedule_slug, a.next_engine_slug, au.role  FROM ' .
-				UserConfig::$mysql_prefix . 'accounts a INNER JOIN ' .
-				UserConfig::$mysql_prefix . 'account_users au ON a.id = au.account_id ' .
+				'a.next_charge, a.next_plan_slug, a.next_schedule_slug, a.next_engine_slug, au.role ' .
+				'FROM u_accounts a ' .
+				'INNER JOIN u_account_users au ON a.id = au.account_id ' .
 				'WHERE au.user_id = ?'))) {
 			throw new DBPrepareStmtException($db);
 		}
@@ -367,7 +367,7 @@ class Account {
 
 		$total = 0;
 
-		if ($stmt = $db->prepare('SELECT COUNT(*) FROM ' . UserConfig::$mysql_prefix . 'accounts')) {
+		if ($stmt = $db->prepare('SELECT COUNT(*) FROM u_accounts')) {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
@@ -462,8 +462,7 @@ class Account {
 
 		$db = UserConfig::getDB();
 
-		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'accounts
-			SET name = ? WHERE id = ?'))) {
+		if (!($stmt = $db->prepare('UPDATE u_accounts SET name = ? WHERE id = ?'))) {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -489,8 +488,7 @@ class Account {
 		$db = UserConfig::getDB();
 		$roles = array();
 
-		if (!($stmt = $db->prepare('SELECT user_id, role FROM ' . UserConfig::$mysql_prefix .
-				'account_users WHERE account_id = ?'))) {
+		if (!($stmt = $db->prepare('SELECT user_id, role FROM u_account_users WHERE account_id = ?'))) {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -535,8 +533,7 @@ class Account {
 		$db = UserConfig::getDB();
 		$role = null;
 
-		if (!($stmt = $db->prepare('SELECT role FROM ' . UserConfig::$mysql_prefix .
-				'account_users WHERE account_id = ? AND user_id = ?'))) {
+		if (!($stmt = $db->prepare('SELECT role FROM u_account_users WHERE account_id = ? AND user_id = ?'))) {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -572,7 +569,7 @@ class Account {
 		$db = UserConfig::getDB();
 		$role_num = $admin ? 1 : 0;
 
-		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'account_users
+		if (!($stmt = $db->prepare('UPDATE u_account_users
 					SET role = ?
 					WHERE account_id = ? AND user_id = ?'
 				))) {
@@ -603,7 +600,7 @@ class Account {
 
 		$userid = $user->getID();
 
-		if ($stmt = $db->prepare('INSERT IGNORE INTO ' . UserConfig::$mysql_prefix . 'account_users (account_id, user_id, role) VALUES (?, ?, ?)')) {
+		if ($stmt = $db->prepare('INSERT IGNORE INTO u_account_users (account_id, user_id, role) VALUES (?, ?, ?)')) {
 			if (!$stmt->bind_param('iii', $this->id, $userid, $role)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -629,7 +626,7 @@ class Account {
 
 		$userid = $user->getID();
 
-		if ($stmt = $db->prepare('DELETE FROM ' . UserConfig::$mysql_prefix . 'account_users WHERE account_id = ? AND user_id = ?')) {
+		if ($stmt = $db->prepare('DELETE FROM u_account_users WHERE account_id = ? AND user_id = ?')) {
 			if (!$stmt->bind_param('ii', $this->id, $userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -729,8 +726,7 @@ class Account {
 
 		$db = UserConfig::getDB();
 
-		if (!($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix .
-				'accounts (name, plan_slug, schedule_slug, engine_slug) VALUES (?, ?, ?, ?)'))) {
+		if (!($stmt = $db->prepare('INSERT INTO u_accounts (name, plan_slug, schedule_slug, engine_slug) VALUES (?, ?, ?, ?)'))) {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -785,10 +781,10 @@ class Account {
 
 		if (!($stmt = $db->prepare(
 				'SELECT a.id, a.name, a.plan_slug, a.schedule_slug, a.engine_slug, a.active, ' .
-				'a.next_charge, a.next_plan_slug, a.next_schedule_slug, a.next_engine_slug, au.role FROM ' .
-				UserConfig::$mysql_prefix . 'user_preferences up INNER JOIN ' .
-				UserConfig::$mysql_prefix . 'accounts a ON a.id = up.current_account_id INNER JOIN ' .
-				UserConfig::$mysql_prefix . 'account_users au ON a.id = au.account_id ' .
+				'a.next_charge, a.next_plan_slug, a.next_schedule_slug, a.next_engine_slug, au.role ' .
+				'FROM u_user_preferences up ' .
+				'INNER JOIN u_accounts a ON a.id = up.current_account_id ' .
+				'INNER JOIN u_account_users au ON a.id = au.account_id ' .
 				'WHERE up.user_id = ? AND au.user_id = ?'))) {
 			throw new DBPrepareStmtException($db);
 		}
@@ -862,8 +858,7 @@ class Account {
 			return; // silently ignore if user is not connected to this account
 		}
 
-		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
-				'user_preferences SET current_account_id = ? WHERE user_id = ?')) {
+		if ($stmt = $db->prepare('UPDATE u_user_preferences SET current_account_id = ? WHERE user_id = ?')) {
 			$userid = $user->getID();
 
 			if (!$stmt->bind_param('ii', $this->id, $userid)) {
@@ -943,8 +938,7 @@ class Account {
 
 		$db = UserConfig::getDB();
 
-		if (!($stmt = $db->prepare('SELECT date_time, amount FROM ' .
-				UserConfig::$mysql_prefix . 'account_charge WHERE account_id = ? ' .
+		if (!($stmt = $db->prepare('SELECT date_time, amount FROM u_account_charge WHERE account_id = ? ' .
 				'ORDER BY date_time'))) {
 			throw new DBPrepareStmtException($db);
 		}
@@ -995,7 +989,7 @@ class Account {
 		$db = UserConfig::getDB();
 
 		// Lock tables
-		$db->query("LOCK TABLES " . UserConfig::$mysql_prefix . "account_charge WRITE");
+		$db->query("LOCK TABLES u_account_charge WRITE");
 
 		if ($c !== FALSE && $this->charges[$c]['amount'] > 0) {
 			if ($this->charges[$c]['amount'] - $charge_amount < 0) {
@@ -1003,8 +997,7 @@ class Account {
 
 				$charge_amount -= $this->charges[$c]['amount'];
 
-				if (!($stmt = $db->prepare('DELETE FROM ' . UserConfig::$mysql_prefix .
-						'account_charge WHERE account_id = ?'))) {
+				if (!($stmt = $db->prepare('DELETE FROM u_account_charge WHERE account_id = ?'))) {
 					throw new DBPrepareStmtException($db);
 				}
 
@@ -1019,8 +1012,7 @@ class Account {
 				$this->charges = array();
 				$stmt->close();
 			} else { // We still owe to user
-				if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
-						'account_charge SET amount = ? WHERE account_id = ?'))) {
+				if (!($stmt = $db->prepare('UPDATE u_account_charge SET amount = ? WHERE account_id = ?'))) {
 					throw new DBPrepareStmtException($db);
 				}
 
@@ -1050,8 +1042,7 @@ class Account {
 				'amount' => -$charge_amount);
 			$this->charges[] = $charge;
 
-			if (!($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix .
-					'account_charge (account_id, date_time, amount) VALUES (?, ?, ?)'))) {
+			if (!($stmt = $db->prepare('INSERT INTO u_account_charge (account_id, date_time, amount) VALUES (?, ?, ?)'))) {
 				throw new DBPrepareStmtException($db);
 			}
 
@@ -1095,8 +1086,7 @@ class Account {
 		$amount_to_log = $amount;
 
 		// Lock tables
-		$db->query("LOCK TABLES " . UserConfig::$mysql_prefix .
-				"account_charge WRITE");
+		$db->query("LOCK TABLES u_account_charge WRITE");
 		foreach (array_reverse(array_keys($this->charges)) as $n => $k) {
 
 			if ($amount <= 0) {
@@ -1109,8 +1099,7 @@ class Account {
 			} else {
 				$this->charges[$k]['amount'] += $amount;
 
-				if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
-						'account_charge SET amount = ? ' .
+				if (!($stmt = $db->prepare('UPDATE u_account_charge SET amount = ? ' .
 						'WHERE account_id = ? and date_time = ?'))) {
 					throw new DBPrepareStmtException($db);
 				}
@@ -1130,8 +1119,7 @@ class Account {
 
 		foreach ($cleared as $n => $k) {
 
-			if (!($stmt = $db->prepare('DELETE FROM ' . UserConfig::$mysql_prefix .
-					'account_charge WHERE account_id = ? and date_time = ?'))) {
+			if (!($stmt = $db->prepare('DELETE FROM u_account_charge WHERE account_id = ? and date_time = ?'))) {
 				throw new DBPrepareStmtException($db);
 			}
 
@@ -1152,8 +1140,7 @@ class Account {
 				'amount' => $amount);
 			$this->charges[] = $charge;
 
-			if (!($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix .
-					'account_charge (account_id, date_time, amount) VALUES (?, ?, ?)'))) {
+			if (!($stmt = $db->prepare('INSERT INTO u_account_charge (account_id, date_time, amount) VALUES (?, ?, ?)'))) {
 				throw new DBPrepareStmtException($db);
 			}
 
@@ -1209,8 +1196,7 @@ class Account {
 		$db = UserConfig::getDB();
 
 		if (!$new_plan || !UserConfig::$useSubscriptions) {
-			if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
-					'accounts SET plan_slug = ?, schedule_slug = NULL, engine_slug = NULL, active = 1, next_charge = NULL, ' .
+			if (!($stmt = $db->prepare('UPDATE u_accounts SET plan_slug = ?, schedule_slug = NULL, engine_slug = NULL, active = 1, next_charge = NULL, ' .
 					'next_plan_slug = NULL, next_schedule_slug = NULL, next_engine_slug = NULL WHERE id = ?'))) {
 				throw new DBPrepareStmtException($db);
 			}
@@ -1264,8 +1250,7 @@ class Account {
 			 * Update db There is a risk that this query fail. If so, object state
 			 * will differ from db state. Should be addressed in further releases.
 			 */
-			if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
-					'accounts SET plan_slug = ?, schedule_slug = ?, engine_slug = ?, active = 1, next_charge = ?, ' .
+			if (!($stmt = $db->prepare('UPDATE u_accounts SET plan_slug = ?, schedule_slug = ?, engine_slug = ?, active = 1, next_charge = ?, ' .
 					'next_plan_slug = NULL, next_schedule_slug = NULL, next_engine_slug = NULL WHERE id = ?'))) {
 				throw new DBPrepareStmtException($db);
 			}
@@ -1334,7 +1319,7 @@ class Account {
 		// Update db
 		$db = UserConfig::getDB();
 
-		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'accounts SET
+		if (!($stmt = $db->prepare('UPDATE u_accounts SET
 			schedule_slug = ?, engine_slug = ?, next_charge = ?,
 			next_plan_slug = NULL, next_schedule_slug = NULL, next_engine_slug = NULL
 			WHERE id = ?'))) {
@@ -1438,8 +1423,7 @@ class Account {
 		// Update db
 		$db = UserConfig::getDB();
 
-		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
-				'accounts SET engine_slug = ? WHERE id = ?'))) {
+		if (!($stmt = $db->prepare('UPDATE u_accounts SET engine_slug = ? WHERE id = ?'))) {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -1537,8 +1521,7 @@ class Account {
 		// Update db
 		$db = UserConfig::getDB();
 
-		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
-				'accounts SET next_plan_slug = ?, next_schedule_slug = ?, next_engine_slug = ? WHERE id = ?'))) {
+		if (!($stmt = $db->prepare('UPDATE u_accounts SET next_plan_slug = ?, next_schedule_slug = ?, next_engine_slug = ? WHERE id = ?'))) {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -1592,8 +1575,7 @@ class Account {
 		// Update db
 		$db = UserConfig::getDB();
 
-		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
-				'accounts SET next_plan_slug = plan_slug, next_schedule_slug = ?,
+		if (!($stmt = $db->prepare('UPDATE u_accounts SET next_plan_slug = plan_slug, next_schedule_slug = ?,
 					next_engine_slug = ? WHERE id = ?'))) {
 			throw new DBPrepareStmtException($db);
 		}
@@ -1623,8 +1605,7 @@ class Account {
 
 		$db = UserConfig::getDB();
 
-		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
-				'accounts SET active = 0 WHERE id = ?'))) {
+		if (!($stmt = $db->prepare('UPDATE u_accounts SET active = 0 WHERE id = ?'))) {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -1651,8 +1632,7 @@ class Account {
 
 		$db = UserConfig::getDB();
 
-		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
-				'accounts SET active = 1 WHERE id = ?'))) {
+		if (!($stmt = $db->prepare('UPDATE u_accounts SET active = 1 WHERE id = ?'))) {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -1689,7 +1669,7 @@ class Account {
 
 		$db = UserConfig::getDB();
 
-		if (!($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'accounts SET ' .
+		if (!($stmt = $db->prepare('UPDATE u_accounts SET ' .
 				'next_plan_slug = NULL, next_schedule_slug = NULL, next_engine_slug = NULL ' .
 				'WHERE id = ?'))) {
 			throw new DBPrepareStmtException($db);

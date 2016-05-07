@@ -50,7 +50,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 
 		$userid = $user->getID();
 
-		if ($stmt = $db->prepare('SELECT username FROM '.UserConfig::$mysql_prefix.'users WHERE id = ?'))
+		if ($stmt = $db->prepare('SELECT username FROM u_users WHERE id = ?'))
 		{
 			if (!$stmt->bind_param('i', $userid))
 			{
@@ -90,7 +90,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 
 		$conns = 0;
 
-		if ($stmt = $db->prepare('SELECT count(*) AS conns FROM '.UserConfig::$mysql_prefix.'users WHERE username IS NOT NULL'))
+		if ($stmt = $db->prepare('SELECT count(*) AS conns FROM u_users WHERE username IS NOT NULL'))
 		{
 			if (!$stmt->execute())
 			{
@@ -120,7 +120,7 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 
 		$dailyregs = array();
 
-		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, count(*) AS regs FROM '.UserConfig::$mysql_prefix.'users WHERE username IS NOT NULL GROUP BY regdate'))
+		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, count(*) AS regs FROM u_users WHERE username IS NOT NULL GROUP BY regdate'))
 		{
 			if (!$stmt->execute())
 			{

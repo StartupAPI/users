@@ -197,7 +197,7 @@ abstract class AuthenticationModule extends StartupAPIModule {
 
 		$dailyregs = array();
 
-		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, count(*) AS regs FROM ' . UserConfig::$mysql_prefix . 'users WHERE regmodule = ? GROUP BY regdate')) {
+		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, count(*) AS regs FROM u_users WHERE regmodule = ? GROUP BY regdate')) {
 			if (!$stmt->bind_param('s', $this->getID())) {
 				throw new DBBindParamException($db, $stmt);
 			}

@@ -252,7 +252,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 
 		$module_slug = $this->getID();
 
-		$query = 'INSERT INTO '.UserConfig::$mysql_prefix.'oauth2_clients (module_slug) VALUES (?)';
+		$query = 'INSERT INTO u_oauth2_clients (module_slug) VALUES (?)';
 		UserTools::debug($query);
 
 		if ($stmt = $db->prepare($query))
@@ -297,7 +297,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		$module_slug = $this->getID();
 
 		// updating new recently created entry
-		$query = 'UPDATE '.UserConfig::$mysql_prefix.'oauth2_clients
+		$query = 'UPDATE u_oauth2_clients
                         SET identity = ?, userinfo = ?
                         WHERE oauth2_client_id = ?';
 		UserTools::debug($query);
@@ -321,7 +321,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		}
 
 		// Inserting new link between user and their oauth2
-		$query = 'INSERT INTO '.UserConfig::$mysql_prefix.'user_oauth2_identity
+		$query = 'INSERT INTO u_user_oauth2_identity
                         (user_id, oauth2_client_id) VALUES (?, ?)';
 		UserTools::debug($query);
 
@@ -354,7 +354,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	public function deleteOAuth2Client($oauth2_client_id) {
 		$db = UserConfig::getDB();
 
-		$query = 'DELETE FROM '.UserConfig::$mysql_prefix.'oauth2_clients WHERE oauth2_client_id = ?';
+		$query = 'DELETE FROM u_oauth2_clients WHERE oauth2_client_id = ?';
 		UserTools::debug($query);
 
 		if ($stmt = $db->prepare($query))
@@ -399,8 +399,8 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		$old_oauth2_client_id = null;
 
 		$query = 'SELECT i.oauth2_client_id, i.user_id
-			FROM '.UserConfig::$mysql_prefix.'user_oauth2_identity i
-			INNER JOIN '.UserConfig::$mysql_prefix.'oauth2_clients c
+			FROM u_user_oauth2_identity i
+			INNER JOIN u_oauth2_clients c
 				on i.oauth2_client_id = c.oauth2_client_id
 			WHERE c.module_slug = ? AND c.identity = ?';
 		UserTools::debug($query);
@@ -525,7 +525,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		$current_refresh = null;
 
 		$query = 'SELECT oauth2_client_id, access_token_expires, refresh_token
-			FROM '.UserConfig::$mysql_prefix.'oauth2_clients
+			FROM u_oauth2_clients
 			WHERE module_slug = ? AND access_token = ?';
 		UserTools::debug($query);
 
@@ -555,7 +555,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		UserTools::debug("Found OAuth2 clien ID: " . var_export($oauth2_client_ID));
 
 		if (!$oauth2_client_id) {
-			$query = 'INSERT INTO '.UserConfig::$mysql_prefix.'oauth2_clients
+			$query = 'INSERT INTO u_oauth2_clients
                                 (module_slug, access_token, access_token_expires, refresh_token)
                                 VALUES (?, ?, ?, ?)';
 			UserTools::debug($query);
@@ -582,7 +582,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 			}
 		} else if ($access_token_expires != $current_expires
 				|| $refresh_token != $current_refresh) {
-			$query = 'UPDATE '.UserConfig::$mysql_prefix.'oauth2_clients
+			$query = 'UPDATE u_oauth2_clients
                                 SET access_token_expires = ?, refresh_token = ?
                                 WHERE oauth2_client_id = ?';
 			UserTools::debug($query);
@@ -693,8 +693,8 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		$serialized_userinfo = null;
 
 		$query = 'SELECT c.oauth2_client_id, c.userinfo
-			FROM '.UserConfig::$mysql_prefix.'user_oauth2_identity i
-			INNER JOIN '.UserConfig::$mysql_prefix.'oauth2_clients c
+			FROM u_user_oauth2_identity i
+			INNER JOIN u_oauth2_clients c
 				ON i.oauth2_client_id = c.oauth2_client_id
 			WHERE i.user_id = ? AND c.module_slug = ?';
 		UserTools::debug($query);
@@ -757,7 +757,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		$serialized_userinfo = null;
 
 		$query = 'SELECT userinfo, access_token, access_token_expires, refresh_token
-			FROM '.UserConfig::$mysql_prefix.'oauth2_clients
+			FROM u_oauth2_clients
 			WHERE oauth2_client_id = ?';
 		UserTools::debug($query);
 
@@ -811,8 +811,8 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 
 		$query = 'SELECT c.oauth2_client_id, c.userinfo,
 			c.access_token, c.access_token_expires, c.refresh_token
-			FROM '.UserConfig::$mysql_prefix.'user_oauth2_identity i
-			INNER JOIN '.UserConfig::$mysql_prefix.'oauth2_clients c
+			FROM u_user_oauth2_identity i
+			INNER JOIN u_oauth2_clients c
 				on i.oauth2_client_id = c.oauth2_client_id
 			WHERE i.user_id = ? AND c.module_slug = ?';
 		UserTools::debug($query);
@@ -987,8 +987,8 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		$conns = 0;
 
 		$query = 'SELECT count(*) AS conns
-			FROM '.UserConfig::$mysql_prefix.'users u
-			LEFT JOIN '.UserConfig::$mysql_prefix.'user_oauth2_identity oa ON u.id = oa.user_id
+			FROM u_users u
+			LEFT JOIN u_user_oauth2_identity oa ON u.id = oa.user_id
 			WHERE oa.oauth2_client_id IS NOT NULL AND oa.module = ?';
 		UserTools::debug($query);
 

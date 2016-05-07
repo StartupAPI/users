@@ -38,12 +38,12 @@ function aggregatePoints() {
 		{
 			if ($db->query('CREATE TEMPORARY TABLE user_activity_points
 					SELECT u.id AS user_id, SUM(p.points) AS points
-					FROM '.UserConfig::$mysql_prefix.'users u
-					INNER JOIN '.UserConfig::$mysql_prefix.'activity a ON u.id = a.user_id
+					FROM u_users u
+					INNER JOIN u_activity a ON u.id = a.user_id
 					INNER JOIN activity_points p ON a.activity_id = p.activity_id
 					GROUP BY u.id'))
 			{
-				if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'users u
+				if ($stmt = $db->prepare('UPDATE u_users u
 						INNER JOIN user_activity_points up ON u.id = up.user_id
 						SET u.points = up.points'))
 				{

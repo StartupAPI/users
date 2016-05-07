@@ -238,8 +238,7 @@ class CampaignTracker
 
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('INSERT IGNORE INTO '.UserConfig::$mysql_prefix."$dictionary_table ($dictionary_column)
-						VALUES (?)"))
+		if ($stmt = $db->prepare("INSERT IGNORE INTO u_$dictionary_table ($dictionary_column) VALUES (?)"))
 		{
 			if (!$stmt->bind_param('s', $string_value))
 			{
@@ -257,8 +256,7 @@ class CampaignTracker
 		}
 
 		$id = null;
-		if ($stmt = $db->prepare('SELECT id FROM '.UserConfig::$mysql_prefix."$dictionary_table
-						WHERE $dictionary_column = ?"))
+		if ($stmt = $db->prepare("SELECT id FROM u_$dictionary_table WHERE $dictionary_column = ?"))
 		{
 			if (!$stmt->bind_param('s', $string_value))
 			{

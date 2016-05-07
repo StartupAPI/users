@@ -131,8 +131,8 @@ switch ($action) {
 
 				$db = UserConfig::getDB();
 
-				if (!($stmt = $db->prepare('SELECT id,name,plan_slug,schedule_slug,active,COALESCE(SUM(amount),0) AS balance FROM ' .
-						UserConfig::$mysql_prefix . 'accounts AS a LEFT JOIN ' . UserConfig::$mysql_prefix . 'account_charge AS c ' .
+				if (!($stmt = $db->prepare('SELECT id,name,plan_slug,schedule_slug,active,COALESCE(SUM(amount),0) AS balance
+						FROM u_accounts AS a LEFT JOIN u_account_charge AS c ' .
 						'ON c.account_id = a.id WHERE engine_slug = "manual" ' . (is_null($search) ? '' : 'AND name like ? ') .
 						'GROUP BY a.id ORDER BY ' . $sortby . ' LIMIT ' . $perpage . ' OFFSET ' . $pagenumber * $perpage))) {
 					throw new DBPrepareStmtException($db);

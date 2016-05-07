@@ -177,7 +177,7 @@ abstract class CohortProvider {
 		$query = 'SELECT u.cohort_id AS cohort_id,
 			FLOOR(DATEDIFF(a.time, u.regtime) / ?) AS actperiod,
 			COUNT(DISTINCT u.id) AS total
-			FROM `'.UserConfig::$mysql_prefix.'activity` AS a
+			FROM `u_activity` AS a
 				INNER JOIN ('.$this->getCohortSQL().') AS u
 					ON a.user_id = u.id';
 		if (!is_null($activityid)) {
@@ -342,13 +342,13 @@ class GenerationCohorts extends CohortProvider {
 				$query = "SELECT EXTRACT(YEAR_MONTH FROM regtime) AS cohort_id,
 					DATE_FORMAT(regtime, '%b %Y') AS title,
 					COUNT(*) AS totals
-					FROM ".UserConfig::$mysql_prefix.'users';
+					FROM u_users";
 				break;
 			case self::YEAR:
 				$query = "SELECT YEAR(regtime) AS cohort_id,
 					YEAR(regtime) AS title,
 					COUNT(*) AS totals
-					FROM ".UserConfig::$mysql_prefix.'users';
+					FROM u_users";
 				break;
 			case self::WEEK:
 				$query = "SELECT YEARWEEK(regtime) AS cohort_id,
@@ -363,7 +363,7 @@ class GenerationCohorts extends CohortProvider {
 						)
 					) AS title,
 					COUNT(*) AS totals
-					FROM ".UserConfig::$mysql_prefix.'users';
+					FROM u_users";
 				break;
 			default:
 				throw new StartupAPIException('Wrong generation period');
@@ -412,15 +412,15 @@ class GenerationCohorts extends CohortProvider {
 		switch ($this->period) {
 			case self::MONTH:
 				$query = 'SELECT id, regtime, EXTRACT(YEAR_MONTH FROM regtime) AS cohort_id
-					FROM '.UserConfig::$mysql_prefix.'users';
+					FROM u_users';
 				break;
 			case self::YEAR:
 				$query = 'SELECT id, regtime, YEAR(regtime) AS cohort_id
-					FROM '.UserConfig::$mysql_prefix.'users';
+					FROM u_users';
 				break;
 			case self::WEEK:
 				$query = 'SELECT id, regtime, YEARWEEK(regtime) AS cohort_id
-					FROM '.UserConfig::$mysql_prefix.'users';
+					FROM u_users';
 				break;
 			default:
 				throw new StartupAPIException('Wrong generation period');
@@ -472,8 +472,7 @@ class RegMethodCohorts extends CohortProvider {
 		/**
 		 * The query must return a unique cohort_id, title and total members
 		 */
-		$query = "SELECT regmodule AS cohort_id, COUNT(*) AS totals
-			FROM ".UserConfig::$mysql_prefix.'users';
+		$query = 'SELECT regmodule AS cohort_id, COUNT(*) AS totals FROM u_users';
 
 		$siteadminsstring = null;
 		if (count(UserConfig::$admins) > 0) {
@@ -519,6 +518,6 @@ class RegMethodCohorts extends CohortProvider {
 	 * @return string SQL statement for generating a resultset with id, regtime and cohort_id
 	 */
 	public function getCohortSQL() {
-		return 'SELECT id, regtime, regmodule AS cohort_id FROM '.UserConfig::$mysql_prefix.'users';
+		return 'SELECT id, regtime, regmodule AS cohort_id FROM u_users';
 	}
 }

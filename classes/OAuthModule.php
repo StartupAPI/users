@@ -182,7 +182,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 
 		$this->oAuthStore = OAuthStore::instance('MySQLi', array(
 			'conn' => UserConfig::getDB(),
-			'table_prefix' => UserConfig::$mysql_prefix
+			'table_prefix' => 'u_'
 		));
 	}
 
@@ -312,7 +312,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 
 		$module = $this->getID();
 
-		if ($stmt = $db->prepare('INSERT INTO '.UserConfig::$mysql_prefix.'user_oauth_identity (module) VALUES (?)'))
+		if ($stmt = $db->prepare('INSERT INTO u_user_oauth_identity (module) VALUES (?)'))
 		{
 			if (!$stmt->bind_param('s', $module))
 			{
@@ -354,7 +354,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		$module = $this->getID();
 
 		// updating new recently created entry
-		if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'user_oauth_identity SET user_id = ?, identity = ?, userinfo = ? WHERE oauth_user_id = ? AND module = ?'))
+		if ($stmt = $db->prepare('UPDATE u_user_oauth_identity SET user_id = ?, identity = ?, userinfo = ? WHERE oauth_user_id = ? AND module = ?'))
 		{
 			if (!$stmt->bind_param('issis', $user_id, $server_unique_id, $serialized_userinfo, $oauth_user_id, $module))
 			{
@@ -383,7 +383,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 	public function deleteOAuthUser($oauth_user_id) {
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.'user_oauth_identity WHERE oauth_user_id = ?'))
+		if ($stmt = $db->prepare('DELETE FROM u_user_oauth_identity WHERE oauth_user_id = ?'))
 		{
 			if (!$stmt->bind_param('i', $oauth_user_id))
 			{
@@ -424,7 +424,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 
 		$module = $this->getID();
 
-		if ($stmt = $db->prepare('SELECT oauth_user_id, user_id FROM '.UserConfig::$mysql_prefix.'user_oauth_identity WHERE module = ? AND identity = ?'))
+		if ($stmt = $db->prepare('SELECT oauth_user_id, user_id FROM u_user_oauth_identity WHERE module = ? AND identity = ?'))
 		{
 			if (!$stmt->bind_param('ss', $module, $server_unique_id))
 			{
@@ -460,7 +460,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 			$serialized_userinfo = serialize($identity);
 
 			// updating new recently created entry
-			if ($stmt = $db->prepare('UPDATE '.UserConfig::$mysql_prefix.'user_oauth_identity SET user_id = ?, identity = ?, userinfo = ? WHERE oauth_user_id = ?'))
+			if ($stmt = $db->prepare('UPDATE u_user_oauth_identity SET user_id = ?, identity = ?, userinfo = ? WHERE oauth_user_id = ?'))
 			{
 				if (!$stmt->bind_param('issi', $user_id, $server_unique_id, $serialized_userinfo, $oauth_user_id))
 				{
@@ -585,7 +585,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		$oauth_user_id = null;
 		$serialized_userinfo = null;
 
-		if ($stmt = $db->prepare('SELECT oauth_user_id, userinfo FROM '.UserConfig::$mysql_prefix.'user_oauth_identity WHERE user_id = ? AND module = ?'))
+		if ($stmt = $db->prepare('SELECT oauth_user_id, userinfo FROM u_user_oauth_identity WHERE user_id = ? AND module = ?'))
 		{
 			if (!$stmt->bind_param('is', $user_id, $module))
 			{
@@ -643,7 +643,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		$oauth_user_id = null;
 		$serialized_userinfo = null;
 
-		if ($stmt = $db->prepare('SELECT oauth_user_id, userinfo FROM '.UserConfig::$mysql_prefix.'user_oauth_identity WHERE user_id = ? AND module = ?'))
+		if ($stmt = $db->prepare('SELECT oauth_user_id, userinfo FROM u_user_oauth_identity WHERE user_id = ? AND module = ?'))
 		{
 			if (!$stmt->bind_param('is', $user_id, $module))
 			{
@@ -749,7 +749,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 			$oauth_user_id = $data['oauth_user_id'];
 			$user_id = $user->getID();
 
-			if ($stmt = $db->prepare('DELETE FROM '.UserConfig::$mysql_prefix.'user_oauth_identity WHERE oauth_user_id = ? AND user_id = ?'))
+			if ($stmt = $db->prepare('DELETE FROM u_user_oauth_identity WHERE oauth_user_id = ? AND user_id = ?'))
 			{
 				if (!$stmt->bind_param('ii', $oauth_user_id, $user_id))
 				{
@@ -827,7 +827,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 
 		$conns = 0;
 
-		if ($stmt = $db->prepare('SELECT count(*) AS conns FROM '.UserConfig::$mysql_prefix.'users u LEFT JOIN '.UserConfig::$mysql_prefix.'user_oauth_identity oa ON u.id = oa.user_id WHERE oa.oauth_user_id IS NOT NULL AND oa.module = ?'))
+		if ($stmt = $db->prepare('SELECT count(*) AS conns FROM u_users u LEFT JOIN u_user_oauth_identity oa ON u.id = oa.user_id WHERE oa.oauth_user_id IS NOT NULL AND oa.module = ?'))
 		{
 			if (!$stmt->bind_param('s', $module_id))
 			{

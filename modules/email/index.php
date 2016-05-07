@@ -50,7 +50,7 @@ class EmailAuthenticationModule extends AuthenticationModule {
 
 		$userid = $user->getID();
 
-		if ($stmt = $db->prepare('SELECT email FROM ' . UserConfig::$mysql_prefix . 'users WHERE id = ?')) {
+		if ($stmt = $db->prepare('SELECT email FROM u_users WHERE id = ?')) {
 			if (!$stmt->bind_param('i', $userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -86,7 +86,7 @@ class EmailAuthenticationModule extends AuthenticationModule {
 
 		$conns = 0;
 
-		if ($stmt = $db->prepare('SELECT count(*) AS conns FROM ' . UserConfig::$mysql_prefix . 'users WHERE email IS NOT NULL')) {
+		if ($stmt = $db->prepare('SELECT count(*) AS conns FROM u_users WHERE email IS NOT NULL')) {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}

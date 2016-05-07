@@ -103,7 +103,7 @@ class Invitation {
 		$db = UserConfig::getDB();
 
 		if ($stmt = $db->prepare('SELECT code, created, issuedby
-			FROM ' . UserConfig::$mysql_prefix . 'invitation
+			FROM u_invitation
 			WHERE is_admin_invite = 1 AND sent_to_note IS NULL AND user_id IS NULL')) {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
@@ -142,7 +142,7 @@ class Invitation {
 		$query = 'SELECT code, UNIX_TIMESTAMP(created), issuedby, is_admin_invite,
 				sent_to_email, sent_to_name, sent_to_note,
 				user_id, account_id, plan_slug
-			FROM ' . UserConfig::$mysql_prefix . 'invitation
+			FROM u_invitation
 			WHERE sent_to_note IS NOT NULL AND user_id IS NULL';
 
 		if (!is_null($issuer)) {
@@ -191,7 +191,7 @@ class Invitation {
 	public static function cancelByCode($code) {
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('DELETE FROM ' . UserConfig::$mysql_prefix . 'invitation WHERE code = ?')) {
+		if ($stmt = $db->prepare('DELETE FROM u_invitation WHERE code = ?')) {
 			if (!$stmt->bind_param('s', $code)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -222,8 +222,8 @@ class Invitation {
 
 		$query = 'SELECT i.code, UNIX_TIMESTAMP(i.created), i.issuedby, i.is_admin_invite,
 				i.sent_to_email, i.sent_to_name, i.sent_to_note, i.user_id, i.account_id, i.plan_slug
-			FROM ' . UserConfig::$mysql_prefix . 'invitation i
-				INNER JOIN ' . UserConfig::$mysql_prefix . 'users u
+			FROM u_invitation i
+				INNER JOIN u_users u
 					ON i.user_id = u.id
 			WHERE i.user_id IS NOT NULL';
 
@@ -274,7 +274,7 @@ class Invitation {
 
 		if ($stmt = $db->prepare('SELECT code, UNIX_TIMESTAMP(created), issuedby, is_admin_invite,
 				sent_to_email, sent_to_name, sent_to_note, user_id, account_id, plan_slug
-			FROM ' . UserConfig::$mysql_prefix . 'invitation
+			FROM u_invitation
 			WHERE code = ?')) {
 			if (!$stmt->bind_param('s', $code)) {
 				throw new DBBindParamException($db, $stmt);
@@ -316,7 +316,7 @@ class Invitation {
 
 		if ($stmt = $db->prepare('SELECT code, UNIX_TIMESTAMP(created), issuedby, is_admin_invite,
 				sent_to_email, sent_to_name, sent_to_note, user_id, account_id, plan_slug
-			FROM ' . UserConfig::$mysql_prefix . 'invitation
+			FROM u_invitation
 			WHERE user_id = ?')) {
 			if (!$stmt->bind_param('i', $user_id)) {
 				throw new DBBindParamException($db, $stmt);
@@ -351,7 +351,7 @@ class Invitation {
 	public static function generateAdminInvites($howmany = 1) {
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . 'invitation (code, is_admin_invite) VALUES (?, 1)')) {
+		if ($stmt = $db->prepare('INSERT INTO u_invitation (code, is_admin_invite) VALUES (?, 1)')) {
 			for ($i = 0; $i < $howmany; $i++) {
 				$code = self::generateCode();
 
@@ -378,7 +378,7 @@ class Invitation {
 	public static function createInvite($from_admin = false) {
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . 'invitation (code, is_admin_invite) VALUES (?, ?)')) {
+		if ($stmt = $db->prepare('INSERT INTO u_invitation (code, is_admin_invite) VALUES (?, ?)')) {
 			$code = self::generateCode();
 			$from_admin_int = $from_admin ? 1 : 0;
 
@@ -593,7 +593,7 @@ class Invitation {
 		$name = mb_convert_encoding($this->sent_to_name, 'UTF-8');
 		$note = mb_convert_encoding($this->sent_to_note, 'UTF-8');
 
-		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'invitation
+		if ($stmt = $db->prepare('UPDATE u_invitation
 			SET sent_to_email = ?,
 				sent_to_name = ?,
 				sent_to_note = ?,

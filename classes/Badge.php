@@ -268,7 +268,7 @@ class Badge {
 
 		$user_id = $user->getID();
 
-		if ($stmt = $db->prepare('SELECT badge_id, MAX(badge_level) as level, time FROM ' . UserConfig::$mysql_prefix . 'user_badges WHERE user_id = ? GROUP BY badge_id')) {
+		if ($stmt = $db->prepare('SELECT badge_id, MAX(badge_level) as level, time FROM u_user_badges WHERE user_id = ? GROUP BY badge_id')) {
 			if (!$stmt->bind_param('i', $user_id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -303,7 +303,7 @@ class Badge {
 
 		$counts = array();
 
-		if ($stmt = $db->prepare('SELECT badge_level, count(user_id) as total FROM ' . UserConfig::$mysql_prefix . 'user_badges WHERE badge_id = ? GROUP BY badge_level')) {
+		if ($stmt = $db->prepare('SELECT badge_level, count(user_id) as total FROM u_user_badges WHERE badge_id = ? GROUP BY badge_level')) {
 			if (!$stmt->bind_param('i', $this->id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -343,12 +343,12 @@ class Badge {
 		$user_ids = array();
 
 		if (is_null($level)) {
-			$query = 'SELECT user_id FROM ' . UserConfig::$mysql_prefix . 'user_badges
+			$query = 'SELECT user_id FROM u_user_badges
 				WHERE badge_id = ?
 				ORDER BY time DESC
 				LIMIT ?, ?';
 		} else {
-			$query = 'SELECT user_id FROM ' . UserConfig::$mysql_prefix . 'user_badges
+			$query = 'SELECT user_id FROM u_user_badges
 				WHERE badge_id = ? AND badge_level = ?
 				ORDER BY time DESC
 				LIMIT ?, ?';
@@ -399,7 +399,7 @@ class Badge {
 
 		$user_id = $user->getID();
 
-		if ($stmt = $db->prepare('INSERT IGNORE INTO ' . UserConfig::$mysql_prefix . 'user_badges
+		if ($stmt = $db->prepare('INSERT IGNORE INTO u_user_badges
 									(user_id, badge_id, badge_level) VALUES (?, ?, ?)')) {
 			if (!$stmt->bind_param('iii', $user_id, $this->id, $level)) {
 				throw new DBBindParamException($db, $stmt);

@@ -231,8 +231,7 @@ abstract class PaymentEngine extends StartupAPIModule {
 		// Deactivate all accounts where grace period is expired
 		// Those accounts should have negative balance, so we can restrict 'where' condition
 
-		if (!($stmt = $db->prepare('SELECT a.id, UNIX_TIMESTAMP(MIN(ac.date_time)) FROM ' . UserConfig::$mysql_prefix . 'accounts a INNER JOIN ' .
-				UserConfig::$mysql_prefix . 'account_charge ac ON a.id = ac.account_id AND ac.amount > 0 AND engine_slug = ? GROUP BY a.id'))) {
+		if (!($stmt = $db->prepare('SELECT a.id, UNIX_TIMESTAMP(MIN(ac.date_time)) FROM u_accounts a INNER JOIN u_account_charge ac ON a.id = ac.account_id AND ac.amount > 0 AND engine_slug = ? GROUP BY a.id'))) {
 			throw new DBPrepareStmtException($db);
 		}
 
@@ -272,7 +271,7 @@ abstract class PaymentEngine extends StartupAPIModule {
 		// Find all accounts which are served by this Payment Engine and which has next_charge date earlier than now
 
 		if (!($stmt = $db->prepare('SELECT id, plan_slug, next_plan_slug, schedule_slug, next_schedule_slug, next_engine_slug ' .
-				'FROM ' . UserConfig::$mysql_prefix . 'accounts ' .
+				'FROM u_accounts ' .
 				'WHERE engine_slug = ? AND active = 1 AND next_charge < ?'))) {
 			throw new DBPrepareStmtException($db);
 		}
@@ -333,8 +332,7 @@ abstract class PaymentEngine extends StartupAPIModule {
 				if ($plan && !is_null($schedule = $account->getSchedule())) {
 
 					// Set new next_charge
-					if (!($stmt2 = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix .
-							'accounts SET next_charge = next_charge + INTERVAL ? DAY WHERE id = ?'))) {
+					if (!($stmt2 = $db->prepare('UPDATE u_accounts SET next_charge = next_charge + INTERVAL ? DAY WHERE id = ?'))) {
 						throw new DBPrepareStmtException($db);
 					}
 

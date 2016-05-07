@@ -24,7 +24,7 @@ class TransactionLogger {
 
 		$db = UserConfig::getDB();
 
-		if (!($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . 'transaction_log
+		if (!($stmt = $db->prepare('INSERT INTO u_transaction_log
 			(date_time, account_id, engine_slug, amount, message) VALUES (NOW(), ?, ?, ?, ?)'))) {
 			throw new DBPrepareStmtException($db);
 		}
@@ -60,8 +60,8 @@ class TransactionLogger {
 
 		$db = UserConfig::getDB();
 
-		$query = 'SELECT transaction_id, date_time, engine_slug, amount, message FROM ' .
-				UserConfig::$mysql_prefix . 'transaction_log WHERE account_id = ?' .
+		$query = 'SELECT transaction_id, date_time, engine_slug, amount, message ' .
+				'FROM u_transaction_log WHERE account_id = ?' .
 				(is_null($from) ? '' : ' AND date_time >= ?') .
 				(is_null($to) ? '' : ' AND date_time - INTERVAL 1 DAY <= ?') .
 				' ORDER BY date_time ' . ($order ? 'ASC' : 'DESC') .

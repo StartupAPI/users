@@ -233,7 +233,7 @@ class Feature
 
 		$account_id = $account->getID();
 
-		if ($stmt = $db->prepare('SELECT COUNT(*) FROM ' . UserConfig::$mysql_prefix . 'account_features WHERE account_id = ? AND feature_id = ?')) {
+		if ($stmt = $db->prepare('SELECT COUNT(*) FROM u_account_features WHERE account_id = ? AND feature_id = ?')) {
 			if (!$stmt->bind_param('ii', $account_id, $this->id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -265,7 +265,7 @@ class Feature
 
 		$account_id = $account->getID();
 
-		if ($stmt = $db->prepare('REPLACE INTO ' . UserConfig::$mysql_prefix . 'account_features (account_id, feature_id) VALUES (?, ?)')) {
+		if ($stmt = $db->prepare('REPLACE INTO u_account_features (account_id, feature_id) VALUES (?, ?)')) {
 			if (!$stmt->bind_param('ii', $account_id, $this->id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -291,7 +291,7 @@ class Feature
 
 		$account_id = $account->getID();
 
-		if ($stmt = $db->prepare('DELETE FROM ' . UserConfig::$mysql_prefix . 'account_features WHERE account_id = ? AND feature_id = ?')) {
+		if ($stmt = $db->prepare('DELETE FROM u_account_features WHERE account_id = ? AND feature_id = ?')) {
 			if (!$stmt->bind_param('ii', $account_id, $this->id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -337,7 +337,7 @@ class Feature
 
 		$user_id = $user->getID();
 
-		if ($stmt = $db->prepare('SELECT COUNT(*) FROM ' . UserConfig::$mysql_prefix . 'user_features WHERE user_id = ? AND feature_id = ?')) {
+		if ($stmt = $db->prepare('SELECT COUNT(*) FROM u_user_features WHERE user_id = ? AND feature_id = ?')) {
 			if (!$stmt->bind_param('ii', $user_id, $this->id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -369,7 +369,7 @@ class Feature
 	public function getUserCount() {
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('SELECT COUNT(*) FROM ' . UserConfig::$mysql_prefix . 'user_features WHERE feature_id = ?')) {
+		if ($stmt = $db->prepare('SELECT COUNT(*) FROM u_user_features WHERE feature_id = ?')) {
 			if (!$stmt->bind_param('i', $this->id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -401,7 +401,7 @@ class Feature
 	public function getAccountCount() {
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('SELECT COUNT(*) FROM ' . UserConfig::$mysql_prefix . 'account_features WHERE feature_id = ?')) {
+		if ($stmt = $db->prepare('SELECT COUNT(*) FROM u_account_features WHERE feature_id = ?')) {
 			if (!$stmt->bind_param('i', $this->id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -436,7 +436,7 @@ class Feature
 
 		$userid = $user->getID();
 
-		if ($stmt = $db->prepare('DELETE FROM ' . UserConfig::$mysql_prefix . 'user_features WHERE user_id = ? AND feature_id = ?')) {
+		if ($stmt = $db->prepare('DELETE FROM u_user_features WHERE user_id = ? AND feature_id = ?')) {
 			if (!$stmt->bind_param('ii', $userid, $this->id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -462,7 +462,7 @@ class Feature
 
 		$userid = $user->getID();
 
-		if ($stmt = $db->prepare('REPLACE INTO ' . UserConfig::$mysql_prefix . 'user_features (user_id, feature_id) VALUES (?, ?)')) {
+		if ($stmt = $db->prepare('REPLACE INTO u_user_features (user_id, feature_id) VALUES (?, ?)')) {
 			if (!$stmt->bind_param('ii', $userid, $this->id)) {
 				throw new DBBindParamException($db, $stmt);
 			}

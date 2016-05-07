@@ -291,6 +291,8 @@ class UserConfig {
 
 	/**
 	 * @var string MySQL table prefix for all StartupAPI tables ('u_' by default)
+	 *
+	 * @deprecated prefix is now hard-coded so there is no need to change it
 	 */
 	public static $mysql_prefix = 'u_';
 

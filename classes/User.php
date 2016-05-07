@@ -198,7 +198,7 @@ class User {
 
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'users SET referer = ? WHERE id = ?')) {
+		if ($stmt = $db->prepare('UPDATE u_users SET referer = ? WHERE id = ?')) {
 			if (!$stmt->bind_param('si', $referer, $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -224,7 +224,7 @@ class User {
 
 		$referer = null;
 
-		if ($stmt = $db->prepare('SELECT referer FROM ' . UserConfig::$mysql_prefix . 'users WHERE id = ?')) {
+		if ($stmt = $db->prepare('SELECT referer FROM u_users WHERE id = ?')) {
 			if (!$stmt->bind_param('i', $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -258,7 +258,7 @@ class User {
 
 		$sources = array();
 
-		if ($stmt = $db->prepare('SELECT referer, id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users WHERE referer IS NOT NULL AND regtime > DATE_SUB(NOW(), INTERVAL ? DAY) ORDER BY regtime DESC')) {
+		if ($stmt = $db->prepare('SELECT referer, id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE referer IS NOT NULL AND regtime > DATE_SUB(NOW(), INTERVAL ? DAY) ORDER BY regtime DESC')) {
 			if (!$stmt->bind_param('i', $days)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -323,7 +323,7 @@ class User {
 		}
 
 		// update user record with compaign IDs
-		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'users SET
+		if ($stmt = $db->prepare('UPDATE u_users SET
 			reg_cmp_source_id = ?,
 			reg_cmp_medium_id = ?,
 			reg_cmp_keywords_id = ?,
@@ -356,12 +356,12 @@ class User {
 		$campaign = array();
 
 		if ($stmt = $db->prepare('SELECT cmp.name, cmp_content.content, cmp_keywords.keywords, cmp_medium.medium, cmp_source.source
-			FROM ' . UserConfig::$mysql_prefix . 'users AS users
-				LEFT JOIN ' . UserConfig::$mysql_prefix . 'cmp AS cmp ON users.reg_cmp_name_id = cmp.id
-				LEFT JOIN ' . UserConfig::$mysql_prefix . 'cmp_content AS cmp_content ON users.reg_cmp_content_id = cmp_content.id
-				LEFT JOIN ' . UserConfig::$mysql_prefix . 'cmp_keywords AS cmp_keywords ON users.reg_cmp_keywords_id = cmp_keywords.id
-				LEFT JOIN ' . UserConfig::$mysql_prefix . 'cmp_medium AS cmp_medium ON users.reg_cmp_medium_id = cmp_medium.id
-				LEFT JOIN ' . UserConfig::$mysql_prefix . 'cmp_source AS cmp_source ON users.reg_cmp_source_id = cmp_source.id
+			FROM u_users AS users
+				LEFT JOIN u_cmp AS cmp ON users.reg_cmp_name_id = cmp.id
+				LEFT JOIN u_cmp_content AS cmp_content ON users.reg_cmp_content_id = cmp_content.id
+				LEFT JOIN u_cmp_keywords AS cmp_keywords ON users.reg_cmp_keywords_id = cmp_keywords.id
+				LEFT JOIN u_cmp_medium AS cmp_medium ON users.reg_cmp_medium_id = cmp_medium.id
+				LEFT JOIN u_cmp_source AS cmp_source ON users.reg_cmp_source_id = cmp_source.id
 			WHERE users.id = ?')) {
 			if (!$stmt->bind_param('i', $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
@@ -405,12 +405,12 @@ class User {
 
 		if ($stmt = $db->prepare('SELECT cmp.name, cmp_content.content, cmp_keywords.keywords, cmp_medium.medium, cmp_source.source,
 			users.id, status, users.name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified
-			FROM ' . UserConfig::$mysql_prefix . 'users AS users
-				LEFT JOIN ' . UserConfig::$mysql_prefix . 'cmp AS cmp ON users.reg_cmp_name_id = cmp.id
-				LEFT JOIN ' . UserConfig::$mysql_prefix . 'cmp_content AS cmp_content ON users.reg_cmp_content_id = cmp_content.id
-				LEFT JOIN ' . UserConfig::$mysql_prefix . 'cmp_keywords AS cmp_keywords ON users.reg_cmp_keywords_id = cmp_keywords.id
-				LEFT JOIN ' . UserConfig::$mysql_prefix . 'cmp_medium AS cmp_medium ON users.reg_cmp_medium_id = cmp_medium.id
-				LEFT JOIN ' . UserConfig::$mysql_prefix . 'cmp_source AS cmp_source ON users.reg_cmp_source_id = cmp_source.id
+			FROM u_users AS users
+				LEFT JOIN u_cmp AS cmp ON users.reg_cmp_name_id = cmp.id
+				LEFT JOIN u_cmp_content AS cmp_content ON users.reg_cmp_content_id = cmp_content.id
+				LEFT JOIN u_cmp_keywords AS cmp_keywords ON users.reg_cmp_keywords_id = cmp_keywords.id
+				LEFT JOIN u_cmp_medium AS cmp_medium ON users.reg_cmp_medium_id = cmp_medium.id
+				LEFT JOIN u_cmp_source AS cmp_source ON users.reg_cmp_source_id = cmp_source.id
 			WHERE regtime > DATE_SUB(NOW(), INTERVAL ? DAY)
 				AND (reg_cmp_name_id IS NOT NULL
 					OR reg_cmp_content_id IS NOT NULL
@@ -506,7 +506,7 @@ class User {
 
 		$userid = $this->getID();
 
-		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . 'user_preferences (user_id) VALUES (?)')) {
+		if ($stmt = $db->prepare('INSERT INTO u_user_preferences (user_id) VALUES (?)')) {
 			if (!$stmt->bind_param('i', $userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -589,14 +589,14 @@ class User {
 		}
 
 		if (is_null($user)) {
-			$query = 'UPDATE ' . UserConfig::$mysql_prefix . 'users
+			$query = 'UPDATE u_users
 						SET email_verified = 1,
 							email_verification_code = null,
 							email_verification_code_time = null
 						WHERE email_verification_code = ?
 							AND email_verification_code_time > DATE_SUB(NOW(), INTERVAL ? DAY)';
 		} else {
-			$query = 'UPDATE ' . UserConfig::$mysql_prefix . 'users
+			$query = 'UPDATE u_users
 						SET email_verified = 1,
 							email_verification_code = null,
 							email_verification_code_time = null
@@ -651,7 +651,7 @@ class User {
 
 		$code = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 10);
 
-		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'users SET
+		if ($stmt = $db->prepare('UPDATE u_users SET
 										email_verification_code = ?,
 										email_verification_code_time = now()
 									WHERE id = ?')) {
@@ -739,7 +739,7 @@ class User {
 
 		$user = null;
 
-		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . "users (name, regmodule, tos_version, email, fb_id) VALUES (?, 'facebook', ?, ?, ?)")) {
+		if ($stmt = $db->prepare("INSERT INTO u_users (name, regmodule, tos_version, email, fb_id) VALUES (?, 'facebook', ?, ?, ?)")) {
 			if (!$stmt->bind_param('sisi', $name, UserConfig::$currentTOSVersion, $email, $fb_id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -793,7 +793,7 @@ class User {
 			$email = null;
 		}
 
-		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . 'users (name, email, regmodule, tos_version) VALUES (?, ?, ?, ?)')) {
+		if ($stmt = $db->prepare('INSERT INTO u_users (name, email, regmodule, tos_version) VALUES (?, ?, ?, ?)')) {
 			if (!$stmt->bind_param('sssi', $name, $email, $module_id, UserConfig::$currentTOSVersion)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -842,7 +842,7 @@ class User {
 		;
 		$pass = sha1($salt . $password);
 
-		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . "users (regmodule, tos_version, name, username, email, pass, salt) VALUES ('userpass', ?, ?, ?, ?, ?, ?)")) {
+		if ($stmt = $db->prepare("INSERT INTO u_users (regmodule, tos_version, name, username, email, pass, salt) VALUES ('userpass', ?, ?, ?, ?, ?, ?)")) {
 			if (!$stmt->bind_param('isssss', UserConfig::$currentTOSVersion, $name, $username, $email, $pass, $salt)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -876,7 +876,7 @@ class User {
 
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('DELETE FROM ' . UserConfig::$mysql_prefix . "users WHERE username = ?")) {
+		if ($stmt = $db->prepare('DELETE FROM u_users WHERE username = ?')) {
 			if (!$stmt->bind_param('s', $username)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -902,7 +902,7 @@ class User {
 
 		$total = 0;
 
-		if ($stmt = $db->prepare('SELECT COUNT(*) FROM ' . UserConfig::$mysql_prefix . 'users')) {
+		if ($stmt = $db->prepare('SELECT COUNT(*) FROM u_users')) {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
@@ -954,8 +954,8 @@ class User {
 
 			$query = 'SELECT count(*) AS total FROM (
 					SELECT user_id, count(*)
-					FROM ' . UserConfig::$mysql_prefix . 'activity a
-					INNER JOIN ' . UserConfig::$mysql_prefix . 'users u
+					FROM u_activity a
+					INNER JOIN u_users u
 						ON a.user_id = u.id
 					WHERE a.time > DATE_ADD(u.regtime, INTERVAL 1 DAY)
 						AND a.time > DATE_SUB(' .
@@ -968,8 +968,8 @@ class User {
 		} else {
 			$query = 'SELECT count(*) AS total FROM (
 					SELECT user_id, count(*)
-					FROM ' . UserConfig::$mysql_prefix . 'activity a
-					INNER JOIN ' . UserConfig::$mysql_prefix . 'users u
+					FROM u_activity a
+					INNER JOIN u_users u
 						ON a.user_id = u.id
 					WHERE a.time > DATE_ADD(u.regtime, INTERVAL 1 DAY)
 						AND a.time > DATE_SUB(' .
@@ -1027,7 +1027,7 @@ class User {
 			DAYOFMONTH(MIN(time)) as day,
 			MONTH(MIN(time)) as month,
 			YEAR(MIN(time)) as year
-			FROM ' . UserConfig::$mysql_prefix . 'activity' .
+			FROM u_activity' .
 				((!is_null($lastndays) && is_int($lastndays)) ?
 						' WHERE time > DATE_SUB(NOW(), INTERVAL ' . $lastndays . ' DAY)' : '')
 		)) {
@@ -1051,7 +1051,7 @@ class User {
 
 		// now getting all cached numbers
 		if ($stmt = $db->prepare('SELECT day, active_users
-			FROM ' . UserConfig::$mysql_prefix . 'admin_daily_stats_cache' .
+			FROM u_admin_daily_stats_cache' .
 				((!is_null($lastndays) && is_int($lastndays)) ?
 						' WHERE day > DATE_SUB(NOW(), INTERVAL ' . $lastndays . ' DAY)' : ''))) {
 			if (!$stmt->execute()) {
@@ -1092,7 +1092,7 @@ class User {
 		$totalupdates = count($updates);
 
 		if ($totalupdates > 0) {
-			$query = 'REPLACE INTO ' . UserConfig::$mysql_prefix . 'admin_daily_stats_cache
+			$query = 'REPLACE INTO u_admin_daily_stats_cache
 				(day, active_users) VALUES';
 
 			$first = true;
@@ -1135,7 +1135,7 @@ class User {
 
 		$daily_activity = array();
 
-		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, count(*) AS cnt FROM ' . UserConfig::$mysql_prefix . 'activity WHERE activity_id = ? GROUP BY activity_date')) {
+		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, count(*) AS cnt FROM u_activity WHERE activity_id = ? GROUP BY activity_date')) {
 			if (!$stmt->bind_param('i', $activityid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -1183,7 +1183,7 @@ class User {
 			$where = ' WHERE user_id NOT IN(' . join(', ', UserConfig::$dont_display_activity_for) . ') ';
 		}
 
-		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total FROM ' . UserConfig::$mysql_prefix . 'activity ' . $where . 'GROUP BY activity_date, activity_id')) {
+		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total FROM u_activity ' . $where . 'GROUP BY activity_date, activity_id')) {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
@@ -1217,7 +1217,7 @@ class User {
 
 		$dailyregs = array();
 
-		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, count(*) AS regs FROM ' . UserConfig::$mysql_prefix . 'users GROUP BY regdate')) {
+		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, count(*) AS regs FROM u_users GROUP BY regdate')) {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
@@ -1251,7 +1251,7 @@ class User {
 
 		$dailyregs = array();
 
-		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, regmodule, count(*) AS reg FROM ' . UserConfig::$mysql_prefix . 'users GROUP BY regdate, regmodule')) {
+		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, regmodule, count(*) AS reg FROM u_users GROUP BY regdate, regmodule')) {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
@@ -1292,7 +1292,7 @@ class User {
 
 		$regs = array();
 
-		if ($stmt = $db->prepare('SELECT regmodule, count(*) AS reg FROM ' . UserConfig::$mysql_prefix . 'users u WHERE regtime > DATE_SUB(NOW(), INTERVAL 30 DAY) GROUP BY regmodule')) {
+		if ($stmt = $db->prepare('SELECT regmodule, count(*) AS reg FROM u_users u WHERE regtime > DATE_SUB(NOW(), INTERVAL 30 DAY) GROUP BY regmodule')) {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
@@ -1393,7 +1393,7 @@ class User {
 		}
 
 		$query = 'SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified
-			FROM ' . UserConfig::$mysql_prefix . 'users ' .
+			FROM u_users ' .
 				$where . '
 			ORDER BY ' . $orderby . ' ' . ($sort_order ? 'ASC' : 'DESC') . '
 			LIMIT ?, ?';
@@ -1460,7 +1460,7 @@ class User {
 		}
 
 		// TODO Replace with real, fast and powerful full-text search
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users WHERE INSTR(name, ?) > 0 OR INSTR(username, ?) > 0 OR INSTR(email, ?) > 0 ORDER BY ' . $orderby . ' DESC LIMIT ?, ?')) {
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE INSTR(name, ?) > 0 OR INSTR(username, ?) > 0 OR INSTR(email, ?) > 0 ORDER BY ' . $orderby . ' DESC LIMIT ?, ?')) {
 			if (!$stmt->bind_param('sssii', $search, $search, $search, $first, $perpage)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -1509,7 +1509,7 @@ class User {
 		}
 
 		if ($all) {
-			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM ' . UserConfig::$mysql_prefix . 'activity ' . ($exclude != '' ? 'WHERE ' . $exclude : '') . ' ORDER BY time DESC LIMIT ?, ?';
+			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM u_activity ' . ($exclude != '' ? 'WHERE ' . $exclude : '') . ' ORDER BY time DESC LIMIT ?, ?';
 		} else {
 			$ids = array();
 
@@ -1523,7 +1523,7 @@ class User {
 				return $activities; // no activities are configured to be worthy
 			}
 
-			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM ' . UserConfig::$mysql_prefix . 'activity WHERE activity_id IN (' . implode(', ', $ids) . ') ' . ($exclude != '' ? 'AND ' . $exclude : '') . 'ORDER BY time DESC LIMIT ?, ?';
+			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM u_activity WHERE activity_id IN (' . implode(', ', $ids) . ') ' . ($exclude != '' ? 'AND ' . $exclude : '') . 'ORDER BY time DESC LIMIT ?, ?';
 		}
 
 		$db = UserConfig::getDB();
@@ -1574,7 +1574,7 @@ class User {
 			$exclude = ' AND user_id NOT IN(' . join(', ', UserConfig::$dont_display_activity_for) . ') ';
 		}
 
-		$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id FROM ' . UserConfig::$mysql_prefix . 'activity WHERE activity_id = ? ' . $exclude . ' ORDER BY time DESC LIMIT ?, ?';
+		$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id FROM u_activity WHERE activity_id = ? ' . $exclude . ' ORDER BY time DESC LIMIT ?, ?';
 
 		$db = UserConfig::getDB();
 
@@ -1621,7 +1621,7 @@ class User {
 
 		$users = array();
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users WHERE username = ? OR email = ?')) {
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE username = ? OR email = ?')) {
 			if (!$stmt->bind_param('ss', $nameoremail, $nameoremail)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -1665,7 +1665,7 @@ class User {
 			$where = ' WHERE user_id NOT IN(' . join(', ', UserConfig::$dont_display_activity_for) . ') ';
 		}
 
-		$query = 'SELECT activity_id, count(*) as cnt FROM ' . UserConfig::$mysql_prefix . "activity $where GROUP BY activity_id";
+		$query = "SELECT activity_id, count(*) as cnt FROM u_activity $where GROUP BY activity_id";
 
 		$db = UserConfig::getDB();
 
@@ -1706,7 +1706,7 @@ class User {
 		$activities = array();
 
 		if ($all) {
-			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM ' . UserConfig::$mysql_prefix . 'activity WHERE user_id = ? ORDER BY time DESC LIMIT ?, ?';
+			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM u_activity WHERE user_id = ? ORDER BY time DESC LIMIT ?, ?';
 		} else {
 			$ids = array();
 
@@ -1720,7 +1720,7 @@ class User {
 				return $activities; // no activities are configured to be worthy
 			}
 
-			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM ' . UserConfig::$mysql_prefix . 'activity WHERE user_id = ? AND activity_id IN (' . implode(', ', $ids) . ')  ORDER BY time DESC LIMIT ?, ?';
+			$query = 'SELECT UNIX_TIMESTAMP(time) as time, user_id, activity_id FROM u_activity WHERE user_id = ? AND activity_id IN (' . implode(', ', $ids) . ')  ORDER BY time DESC LIMIT ?, ?';
 		}
 
 		$db = UserConfig::getDB();
@@ -1767,7 +1767,7 @@ class User {
 		$temppass = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 13);
 		;
 
-		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'users SET temppass = ?, temppasstime = now() WHERE id = ?')) {
+		if ($stmt = $db->prepare('UPDATE u_users SET temppass = ?, temppasstime = now() WHERE id = ?')) {
 			if (!$stmt->bind_param('si', $temppass, $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -1793,7 +1793,7 @@ class User {
 	public function resetTemporaryPassword() {
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'users SET temppass = null, temppasstime = null WHERE id = ?')) {
+		if ($stmt = $db->prepare('UPDATE u_users SET temppass = null, temppasstime = null WHERE id = ?')) {
 			if (!$stmt->bind_param('s', $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -1823,7 +1823,7 @@ class User {
 
 		$module_id = $module->getID();
 
-		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'users SET regmodule = ? WHERE id = ?')) {
+		if ($stmt = $db->prepare('UPDATE u_users SET regmodule = ? WHERE id = ?')) {
 			if (!$stmt->bind_param('si', $module_id, $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -1870,7 +1870,7 @@ class User {
 
 		$idlist = join(', ', $ids);
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users WHERE id IN (' . $idlist . ')')) {
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE id IN (' . $idlist . ')')) {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
@@ -1908,7 +1908,7 @@ class User {
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, pass, salt, temppass, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users WHERE username = ?')) {
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, pass, salt, temppass, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE username = ?')) {
 			if (!$stmt->bind_param('s', $entered_username)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -1941,7 +1941,7 @@ class User {
 		}
 
 		if (is_null($user)) {
-			if ($stmt = $db->prepare('SELECT id, status, name, username, email, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users WHERE username = ? AND temppass = ? AND temppasstime > DATE_SUB(NOW(), INTERVAL 1 DAY)')) {
+			if ($stmt = $db->prepare('SELECT id, status, name, username, email, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE username = ? AND temppass = ? AND temppasstime > DATE_SUB(NOW(), INTERVAL 1 DAY)')) {
 				if (!$stmt->bind_param('ss', $entered_username, $entered_password)) {
 					throw new DBBindParamException($db, $stmt);
 				}
@@ -1995,7 +1995,7 @@ class User {
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users WHERE fb_id = ?')) {
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE fb_id = ?')) {
 			if (!$stmt->bind_param('i', $fb_id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -2032,7 +2032,7 @@ class User {
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM ' . UserConfig::$mysql_prefix . 'users WHERE id = ?')) {
+		if ($stmt = $db->prepare('SELECT status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE id = ?')) {
 			if (!$stmt->bind_param('i', $userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -2429,7 +2429,7 @@ class User {
 	public function checkPass($password) {
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('SELECT pass, salt FROM ' . UserConfig::$mysql_prefix . 'users WHERE id = ?')) {
+		if ($stmt = $db->prepare('SELECT pass, salt FROM u_users WHERE id = ?')) {
 			if (!$stmt->bind_param('i', $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -2465,7 +2465,7 @@ class User {
 		$salt = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 13);
 		$pass = sha1($salt . $password);
 
-		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'users SET pass = ?, salt = ? WHERE id = ?')) {
+		if ($stmt = $db->prepare('UPDATE u_users SET pass = ?, salt = ? WHERE id = ?')) {
 			if (!$stmt->bind_param('ssi', $pass, $salt, $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -2487,7 +2487,7 @@ class User {
 		$userid = $this->userid;
 
 		if ($stmt = $db->prepare('SELECT app_settings_json
-				FROM ' . UserConfig::$mysql_prefix . 'user_preferences
+				FROM u_user_preferences
 				WHERE user_id = ?')
 		) {
 			if (!$stmt->bind_param('i', $userid)) {
@@ -2519,7 +2519,7 @@ class User {
 
 		$json = json_encode($settings);
 
-		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'user_preferences
+		if ($stmt = $db->prepare('UPDATE u_user_preferences
 			SET app_settings_json = ? WHERE user_id = ?')
 		) {
 			if (!$stmt->bind_param('si', $json, $this->userid)) {
@@ -2558,7 +2558,7 @@ class User {
 		$name = is_null($this->name) || $this->name == '' ? null : mb_convert_encoding($this->name, 'UTF-8');
 		$email = is_null($this->email) || $this->email == '' ? null : mb_convert_encoding($this->email, 'UTF-8');
 
-		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'users SET status = ?, username = ?, name = ?, email = ?, email_verified = ?, requirespassreset = ?, fb_id = ? WHERE id = ?')) {
+		if ($stmt = $db->prepare('UPDATE u_users SET status = ?, username = ?, name = ?, email = ?, email_verified = ?, requirespassreset = ?, fb_id = ? WHERE id = ?')) {
 			if (!$stmt->bind_param('isssiiii', $status, $username, $name, $email, $email_verifiednum, $passresetnum, $this->fbid, $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -2696,7 +2696,7 @@ class User {
 
 		$db = UserConfig::getDB();
 
-		if ($stmt = $db->prepare('INSERT INTO ' . UserConfig::$mysql_prefix . 'activity (user_id, activity_id) VALUES (?, ?)')) {
+		if ($stmt = $db->prepare('INSERT INTO u_activity (user_id, activity_id) VALUES (?, ?)')) {
 			if (!$stmt->bind_param('ii', $this->userid, $activity_id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -2709,7 +2709,7 @@ class User {
 			throw new DBPrepareStmtException($db);
 		}
 
-		if ($stmt = $db->prepare('UPDATE ' . UserConfig::$mysql_prefix . 'users SET points = points + ? WHERE id = ?')) {
+		if ($stmt = $db->prepare('UPDATE u_users SET points = points + ? WHERE id = ?')) {
 			if (!$stmt->bind_param('ii', UserConfig::$activities[$activity_id][1], $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
@@ -2757,7 +2757,7 @@ class User {
 
 		$in = implode(', ', $activity_ids);
 
-		if ($stmt = $db->prepare('SELECT count(*) as count FROM ' . UserConfig::$mysql_prefix . 'activity
+		if ($stmt = $db->prepare('SELECT count(*) as count FROM u_activity
 									WHERE user_id = ? AND activity_id IN (' . $in . ')')) {
 			if (!$stmt->bind_param('i', $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
