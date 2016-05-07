@@ -696,8 +696,6 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 	 * @param boolean $remember whatever or not to remember the user
 	 *
 	 * @return null This method never returns user information
-	 *
-	 * @todo Figure out if we need $remember parameter at all for these modules
 	 */
 	public function processLogin($data, &$remember)
 	{
@@ -716,8 +714,6 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 	 * @param boolean $remember whatever or not to remember the user
 	 *
 	 * @return null This method never returns user information
-	 *
-	 * @todo Figure out if we need $remember parameter at all for these modules
 	 */
 	public function processRegistration($data, &$remember)
 	{
