@@ -1272,21 +1272,17 @@ class Account {
 	 * Deactivates subscription plan and downgrades to plan defined in "downgrade_to"
 	 * or suspend the account
 	 *
-	 * @TODO Something is off here - downgrade_to property is not on account, but on Plan
-	 *
 	 * @return boolean True if account is still active and false if suspended
 	 */
 	public function deactivatePlan() {
 		$this->plan->deactivateHook($this->id, $this->downgrade_to, NULL);
 
 		if (!is_null($this->downgrade_to)) {
-
 			$this->activatePlan($this->downgrade_to);
 			$this->lastTransactionID =
 					TransactionLogger::log($this->id, is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug(), 0, 'Plan downgraded to "' . $this->plan->getName() . '"');
 			return TRUE;
 		} else {
-
 			// Nothing to downgrade to - mark account as not active
 			$this->suspend();
 			$this->lastTransactionID =
