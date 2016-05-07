@@ -5,7 +5,7 @@ require_once(dirname(__DIR__) . '/global.php');
 /**
  * Adding an interface to allow defining unimplemented static methods
  */
-interface iStartupAPIModule {
+interface StartupAPIModuleInterface {
 
 	/**
 	 * Returns module ID string
@@ -34,7 +34,7 @@ interface iStartupAPIModule {
  *
  * @todo Rename module IDs to module slugs throughout the application to confirm with coding standards
  */
-abstract class StartupAPIModule implements iStartupAPIModule {
+abstract class StartupAPIModule implements StartupAPIModuleInterface {
 
 	/**
 	 * Creates new module and registers it with the system
@@ -137,4 +137,3 @@ abstract class StartupAPIModule implements iStartupAPIModule {
 require_once(__DIR__ . '/AuthenticationModule.php');
 require_once(__DIR__ . '/EmailModule.php');
 require_once(__DIR__ . '/PaymentEngine.php');
-
