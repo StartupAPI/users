@@ -347,7 +347,6 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		$db = UserConfig::getDB();
 
 		$user_id = $user->getID();
-		$old_oauth_user_id = null;
 
 		$server_unique_id = $identity['id'];
 		$serialized_userinfo = serialize($identity);
@@ -573,7 +572,7 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 	 * @param array $data Data submitted to the form
 	 *
 	 * @return string Rendered user ediging form for this module
-	 * 
+	 *
 	 * @throws DBException
 	 */
 	public function renderEditUserForm($template_info, $action, $errors, $user, $data)
@@ -678,9 +677,9 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 	 * Renders user information as HTML
 	 *
 	 * Subclasses can override to add links to user profiles on destination sites, userpics and etc.
-	 * 
+	 *
 	 * @param array $serialized_userinfo Array of user info parameters from provider with "id" and "name" required
-	 * 
+	 *
 	 * @return string Rendered user information HTML
 	 */
 	protected function renderUserInfo($serialized_userinfo) {
