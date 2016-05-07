@@ -234,7 +234,8 @@ require_once(__DIR__ . '/header.php');
 			</tr>
 
 			<?php
-			for ($cohort_number = 0; $cohort_number < count($cohorts); $cohort_number += 1) {
+			$total_cohorts = count($cohorts);
+			for ($cohort_number = 0; $cohort_number < $total_cohorts; $cohort_number += 1) {
 				$cohort = $cohorts[$cohort_number];
 				$total_cohort_users = $cohort->getTotal();
 				?><tr><th><?php echo $cohort->getTitle() ?></th><?php

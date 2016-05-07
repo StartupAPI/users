@@ -18,7 +18,8 @@ if (count($daily_active_users) > 0) {
 
 	$max_daily_active_users = max($daily_active_users_vals);
 
-	for ($i = 0; $i < count($daily_active_users_vals); $i++) {
+	$total_values = count($daily_active_users_vals);
+	for ($i = 0; $i < $total_values; $i++) {
 
 		if ($max_daily_active_users > $min_daily_active_users) {
 			$daily_active_users_ranked[] = round(($daily_active_users_vals[$i] - $min_daily_active_users)
