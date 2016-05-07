@@ -62,10 +62,6 @@ $builtin_modules = array(
 		'class' => 'OhlohAuthenticationModule',
 		'category_slug' => 'auth'
 	),
-	'statusnet' => array(
-		'class' => 'StatusNetAuthenticationModule',
-		'category_slug' => 'auth'
-	),
 	'mailchimp' => array(
 		'class' => 'MailChimpModule',
 		'experimental' => true,

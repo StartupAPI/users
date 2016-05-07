@@ -126,19 +126,6 @@ new UsernamePasswordAuthenticationModule();
 #new TwitterAuthenticationModule('...api.key.goes.here...', '...api.secret.goes.here...');
 
 /**
- * Status.Net Authentication configuration
- * Register your app with your Status.Net installation
- * And then uncomment two lines below and copy API Key, App Secret
- * as well as provider name and root URL for the site and API
- */
-#UserConfig::loadModule('statusnet');
-#new StatusNetAuthenticationModule('...api.key.goes.here...', '...api.secret.goes.here...', '...provider.name...', '...base.app.url...', '...base.api.url...');
-
-# Identi.ca's simplified setup (get your keys here: http://identi.ca/settings/oauthapps)
-#UserConfig::loadModule('statusnet');
-#new StatusNetAuthenticationModule('...identi.ca.api.key.goes.here...', '...identi.ca.api.secret.goes.here...');
-
-/**
  * Meetup Authentication configuration
  * Register your app here: http://www.meetup.com/meetup_api/oauth_consumers/
  * Click red "Register OAuth Consumer" button on the right and enter your site's name and URL
