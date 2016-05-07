@@ -14,3 +14,5 @@ It is distributed under [MIT license](http://opensource.org/licenses/MIT) distri
 ## Problems and Questions
 
 If you have any problems with installations check out the [list of issues/tasks](https://github.com/StartupAPI/users/issues) or let us know about new one.
+
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/27d25d75-36a5-418a-a7f5-78162c01df10/mini.png)](https://insight.sensiolabs.com/projects/27d25d75-36a5-418a-a7f5-78162c01df10)
