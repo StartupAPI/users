@@ -569,10 +569,6 @@ class User {
 	 * @return boolean Is code associated with a user or not
 	 *
 	 * @throws DBException
-	 *
-	 * @todo Check if this can be an attack vector for brute forcing the code
-	 * verification for unauthorized users and if there are any ways to prevent
-	 * this from happening
 	 */
 	public static function verifyEmailLinkCode($code, User $user = null) {
 		$db = UserConfig::getDB();
