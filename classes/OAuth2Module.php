@@ -135,10 +135,6 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	 * @param string $logInButtonURL Login button image URL
 	 * @param string $connectButtonURL Connect button image URL
 	 * @param array $activities Array of user activity configuration entries (see UserConfig::$activities)
-	 *
-	 * @todo Refactor to move the initialization into separate method and only do
-	 *       construction with parameters that end users will most likely have to
-	 *       provide in subclasses, e.g. consumer key, secret and scopes
 	 */
 	public function __construct($serviceName,
 		$oAuth2APIRootURL,
