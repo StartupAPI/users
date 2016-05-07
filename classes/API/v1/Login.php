@@ -30,7 +30,7 @@ class Login extends \StartupAPI\API\Endpoint {
 	}
 
 	public function call($values, $raw_request_body = null) {
-		parent::call($values, $raw_request_body = null);
+		parent::call($values, $raw_request_body);
 
 		$module = \AuthenticationModule::get('usernamepass');
 		$remember = true;
