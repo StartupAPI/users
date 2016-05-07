@@ -1891,46 +1891,6 @@ class User {
 	}
 
 	/**
-	 * Removes association between the user and Google Friend Connect credential
-	 *
-	 * @param string $google_id Google Friend Connect user ID
-	 *
-	 * @throws DBException
-	 *
-	 * @deprecated
-	 */
-	public function removeGoogleFriendConnectAssociation($google_id) {
-		throw StartupAPIDeprecatedException('Google Friend Connect support is deprecated');
-	}
-
-	/**
-	 * Adds association between the user and Google Friend Connect credential
-	 *
-	 * @param string $google_id Google Friend Connect user ID
-	 * @param string $userpic User's userpic URL
-	 *
-	 * @throws DBException
-	 *
-	 * @deprecated
-	 */
-	public function addGoogleFriendConnectAssociation($google_id, $userpic) {
-		throw StartupAPIDeprecatedException('Google Friend Connect support is deprecated');
-	}
-
-	/**
-	 * Returns all Google Friend Connect associations for the user
-	 *
-	 * @return array Array of (google_id, userpic) records
-	 *
-	 * @throws DBException
-	 *
-	 * @deprecated
-	 */
-	public function getGoogleFriendsConnectAssociations() {
-		throw StartupAPIDeprecatedException('Google Friend Connect support is deprecated');
-	}
-
-	/**
 	 * Returns a user by username and password
 	 *
 	 * Returns user object or null if username and password do not match.
@@ -2015,21 +1975,6 @@ class User {
 		}
 
 		return $user;
-	}
-
-	/**
-	 * Returnes user by their Google Friend Connect ID
-	 *
-	 * @param string $googleid Google Friend Connect ID
-	 *
-	 * @return User User object
-	 *
-	 * @throws DBException
-	 *
-	 * @deprecated
-	 */
-	public static function getUserByGoogleFriendConnectID($googleid) {
-		throw StartupAPIDeprecatedException('Google Friend Connect support is deprecated');
 	}
 
 	/*
