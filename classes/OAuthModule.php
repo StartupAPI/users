@@ -248,7 +248,6 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 		{
 			$callback = UserConfig::$USERSROOTFULLURL.'/oauth_callback.php?module='.$this->getID();
 
-			// TODO add a way to skip this step if server was initialized
 			$this->initOAuthServer();
 
 			$params = array(
@@ -301,7 +300,6 @@ abstract class OAuthAuthenticationModule extends AuthenticationModule
 	 * @throws DBException
 	 */
 	protected function getNewOAuthUserID() {
-		// TODO add a way to skip this step if server was initialized
 		$this->initOAuthServer();
 
 		$db = UserConfig::getDB();
