@@ -114,4 +114,3 @@ foreach (UserConfig::$authentication_modules as $module) {
 
 <?php
 require_once(__DIR__ . '/footer.php');
-

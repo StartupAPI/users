@@ -4,7 +4,7 @@ require_once(dirname(dirname(__DIR__)).'/classes/OAuth2Module.php');
 /**
  * First register an app here: https://console.developers.google.com/project
  * Google OAuth2 docs: https://developers.google.com/identity/protocols/OAuth2
- * 
+ *
  * @package StartupAPI
  * @subpackage Authentication\Google
  */
@@ -70,7 +70,7 @@ class GoogleAuthenticationModule extends OAuth2AuthenticationModule
 	}
 
 	public function getIdentity($oauth2_client_id) {
-		$credentials = $this->getOAuth2Credentials($oauth2_client_id); 
+		$credentials = $this->getOAuth2Credentials($oauth2_client_id);
 
 		try {
 			$result = $credentials->makeOAuth2Request('https://www.googleapis.com/plus/v1/people/me');

@@ -4,7 +4,7 @@ require_once(dirname(dirname(__DIR__)).'/classes/OAuth2Module.php');
 /**
  * First register an app here: https://sellercentral.amazon.com/gp/homepage.html
  * Amazon OAuth(2) docs: https://login.amazon.com/documentation
- * 
+ *
  * @package StartupAPI
  * @subpackage Authentication\Amazon
  */

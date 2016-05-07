@@ -4,7 +4,7 @@ require_once(dirname(dirname(__DIR__)).'/classes/OAuth2Module.php');
 /**
  * First register an app here: https://github.com/settings/applications/new
  * GitHub OAuth(2) docs: http://developer.github.com/v3/oauth/
- * 
+ *
  * @package StartupAPI
  * @subpackage Authentication\Githib
  */
@@ -67,7 +67,7 @@ class GithubAuthenticationModule extends OAuth2AuthenticationModule
 	}
 
 	public function getIdentity($oauth2_client_id) {
-		$credentials = $this->getOAuth2Credentials($oauth2_client_id); 
+		$credentials = $this->getOAuth2Credentials($oauth2_client_id);
 
 		try {
 			$result = $credentials->makeOAuth2Request('https://api.github.com/user', 'GET', null, array(

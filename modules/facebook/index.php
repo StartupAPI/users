@@ -257,7 +257,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 			$template_info['action'] = $action;
 			$template_info['errors'] = $errors;
 			$template_info['data'] = $data;
-			
+
 			$template_info['me'] = $me;
 			$template_info['fb_id'] = $fb_id;
 

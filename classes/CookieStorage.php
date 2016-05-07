@@ -13,7 +13,7 @@
  * } else {
  *    // check $storage->errors
  * }
- * 
+ *
  * // later request
  * $user = $storage->fetch('user');
  * if (is_string($user)) {
@@ -26,7 +26,7 @@
  *         // cookie not present
  *     }
  * }
- * 
+ *
  * // encrypt cookie contents
  * $storage = new MrClay_CookieStorage(array(
  *     'secret' => '67676kmcuiekihbfyhbtfitfytrdo=op-p-=[hH8'
@@ -40,7 +40,7 @@ class MrClay_CookieStorage {
     const LENGTH_LIMIT = 3896;
     const MODE_VISIBLE = 0;
     const MODE_ENCRYPT = 1;
-    
+
     /**
      * @var array errors that occured
      */
@@ -51,12 +51,12 @@ class MrClay_CookieStorage {
     {
         $this->_o = array_merge(self::getDefaults(), $options);
     }
-    
+
     public static function hash($input)
     {
         return str_replace('=', '', base64_encode(hash('ripemd160', $input, true)));
     }
-    
+
     public static function padkey($key, $bits = 256)
     {
         $keylen = round($bits / 8);
@@ -67,20 +67,20 @@ class MrClay_CookieStorage {
 
     public static function encrypt($key, $str)
     {
-        $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);  
-        $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);  
+        $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
+        $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
         $data = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, self::padkey($key, 256), $str, MCRYPT_MODE_ECB, $iv);
         return base64_encode($data);
     }
-    
+
     public static function decrypt($key, $data)
     {
         if (false === ($data = base64_decode($data))) {
             return false;
         }
 
-        $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);  
-        $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);  
+        $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
+        $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
         return mcrypt_decrypt(MCRYPT_RIJNDAEL_256, self::padkey($key, 256), $data, MCRYPT_MODE_ECB, $iv);
     }
 
@@ -118,7 +118,7 @@ class MrClay_CookieStorage {
             ? $this->_storeEncrypted($name, $str)
             : $this->_store($name, $str);
     }
-    
+
     private function _store($name, $str)
     {
         if (! is_callable($this->_o['hashFunc'])) {
@@ -134,7 +134,7 @@ class MrClay_CookieStorage {
             $this->errors[] = 'Cookie is likely too large to store.';
             return false;
         }
-        $res = setcookie($name, $raw, $this->_o['expire'], $this->_o['path'], 
+        $res = setcookie($name, $raw, $this->_o['expire'], $this->_o['path'],
                          $this->_o['domain'], $this->_o['secure'], $this->_o['httponly']);
         if ($res) {
             return true;
@@ -143,7 +143,7 @@ class MrClay_CookieStorage {
             return false;
         }
     }
-    
+
     private function _storeEncrypted($name, $str)
     {
         if (! is_callable($this->_o['encryptFunc'])) {
@@ -157,7 +157,7 @@ class MrClay_CookieStorage {
             $this->errors[] = 'Cookie is likely too large to store.';
             return false;
         }
-        $res = setcookie($name, $raw, $this->_o['expire'], $this->_o['path'], 
+        $res = setcookie($name, $raw, $this->_o['expire'], $this->_o['path'],
                          $this->_o['domain'], $this->_o['secure'], $this->_o['httponly']);
         if ($res) {
             return true;
@@ -179,7 +179,7 @@ class MrClay_CookieStorage {
             ? $this->_fetchEncrypted($name)
             : $this->_fetch($name);
     }
-    
+
     private function _fetch($name)
     {
         if (isset($this->_returns[self::MODE_VISIBLE][$name])) {
@@ -203,7 +203,7 @@ class MrClay_CookieStorage {
         $this->_returns[self::MODE_VISIBLE][$name] = array($str, $time);
         return $str;
     }
-    
+
     private function _fetchEncrypted($name)
     {
         if (isset($this->_returns[self::MODE_ENCRYPT][$name])) {
@@ -247,7 +247,7 @@ class MrClay_CookieStorage {
     {
         setcookie($name, '', time() - 3600, $this->_o['path'], $this->_o['domain'], $this->_o['secure'], $this->_o['httponly']);
     }
-    
+
     /**
      * @var array options
      */
@@ -255,4 +255,3 @@ class MrClay_CookieStorage {
 
     private $_returns = array();
 }
-

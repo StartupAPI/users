@@ -60,4 +60,3 @@ class ModelledClock extends Clock {
     $this -> datetime -> add( new DateInterval ( $date_interval ));
   }
 }
-

@@ -19,7 +19,7 @@ client.init()
 	.addCommand("record", function(cb) {
 		var image_file = run_images + '/' + screenshot_prefix + (screenshot_index++) + '.png';
 		this.saveScreenshot(image_file).call(cb);
-	})	
+	})
 	.addCommand("login", function(url, user, pw, cb) {
 		this.url(url)
 		.record()

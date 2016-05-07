@@ -3,8 +3,8 @@ require_once(dirname(dirname(__DIR__)).'/classes/OAuth2Module.php');
 
 /**
  * First register an app here: https://instagram.com/developer/clients/register/
- * Instagram OAuth2 docs: https://instagram.com/developer/authentication/ 
- * 
+ * Instagram OAuth2 docs: https://instagram.com/developer/authentication/
+ *
  * @package StartupAPI
  * @subpackage Authentication\Instagram
  */
@@ -68,7 +68,7 @@ class InstagramAuthenticationModule extends OAuth2AuthenticationModule
 	}
 
 	public function getIdentity($oauth2_client_id) {
-		$credentials = $this->getOAuth2Credentials($oauth2_client_id); 
+		$credentials = $this->getOAuth2Credentials($oauth2_client_id);
 
 		try {
 			$result = $credentials->makeOAuth2Request('https://api.instagram.com/v1/users/self');

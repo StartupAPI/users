@@ -152,7 +152,7 @@ class EtsyAuthenticationModule extends OAuthAuthenticationModule
 	 * Displays user's login name with the link to their Etsy store
 	 *
 	 * @param string $serialized_userinfo Serialized user information array
-	 * 
+	 *
 	 * @return string Rendered user information HTML
 	 */
 	protected function renderUserInfo($serialized_userinfo) {

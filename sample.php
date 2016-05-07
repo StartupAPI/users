@@ -44,6 +44,6 @@ else
 <p><a href="<?php echo UserConfig::$USERSROOTURL ?>/login.php">Log in</a> to enjoy the magic.</p>
 <?php
 }
-?> 
+?>
 </body>
 </html>
