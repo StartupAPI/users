@@ -44,7 +44,7 @@ class Badge {
 	private $set;
 
 	/**
-	 * @var badgeActivityTrigger[] A list of activity triggers
+	 * @var BadgeActivityTrigger[] A list of activity triggers
 	 */
 	private static $activityTriggers = array();
 
@@ -232,7 +232,7 @@ class Badge {
 		}
 
 		foreach ($activity_ids as $activity_id) {
-			self::$activityTriggers[$activity_id][] = new badgeActivityTrigger(
+			self::$activityTriggers[$activity_id][] = new BadgeActivityTrigger(
 							$this, $activity_ids, $activity_count, $badge_level, $activity_period
 			);
 		}
@@ -447,7 +447,7 @@ class Badge {
  *
  * @internal Used only for data management in Badge class
  */
-class badgeActivityTrigger {
+class BadgeActivityTrigger {
 
 	/**
 	 * @var Badge Badge to give if triggered
