@@ -2,8 +2,6 @@
 require_once(__DIR__ . '/global.php');
 
 if (!array_key_exists('call', $_GET)) {
-	// @TODO Add interactive docs here
-	// (for public methods or if user is authenticated, with private methods and so on)
 	header('HTTP/1.0 400 Bad Request');
 	?>
 	<style>
