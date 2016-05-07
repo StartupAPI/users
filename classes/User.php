@@ -574,7 +574,7 @@ class User {
 	 * verification for unauthorized users and if there are any ways to prevent
 	 * this from happening
 	 */
-	public static function verifyEmailLinkCode($code, $user = null) {
+	public static function verifyEmailLinkCode($code, User $user = null) {
 		$db = UserConfig::getDB();
 
 		$verified = false;
@@ -779,7 +779,7 @@ class User {
 	 *
 	 * @throws DBException
 	 */
-	public static function createNewWithoutCredentials($module, $name, $email = null) {
+	public static function createNewWithoutCredentials(StartupAPIModule $module, $name, $email = null) {
 		$module_id = $module->getID();
 
 		$name = mb_convert_encoding($name, 'UTF-8');
@@ -1171,7 +1171,7 @@ class User {
 	 *
 	 * @internal Used in admin dashboard
 	 */
-	public static function getDailyActivityPoints($user = null) {
+	public static function getDailyActivityPoints(User $user = null) {
 		$db = UserConfig::getDB();
 
 		$daily_activity = array();
@@ -1818,7 +1818,7 @@ class User {
 	 *
 	 * @deprecated
 	 */
-	public function setRegistrationModule($module) {
+	public function setRegistrationModule(StartupAPIModule $module) {
 		$db = UserConfig::getDB();
 
 		$module_id = $module->getID();
@@ -2400,11 +2400,11 @@ class User {
 	/**
 	 * Compares this user object to another user object
 	 *
-	 * @param Use $user User object to compare to
+	 * @param User $user User object to compare to
 	 *
 	 * @return boolean Returns whatever this is the same user or not
 	 */
-	public function isTheSameAs($user) {
+	public function isTheSameAs(User $user) {
 		return $this->getID() == $user->getID();
 	}
 
@@ -2887,7 +2887,7 @@ class User {
 	 *
 	 * @param Badge $badge Badge to Register for a user
 	 */
-	public function registerBadge($badge) {
+	public function registerBadge(Badge $badge) {
 		$badge->registerForUser();
 	}
 

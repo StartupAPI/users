@@ -134,7 +134,7 @@ class Invitation {
 	 *
 	 * @throws DBException
 	 */
-	public static function getSent($admin = null, $issuer = null) {
+	public static function getSent($admin = null, User $issuer = null) {
 		$invitations = array();
 
 		$db = UserConfig::getDB();
@@ -215,7 +215,7 @@ class Invitation {
 	 *
 	 * @throws DBException
 	 */
-	public static function getAccepted($admin = null, $issuer = null) {
+	public static function getAccepted($admin = null, User $issuer = null) {
 		$invitations = array();
 
 		$db = UserConfig::getDB();
@@ -308,7 +308,7 @@ class Invitation {
 	 *
 	 * @throws DBException
 	 */
-	public static function getUserInvitation($user) {
+	public static function getUserInvitation(User $user) {
 		$invitation = null;
 		$user_id = $user->getID();
 
@@ -503,7 +503,7 @@ class Invitation {
 	 *
 	 * @param User $user Issuer's User object
 	 */
-	public function setIssuer($user) {
+	public function setIssuer(User $user) {
 		$this->issuedby = $user->getID();
 	}
 
@@ -575,7 +575,7 @@ class Invitation {
 	 *
 	 * @param Plan|null $plan Plan Subscription Plan
 	 */
-	public function setPlan($plan) {
+	public function setPlan(Plan $plan) {
 		if ($plan) {
 			$this->plan_slug = $plan->getSlug();
 		}
@@ -630,7 +630,7 @@ class Invitation {
 	 *
 	 * @param User $user User
 	 */
-	public function setUser($user) {
+	public function setUser(User $user) {
 		$this->user_id = $user->getID();
 	}
 
@@ -652,7 +652,7 @@ class Invitation {
 	 *
 	 * @param Account $account
 	 */
-	public function setAccount($account) {
+	public function setAccount(Account $account) {
 		if (!is_null($account)) {
 			$this->account_id = $account->getID();
 		}

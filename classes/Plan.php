@@ -263,7 +263,7 @@ class Plan {
 	 *
 	 * @return boolean True if same plan
 	 */
-	public function isTheSameAs($other_plan) {
+	public function isTheSameAs(Plan $other_plan) {
 		return $this->slug == $other_plan->getSlug();
 	}
 
@@ -274,7 +274,7 @@ class Plan {
 	 *
 	 * @return boolean Enabled / Disabled
 	 */
-	public function hasFeatureEnabled($feature) {
+	public function hasFeatureEnabled(Feature $feature) {
 		if (array_key_exists('enable_features', $this->capabilities) && is_array($this->capabilities['enable_features'])) {
 			return in_array($feature->getID(), $this->capabilities['enable_features']);
 		}

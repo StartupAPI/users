@@ -26,7 +26,7 @@ class Accounts extends \StartupAPI\API\AuthenticatedEndpoint {
 		$accounts = $user->getAccounts();
 
 		// @TODO Implement general API serialization logic for all objects
-		return array_map(function($account) {
+		return array_map(function(Account $account) {
 			$users_and_roles = $account->getUsers();
 			return array(
 				'id' => $account->getID(),

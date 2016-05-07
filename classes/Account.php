@@ -531,7 +531,7 @@ class Account {
 	 *
 	 * @throws DBException
 	 */
-	public function getUserRole($user) {
+	public function getUserRole(User $user) {
 		$db = UserConfig::getDB();
 		$role = null;
 
@@ -568,7 +568,7 @@ class Account {
 	 *
 	 * @throws DBException
 	 */
-	public function setUserRole($user, $admin) {
+	public function setUserRole(User $user, $admin) {
 		$db = UserConfig::getDB();
 		$role_num = $admin ? 1 : 0;
 
@@ -598,7 +598,7 @@ class Account {
 	 *
 	 * @throws DBException
 	 */
-	public function addUser($user, $role = self::ROLE_USER) {
+	public function addUser(User $user, $role = self::ROLE_USER) {
 		$db = UserConfig::getDB();
 
 		$userid = $user->getID();
@@ -624,7 +624,7 @@ class Account {
 	 *
 	 * @throws DBException
 	 */
-	public function removeUser($user) {
+	public function removeUser(User $user) {
 		$db = UserConfig::getDB();
 
 		$userid = $user->getID();
@@ -758,7 +758,13 @@ class Account {
 		return $account;
 	}
 
-	public static function createPersonalAccount($user) {
+	/**
+	 * Creates a personal account for the user
+	 *
+	 * @param  User   $user User to create account for
+	 * @return Account       Personal account with a user assigned as admin
+	 */
+	public static function createPersonalAccount(User $user) {
 		return self::createAccount($user->getName(), UserConfig::$default_plan_slug, NULL, $user, self::ROLE_ADMIN, NULL);
 	}
 
@@ -772,7 +778,7 @@ class Account {
 	 * @throws DBException
 	 * @throws StartupAPIException
 	 */
-	public static function getCurrentAccount($user) {
+	public static function getCurrentAccount(User $user) {
 		$db = UserConfig::getDB();
 
 		$userid = $user->getID();
@@ -839,7 +845,7 @@ class Account {
 	 *
 	 * @throws DBException
 	 */
-	public function setAsCurrent($user) {
+	public function setAsCurrent(User $user) {
 		$db = UserConfig::getDB();
 
 		$accounts = self::getUserAccounts($user);
@@ -880,7 +886,7 @@ class Account {
 	 *
 	 * @return boolean True if two account objects refer to the same account
 	 */
-	public function isTheSameAs($account) {
+	public function isTheSameAs(Account $account) {
 		if (is_null($account)) {
 			return false;
 		}

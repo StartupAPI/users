@@ -218,7 +218,7 @@ class StartupAPI {
 				}
 			}
 		}
-		$config_info['authentication_modules'] = array_map(function($module) {
+		$config_info['authentication_modules'] = array_map(function(AuthenticationModule $module) {
 			return array(
 				'id' => $module->getID(),
 				'title' => $module->getTitle(),

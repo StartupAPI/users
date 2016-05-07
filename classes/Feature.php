@@ -197,7 +197,7 @@ class Feature
 	 *
 	 * @return boolean Enabled / Disabled
 	 */
-	public function isEnabledForPlan($plan) {
+	public function isEnabledForPlan(Plan $plan) {
 		return $plan->hasFeatureEnabled($this);
 	}
 
@@ -210,7 +210,7 @@ class Feature
 	 *
 	 * @throws DBException
 	 */
-	public function isEnabledForAccount($account, $ignore_propagation = false) {
+	public function isEnabledForAccount(Account $account, $ignore_propagation = false) {
 		if (!$ignore_propagation) {
 			if ($this->emergency_shutdown || !$this->enabled) {
 				return false;
@@ -260,7 +260,7 @@ class Feature
 	 *
 	 * @throws DBException
 	 */
-	public function enableForAccount($account) {
+	public function enableForAccount(Account $account) {
 		$db = UserConfig::getDB();
 
 		$account_id = $account->getID();
@@ -286,7 +286,7 @@ class Feature
 	 *
 	 * @throws DBException
 	 */
-	public function removeForAccount($account) {
+	public function removeForAccount(Account $account) {
 		$db = UserConfig::getDB();
 
 		$account_id = $account->getID();
@@ -315,7 +315,7 @@ class Feature
 	 *
 	 * @throws DBException
 	 */
-	public function isEnabledForUser($user, $ignore_propagation = false) {
+	public function isEnabledForUser(User $user, $ignore_propagation = false) {
 		if (!$ignore_propagation) {
 			if ($this->emergency_shutdown || !$this->enabled) {
 				return false;
@@ -430,7 +430,7 @@ class Feature
 	 *
 	 * @throws DBException
 	 */
-	public function removeForUser($user) {
+	public function removeForUser(User $user) {
 		// now, let's see if user has it enabled
 		$db = UserConfig::getDB();
 
@@ -456,7 +456,7 @@ class Feature
 	 *
 	 * @throws DBException
 	 */
-	public function enableForUser($user) {
+	public function enableForUser(User $user) {
 		// now, let's see if user has it enabled
 		$db = UserConfig::getDB();
 

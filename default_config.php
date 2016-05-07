@@ -942,7 +942,7 @@ class UserConfig {
 	 *
 	 * @param Invitation $invitation Invitation object
 	 */
-	public static function renderUserInvitationAction($invitation) {
+	public static function renderUserInvitationAction(Invitation $invitation) {
 		?><a class="btn btn-info btn-mini" href="mailto:<?php echo UserTools::spaceencode($invitation->getSentToEmail()) ?>?Subject=Invitation&Body=<?php echo UserTools::spaceencode(UserConfig::$SITEROOTFULLURL . '/users/register.php?invite=' . urlencode($invitation->getCode())) ?>"><i class="icon-envelope icon-white"></i> Invite</a><?php
 	}
 
@@ -951,7 +951,7 @@ class UserConfig {
 	 *
 	 * @param Invitation $invitation Invitation object
 	 */
-	public static function renderUserInvitationFollowUpAction($invitation) {
+	public static function renderUserInvitationFollowUpAction(Invitation $invitation) {
 		?><a class="btn btn-warning btn-mini"href="mailto:<?php echo UserTools::spaceencode($invitation->getSentToEmail()) ?>?Subject=Re:%20Invitation&Body=<?php echo UserTools::spaceencode(UserConfig::$SITEROOTFULLURL . '/users/register.php?invite=' . urlencode($invitation->getCode())) ?>"><i class="icon-envelope icon-white"></i> Follow Up</a><?php
 	}
 
@@ -962,7 +962,7 @@ class UserConfig {
 	 *
 	 * @return string
 	 */
-	public static function renderUserInvitationMessagePlaceholder($user) {
+	public static function renderUserInvitationMessagePlaceholder(User $user) {
 		$app_name = UserConfig::$appName;
 		$user_name = $user->getName();
 
@@ -1056,7 +1056,7 @@ EOD;
 	 *
 	 * @return string Invitation email message
 	 */
-	public static function renderInvitationEmailMessage($invitation) {
+	public static function renderInvitationEmailMessage(Invitation $invitation) {
 		$code = $invitation->getCode();
 
 		$registration_code_link = UserConfig::$USERSROOTFULLURL . '/register.php?invite=' . urlencode($code);
@@ -1102,7 +1102,7 @@ EOD;
 	 * @param Invitation $invitation Invitation object
 	 * @return string Invitation email subject
 	 */
-	public static function renderInvitationEmailSubject($invitation) {
+	public static function renderInvitationEmailSubject(Invitation $invitation) {
 		$app = self::$appName;
 		$issuer_name = $invitation->getIssuer()->getName();
 

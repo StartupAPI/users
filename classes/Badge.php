@@ -261,7 +261,7 @@ class Badge {
 	 *
 	 * @throws DBException
 	 */
-	public static function getUserBadges($user) {
+	public static function getUserBadges(User $user) {
 		$db = UserConfig::getDB();
 
 		$user_badges = array();
@@ -394,7 +394,7 @@ class Badge {
 	 *
 	 * @throws DBException
 	 */
-	public function registerForUser($user, $level) {
+	public function registerForUser(User $user, $level) {
 		$db = UserConfig::getDB();
 
 		$user_id = $user->getID();
@@ -419,7 +419,7 @@ class Badge {
 	 * @param User $user User object
 	 * @param int $activity_id Activity ID
 	 */
-	public static function triggerActivityBadge($user, $activity_id) {
+	public static function triggerActivityBadge(User $user, $activity_id) {
 		if (!array_key_exists($activity_id, self::$activityTriggers)) {
 			return;
 		}
