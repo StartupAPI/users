@@ -83,8 +83,7 @@ if (array_key_exists('save', $_POST)) {
 			$user->setEmail($email);
 			$user->save();
 
-			# TODO register activity and record it here
-			#$user->recordActivity(USERBASE_ACTIVITY_UPDATEUSERINFO);
+			$user->recordActivity(USERBASE_ACTIVITY_UPDATEUSERINFO);
 
 			header('Location: ' . UserConfig::$USERSROOTURL . '/edit.php');
 			exit;
