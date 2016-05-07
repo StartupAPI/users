@@ -178,8 +178,6 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 	{
 		$remember = UserConfig::$allowRememberMe && array_key_exists('remember', $data);
 
-		$db = UserConfig::getDB();
-
 		$user = User::getUserByUsernamePassword($data['username'], $data['pass']);
 
 		if (!is_null($user))
