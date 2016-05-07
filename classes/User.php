@@ -2790,8 +2790,6 @@ class User {
 	 * @return int Number of times any of the activities requested have happened
 	 *
 	 * @throws DBException
-	 *
-	 * @todo Actially implement activity window
 	 */
 	public function getActivitiesCount($activity_ids, $period = null) {
 		$db = UserConfig::getDB();
