@@ -95,8 +95,6 @@ EOF;
 		$request = new OAuthRequester('https://www.google.com/m8/feeds/groups/default/thin', 'GET');
 		$result = $request->doRequest($oauth_user_id);
 
-		$self_url = null;
-
 		if ($result['code'] == 200) {
 			$raw_xml = $result['body'];
 			$xml = new SimpleXMLElement($raw_xml);

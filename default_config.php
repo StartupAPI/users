@@ -1060,7 +1060,6 @@ EOD;
 		$code = $invitation->getCode();
 
 		$registration_code_link = UserConfig::$USERSROOTFULLURL . '/register.php?invite=' . urlencode($code);
-		$registration_url = UserConfig::$USERSROOTFULLURL . '/register.php';
 
 		$app = self::$appName;
 		$issuer_name = $invitation->getIssuer()->getName();
