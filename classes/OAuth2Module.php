@@ -29,7 +29,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	protected $oAuth2APIRootURL;
 
 	/**
-	 * @var string OAuth2 client ID 
+	 * @var string OAuth2 client ID
 	 */
 	protected $oAuth2ClientID;
 
@@ -278,7 +278,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	}
 
 	/**
-	 * Adds user identity to OAuth2 client 
+	 * Adds user identity to OAuth2 client
 	 *
 	 * @param User $user User who this OAuth2 credentials belong
 	 * @param array $identity Identity array provided for this OAuth user
@@ -320,7 +320,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 			throw new DBPrepareStmtException($db);
 		}
 
-		// Inserting new link between user and their oauth2 
+		// Inserting new link between user and their oauth2
 		$query = 'INSERT INTO '.UserConfig::$mysql_prefix.'user_oauth2_identity
                         (user_id, oauth2_client_id) VALUES (?, ?)';
 		UserTools::debug($query);
@@ -468,8 +468,8 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		curl_setopt($ch, CURLOPT_URL, $this->oAuth2AccessTokenURL);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($ch, CURLOPT_HEADER, FALSE);
-		curl_setopt($ch, CURLOPT_POST, TRUE); 
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE); 
+		curl_setopt($ch, CURLOPT_POST, TRUE);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/json'));
 		curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
 
@@ -525,7 +525,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		$current_refresh = null;
 
 		$query = 'SELECT oauth2_client_id, access_token_expires, refresh_token
-			FROM '.UserConfig::$mysql_prefix.'oauth2_clients 
+			FROM '.UserConfig::$mysql_prefix.'oauth2_clients
 			WHERE module_slug = ? AND access_token = ?';
 		UserTools::debug($query);
 
@@ -671,7 +671,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	 * Renders user editing form
 	 *
 	 * Uses self::$connectButtonURL for a button image if supplied
-	 * 
+	 *
 	 * @param array[] $template_info Array of base information for Twig template
 	 * @param string $action Form action URL to post back to
 	 * @param array $errors Array of error messages to display
@@ -746,7 +746,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	 *
 	 * @param User $user User to get credentials for
 	 *
-	 * @return OAuth2UserCredentials OAuth2 credentials object 
+	 * @return OAuth2UserCredentials OAuth2 credentials object
 	 *
 	 * @throws DBException
 	 */
@@ -860,7 +860,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	 */
 	protected function renderUserInfo($serialized_userinfo) {
 		$user_info = unserialize($serialized_userinfo);
-		
+
 		if (array_key_exists('name', $user_info)) {
 			return $user_info['name'];
 		} else {
@@ -923,7 +923,6 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 			$db = UserConfig::getDB();
 
 			$oauth2_client_id = $data['oauth2_client_id'];
-			$user_id = $user->getID();
 
 			$this->deleteOAuth2Client($oauth2_client_id);
 
@@ -1072,17 +1071,17 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($ch, CURLOPT_HEADER, FALSE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE); 
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE);
 		curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
 
 		if (is_array($curlopt)) {
 			curl_setopt_array($ch, $curlopt);
 		}
- 
+
 		$result = curl_exec($ch);
 		UserTools::debug("Request: " . var_export(curl_getinfo($ch, CURLINFO_HEADER_OUT), true));
 		UserTools::debug("Response: $result");
-		
+
 		if (curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200) {
 			throw new OAuth2Exception("OAuth2 call failed: " . curl_error($ch) . ' (Code: ' . curl_getinfo($ch, CURLINFO_HTTP_CODE) . ')');
 		}
@@ -1185,7 +1184,7 @@ class OAuth2UserCredentials extends UserCredentials {
 }
 
 /**
- * Represents exceptions related to OAuth2 flows 
+ * Represents exceptions related to OAuth2 flows
  *
  * @package StartupAPI
  * @subpackage Authentication\OAuth2
