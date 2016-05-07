@@ -39,8 +39,6 @@ class UserTools {
 	 * Prevents CSRF for all POST requests by comparing cookie and POST nonces.
 	 *
 	 * Keeps track of 3 recent nonces to avoid problems for double-submissions, but still prevent CSRF attacks
-	 *
-	 * @todo Check if tracking multiple nonces is actually safe - need professional opinion
 	 */
 	public static function preventCSRF() {
 		$storage = new MrClay_CookieStorage(array(
