@@ -4,13 +4,13 @@ require_once(dirname(dirname(__DIR__)).'/classes/OAuth2Module.php');
 /**
  * First register an app here: https://foursquare.com/developers/apps
  * GitHub OAuth(2) docs: https://developer.foursquare.com/overview/auth
- * 
+ *
  * @package StartupAPI
  * @subpackage Authentication\Foursquare
  */
 class FoursquareAuthenticationModule extends OAuth2AuthenticationModule
 {
-	const compatibilityDate = '20130302';
+	const COMPATIBILITY_DATE = '20130302';
 
 	protected $userCredentialsClass = 'FoursquareUserCredentials';
 
@@ -36,7 +36,7 @@ class FoursquareAuthenticationModule extends OAuth2AuthenticationModule
 		);
 
 		$this->oAuth2AccessTokenParamName = 'oauth_token';
-		$this->oAuth2ExtraParameters = array('v' => self::compatibilityDate);
+		$this->oAuth2ExtraParameters = array('v' => self::COMPATIBILITY_DATE);
 	}
 
 	public function getID()
@@ -73,7 +73,7 @@ class FoursquareAuthenticationModule extends OAuth2AuthenticationModule
 
 	// YODO make actual foursquare calls, not twitter
 	public function getIdentity($oauth2_client_id) {
-		$credentials = $this->getOAuth2Credentials($oauth2_client_id); 
+		$credentials = $this->getOAuth2Credentials($oauth2_client_id);
 
 		try {
 			$result = $credentials->makeOAuth2Request('https://api.foursquare.com/v2/users/self');
