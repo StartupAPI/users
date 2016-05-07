@@ -31,8 +31,6 @@ if (array_key_exists('user_id', $_POST)) {
 
 		$account->addUser($user, $user_role);
 
-		// @todo make them admin if they are the only user
-
 		header('Location: ' . UserConfig::$USERSROOTURL . '/admin/account.php?id=' . UserTools::escape($account_id));
 		exit;
 	}
