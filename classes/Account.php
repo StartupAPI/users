@@ -1561,9 +1561,10 @@ class Account {
 	 * @throws DBException
 	 */
 	public function scheduleChangeRequest($schedule_slug, $engine_slug) {
-		if (!($schedule = $this->plan->getPaymentScheduleBySlug($schedule_slug))
-				|| !($engine = PaymentEngine::getEngineBySlug($engine_slug))
-		) {
+		$schedule = $this->plan->getPaymentScheduleBySlug($schedule_slug);
+		$engine = PaymentEngine::getEngineBySlug($engine_slug);
+
+		if (!$schedule || !$engine) {
 			return FALSE;
 		}
 
