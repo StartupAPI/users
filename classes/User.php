@@ -2735,7 +2735,6 @@ class User {
 	 */
 	public function recordActivity($activity_id) {
 		if ($this->isImpersonated()) {
-			// TODO Implement real impersonation logging instead of tracking activity for a user
 			error_log('[Impersonation log] Activity "' . UserConfig::$activities[$activity_id][0] . '" (User ID: ' . $activity_id . ') by ' .
 					$this->impersonator->getName() . ' (Activity ID: ' . $this->impersonator->getID() .
 					') on behalf of ' . $this->getName() . ' (User ID: ' . $this->getID() . ')');
