@@ -2598,11 +2598,8 @@ class User {
 		$status = $this->status ? 1 : 0;
 		$email_verifiednum = $this->is_email_verified ? 1 : 0;
 
-		// !WARNING! it's not safe to do anything with this user except reading it's built-in
-		// properties
-		// TODO implement some protection from reading or writing to DB based on this user's info,
-		// just reading object properties.
 		// creating a copy of the user in case we need to update their email subscription
+		// !!!WARNING!!! it's not safe to do anything with this user except reading it's built-in properties
 		$old_user = self::getUser($this->getID());
 
 		$username = is_null($this->username) || $this->username == '' ? null : mb_convert_encoding($this->username, 'UTF-8');
