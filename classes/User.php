@@ -1511,7 +1511,6 @@ class User {
 			$orderby = 'points';
 		}
 
-		// TODO Replace with real, fast and powerful full-text search
 		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE INSTR(name, ?) > 0 OR INSTR(username, ?) > 0 OR INSTR(email, ?) > 0 ORDER BY ' . $orderby . ' DESC LIMIT ?, ?')) {
 			if (!$stmt->bind_param('sssii', $search, $search, $search, $first, $perpage)) {
 				throw new DBBindParamException($db, $stmt);
