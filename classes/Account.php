@@ -931,8 +931,6 @@ class Account {
 	 * @return array[] Array of charges (datetime, amount(
 	 *
 	 * @throws Exception
-	 *
-	 * @todo rework to just be part of or called from constructor
 	 */
 	private static function fillCharges($account_id) {
 
