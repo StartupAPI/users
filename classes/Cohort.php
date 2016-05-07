@@ -249,8 +249,6 @@ abstract class CohortProvider {
  *
  * @package StartupAPI
  * @subpackage Analytics\CohortAnalysis
- *
- * @todo Rework into three separate classes subclassing a parent to avoid a contraption with constants
  */
 class GenerationCohorts extends CohortProvider {
 	/**
