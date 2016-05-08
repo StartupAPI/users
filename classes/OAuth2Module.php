@@ -537,8 +537,6 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 			throw new DBPrepareStmtException($db);
 		}
 
-		UserTools::debug("Found OAuth2 clien ID: " . var_export($oauth2_client_ID));
-
 		if (!$oauth2_client_id) {
 			$query = 'INSERT INTO u_oauth2_clients
                                 (module_slug, access_token, access_token_expires, refresh_token)
