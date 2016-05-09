@@ -7,7 +7,7 @@ namespace StartupAPI\Modules\MeetupAuthenticationModule;
  * @package StartupAPI
  * @subpackage Authentication\Meetup
  */
-class MeetupUserCredentials extends OAuthUserCredentials {
+class MeetupUserCredentials extends \StartupAPI\OAuthUserCredentials {
 	public function getHTML() {
 		return StartupAPI::$template->render("@startupapi/modules/meetup/credentials.html.twig", $this->userinfo);
 	}

@@ -7,6 +7,6 @@ namespace StartupAPI\Exceptions;
  * @package StartupAPI
  * @subpackage Authentication\OAuth2
  */
-class OAuth2Exception extends Exceptions\StartupAPIException {
+class OAuth2Exception extends StartupAPIException {
 
 }

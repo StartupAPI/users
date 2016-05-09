@@ -7,7 +7,7 @@ namespace StartupAPI\Modules\LinkedInAuthenticationModule;
  * @package StartupAPI
  * @subpackage Authentication\Linkedin
  */
-class LinkedInUserCredentials extends OAuthUserCredentials {
+class LinkedInUserCredentials extends \StartupAPI\OAuthUserCredentials {
 
 	public function getHTML() {
 		return \StartupAPI\StartupAPI::$template->render(

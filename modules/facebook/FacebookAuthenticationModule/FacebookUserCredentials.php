@@ -7,7 +7,7 @@ namespace StartupAPI\Modules\FacebookAuthenticationModule;
  * @package StartupAPI
  * @subpackage Authentication\Facebook
  */
-class FacebookUserCredentials extends UserCredentials {
+class FacebookUserCredentials extends \StartupAPI\UserCredentials {
 
 	/**
 	 * @var int Facebook user id

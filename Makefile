@@ -64,7 +64,7 @@ else
 endif
 
 docs:	documentation
-documentation: phpdoc apigen
+documentation: phpdoc
 
 phpdoc:
 	# Using PHPDocumentor which wirks with phpdocx.dist.xml
@@ -72,7 +72,7 @@ phpdoc:
 
 apigen:
 	# Using ApiGen which works with apigen.neon file for configuration
-	apigen
+	apigen generate
 
 code:
 	php phptidy/phptidy.php replace

@@ -12,7 +12,6 @@
 	</transformations>
 	<files>
 		<directory>.</directory>
-		<ignore>CookieStorage.php</ignore>
 		<ignore>oauth-php/*</ignore>
 		<ignore>modules/facebook/facebook-php-sdk/*</ignore>
 		<ignore>dbupgrade/*</ignore>
@@ -21,6 +20,8 @@
 		<ignore>twig/*</ignore>
 		<ignore>cache/*</ignore>
 		<ignore>phptidy/*</ignore>
-		<ignore>CookieStorage.php</ignore>
+		<ignore>MrClay_CookieStorage.php</ignore>
+		<ignore>swiftmailer/*</ignore>
+		<ignore>php-bootstrap/*</ignore>
 	</files>
 </phpdoc>

@@ -1,8 +1,6 @@
 <?php
 namespace StartupAPI\Modules;
 
-require_once(__DIR__ . '/Facebook.php');
-
 /**
  * Facebook Authentication Module
  *
@@ -70,7 +68,7 @@ class FacebookAuthenticationModule extends \StartupAPI\AuthenticationModule {
 			'secret' => $this->secret
 		);
 
-		$this->sdk = new \Facebook($config);
+		$this->sdk = new FacebookAuthenticationModule\Facebook($config);
 	}
 
 	public function getID() {

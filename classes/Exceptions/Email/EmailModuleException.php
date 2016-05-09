@@ -7,4 +7,4 @@ namespace StartupAPI\Exceptions\Email;
  * @package StartupAPI
  * @subpackage Email
  */
-class EmailModuleException extends \StartupAPI\StartupAPIException {}
+class EmailModuleException extends \StartupAPI\Exceptions\StartupAPIException {}

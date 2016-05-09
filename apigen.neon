@@ -3,25 +3,23 @@ source: .
 destination: docs/apigen
 
 exclude:
-	- */oauth-php/*
-	- */modules/facebook/facebook-php-sdk/*
-	- */dbupgrade/*
-	- */admin/swfobject/*
-	- */docs/*
-	- */twig/*
-	- */phptidy/*
-	- */apigen-docs/*
-	- */classes/CookieStorage.php
+  - */oauth-php/*
+  - */modules/facebook/facebook-php-sdk/*
+  - */modules/facebook/facebook-php-sdk/src/*
+  - */dbupgrade/*
+  - */admin/swfobject/*
+  - */docs/*
+  - */twig/*
+  - */phptidy/*
+  - */classes/MrClay_CookieStorage.php
+  - */swiftmailer/*
+  - */php-bootstrap/*
 
 php: no
-
-report: docs/apigen/report.xml
 
 todo: yes
 
 accessLevels:
-	- public
-	- protected
-	- private
-
-updateCheck: no
+  - public
+  - protected
+  - private

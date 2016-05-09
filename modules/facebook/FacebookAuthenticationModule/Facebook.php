@@ -1,4 +1,13 @@
 <?php
+namespace StartupAPI\Modules\FacebookAuthenticationModule;
+
+/**
+ * User credentials for Facebook users
+ *
+ * @package StartupAPI
+ * @subpackage Authentication\Facebook
+ */
+
 /**
  * Copyright 2011 Facebook, Inc.
  *
@@ -15,9 +24,7 @@
  * under the License.
  */
 
-require_once __DIR__."/facebook-php-sdk/src/base_facebook.php";
-
-require_once(dirname(dirname(__DIR__)).'/global.php');
+require_once dirname(__DIR__)."/facebook-php-sdk/src/base_facebook.php";
 
 /**
  * Extends the BaseFacebook class with the intent of using
@@ -28,7 +35,7 @@ require_once(dirname(dirname(__DIR__)).'/global.php');
  * @package StartupAPI
  * @subpackage Authentication\Facebook
  */
-class Facebook extends BaseFacebook
+class Facebook extends \BaseFacebook
 {
 	/**
 	* Identical to the parent constructor, except that
