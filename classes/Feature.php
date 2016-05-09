@@ -208,7 +208,7 @@ class Feature
 	 *
 	 * @return boolean Enabled / Disabled
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function isEnabledForAccount(Account $account, $ignore_propagation = false) {
 		if (!$ignore_propagation) {
@@ -235,13 +235,13 @@ class Feature
 
 		if ($stmt = $db->prepare('SELECT COUNT(*) FROM u_account_features WHERE account_id = ? AND feature_id = ?')) {
 			if (!$stmt->bind_param('ii', $account_id, $this->id)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($enabled)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -249,7 +249,7 @@ class Feature
 
 			return $enabled > 0;
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 	}
 
@@ -258,7 +258,7 @@ class Feature
 	 *
 	 * @param Account $account Account to enable this feature for
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function enableForAccount(Account $account) {
 		$db = UserConfig::getDB();
@@ -267,15 +267,15 @@ class Feature
 
 		if ($stmt = $db->prepare('REPLACE INTO u_account_features (account_id, feature_id) VALUES (?, ?)')) {
 			if (!$stmt->bind_param('ii', $account_id, $this->id)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 	}
 
@@ -284,7 +284,7 @@ class Feature
 	 *
 	 * @param Account $account Account to remove this feature for
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function removeForAccount(Account $account) {
 		$db = UserConfig::getDB();
@@ -293,14 +293,14 @@ class Feature
 
 		if ($stmt = $db->prepare('DELETE FROM u_account_features WHERE account_id = ? AND feature_id = ?')) {
 			if (!$stmt->bind_param('ii', $account_id, $this->id)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 	}
 
@@ -313,7 +313,7 @@ class Feature
 	 *
 	 * @return boolean Enabled / Disabled
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function isEnabledForUser(User $user, $ignore_propagation = false) {
 		if (!$ignore_propagation) {
@@ -339,13 +339,13 @@ class Feature
 
 		if ($stmt = $db->prepare('SELECT COUNT(*) FROM u_user_features WHERE user_id = ? AND feature_id = ?')) {
 			if (!$stmt->bind_param('ii', $user_id, $this->id)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($enabled)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -353,7 +353,7 @@ class Feature
 
 			return $enabled > 0 ? true : false;
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return false;
@@ -364,20 +364,20 @@ class Feature
 	 *
 	 * @return int Number of users this feature is enabled for
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function getUserCount() {
 		$db = UserConfig::getDB();
 
 		if ($stmt = $db->prepare('SELECT COUNT(*) FROM u_user_features WHERE feature_id = ?')) {
 			if (!$stmt->bind_param('i', $this->id)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($rolledout)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -385,7 +385,7 @@ class Feature
 
 			return $rolledout;
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return false;
@@ -396,20 +396,20 @@ class Feature
 	 *
 	 * @return int Number of accounts this feature is enabled for
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function getAccountCount() {
 		$db = UserConfig::getDB();
 
 		if ($stmt = $db->prepare('SELECT COUNT(*) FROM u_account_features WHERE feature_id = ?')) {
 			if (!$stmt->bind_param('i', $this->id)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($rolledout)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -417,7 +417,7 @@ class Feature
 
 			return $rolledout;
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return false;
@@ -428,7 +428,7 @@ class Feature
 	 *
 	 * @param User $user User to remove this feature for
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function removeForUser(User $user) {
 		// now, let's see if user has it enabled
@@ -438,14 +438,14 @@ class Feature
 
 		if ($stmt = $db->prepare('DELETE FROM u_user_features WHERE user_id = ? AND feature_id = ?')) {
 			if (!$stmt->bind_param('ii', $userid, $this->id)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 	}
 
@@ -454,7 +454,7 @@ class Feature
 	 *
 	 * @param User $user User to enables this feature for
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function enableForUser(User $user) {
 		// now, let's see if user has it enabled
@@ -464,15 +464,15 @@ class Feature
 
 		if ($stmt = $db->prepare('REPLACE INTO u_user_features (user_id, feature_id) VALUES (?, ?)')) {
 			if (!$stmt->bind_param('ii', $userid, $this->id)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 	}
 }

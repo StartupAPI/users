@@ -95,7 +95,7 @@ class Invitation {
 	 *
 	 * @return array Array of Invitation objects
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getUnsent() {
 		$invitations = array();
@@ -106,10 +106,10 @@ class Invitation {
 			FROM u_invitation
 			WHERE is_admin_invite = 1 AND sent_to_note IS NULL AND user_id IS NULL')) {
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($code, $time_created, $issuedby)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -118,7 +118,7 @@ class Invitation {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $invitations;
@@ -132,7 +132,7 @@ class Invitation {
 	 *
 	 * @return array Array of Invitation objects
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getSent($admin = null, User $issuer = null) {
 		$invitations = array();
@@ -155,10 +155,10 @@ class Invitation {
 
 		if ($stmt = $db->prepare($query)) {
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id, $plan_slug)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -168,7 +168,7 @@ class Invitation {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $invitations;
@@ -186,22 +186,22 @@ class Invitation {
 	 *
 	 * @param string $code Invitation code to cancel
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function cancelByCode($code) {
 		$db = UserConfig::getDB();
 
 		if ($stmt = $db->prepare('DELETE FROM u_invitation WHERE code = ?')) {
 			if (!$stmt->bind_param('s', $code)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 	}
 
@@ -213,7 +213,7 @@ class Invitation {
 	 *
 	 * @return array Array of Invitation objects
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getAccepted($admin = null, User $issuer = null) {
 		$invitations = array();
@@ -239,10 +239,10 @@ class Invitation {
 
 		if ($stmt = $db->prepare($query)) {
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id, $plan_slug)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -252,7 +252,7 @@ class Invitation {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $invitations;
@@ -265,7 +265,7 @@ class Invitation {
 	 *
 	 * @return Invitation
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getByCode($code) {
 		$invitation = null;
@@ -277,13 +277,13 @@ class Invitation {
 			FROM u_invitation
 			WHERE code = ?')) {
 			if (!$stmt->bind_param('s', $code)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id, $plan_slug)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE) {
@@ -293,7 +293,7 @@ class Invitation {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $invitation;
@@ -306,7 +306,7 @@ class Invitation {
 	 *
 	 * @return Invitation
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getUserInvitation(User $user) {
 		$invitation = null;
@@ -319,13 +319,13 @@ class Invitation {
 			FROM u_invitation
 			WHERE user_id = ?')) {
 			if (!$stmt->bind_param('i', $user_id)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($code, $time_created, $issuedby, $is_admin_invite, $sent_to_email, $sent_to_name, $sent_to_note, $user_id, $account_id, $plan_slug)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE) {
@@ -335,7 +335,7 @@ class Invitation {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $invitation;
@@ -346,7 +346,7 @@ class Invitation {
 	 *
 	 * @param int $howmany How many codes to generate
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function generateAdminInvites($howmany = 1) {
 		$db = UserConfig::getDB();
@@ -356,16 +356,16 @@ class Invitation {
 				$code = self::generateCode();
 
 				if (!$stmt->bind_param('s', $code)) {
-					throw new DBBindParamException($db, $stmt);
+					throw new Exceptions\DBBindParamException($db, $stmt);
 				}
 				if (!$stmt->execute()) {
-					throw new DBExecuteStmtException($db, $stmt);
+					throw new Exceptions\DBExecuteStmtException($db, $stmt);
 				}
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 	}
 
@@ -383,15 +383,15 @@ class Invitation {
 			$from_admin_int = $from_admin ? 1 : 0;
 
 			if (!$stmt->bind_param('si', $code, $from_admin_int)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return self::getByCode($code);
@@ -584,7 +584,7 @@ class Invitation {
 	/**
 	 * Persists invitation object in database
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function save() {
 		$db = UserConfig::getDB();
@@ -604,15 +604,15 @@ class Invitation {
 				plan_slug = ?
 			WHERE code = ?')) {
 			if (!$stmt->bind_param('sssiiiiss', $email, $name, $note, $this->issuedby, $this->is_admin_invite, $this->user_id, $this->account_id, $this->plan_slug, $this->code)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 	}
 

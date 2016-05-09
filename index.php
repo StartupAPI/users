@@ -1,4 +1,6 @@
 <?php
+namespace StartupAPI;
+
 /**
  * Testing if code is there
  */
@@ -232,7 +234,7 @@ if ($code_ready && $dependencies_ready && $config_ready) {
 			// Now when database is ready, we can start registering users
 			$admin_disabled = false;
 		}
-	} catch (DBException $ex) {
+	} catch (Exceptions\DBException $ex) {
 		$database_exception = $ex;
 	}
 }

@@ -1,9 +1,10 @@
 <?php
+namespace StartupAPI;
+
 /**
  * OAuth callback script used by all modules that subclass OAuthModule
  */
 require_once(__DIR__.'/global.php');
-require_once(__DIR__.'/classes/User.php');
 
 $current_user = User::get();
 
@@ -12,11 +13,11 @@ $oauth_user_id = null;
 try
 {
 	if (!array_key_exists('module', $_GET)) {
-		throw new StartupAPIException('module not specified');
+		throw new Exceptions\StartupAPIException('module not specified');
 	}
 
 	if (!array_key_exists('oauth_token', $_GET) || !array_key_exists('oauth_verifier', $_GET)) {
-		throw new StartupAPIException('oauth_token & oauth_varifier required');
+		throw new Exceptions\StartupAPIException('oauth_token & oauth_varifier required');
 	}
 
 	$module = AuthenticationModule::get($_GET['module']);
@@ -32,7 +33,7 @@ try
 	$storage->delete(UserConfig::$oauth_user_id_key);
 
 	if (is_null($oauth_user_id)) {
-		throw new StartupAPIException("can't determine OAuth User ID");
+		throw new Exceptions\StartupAPIException("can't determine OAuth User ID");
 	}
 
 	try
@@ -41,7 +42,7 @@ try
 	}
 	catch (OAuthException2 $e)
 	{
-		throw new StartupAPIException('problem getting access token: '.$e->getMessage());
+		throw new Exceptions\StartupAPIException('problem getting access token: '.$e->getMessage());
 	}
 
 	try
@@ -50,11 +51,11 @@ try
 	}
 	catch (OAuthException2 $e)
 	{
-		throw new StartupAPIException('problem getting user identity: '.$e->getMessage());
+		throw new Exceptions\StartupAPIException('problem getting user identity: '.$e->getMessage());
 	}
 
 	if (is_null($identity)) {
-		throw new StartupAPIException('no identity returned');
+		throw new Exceptions\StartupAPIException('no identity returned');
 	}
 
 	#error_log(
@@ -85,7 +86,7 @@ try
 	} else {
 		// otherwise, we're adding their credential to an existing user
 		if (!is_null($user)) {
-			throw new StartupAPIException('another user is already connected with this account');
+			throw new Exceptions\StartupAPIException('another user is already connected with this account');
 		}
 
 		$module->addUserOAuthIdentity($current_user, $identity, $oauth_user_id);

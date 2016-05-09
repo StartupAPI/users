@@ -1,6 +1,5 @@
 <?php
-
-require_once(__DIR__ . '/StartupAPIModule.php');
+namespace StartupAPI;
 
 /**
  * Abstract class that can be subclassed to implement StartupAPI Authentication modules/extensions
@@ -111,7 +110,7 @@ abstract class AuthenticationModule extends StartupAPIModule {
 	 * @param User $user User to get credentials for
 	 * @return UserCredentials User credentials object specific to the module
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	abstract public function getUserCredentials($user);
 
@@ -123,7 +122,7 @@ abstract class AuthenticationModule extends StartupAPIModule {
 	 * @return int Number of users who have connections through this provider
 	 * 	       Some modules might allow for multiple connections, but the user is only counted once
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	abstract public function getTotalConnectedUsers();
 
@@ -190,7 +189,7 @@ abstract class AuthenticationModule extends StartupAPIModule {
 	 *
 	 * @return array Array of date => count pairs for all dates that have users registered on that date
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function getDailyRegistrations() {
 		$db = UserConfig::getDB();
@@ -199,13 +198,13 @@ abstract class AuthenticationModule extends StartupAPIModule {
 
 		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, count(*) AS regs FROM u_users WHERE regmodule = ? GROUP BY regdate')) {
 			if (!$stmt->bind_param('s', $this->getID())) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($regdate, $regs)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -214,7 +213,7 @@ abstract class AuthenticationModule extends StartupAPIModule {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $dailyregs;
@@ -230,109 +229,4 @@ abstract class AuthenticationModule extends StartupAPIModule {
 		return false;
 	}
 
-}
-
-/**
- * Abstract authentication exception class for specific exceptions to subclass
- *
- * Comparing to regular exception, this one also stores a list of messages to be passed back to forms being rendered
- *
- * @package StartupAPI
- * @subpackage Authentication
- */
-abstract class AuthenticationException extends Exception {
-
-	/**
-	 * An associative array of error messages
-	 *
-	 * Each form is free to define it's own keys, usually to indicate
-	 * part of the form where error messages will be displayed.
-	 *
-	 * Values can also be linear arrays to allow for display of
-	 * multiple messages in the same location.
-	 *
-	 * @var array
-	 */
-	protected $errors;
-
-	/**
-	 * Creates an exception accepting the list of error messages as 3rd parameter
-	 *
-	 * Example:
-	 * <code>
-	 * $errors['email'][] = "Using example domain";
-	 * $errors['email'][] = "Verification email doesn't match";
-	 * throw new InputValidationException('Email validation failed', 0, $errors);
-	 * </code>
-	 *
-	 * @see InputValidationException
-	 *
-	 * @param string $string Exception message
-	 * @param int $code Excepton code
-	 * @param array $errors A list of error messages to be displayed to the user
-	 */
-	public function __construct($string, $code, $errors) {
-		parent::__construct($string, $code);
-		$this->errors = $errors;
-	}
-
-	/**
-	 * Returns a list of error messages to display
-	 *
-	 * @return array an array of error messages
-	 */
-	public function getErrors() {
-		return $this->errors;
-	}
-
-}
-
-/**
- * Exception thrown when form fields didn't pass validation
- *
- * @package StartupAPI
- * @subpackage Authentication
- */
-class InputValidationException extends AuthenticationException {
-
-}
-
-/**
- * Exception thrown when newly registered user already exists
- *
- * @package StartupAPI
- * @subpackage Authentication
- */
-class ExistingUserException extends AuthenticationException {
-
-}
-
-/**
- * Exception thrown when user account couldn't be created
- *
- * @todo Check if this is actually used or there is a valid use case for it.
- *
- * @package StartupAPI
- * @subpackage Authentication
- */
-class UserCreationException extends AuthenticationException {
-
-}
-
-/**
- * Class representing user credentials for particular module
- * Must be subclassed and implemented by module
- *
- * @package StartupAPI
- * @subpackage Authentication
- */
-abstract class UserCredentials {
-
-	/**
-	 * This method should return HTML representation of user credentials to be included in admin interface
-	 * Usually linking to user's public profile at the source service
-	 *
-	 * @return string HTML representation of user credentials
-	 */
-	public abstract function getHTML();
 }

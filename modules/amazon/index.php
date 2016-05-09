@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__DIR__)).'/classes/OAuth2Module.php');
+namespace StartupAPI\Modules;
 
 /**
  * First register an app here: https://sellercentral.amazon.com/gp/homepage.html
@@ -81,7 +81,7 @@ class AmazonAuthenticationModule extends OAuth2AuthenticationModule
 					'User-Agent: ' . UserConfig::$appName . ' (Startup API v.' . StartupAPI::getVersion() . ')'
 				)
 			));
-		} catch (OAuth2Exception $ex) {
+		} catch (Exceptions\OAuth2Exception $ex) {
 			error_log("Error verifying access token: " . $ex->getMessage());
 			return null;
 		}
@@ -94,7 +94,7 @@ class AmazonAuthenticationModule extends OAuth2AuthenticationModule
 					'User-Agent: ' . UserConfig::$appName . ' (Startup API v.' . StartupAPI::getVersion() . ')'
 				)
 			));
-		} catch (OAuth2Exception $ex) {
+		} catch (Exceptions\OAuth2Exception $ex) {
 			error_log("Error getting identity: " . $ex->getMessage());
 			return null;
 		}

@@ -1,4 +1,5 @@
 <?php
+namespace StartupAPI;
 
 /**
  * @package StartupAPI
@@ -14,15 +15,15 @@ $account = Account::getCurrentAccount($user);
 try {
 	// Check if plan and schedule exists
 	if (!array_key_exists('plan', $_GET) || !($plan = Plan::getPlanBySlug($_GET['plan']))) {
-		throw new Exception("Unknown plan '" . UserTools::escape($_GET['plan']) . '"');
+		throw new Exceptions\StartupAPIException("Unknown plan '" . UserTools::escape($_GET['plan']) . '"');
 	}
 
 	if (!array_key_exists('schedule', $_GET) || !($schedule = $plan->getPaymentScheduleBySlug($_GET['schedule']))) {
-		throw new Exception("Unknown schedule '" . UserTools::escape($_GET['schedule']) . "' for plan '" . UserTools::escape($_GET['plan']) . "'");
+		throw new Exceptions\StartupAPIException("Unknown schedule '" . UserTools::escape($_GET['schedule']) . "' for plan '" . UserTools::escape($_GET['plan']) . "'");
 	}
 
 	if (!array_key_exists('engine', $_GET) || !($engine = PaymentEngine::getEngineBySlug($_GET['engine']))) {
-		throw new Exception("Unknown schedule '" . UserTools::escape($_GET['schedule']) . "' for plan '" . UserTools::escape($_GET['plan']) . "'");
+		throw new Exceptions\StartupAPIException("Unknown schedule '" . UserTools::escape($_GET['schedule']) . "' for plan '" . UserTools::escape($_GET['plan']) . "'");
 	}
 } catch (Exception $e) {
 	$_SESSION['message'][] = $e->getMessage();

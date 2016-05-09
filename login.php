@@ -1,8 +1,7 @@
 <?php
+namespace StartupAPI;
 
 require_once(__DIR__ . '/global.php');
-
-require_once(__DIR__ . '/classes/User.php');
 
 // Allow modules to auto-login (if supported)
 $user = null;

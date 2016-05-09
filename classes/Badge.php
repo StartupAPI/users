@@ -1,4 +1,5 @@
 <?php
+namespace StartupAPI;
 
 /**
  * This class represents gamification badges people can uses
@@ -259,7 +260,7 @@ class Badge {
 	 *
 	 * @return array Array of user badges with badge IDs as keys and arrays of Badge object and maximum level as value
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getUserBadges(User $user) {
 		$db = UserConfig::getDB();
@@ -270,13 +271,13 @@ class Badge {
 
 		if ($stmt = $db->prepare('SELECT badge_id, MAX(badge_level) as level, time FROM u_user_badges WHERE user_id = ? GROUP BY badge_id')) {
 			if (!$stmt->bind_param('i', $user_id)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($id, $level, $time)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -285,7 +286,7 @@ class Badge {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $user_badges;
@@ -296,7 +297,7 @@ class Badge {
 	 *
 	 * @return array Array of user counts for each level (0 if not present)
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function getUserCounts() {
 		$db = UserConfig::getDB();
@@ -305,13 +306,13 @@ class Badge {
 
 		if ($stmt = $db->prepare('SELECT badge_level, count(user_id) as total FROM u_user_badges WHERE badge_id = ? GROUP BY badge_level')) {
 			if (!$stmt->bind_param('i', $this->id)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($level, $total)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -320,7 +321,7 @@ class Badge {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $counts;
@@ -335,7 +336,7 @@ class Badge {
 	 *
 	 * @return User[] Array of users objects ordered by time
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function getBadgeUsers($level = null, $pagenumber = 0, $perpage = 20) {
 		$db = UserConfig::getDB();
@@ -363,13 +364,13 @@ class Badge {
 				$result = $stmt->bind_param('iiii', $this->id, $level, $start, $perpage);
 			}
 			if (!$result) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($user_id)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -378,7 +379,7 @@ class Badge {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		$badge_users = User::getUsersByIDs($user_ids);
@@ -392,7 +393,7 @@ class Badge {
 	 * @param User $user User who got a badge
 	 * @param int $level Badge level
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function registerForUser(User $user, $level) {
 		$db = UserConfig::getDB();
@@ -402,14 +403,14 @@ class Badge {
 		if ($stmt = $db->prepare('INSERT IGNORE INTO u_user_badges
 									(user_id, badge_id, badge_level) VALUES (?, ?, ?)')) {
 			if (!$stmt->bind_param('iii', $user_id, $this->id, $level)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt, "Can't register a badge for a user");
+				throw new Exceptions\DBExecuteStmtException($db, $stmt, "Can't register a badge for a user");
 			}
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db, "Can't register a badge for a user");
+			throw new Exceptions\DBPrepareStmtException($db, "Can't register a badge for a user");
 		}
 	}
 
@@ -435,60 +436,6 @@ class Badge {
 				$activityTrigger->badge->registerForUser($user, $activityTrigger->badge_level);
 			}
 		}
-	}
-
-}
-
-/**
- * Basic data structure to hold information about activity triggers
- *
- * @package StartupAPI
- * @subpackage Gamification
- *
- * @internal Used only for data management in Badge class
- */
-class BadgeActivityTrigger {
-
-	/**
-	 * @var Badge Badge to give if triggered
-	 */
-	public $badge;
-
-	/**
-	 * @var int[] Array of activity IDs that would activate the trigger
-	 */
-	public $activity_ids = array();
-
-	/**
-	 * @var int Number of activities to activate the trigger
-	 */
-	public $activity_count = 0;
-
-	/**
-	 * @var int Badge level to grant if triggered
-	 */
-	public $badge_level = 1;
-
-	/**
-	 * @var int Amount of days in activity window to cause the trigger
-	 */
-	public $activity_period = null;
-
-	/**
-	 * Creates a badge activity trigger
-	 *
-	 * @param Badge $badge Badge to give if triggered
-	 * @param int[] $activity_ids Array of activity IDs that would activate the trigger
-	 * @param int $activity_count Number of activities to activate the trigger
-	 * @param int $badge_level Badge level to grant if triggered
-	 * @param int $activity_period Amount of days in activity window to cause the trigger
-	 */
-	public function __construct($badge, $activity_ids, $activity_count, $badge_level, $activity_period = null) {
-		$this->badge = $badge;
-		$this->activity_ids = $activity_ids;
-		$this->activity_count = $activity_count;
-		$this->badge_level = $badge_level;
-		$this->activity_period = $activity_period;
 	}
 
 }

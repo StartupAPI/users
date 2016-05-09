@@ -1,4 +1,6 @@
 <?php
+namespace StartupAPI;
+
 require_once(dirname(dirname(__DIR__)).'/global.php');
 
 $user = User::require_login();

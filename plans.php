@@ -1,4 +1,5 @@
 <?php
+namespace StartupAPI;
 
 require_once(__DIR__ . '/global.php');
 
@@ -52,15 +53,15 @@ if (array_key_exists('plan', $_POST)) {
 	try {
 		// Check if plan and schedule exists
 		if (!($plan = Plan::getPlanBySlug($selected_plan_slug))) {
-			throw new Exception("Unknown plan '" . $selected_plan_slug . '"');
+			throw new Exceptions\StartupAPIException("Unknown plan '" . $selected_plan_slug . '"');
 		}
 
 		if (!is_null($selected_schedule_slug) && !($schedule = $plan->getPaymentScheduleBySlug($selected_schedule_slug))) {
-			throw new Exception("Unknown schedule '" . $selected_schedule_slug . "' for plan '" . $selected_plan_slug . "'");
+			throw new Exceptions\StartupAPIException("Unknown schedule '" . $selected_schedule_slug . "' for plan '" . $selected_plan_slug . "'");
 		}
 
 		if (!is_null($selected_engine_slug) && !($engine = PaymentEngine::getEngineBySlug($selected_engine_slug))) {
-			throw new Exception("Unknown payment engine '" . $engine . "' for schedule schedule '" . $selected_schedule_slug . "' for plan '" . $selected_plan_slug . "'");
+			throw new Exceptions\StartupAPIException("Unknown payment engine '" . $engine . "' for schedule schedule '" . $selected_schedule_slug . "' for plan '" . $selected_plan_slug . "'");
 		}
 	} catch (Exception $e) {
 		$_SESSION['message'][] = $e->getMessage();

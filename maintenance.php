@@ -1,6 +1,7 @@
 <?php
+namespace StartupAPI;
+
 require_once(__DIR__.'/global.php');
-require_once(__DIR__.'/classes/User.php');
 
 /**
  * maintenance script to be run on a daily basis

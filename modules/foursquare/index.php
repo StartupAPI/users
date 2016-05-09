@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__DIR__)).'/classes/OAuth2Module.php');
+namespace StartupAPI\Modules;
 
 /**
  * First register an app here: https://foursquare.com/developers/apps
@@ -77,7 +77,7 @@ class FoursquareAuthenticationModule extends OAuth2AuthenticationModule
 
 		try {
 			$result = $credentials->makeOAuth2Request('https://api.foursquare.com/v2/users/self');
-		} catch (OAuth2Exception $ex) {
+		} catch (Exceptions\OAuth2Exception $ex) {
 			return null;
 		}
 

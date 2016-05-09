@@ -1,4 +1,6 @@
 <?php
+namespace StartupAPI;
+
 /*
  * Copy this script to the folder above and populate $versions array with your migrations
  * For more info see: http://www.dbupgrade.org/Main_Page#Migrations_($versions_array)
@@ -851,7 +853,7 @@ $versions[1]['down'][] = "DROP TABLE `u_user_preferences`";
 
 // creating DBUpgrade object with your database credentials and $versions defined above
 // using 'UserBase' namespace to make sure we don't conflict with parent project's dbupgrade
-$dbupgrade = new DBUpgrade(UserConfig::getDB(),	$versions, array(
+$dbupgrade = new \DBUpgrade(UserConfig::getDB(),	$versions, array(
 	'namespace' => 'UserBase',
 	'prefix' => 'u_'
 ));

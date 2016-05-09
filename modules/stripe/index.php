@@ -1,4 +1,5 @@
 <?php
+namespace StartupAPI\Modules;
 
 /**
  * @package StartupAPI
@@ -76,7 +77,7 @@ EOF;
 	 *
 	 * @return boolean True if transaction details were successfully recorded
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function storeTransactionDetails($transaction_id, $details) {
 
@@ -89,15 +90,15 @@ EOF;
 
 		  if (!($stmt = $db->prepare('INSERT INTO u_transaction_details_' . $this->getSlug() .
 		  ' (transaction_id, funds_source, comment) VALUES(?,?,?,?)'))) {
-		  throw new DBPrepareStmtException($db);
+		  throw new Exceptions\DBPrepareStmtException($db);
 		  }
 
 		  if (!$stmt->bind_param('iiss', $transaction_id, $operator_id, $funds_source, $comment)) {
-		  throw new DBBindParamException($db, $stmt);
+		  throw new Exceptions\DBBindParamException($db, $stmt);
 		  }
 
 		  if (!$stmt->execute()) {
-		  throw new DBExecuteStmtException($db, $stmt);
+		  throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		  }
 		 */
 
@@ -111,7 +112,7 @@ EOF;
 	 *
 	 * @return mixed[]|false Retrieves array of transaction details or false if none available
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function expandTransactionDetails($transaction_id) {
 		if (is_null($transaction_id)) {
@@ -125,19 +126,19 @@ EOF;
 
 		  if (!($stmt = $db->prepare('SELECT operator_id, funds_source, comment FROM u_transaction_details_' . $this->getSlug() .
 		  ' WHERE transaction_id = ?'))) {
-		  throw new DBPrepareStmtException($db);
+		  throw new Exceptions\DBPrepareStmtException($db);
 		  }
 
 		  if (!$stmt->bind_param('i', $transaction_id)) {
-		  throw new DBBindParamException($db, $stmt);
+		  throw new Exceptions\DBBindParamException($db, $stmt);
 		  }
 
 		  if (!$stmt->execute()) {
-		  throw new DBExecuteStmtException($db, $stmt);
+		  throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		  }
 
 		  if (!$stmt->bind_result($operator_id, $funds_source, $comment)) {
-		  throw new DBBindResultException($db, $stmt);
+		  throw new Exceptions\DBBindResultException($db, $stmt);
 		  }
 
 		  $details = array();

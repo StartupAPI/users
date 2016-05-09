@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__.'/CookieStorage.php');
+namespace StartupAPI;
 
 /**
  * Tracks sources of marketing campaigns using variables in the incoming URLs
@@ -45,7 +45,7 @@ class CampaignTracker
 	 *
 	 * This function is called on every page view, let's keep it fast and simple.
 	 *
-	 * @throws StartupAPIException
+	 * @throws Exceptions\StartupAPIException
 	 *
 	 * @see UserConfig::$campaign_variables
 	 */
@@ -75,7 +75,7 @@ class CampaignTracker
 		));
 
 		if (!$storage->store(UserConfig::$entry_cmp_key, serialize($campaign))) {
-			throw new StartupAPIException(implode("\n", $storage->errors));
+			throw new Exceptions\StartupAPIException(implode("\n", $storage->errors));
 		}
 	}
 
@@ -87,7 +87,7 @@ class CampaignTracker
 	 *
 	 * This function is called on every page view, let's keep it fast and simple.
 	 *
-	 * @throws StartupAPIException
+	 * @throws Exceptions\StartupAPIException
 	 */
 	public static function preserveReferer() {
 		if (array_key_exists('HTTP_REFERER', $_SERVER)) {
@@ -107,7 +107,7 @@ class CampaignTracker
 			));
 
 			if (!$storage->store(UserConfig::$entry_referer_key, $referer)) {
-				throw new StartupAPIException(implode("\n", $storage->errors));
+				throw new Exceptions\StartupAPIException(implode("\n", $storage->errors));
 			}
 
 			self::$referer = $referer;
@@ -163,7 +163,7 @@ class CampaignTracker
 	 *
 	 * @return int Numeric campaign source ID
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getCampaignSourceID($source) {
 		return self::getCampaignDictionaryID($source, 'cmp_source', 'source');
@@ -176,7 +176,7 @@ class CampaignTracker
 	 *
 	 * @return int Numeric campaign medium ID
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getCampaignMediumID($medium) {
 		return self::getCampaignDictionaryID($medium, 'cmp_medium', 'medium');
@@ -188,7 +188,7 @@ class CampaignTracker
 	 *
 	 * @return int Numeric campaign keywords ID
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getCampaignKeywordsID($keywords) {
 		return self::getCampaignDictionaryID($keywords, 'cmp_keywords', 'keywords');
@@ -201,7 +201,7 @@ class CampaignTracker
 	 *
 	 * @return int Numeric campaign content ID
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getCampaignContentID($content) {
 		return self::getCampaignDictionaryID($content, 'cmp_content', 'content');
@@ -214,7 +214,7 @@ class CampaignTracker
 	 *
 	 * @return int Numeric campaign name ID
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getCampaignNameID($name) {
 		return self::getCampaignDictionaryID($name, 'cmp', 'name');
@@ -231,7 +231,7 @@ class CampaignTracker
 	 *
 	 * @return int Numeric ID for a dictionary term
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	protected static function getCampaignDictionaryID($string_value, $dictionary_table, $dictionary_column) {
 		$string_value = mb_convert_encoding($string_value, 'UTF-8');
@@ -242,17 +242,17 @@ class CampaignTracker
 		{
 			if (!$stmt->bind_param('s', $string_value))
 			{
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new DBExecuteStmtException($db, $stmt, "Can't insert compaign $dictionary_column");
+				throw new Exceptions\DBExecuteStmtException($db, $stmt, "Can't insert compaign $dictionary_column");
 			}
 			$stmt->close();
 		}
 		else
 		{
-			throw new DBPrepareStmtException($db, "Can't insert compaign $dictionary_column");
+			throw new Exceptions\DBPrepareStmtException($db, "Can't insert compaign $dictionary_column");
 		}
 
 		$id = null;
@@ -260,15 +260,15 @@ class CampaignTracker
 		{
 			if (!$stmt->bind_param('s', $string_value))
 			{
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute())
 			{
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($id))
 			{
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -276,7 +276,7 @@ class CampaignTracker
 		}
 		else
 		{
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $id;

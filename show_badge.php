@@ -1,7 +1,7 @@
 <?php
-require_once(__DIR__ . '/global.php');
+namespace StartupAPI;
 
-require_once(__DIR__ . '/classes/User.php');
+require_once(__DIR__ . '/global.php');
 
 if (!UserConfig::$enableGamification || !array_key_exists('name', $_GET)) {
 	header('Location: ' . UserConfig::$USERSROOTURL . '/badges.php');

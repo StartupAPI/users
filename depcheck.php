@@ -1,4 +1,6 @@
 <?php
+namsepace StartupAPI;
+
 /**
  * Testing for all dependencies StartupAPI has
  * http://startupapi.org/Startup_API/Installation#Prerequisites

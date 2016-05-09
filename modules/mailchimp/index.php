@@ -1,4 +1,6 @@
 <?php
+namespace StartupAPI\Modules;
+
 /**
  * MailChip mailing list integration module (UNFINISHED)
  *
@@ -142,4 +144,4 @@ class MailChimpModule extends EmailModule
  * @package StartupAPI
  * @subpackage Email\MailChimp
  */
-class MailChimpException extends StartupAPIException { }
+class MailChimpException extends Exceptions\StartupAPIException { }

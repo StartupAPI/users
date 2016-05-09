@@ -1,1 +1,4 @@
-<?php StartupAPI::power_strip();
+<?php
+namespace StartupAPI;
+
+StartupAPI::power_strip();

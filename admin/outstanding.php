@@ -6,15 +6,15 @@ require_once(__DIR__.'/admin.php');
 $db = UserConfig::getDB();
 
 if (!($stmt = $db->prepare('SELECT a.id, a.name, a.plan_slug, a.schedule_slug, SUM(c.amount) AS debt FROM u_accounts AS a JOIN u_account_charge AS c ON a.id = c.account_id GROUP BY c.account_id HAVING debt < 0'))) {
-	throw new DBPrepareStmtException($db);
+	throw new Exceptions\DBPrepareStmtException($db);
 }
 
 if (!$stmt->execute()) {
-	throw new DBExecuteStmtException($db, $stmt);
+	throw new Exceptions\DBExecuteStmtException($db, $stmt);
 }
 
 if (!$stmt->bind_result($id, $name, $plan, $schedule, $debt)) {
-	throw new DBBindResultException($db, $stmt);
+	throw new Exceptions\DBBindResultException($db, $stmt);
 }
 
 $debtors = array();

@@ -1,13 +1,8 @@
 <?php
-
-require_once(__DIR__ . '/User.php');
-require_once(__DIR__ . '/Plan.php');
-require_once(__DIR__ . '/CampaignTracker.php');
-
-require_once(__DIR__ . '/API/Endpoint.php');
+namespace StartupAPI;
 
 require_once(dirname(__DIR__) . '/twig/lib/Twig/Autoloader.php');
-Twig_Autoloader::register();
+\Twig_Autoloader::register();
 
 /**
  * StartupAPI class contains some global static functions and entry points for API
@@ -170,13 +165,13 @@ class StartupAPI {
 		}
 
 		// Configuring the templating
-		$loader = new Twig_Loader_Filesystem(__DIR__);
+		$loader = new \Twig_Loader_Filesystem(__DIR__);
 		foreach ($template_folders as $folder) {
 			$loader->addPath($folder, 'startupapi');
 		}
 		$loader->addPath(dirname(__DIR__) . '/admin/templates', 'startupapi-admin');
 
-		self::$template = new Twig_Environment($loader, UserConfig::$twig_options);
+		self::$template = new \Twig_Environment($loader, UserConfig::$twig_options);
 
 		// StartupAPI apis
 		if (UserConfig::$enable_startupapi_apis) {
@@ -359,118 +354,5 @@ class StartupAPI {
 
 		return $type;
 	}
-
-}
-
-/**
- * Exception superclass used for all exceptions in StartupAPI
- *
- * @package StartupAPI
- */
-class StartupAPIException extends Exception {
-
-	/**
-	 * General Startup API Exception
-	 *
-	 * @param string $message Exception message
-	 * @param int $code Exception code
-	 * @param Exception $previous Previous exception in the chain
-	 */
-	function __construct($message, $code = null, $previous = null) {
-		parent::__construct('[StartupAPI] ' . $message, $code, $previous);
-	}
-
-}
-
-/**
- * Exception thrown when deprecated method is called
- *
- * Replace deprecated code with this exception to make sure instances that use
- * deprecated functionality have last warning to remove it.
- *
- * @package StartupAPI
- */
-class StartupAPIDeprecatedException extends StartupAPIException {
-
-}
-
-/**
- * Exception for database-related problems
- *
- * @package StartupAPI
- */
-class DBException extends StartupAPIException {
-
-	/**
-	 * Creates a database-related exception
-	 *
-	 * @param mysqli $db MySQLi database object
-	 * @param mysqli_stmt $stmt MySQLi database statement
-	 * @param string $message Exception message
-	 * @param int $code Exception code
-	 * @param Exception $previous Previous exception in the chain
-	 */
-	function __construct(mysqli $db = null, $stmt = null, $message = null, $code = null, $previous = null) {
-		$exception_message = $message;
-
-		$class = get_class($this);
-		$file = self::getFile();
-		$line = self::getLine();
-
-		if (is_null($db)) {
-			$exception_message = "[$class] Can't connect to database, \$db object is null (in $file on line $line)";
-		} else if ($db->connect_error) {
-			$exception_message = "[$class] Can't connect to database: (" . $db->connect_errno . ") " .
-					$db->connect_error . " (in $file on line $line)";
-		} else if ($db->error) {
-			$exception_message = "[$class] DB Error: " . $db->error . " (in $file on line $line)";
-		} else if (!$stmt) {
-			$exception_message = "[$class]" .
-					' $db->error: ' . $db->error .
-					' with message: ' . $message . " (in $file on line $line)";
-		} else {
-			$exception_message = "[$class]" .
-					' $stmt->error: ' . $stmt->error .
-					' with message: ' . $message . " (in $file on line $line)";
-		}
-
-		parent::__construct($exception_message, $code, $previous);
-	}
-
-}
-
-/**
- * Paremeter Binding Exception
- *
- * @package StartupAPI
- */
-class DBBindParamException extends DBException {
-
-}
-
-/**
- * Result binding Exception
- *
- * @package StartupAPI
- */
-class DBBindResultException extends DBException {
-
-}
-
-/**
- * Statement Execution Exception
- *
- * @package StartupAPI
- */
-class DBExecuteStmtException extends DBException {
-
-}
-
-/**
- * Statement preparation Exception
- *
- * @package StartupAPI
- */
-class DBPrepareStmtException extends DBException {
 
 }

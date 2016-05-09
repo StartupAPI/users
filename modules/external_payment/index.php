@@ -1,4 +1,5 @@
 <?php
+namespace StartupAPI\Modules;
 
 /**
  * @package StartupAPI

@@ -1,9 +1,7 @@
 <?php
+namespace StartupAPI;
 
 require_once(__DIR__ . '/global.php');
-
-require_once(__DIR__ . '/classes/User.php');
-require_once(__DIR__ . '/classes/Invitation.php');
 
 $errors = array();
 
@@ -13,13 +11,13 @@ if (UserConfig::$enableRegistration && array_key_exists('register', $_POST)) {
 	$module = AuthenticationModule::get($_GET['module']);
 
 	if (is_null($module)) {
-		throw new StartupAPIException('Wrong module specified');
+		throw new Exceptions\StartupAPIException('Wrong module specified');
 	}
 
 	$invitation = null;
 
 	if (UserConfig::$adminInvitationOnly && !array_key_exists('invite', $_GET)) {
-		throw new StartupAPIException('Invitation code is not submitted');
+		throw new Exceptions\StartupAPIException('Invitation code is not submitted');
 	}
 
 	if ((UserConfig::$enableUserInvitations || UserConfig::$adminInvitationOnly)
@@ -28,7 +26,7 @@ if (UserConfig::$enableRegistration && array_key_exists('register', $_POST)) {
 		$invitation = Invitation::getByCode($code);
 
 		if (is_null($invitation) || $invitation->getStatus()) {
-			throw new StartupAPIException('Invitation code is invalid');
+			throw new Exceptions\StartupAPIException('Invitation code is invalid');
 		}
 
 		$_SESSION[UserConfig::$invitation_code_key] = $code;
@@ -54,9 +52,9 @@ if (UserConfig::$enableRegistration && array_key_exists('register', $_POST)) {
 		}
 
 		exit;
-	} catch (InputValidationException $ex) {
+	} catch (Exceptions\Authentication\InputValidationException $ex) {
 		$errors[$module->getID()] = $ex->getErrors();
-	} catch (ExistingUserException $ex) {
+	} catch (Exceptions\ExistingUserException $ex) {
 		$user_exists = true;
 		$errors[$module->getID()] = $ex->getErrors();
 	}

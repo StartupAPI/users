@@ -1,6 +1,5 @@
 <?php
-
-require_once(__DIR__ . '/Plan.php');
+namespace StartupAPI;
 
 /**
  * Account class represents accounts in the system.
@@ -97,7 +96,7 @@ class Account {
 	 *
 	 * @param int $id Account id
 	 * @return Account Account associated with specified ID
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getByID($id) {
 		$db = UserConfig::getDB();
@@ -106,23 +105,23 @@ class Account {
 		if (!($stmt = $db->prepare('SELECT name, plan_slug, schedule_slug, engine_slug,
 			active, next_charge, next_plan_slug, next_schedule_slug, next_engine_slug
 			FROM u_accounts WHERE id = ?'))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('i', $id)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		if (!$stmt->store_result()) {
-			throw new DBException($db, $stmt, "Can't store result");
+			throw new Exceptions\DBException($db, $stmt, "Can't store result");
 		}
 
 		if (!$stmt->bind_result($name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $next_plan_slug, $next_schedule_slug, $next_engine_slug)) {
-			throw new DBBindResultException($db, $stmt);
+			throw new Exceptions\DBBindResultException($db, $stmt);
 		}
 
 		if ($stmt->fetch() === TRUE) {
@@ -144,8 +143,8 @@ class Account {
 	 *
 	 * @return Account[] Array of user accounts
 	 *
-	 * @throws DBException
-	 * @throws StartupAPIException
+	 * @throws Exceptions\DBException
+	 * @throws Exceptions\StartupAPIException
 	 */
 	public static function getUserAccounts(User $user) {
 		$db = UserConfig::getDB();
@@ -158,23 +157,23 @@ class Account {
 				'FROM u_accounts a ' .
 				'INNER JOIN u_account_users au ON a.id = au.account_id ' .
 				'WHERE au.user_id = ?'))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('i', $userid)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		if (!$stmt->store_result()) {
-			throw new DBException($db, $stmt, "Can't store result");
+			throw new Exceptions\DBException($db, $stmt, "Can't store result");
 		}
 
 		if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $role, $next_plan_slug, $next_schedule_slug, $next_engine_slug)) {
-			throw new DBBindResultException($db, $stmt);
+			throw new Exceptions\DBBindResultException($db, $stmt);
 		}
 
 		while ($stmt->fetch() === TRUE) {
@@ -200,8 +199,8 @@ class Account {
 	 *
 	 * @return Account[] Array of user accounts
 	 *
-	 * @throws DBException
-	 * @throws StartupAPIException
+	 * @throws Exceptions\DBException
+	 * @throws Exceptions\StartupAPIException
 	 */
 	public static function getAccounts($pagenumber = 0, $perpage = 20) {
 		$db = UserConfig::getDB();
@@ -215,23 +214,23 @@ class Account {
 					FROM u_accounts
 					LIMIT ?, ?'
 				))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('ii', $first, $perpage)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		if (!$stmt->store_result()) {
-			throw new DBException($db, $stmt, "Can't store result");
+			throw new Exceptions\DBException($db, $stmt, "Can't store result");
 		}
 
 		if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $next_plan_slug, $next_schedule_slug, $next_engine_slug)) {
-			throw new DBBindResultException($db, $stmt);
+			throw new Exceptions\DBBindResultException($db, $stmt);
 		}
 
 		while ($stmt->fetch() === TRUE) {
@@ -249,8 +248,8 @@ class Account {
 	 *
 	 * @return Account[] Array of user accounts
 	 *
-	 * @throws DBException
-	 * @throws StartupAPIException
+	 * @throws Exceptions\DBException
+	 * @throws Exceptions\StartupAPIException
 	 */
 	public static function searchAccounts($search, $pagenumber = 0, $perpage = 20) {
 		$db = UserConfig::getDB();
@@ -265,23 +264,23 @@ class Account {
 					WHERE INSTR(name, ?) > 0
 					LIMIT ?, ?'
 				))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('sii', $search, $first, $perpage)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		if (!$stmt->store_result()) {
-			throw new DBException($db, $stmt, "Can't store result");
+			throw new Exceptions\DBException($db, $stmt, "Can't store result");
 		}
 
 		if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $next_plan_slug, $next_schedule_slug, $next_engine_slug)) {
-			throw new DBBindResultException($db, $stmt);
+			throw new Exceptions\DBBindResultException($db, $stmt);
 		}
 
 		while ($stmt->fetch() === TRUE) {
@@ -301,8 +300,8 @@ class Account {
 	 *
 	 * @return array Array of Account, role pairs
 	 *
-	 * @throws DBException
-	 * @throws StartupAPIException
+	 * @throws Exceptions\DBException
+	 * @throws Exceptions\StartupAPIException
 	 */
 	public static function getUserAccountsAndRoles(User $user) {
 		$db = UserConfig::getDB();
@@ -315,23 +314,23 @@ class Account {
 				'FROM u_accounts a ' .
 				'INNER JOIN u_account_users au ON a.id = au.account_id ' .
 				'WHERE au.user_id = ?'))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('i', $userid)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		if (!$stmt->store_result()) {
-			throw new DBException($db, $stmt, "Can't store result");
+			throw new Exceptions\DBException($db, $stmt, "Can't store result");
 		}
 
 		if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $next_plan_slug, $next_schedule_slug, $next_engine_slug, $role)) {
-			throw new DBBindResultException($db, $stmt);
+			throw new Exceptions\DBBindResultException($db, $stmt);
 		}
 
 		while ($stmt->fetch() === TRUE) {
@@ -360,7 +359,7 @@ class Account {
 	 *
 	 * @return int Total number of accounts in the system
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getTotalAccounts() {
 		$db = UserConfig::getDB();
@@ -369,16 +368,16 @@ class Account {
 
 		if ($stmt = $db->prepare('SELECT COUNT(*) FROM u_accounts')) {
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($total)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $total;
@@ -463,15 +462,15 @@ class Account {
 		$db = UserConfig::getDB();
 
 		if (!($stmt = $db->prepare('UPDATE u_accounts SET name = ? WHERE id = ?'))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('si', $this->name, $this->id)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		$stmt->close();
@@ -482,26 +481,26 @@ class Account {
 	 *
 	 * @return array Array of User, role pairs
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function getUsers() {
 		$db = UserConfig::getDB();
 		$roles = array();
 
 		if (!($stmt = $db->prepare('SELECT user_id, role FROM u_account_users WHERE account_id = ?'))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('i', $this->id)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		if (!$stmt->bind_result($userid, $role)) {
-			throw new DBBindResultException($db, $stmt);
+			throw new Exceptions\DBBindResultException($db, $stmt);
 		}
 
 		while ($stmt->fetch() === TRUE) {
@@ -527,28 +526,28 @@ class Account {
 	 *
 	 * @return int|null User's role or null if user is not a member of the account
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function getUserRole(User $user) {
 		$db = UserConfig::getDB();
 		$role = null;
 
 		if (!($stmt = $db->prepare('SELECT role FROM u_account_users WHERE account_id = ? AND user_id = ?'))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		$user_id = $user->getID();
 
 		if (!$stmt->bind_param('ii', $this->id, $user_id)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		if (!$stmt->bind_result($role)) {
-			throw new DBBindResultException($db, $stmt);
+			throw new Exceptions\DBBindResultException($db, $stmt);
 		}
 
 		$stmt->fetch();
@@ -563,7 +562,7 @@ class Account {
 	 * @param User User
 	 * @param boolean $admin Set to true if you want to promote user to admin false if demote to regular user of the account
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function setUserRole(User $user, $admin) {
 		$db = UserConfig::getDB();
@@ -573,17 +572,17 @@ class Account {
 					SET role = ?
 					WHERE account_id = ? AND user_id = ?'
 				))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		$user_id = $user->getID();
 
 		if (!$stmt->bind_param('iii', $role_num, $this->id, $user_id)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 	}
 
@@ -593,7 +592,7 @@ class Account {
 	 * @param User $user User to add
 	 * @param int $role User role in the account
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function addUser(User $user, $role = self::ROLE_USER) {
 		$db = UserConfig::getDB();
@@ -602,15 +601,15 @@ class Account {
 
 		if ($stmt = $db->prepare('INSERT IGNORE INTO u_account_users (account_id, user_id, role) VALUES (?, ?, ?)')) {
 			if (!$stmt->bind_param('iii', $this->id, $userid, $role)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 	}
 
@@ -619,7 +618,7 @@ class Account {
 	 *
 	 * @param User $user User to add
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function removeUser(User $user) {
 		$db = UserConfig::getDB();
@@ -628,15 +627,15 @@ class Account {
 
 		if ($stmt = $db->prepare('DELETE FROM u_account_users WHERE account_id = ? AND user_id = ?')) {
 			if (!$stmt->bind_param('ii', $this->id, $userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 	}
 
@@ -719,7 +718,7 @@ class Account {
 	 *
 	 * @return Account Newly created account
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function createAccount($name, $plan_slug, $schedule_slug = null, $user = null, $role = self::ROLE_ADMIN, $engine_slug = null) {
 		$name = mb_convert_encoding($name, 'UTF-8');
@@ -727,16 +726,16 @@ class Account {
 		$db = UserConfig::getDB();
 
 		if (!($stmt = $db->prepare('INSERT INTO u_accounts (name, plan_slug, schedule_slug, engine_slug) VALUES (?, ?, ?, ?)'))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 
 		if (!$stmt->bind_param('ssss', $name, $plan_slug, $schedule_slug, $engine_slug)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		$id = $stmt->insert_id;
@@ -771,8 +770,8 @@ class Account {
 	 *
 	 * @return Account
 	 *
-	 * @throws DBException
-	 * @throws StartupAPIException
+	 * @throws Exceptions\DBException
+	 * @throws Exceptions\StartupAPIException
 	 */
 	public static function getCurrentAccount(User $user) {
 		$db = UserConfig::getDB();
@@ -786,21 +785,21 @@ class Account {
 				'INNER JOIN u_accounts a ON a.id = up.current_account_id ' .
 				'INNER JOIN u_account_users au ON a.id = au.account_id ' .
 				'WHERE up.user_id = ? AND au.user_id = ?'))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		$id = null;
 
 		if (!$stmt->bind_param('ii', $userid, $userid)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $engine_slug, $active, $next_charge, $next_plan_slug, $next_schedule_slug, $next_engine_slug, $role)) {
-			throw new DBBindResultException($db, $stmt);
+			throw new Exceptions\DBBindResultException($db, $stmt);
 		}
 
 		$stmt->fetch();
@@ -839,7 +838,7 @@ class Account {
 	 *
 	 * @param User $user
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function setAsCurrent(User $user) {
 		$db = UserConfig::getDB();
@@ -862,15 +861,15 @@ class Account {
 			$userid = $user->getID();
 
 			if (!$stmt->bind_param('ii', $this->id, $userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt, "Can't update user preferences (set current account)");
+				throw new Exceptions\DBExecuteStmtException($db, $stmt, "Can't update user preferences (set current account)");
 			}
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db, "Can't update user preferences (set current account)");
+			throw new Exceptions\DBPrepareStmtException($db, "Can't update user preferences (set current account)");
 		}
 	}
 
@@ -938,19 +937,19 @@ class Account {
 
 		if (!($stmt = $db->prepare('SELECT date_time, amount FROM u_account_charge WHERE account_id = ? ' .
 				'ORDER BY date_time'))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('i', $account_id)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		if (!$stmt->bind_result($datetime, $amount)) {
-			throw new DBBindResultException($db, $stmt);
+			throw new Exceptions\DBBindResultException($db, $stmt);
 		}
 
 		$charges = array();
@@ -969,7 +968,7 @@ class Account {
 	 *
 	 * @return boolean True if charge was successful
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function paymentIsDue($refund = NULL) { // refund is almost the same, as general payment
 		if (is_null($this->schedule)) {
@@ -996,31 +995,31 @@ class Account {
 				$charge_amount -= $this->charges[$c]['amount'];
 
 				if (!($stmt = $db->prepare('DELETE FROM u_account_charge WHERE account_id = ?'))) {
-					throw new DBPrepareStmtException($db);
+					throw new Exceptions\DBPrepareStmtException($db);
 				}
 
 				if (!$stmt->bind_param('i', $this->id)) {
-					throw new DBBindParamException($db, $stmt);
+					throw new Exceptions\DBBindParamException($db, $stmt);
 				}
 
 				if (!$stmt->execute()) {
-					throw new DBExecuteStmtException($db, $stmt);
+					throw new Exceptions\DBExecuteStmtException($db, $stmt);
 				}
 
 				$this->charges = array();
 				$stmt->close();
 			} else { // We still owe to user
 				if (!($stmt = $db->prepare('UPDATE u_account_charge SET amount = ? WHERE account_id = ?'))) {
-					throw new DBPrepareStmtException($db);
+					throw new Exceptions\DBPrepareStmtException($db);
 				}
 
 				$amt = $this->charges[$c]['amount'] - $charge_amount;
 				if (!$stmt->bind_param('di', $amt, $this->id)) {
-					throw new DBBindParamException($db, $stmt);
+					throw new Exceptions\DBBindParamException($db, $stmt);
 				}
 
 				if (!$stmt->execute()) {
-					throw new DBExecuteStmtException($db, $stmt);
+					throw new Exceptions\DBExecuteStmtException($db, $stmt);
 				}
 
 				// Put into the object
@@ -1041,15 +1040,15 @@ class Account {
 			$this->charges[] = $charge;
 
 			if (!($stmt = $db->prepare('INSERT INTO u_account_charge (account_id, date_time, amount) VALUES (?, ?, ?)'))) {
-				throw new DBPrepareStmtException($db);
+				throw new Exceptions\DBPrepareStmtException($db);
 			}
 
 			if (!$stmt->bind_param('isd', $this->id, $charge['datetime'], $charge['amount'])) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
@@ -1075,7 +1074,7 @@ class Account {
 	 *
 	 * @return boolean True if payment was successfully applied
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function paymentReceived($amount) {
 
@@ -1099,15 +1098,15 @@ class Account {
 
 				if (!($stmt = $db->prepare('UPDATE u_account_charge SET amount = ? ' .
 						'WHERE account_id = ? and date_time = ?'))) {
-					throw new DBPrepareStmtException($db);
+					throw new Exceptions\DBPrepareStmtException($db);
 				}
 
 				if (!$stmt->bind_param('dis', $this->charges[$k]['amount'], $this->id, $this->charges[$k]['datetime'])) {
-					throw new DBBindParamException($db, $stmt);
+					throw new Exceptions\DBBindParamException($db, $stmt);
 				}
 
 				if (!$stmt->execute()) {
-					throw new DBExecuteStmtException($db, $stmt);
+					throw new Exceptions\DBExecuteStmtException($db, $stmt);
 				}
 
 				$amount = 0;
@@ -1118,15 +1117,15 @@ class Account {
 		foreach ($cleared as $n => $k) {
 
 			if (!($stmt = $db->prepare('DELETE FROM u_account_charge WHERE account_id = ? and date_time = ?'))) {
-				throw new DBPrepareStmtException($db);
+				throw new Exceptions\DBPrepareStmtException($db);
 			}
 
 			if (!$stmt->bind_param('is', $this->id, $k['datetime'])) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
@@ -1139,15 +1138,15 @@ class Account {
 			$this->charges[] = $charge;
 
 			if (!($stmt = $db->prepare('INSERT INTO u_account_charge (account_id, date_time, amount) VALUES (?, ?, ?)'))) {
-				throw new DBPrepareStmtException($db);
+				throw new Exceptions\DBPrepareStmtException($db);
 			}
 
 			if (!$stmt->bind_param('isd', $this->id, $charge['datetime'], $charge['amount'])) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
@@ -1174,7 +1173,7 @@ class Account {
 	 *
 	 * @return boolean True if activation was successful
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function activatePlan($plan_slug, $schedule_slug = NULL, $engine_slug = NULL) {
 		if (!$plan_slug) {
@@ -1196,15 +1195,15 @@ class Account {
 		if (!$new_plan || !UserConfig::$useSubscriptions) {
 			if (!($stmt = $db->prepare('UPDATE u_accounts SET plan_slug = ?, schedule_slug = NULL, engine_slug = NULL, active = 1, next_charge = NULL, ' .
 					'next_plan_slug = NULL, next_schedule_slug = NULL, next_engine_slug = NULL WHERE id = ?'))) {
-				throw new DBPrepareStmtException($db);
+				throw new Exceptions\DBPrepareStmtException($db);
 			}
 
 			if (!$stmt->bind_param('si', $plan_slug, $this->id)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$this->plan = $new_plan;
@@ -1250,15 +1249,15 @@ class Account {
 			 */
 			if (!($stmt = $db->prepare('UPDATE u_accounts SET plan_slug = ?, schedule_slug = ?, engine_slug = ?, active = 1, next_charge = ?, ' .
 					'next_plan_slug = NULL, next_schedule_slug = NULL, next_engine_slug = NULL WHERE id = ?'))) {
-				throw new DBPrepareStmtException($db);
+				throw new Exceptions\DBPrepareStmtException($db);
 			}
 
 			if (!$stmt->bind_param('ssssi', $plan_slug, $schedule_slug, $engine_slug, $this->nextCharge, $this->id)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$this->paymentIsDue();
@@ -1299,7 +1298,7 @@ class Account {
 	 *
 	 * @return boolean True if successfully set the schedule
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function setPaymentSchedule($schedule_slug, $engine_slug) {
 
@@ -1317,15 +1316,15 @@ class Account {
 			schedule_slug = ?, engine_slug = ?, next_charge = ?,
 			next_plan_slug = NULL, next_schedule_slug = NULL, next_engine_slug = NULL
 			WHERE id = ?'))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('sssi', $schedule_slug, $engine_slug, $this->nextCharge, $this->id)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		// Bill user
@@ -1405,7 +1404,7 @@ class Account {
 	 *
 	 * @return boolean True if successfully updated payment engine
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function setPaymentEngine($engine_slug) {
 		if ($engine_slug == NULL) {
@@ -1418,15 +1417,15 @@ class Account {
 		$db = UserConfig::getDB();
 
 		if (!($stmt = $db->prepare('UPDATE u_accounts SET engine_slug = ? WHERE id = ?'))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('si', $engine_slug, $this->id)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		$this->lastTransactionID =
@@ -1463,7 +1462,7 @@ class Account {
 	 *
 	 * @return boolean True if request was successful
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function planChangeRequest($plan_slug, $schedule_slug, $engine_slug) {
 		// Sanity checks
@@ -1516,15 +1515,15 @@ class Account {
 		$db = UserConfig::getDB();
 
 		if (!($stmt = $db->prepare('UPDATE u_accounts SET next_plan_slug = ?, next_schedule_slug = ?, next_engine_slug = ? WHERE id = ?'))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('sssi', $plan_slug, $schedule_slug, $engine_slug, $this->id)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		$this->lastTransactionID =
@@ -1541,7 +1540,7 @@ class Account {
 	 *
 	 * @return boolean True if request was successful
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function scheduleChangeRequest($schedule_slug, $engine_slug) {
 		$schedule = $this->plan->getPaymentScheduleBySlug($schedule_slug);
@@ -1571,15 +1570,15 @@ class Account {
 
 		if (!($stmt = $db->prepare('UPDATE u_accounts SET next_plan_slug = plan_slug, next_schedule_slug = ?,
 					next_engine_slug = ? WHERE id = ?'))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('ssi', $schedule_slug, $engine_slug, $this->id)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		$this->lastTransactionID =
@@ -1592,7 +1591,7 @@ class Account {
 	 *
 	 * @return boolean True if suspension was successful
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function suspend() {
 		$this->active = 0;
@@ -1600,15 +1599,15 @@ class Account {
 		$db = UserConfig::getDB();
 
 		if (!($stmt = $db->prepare('UPDATE u_accounts SET active = 0 WHERE id = ?'))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('i', $this->id)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		return TRUE;
@@ -1619,7 +1618,7 @@ class Account {
 	 *
 	 * @return boolean True if activation was successful
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function activate() {
 		$this->active = 1;
@@ -1627,15 +1626,15 @@ class Account {
 		$db = UserConfig::getDB();
 
 		if (!($stmt = $db->prepare('UPDATE u_accounts SET active = 1 WHERE id = ?'))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('i', $this->id)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		return TRUE;
@@ -1655,7 +1654,7 @@ class Account {
 	 *
 	 * @return boolean True if cancellation was successful
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function cancelChangeRequest() {
 
@@ -1666,15 +1665,15 @@ class Account {
 		if (!($stmt = $db->prepare('UPDATE u_accounts SET ' .
 				'next_plan_slug = NULL, next_schedule_slug = NULL, next_engine_slug = NULL ' .
 				'WHERE id = ?'))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('i', $this->id)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		$this->nextPlan = NULL;

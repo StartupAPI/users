@@ -1,20 +1,21 @@
 <?php
+namespace StartupAPI;
+
 /**
  * OAuth2 callback script used by all modules that subclass OAuth2Module
  */
 require_once(__DIR__.'/global.php');
-require_once(__DIR__.'/classes/User.php');
 
 $current_user = User::get();
 
 try
 {
 	if (!array_key_exists('module', $_GET)) {
-		throw new StartupAPIException('module not specified');
+		throw new Exceptions\StartupAPIException('module not specified');
 	}
 
 	if (!array_key_exists('code', $_GET)) {
-		throw new StartupAPIException('OAuth2 "code" parameter required');
+		throw new Exceptions\StartupAPIException('OAuth2 "code" parameter required');
 	}
 
 	$module = AuthenticationModule::get($_GET['module']);
@@ -24,22 +25,22 @@ try
 	{
 		$oauth2_client_id = $module->getOAuth2ClientIDByCode($_GET['code']);
 	}
-	catch (OAuth2Exception $e)
+	catch (Exceptions\OAuth2Exception $e)
 	{
-		throw new StartupAPIException('Problem getting access token: '.$e->getMessage());
+		throw new Exceptions\StartupAPIException('Problem getting access token: '.$e->getMessage());
 	}
 
 	try
 	{
 		$identity = $module->getIdentity($oauth2_client_id);
 	}
-	catch (OAuth2Exception $e)
+	catch (Exceptions\OAuth2Exception $e)
 	{
-		throw new StartupAPIException('Problem getting user identity: '.$e->getMessage());
+		throw new Exceptions\StartupAPIException('Problem getting user identity: '.$e->getMessage());
 	}
 
 	if (is_null($identity)) {
-		throw new StartupAPIException('No identity returned');
+		throw new Exceptions\StartupAPIException('No identity returned');
 	}
 
 	UserTools::debug("Current User: " . var_export($current_user, true));
@@ -70,7 +71,7 @@ try
 	} else {
 		// otherwise, we're adding their credential to an existing user
 		if (!is_null($user)) {
-			throw new StartupAPIException('Another user is already connected with this account');
+			throw new Exceptions\StartupAPIException('Another user is already connected with this account');
 		}
 
 		$module->addUserOAuth2Identity($current_user, $identity, $oauth2_client_id);

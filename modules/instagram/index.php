@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__DIR__)).'/classes/OAuth2Module.php');
+namespace StartupAPI\Modules;
 
 /**
  * First register an app here: https://instagram.com/developer/clients/register/
@@ -72,7 +72,7 @@ class InstagramAuthenticationModule extends OAuth2AuthenticationModule
 
 		try {
 			$result = $credentials->makeOAuth2Request('https://api.instagram.com/v1/users/self');
-		} catch (OAuth2Exception $ex) {
+		} catch (Exceptions\OAuth2Exception $ex) {
 			return null;
 		}
 

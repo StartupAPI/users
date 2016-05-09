@@ -1,28 +1,5 @@
 <?php
-
-require_once(dirname(__DIR__) . '/global.php');
-
-/**
- * Adding an interface to allow defining unimplemented static methods
- */
-interface StartupAPIModuleInterface {
-
-	/**
-	 * Returns module ID string
-	 *
-	 * Each module must implement this method and use unique ID
-	 *
-	 * @return string Unique module ID
-	 */
-	public function getID();
-
-	/**
-	 * Returns human readable module name for a class of modules
-	 *
-	 * @return string Module name
-	 */
-	public static function getModulesTitle();
-}
+namespace StartupAPI;
 
 /**
  * StartupAPI module class
@@ -35,6 +12,92 @@ interface StartupAPIModuleInterface {
  * @todo Rename module IDs to module slugs throughout the application to confirm with coding standards
  */
 abstract class StartupAPIModule implements StartupAPIModuleInterface {
+
+	/**
+	 * List of builtin module categories user in admin UI
+	 *
+	 * @var array
+	 */
+	public static $module_categories = array(
+		'auth' => array(
+			'title' => 'Authentication modules'
+		),
+		'email' => array(
+			'title' => 'Email module'
+		),
+		'payment' => array(
+			'title' => 'Payment engines'
+		)
+	);
+
+	/**
+	 * List of builtin modules used in admin UI and for module autoloading
+	 *
+	 * @var array
+	 */
+	public static $builtin_modules = array(
+		'usernamepass' => array(
+			'class' => 'UsernamePasswordAuthenticationModule',
+			'category_slug' => 'auth'
+		),
+		'email' => array(
+			'class' => 'EmailAuthenticationModule',
+			'experimental' => true,
+			'category_slug' => 'auth'
+		),
+		'facebook' => array(
+			'class' => 'FacebookAuthenticationModule',
+			'category_slug' => 'auth'
+		),
+		'twitter' => array(
+			'class' => 'TwitterAuthenticationModule',
+			'category_slug' => 'auth'
+		),
+		'google_oauth' => array(
+			'class' => 'GoogleOAuthAuthenticationModule',
+			'category_slug' => 'auth'
+		),
+		'linkedin' => array(
+			'class' => 'LinkedInAuthenticationModule',
+			'category_slug' => 'auth'
+		),
+		'meetup' => array(
+			'class' => 'MeetupAuthenticationModule',
+			'category_slug' => 'auth'
+		),
+		'etsy' => array(
+			'class' => 'EtsyAuthenticationModule',
+			'category_slug' => 'auth'
+		),
+		'foursquare' => array(
+			'class' => 'FoursquareAuthenticationModule',
+			'category_slug' => 'auth'
+		),
+		'github' => array(
+			'class' => 'GithubAuthenticationModule',
+			'category_slug' => 'auth'
+		),
+		'mailchimp' => array(
+			'class' => 'MailChimpModule',
+			'experimental' => true,
+			'category_slug' => 'email'
+		),
+		'manual' => array(
+			'class' => 'ManualPaymentEngine',
+			'experimental' => true,
+			'category_slug' => 'payment'
+		),
+		'external_payment' => array(
+			'class' => 'ExternalPaymentEngine',
+			'experimental' => true,
+			'category_slug' => 'payment'
+		),
+		'stripe' => array(
+			'class' => 'StripePaymentEngine',
+			'experimental' => true,
+			'category_slug' => 'payment'
+		),
+	);
 
 	/**
 	 * Creates new module and registers it with the system
@@ -133,7 +196,3 @@ abstract class StartupAPIModule implements StartupAPIModuleInterface {
 	}
 
 }
-
-require_once(__DIR__ . '/AuthenticationModule.php');
-require_once(__DIR__ . '/EmailModule.php');
-require_once(__DIR__ . '/PaymentEngine.php');

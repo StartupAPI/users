@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__DIR__)).'/classes/OAuth2Module.php');
+namespace StartupAPI\Modules;
 
 /**
  * First register an app here: https://console.developers.google.com/project
@@ -74,7 +74,7 @@ class GoogleAuthenticationModule extends OAuth2AuthenticationModule
 
 		try {
 			$result = $credentials->makeOAuth2Request('https://www.googleapis.com/plus/v1/people/me');
-		} catch (OAuth2Exception $ex) {
+		} catch (Exceptions\OAuth2Exception $ex) {
 			return null;
 		}
 

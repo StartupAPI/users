@@ -1,7 +1,7 @@
 <?php
-require_once(dirname(dirname(__DIR__)) . '/global.php');
+namespace StartupAPI;
 
-require_once(dirname(dirname(__DIR__)) . '/classes/User.php');
+require_once(dirname(dirname(__DIR__)) . '/global.php');
 
 $errors = array();
 
@@ -22,11 +22,11 @@ if (array_key_exists('code', $_GET) && array_key_exists('email', $_GET)) {
 
 			exit;
 		} else {
-			throw new InputValidationException('Invalid code', 0, array(
+			throw new Exceptions\Authentication\InputValidationException('Invalid code', 0, array(
 				'code' => array('Invalid code')
 			));
 		}
-	} catch (InputValidationException $ex) {
+	} catch (Exceptions\Authentication\InputValidationException $ex) {
 		$errors = $ex->getErrors();
 	}
 }

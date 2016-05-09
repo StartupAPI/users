@@ -120,6 +120,6 @@ class Facebook extends BaseFacebook
 	 * @return string Storage variable name
 	 */
 	protected function constructSessionVariableName($key) {
-		return implode('_', array(UserConfig::$facebook_storage_key_prefix, $this->getAppId(), $key));
+		return implode('_', array(\StartupAPI\UserConfig::$facebook_storage_key_prefix, $this->getAppId(), $key));
 	}
 }

@@ -4,94 +4,14 @@ require_once(__DIR__ . '/admin.php');
 // temporary switch to make it easy to see experimental modules
 $show_experimental = true;
 
-$module_categories = array(
-	'auth' => array(
-		'title' => 'Authentication modules'
-	),
-	'email' => array(
-		'title' => 'Email module'
-	),
-	'payment' => array(
-		'title' => 'Payment engines'
-	)
-);
-
-$builtin_modules = array(
-	'usernamepass' => array(
-		'class' => 'UsernamePasswordAuthenticationModule',
-		'category_slug' => 'auth'
-	),
-	'email' => array(
-		'class' => 'EmailAuthenticationModule',
-		'experimental' => true,
-		'category_slug' => 'auth'
-	),
-	'facebook' => array(
-		'class' => 'FacebookAuthenticationModule',
-		'category_slug' => 'auth'
-	),
-	'twitter' => array(
-		'class' => 'TwitterAuthenticationModule',
-		'category_slug' => 'auth'
-	),
-	'google_oauth' => array(
-		'class' => 'GoogleOAuthAuthenticationModule',
-		'category_slug' => 'auth'
-	),
-	'linkedin' => array(
-		'class' => 'LinkedInAuthenticationModule',
-		'category_slug' => 'auth'
-	),
-	'meetup' => array(
-		'class' => 'MeetupAuthenticationModule',
-		'category_slug' => 'auth'
-	),
-	'etsy' => array(
-		'class' => 'EtsyAuthenticationModule',
-		'category_slug' => 'auth'
-	),
-	'foursquare' => array(
-		'class' => 'FoursquareAuthenticationModule',
-		'category_slug' => 'auth'
-	),
-	'github' => array(
-		'class' => 'GithubAuthenticationModule',
-		'category_slug' => 'auth'
-	),
-	'ohloh' => array(
-		'class' => 'OhlohAuthenticationModule',
-		'category_slug' => 'auth'
-	),
-	'mailchimp' => array(
-		'class' => 'MailChimpModule',
-		'experimental' => true,
-		'category_slug' => 'email'
-	),
-	'manual' => array(
-		'class' => 'ManualPaymentEngine',
-		'experimental' => true,
-		'category_slug' => 'payment'
-	),
-	'external_payment' => array(
-		'class' => 'ExternalPaymentEngine',
-		'experimental' => true,
-		'category_slug' => 'payment'
-	),
-	'stripe' => array(
-		'class' => 'StripePaymentEngine',
-		'experimental' => true,
-		'category_slug' => 'payment'
-	),
-);
-
 $ADMIN_SECTION = 'modules';
 require_once(__DIR__ . '/header.php');
 ?>
 <div class="span9">
 	<?php
-	foreach ($module_categories as $category_slug => $module_category) {
+	foreach (StartupAPIModule::$module_categories as $category_slug => $module_category) {
 		$category_modules = array();
-		foreach ($builtin_modules as $module_slug => $module) {
+		foreach (StartupAPIModule::$builtin_modules as $module_slug => $module) {
 			if ($module['category_slug'] == $category_slug && ($show_experimental || !array_key_exists('experimental', $module) || !$module['experimental'])
 			) {
 				$category_modules[$module_slug] = $module;

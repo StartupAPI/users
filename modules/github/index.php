@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__DIR__)).'/classes/OAuth2Module.php');
+namespace StartupAPI\Modules;
 
 /**
  * First register an app here: https://github.com/settings/applications/new
@@ -76,7 +76,7 @@ class GithubAuthenticationModule extends OAuth2AuthenticationModule
 					'User-Agent: ' . UserConfig::$appName . ' (Startup API v.' . StartupAPI::getVersion() . ')'
 				)
 			));
-		} catch (OAuth2Exception $ex) {
+		} catch (Exceptions\OAuth2Exception $ex) {
 			return null;
 		}
 

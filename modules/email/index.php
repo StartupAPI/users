@@ -1,4 +1,5 @@
 <?php
+namespace StartupAPI\Modules;
 
 /**
  * Email authentication module (UNFINISHED)
@@ -43,7 +44,7 @@ class EmailAuthenticationModule extends AuthenticationModule {
 	 *
 	 * @return EmailUserCredentials|null
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function getUserCredentials($user) {
 		$db = UserConfig::getDB();
@@ -52,13 +53,13 @@ class EmailAuthenticationModule extends AuthenticationModule {
 
 		if ($stmt = $db->prepare('SELECT email FROM u_users WHERE id = ?')) {
 			if (!$stmt->bind_param('i', $userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($email)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
@@ -68,7 +69,7 @@ class EmailAuthenticationModule extends AuthenticationModule {
 				return new EmailUserCredentials($email);
 			}
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return null;
@@ -79,7 +80,7 @@ class EmailAuthenticationModule extends AuthenticationModule {
 	 *
 	 * @return int Number of users with email address
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function getTotalConnectedUsers() {
 		$db = UserConfig::getDB();
@@ -88,16 +89,16 @@ class EmailAuthenticationModule extends AuthenticationModule {
 
 		if ($stmt = $db->prepare('SELECT count(*) AS conns FROM u_users WHERE email IS NOT NULL')) {
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($conns)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $conns;
@@ -187,7 +188,7 @@ class EmailAuthenticationModule extends AuthenticationModule {
 		}
 
 		if (count($errors) > 0) {
-			throw new InputValidationException('Validation failed', 0, $errors);
+			throw new Exceptions\Authentication\InputValidationException('Validation failed', 0, $errors);
 		}
 
 		// TODO check if code is good and log the user in
@@ -202,8 +203,8 @@ class EmailAuthenticationModule extends AuthenticationModule {
 	 *
 	 * @return null Never returns a user object
 	 *
-	 * @throws InputValidationException
-	 * @throws ExistingUserException
+	 * @throws Exceptions\Authentication\InputValidationException
+	 * @throws Exceptions\Authentication\ExistingUserException
 	 */
 	public function processRegistration($data, &$remember) {
 		$errors = array();
@@ -227,7 +228,7 @@ class EmailAuthenticationModule extends AuthenticationModule {
 		}
 
 		if (count($errors) > 0) {
-			throw new InputValidationException('Validation failed', 0, $errors);
+			throw new Exceptions\Authentication\InputValidationException('Validation failed', 0, $errors);
 		}
 
 		if (count(User::getUsersByEmailOrUsername($email)) > 0) {
@@ -235,7 +236,7 @@ class EmailAuthenticationModule extends AuthenticationModule {
 		}
 
 		if (count($errors) > 0) {
-			throw new ExistingUserException('User already exists', 0, $errors);
+			throw new Exceptions\Authentication\ExistingUserException('User already exists', 0, $errors);
 		}
 
 		// ok, let's create a user
@@ -294,7 +295,7 @@ class EmailAuthenticationModule extends AuthenticationModule {
 		}
 
 		if (count($errors) > 0) {
-			throw new InputValidationException('Validation failed', 0, $errors);
+			throw new Exceptions\Authentication\InputValidationException('Validation failed', 0, $errors);
 		}
 
 		$user->setName($name);

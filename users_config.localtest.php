@@ -1,4 +1,6 @@
 <?php
+namespace StartupAPI;
+
 /**
 
 !!!! DO NOT USE THIS CONFIGURATION FILE !!!!
@@ -87,8 +89,7 @@ UserConfig::$admins[] = 1; // usually first user has ID of 1
  * Username and password registration configuration
  * just have these lines or comment them out if you don't want regular form registration
  */
-UserConfig::loadModule('usernamepass');
-new UsernamePasswordAuthenticationModule();
+new Modules\UsernamePasswordAuthenticationModule();
 
 /**
  * Facebook Connect configuration
@@ -96,8 +97,7 @@ new UsernamePasswordAuthenticationModule();
  * Click "Edit settings" -> "Website with Facebook Login" and enter your site's URL
  * And then uncomment two lines below and copy API Key and App Secret
  */
-#UserConfig::loadModule('facebook');
-#new FacebookAuthenticationModule('...api.key.goes.here...', '...api.secret.goes.here...');
+#new Modules\FacebookAuthenticationModule('...api.key.goes.here...', '...api.secret.goes.here...');
 
 /**
  * Twitter Authentication configuration
@@ -110,8 +110,7 @@ new UsernamePasswordAuthenticationModule();
  *
  * And then uncomment two lines below and copy API Key and App Secret
  */
-#UserConfig::loadModule('twitter');
-#new TwitterAuthenticationModule('...api.key.goes.here...', '...api.secret.goes.here...');
+#new Modules\TwitterAuthenticationModule('...api.key.goes.here...', '...api.secret.goes.here...');
 
 /**
  * Google OAuth Authentication configuration
@@ -122,8 +121,7 @@ new UsernamePasswordAuthenticationModule();
  * 	See up-to-date list of scopes here: http://code.google.com/apis/gdata/faq.html#AuthScopes
  *	(Google Contacts API scope is required and is included by default)
  */
-#UserConfig::loadModule('google_oauth');
-#new GoogleOAuthAuthenticationModule(
+#new Modules\GoogleOAuthAuthenticationModule(
 #	'...OAuth.key.goes.here...',
 #	'...OAuth.secret.goes.here...',
 #	array(
@@ -151,24 +149,21 @@ new UsernamePasswordAuthenticationModule();
  * Click red "Register OAuth Consumer" button on the right and enter your site's name and URL
  * And then uncomment two lines below and copy API Key and App Secret
  */
-#UserConfig::loadModule('meetup');
-#new MeetupAuthenticationModule('...OAuth.key.goes.here...', '...OAuth.secret.goes.here...');
+#new Modules\MeetupAuthenticationModule('...OAuth.key.goes.here...', '...OAuth.secret.goes.here...');
 
 /**
  * LinkedIn Authentication configuration
  * Register your app here: https://www.linkedin.com/secure/developer
  * And then uncomment two lines below and copy API Key and Secret Key
  */
-#UserConfig::loadModule('linkedin');
-#new LinkedInAuthenticationModule('...OAuth.key.goes.here...', '...OAuth.secret.goes.here...');
+#new Modules\LinkedInAuthenticationModule('...OAuth.key.goes.here...', '...OAuth.secret.goes.here...');
 
 /**
  * Etsy Authentication configuration
  * Register your app here: https://www.etsy.com/developers/register
  * And then uncomment two lines below and copy API Key and App Secret
  */
-#UserConfig::loadModule('etsy');
-#new EtsyAuthenticationModule('...OAuth.key.goes.here...', '...OAuth.secret.goes.here...');
+#new Modules\EtsyAuthenticationModule('...OAuth.key.goes.here...', '...OAuth.secret.goes.here...');
 
 
 /* ========================================================================
@@ -189,8 +184,7 @@ new UsernamePasswordAuthenticationModule();
  *
  * More modules to come (e.g. PayPal, Amazon & etc)
  */
-#UserConfig::loadModule('manual');
-#new ManualPaymentEngine();
+#new Modules\ManualPaymentEngine();
 
 /**
  * Configure your subscription plans  and payment schedules in addition to a default free subscription

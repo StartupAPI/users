@@ -41,7 +41,7 @@ if (array_key_exists('recover', $_POST)) {
 
 		exit;
 	} else {
-		throw new StartupAPIException('Can\'t render temporary password email, check if UserConfig::$onRenderTemporaryPasswordEmail is set');
+		throw new Exceptions\StartupAPIException('Can\'t render temporary password email, check if UserConfig::$onRenderTemporaryPasswordEmail is set');
 	}
 }
 

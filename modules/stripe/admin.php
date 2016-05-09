@@ -135,22 +135,22 @@
         'FROM u_accounts AS a LEFT JOIN u_account_charge AS c '.
         'ON c.account_id = a.id WHERE engine_slug = "PaymentEngine_Manual" '.(is_null($search) ? '' : 'AND name like ? ').
         'GROUP BY a.id ORDER BY '.$sortby.' LIMIT '.$perpage.' OFFSET '.$pagenumber * $perpage))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
       if(!is_null($search)) {
         $search_like = '%'.$search.'%';
         if (!$stmt->bind_param('s',$search_like)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
       }
 
       if (!$stmt->execute()) {
-		throw new DBExecuteStmtException($db, $stmt);
+		throw new Exceptions\DBExecuteStmtException($db, $stmt);
 	  }
 
       if (!$stmt->bind_result($id, $name, $plan_slug, $schedule_slug, $active, $balance)) {
-		throw new DBBindResultException($db, $stmt);
+		throw new Exceptions\DBBindResultException($db, $stmt);
 	  }
 
       $accounts = array();

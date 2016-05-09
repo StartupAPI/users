@@ -1,11 +1,6 @@
 <?php
+namespace StartupAPI;
 
-require_once(dirname(__DIR__) . '/global.php');
-require_once(__DIR__ . '/Account.php');
-require_once(__DIR__ . '/Badge.php');
-require_once(__DIR__ . '/CookieStorage.php');
-require_once(__DIR__ . '/CampaignTracker.php');
-require_once(__DIR__ . '/Invitation.php');
 require_once(dirname(__DIR__) . '/swiftmailer/lib/swift_required.php');
 
 /**
@@ -152,7 +147,7 @@ class User {
 	/**
 	 * Updates user activity when user returns to the site more then a day after last access
 	 *
-	 * @throws StartupAPIException
+	 * @throws Exceptions\StartupAPIException
 	 *
 	 * @internal
 	 */
@@ -166,7 +161,7 @@ class User {
 
 		$last = $storage->fetch(UserConfig::$last_login_key);
 		if (!$storage->store(UserConfig::$last_login_key, time())) {
-			throw new StartupAPIException(implode('; ', $storage->errors));
+			throw new Exceptions\StartupAPIException(implode('; ', $storage->errors));
 		}
 
 		$user = self::get();
@@ -186,7 +181,7 @@ class User {
 	/**
 	 * Sets user's referrer based on CampaignTracker's information
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 *
 	 * @internal Should not be used other then by login methods
 	 */
@@ -200,15 +195,15 @@ class User {
 
 		if ($stmt = $db->prepare('UPDATE u_users SET referer = ? WHERE id = ?')) {
 			if (!$stmt->bind_param('si', $referer, $this->userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 	}
 
@@ -217,7 +212,7 @@ class User {
 	 *
 	 * @return string Referer URL
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function getReferer() {
 		$db = UserConfig::getDB();
@@ -226,19 +221,19 @@ class User {
 
 		if ($stmt = $db->prepare('SELECT referer FROM u_users WHERE id = ?')) {
 			if (!$stmt->bind_param('i', $this->userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->bind_result($referer)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->fetch();
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $referer;
@@ -251,7 +246,7 @@ class User {
 	 *
 	 * @return array Array with URLs as keys and values are arrays of users
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getReferers($days = 30) {
 		$db = UserConfig::getDB();
@@ -260,13 +255,13 @@ class User {
 
 		if ($stmt = $db->prepare('SELECT referer, id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE referer IS NOT NULL AND regtime > DATE_SUB(NOW(), INTERVAL ? DAY) ORDER BY regtime DESC')) {
 			if (!$stmt->bind_param('i', $days)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($referer, $userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -275,7 +270,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $sources;
@@ -284,7 +279,7 @@ class User {
 	/**
 	 * Sets user's campaign they came from
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 *
 	 * @internal Used by login/registration scripts to record user's campaign
 	 */
@@ -331,15 +326,15 @@ class User {
 			reg_cmp_name_id = ?
 			WHERE id = ?')) {
 			if (!$stmt->bind_param('sssssi', $cmp_source_id, $cmp_medium_id, $cmp_keywords_id, $cmp_content_id, $cmp_name_id, $this->userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 	}
 
@@ -348,7 +343,7 @@ class User {
 	 *
 	 * @return array Array of campaign parameters
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function getCampaign() {
 		$db = UserConfig::getDB();
@@ -364,13 +359,13 @@ class User {
 				LEFT JOIN u_cmp_source AS cmp_source ON users.reg_cmp_source_id = cmp_source.id
 			WHERE users.id = ?')) {
 			if (!$stmt->bind_param('i', $this->userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($cmp_name, $cmp_content, $cmp_keywords, $cmp_medium, $cmp_source)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE) {
@@ -383,7 +378,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $campaign;
@@ -396,7 +391,7 @@ class User {
 	 *
 	 * @return array Array of campaign users data
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getCampaigns($days = 30) {
 		$db = UserConfig::getDB();
@@ -420,13 +415,13 @@ class User {
 				)
 				ORDER BY regtime DESC')) {
 			if (!$stmt->bind_param('i', $days)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($cmp_name, $cmp_content, $cmp_keywords, $cmp_medium, $cmp_source, $userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -451,7 +446,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $campaigns;
@@ -477,7 +472,7 @@ class User {
 	 *
 	 * @return Invitation
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function getInvitation() {
 		return Invitation::getUserInvitation($this);
@@ -486,7 +481,7 @@ class User {
 	/**
 	 * This method is called when new user is created
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	private function init() {
 		$invitation_code = $_SESSION[UserConfig::$invitation_code_key];
@@ -508,14 +503,14 @@ class User {
 
 		if ($stmt = $db->prepare('INSERT INTO u_user_preferences (user_id) VALUES (?)')) {
 			if (!$stmt->bind_param('i', $userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt, "Can't update user preferences (set current account)");
+				throw new Exceptions\DBExecuteStmtException($db, $stmt, "Can't update user preferences (set current account)");
 			}
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db, "Can't update user preferences (set current account)");
+			throw new Exceptions\DBPrepareStmtException($db, "Can't update user preferences (set current account)");
 		}
 
 		$invitation_account = null;
@@ -568,7 +563,7 @@ class User {
 	 *
 	 * @return boolean Is code associated with a user or not
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function verifyEmailLinkCode($code, User $user = null) {
 		$db = UserConfig::getDB();
@@ -604,24 +599,24 @@ class User {
 		if ($stmt = $db->prepare($query)) {
 			if (is_null($user)) {
 				if (!$stmt->bind_param('si', $code, UserConfig::$emailVerificationCodeExpiresInDays)) {
-					throw new DBBindParamException($db, $stmt);
+					throw new Exceptions\DBBindParamException($db, $stmt);
 				}
 			} else {
 				$user_id = $user->getID();
 
 				if (!$stmt->bind_param('isi', $user_id, $code, UserConfig::$emailVerificationCodeExpiresInDays)) {
-					throw new DBBindParamException($db, $stmt);
+					throw new Exceptions\DBBindParamException($db, $stmt);
 				}
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$verified = ($db->affected_rows == 1);
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $verified;
@@ -632,7 +627,7 @@ class User {
 	 *
 	 * Generates a new verification code and sends it to the user's email address
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function sendEmailVerificationCode() {
 		$email = $this->getEmail();
@@ -652,15 +647,15 @@ class User {
 										email_verification_code_time = now()
 									WHERE id = ?')) {
 			if (!$stmt->bind_param('si', $code, $this->userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		$verification_link = UserConfig::$USERSROOTFULLURL . '/verify_email.php?code=' . urlencode($code);
@@ -721,7 +716,7 @@ class User {
 	 *
 	 * @return User Newly created user object
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function createNewFacebookUser($name, $fb_id, $me = null) {
 		$name = mb_convert_encoding($name, 'UTF-8');
@@ -737,17 +732,17 @@ class User {
 
 		if ($stmt = $db->prepare("INSERT INTO u_users (name, regmodule, tos_version, email, fb_id) VALUES (?, 'facebook', ?, ?, ?)")) {
 			if (!$stmt->bind_param('sisi', $name, UserConfig::$currentTOSVersion, $email, $fb_id)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			$id = $stmt->insert_id;
 
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		$user = self::getUser($id);
@@ -773,7 +768,7 @@ class User {
 	 *
 	 * @return User Newly created user object
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function createNewWithoutCredentials(StartupAPIModule $module, $name, $email = null) {
 		$module_id = $module->getID();
@@ -791,16 +786,16 @@ class User {
 
 		if ($stmt = $db->prepare('INSERT INTO u_users (name, email, regmodule, tos_version) VALUES (?, ?, ?, ?)')) {
 			if (!$stmt->bind_param('sssi', $name, $email, $module_id, UserConfig::$currentTOSVersion)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			$id = $stmt->insert_id;
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		$user = self::getUser($id);
@@ -824,7 +819,7 @@ class User {
 	 *
 	 * @return User Newly created user object
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function createNew($name, $username, $email, $password) {
 		$name = mb_convert_encoding($name, 'UTF-8');
@@ -840,16 +835,16 @@ class User {
 
 		if ($stmt = $db->prepare("INSERT INTO u_users (regmodule, tos_version, name, username, email, pass, salt) VALUES ('userpass', ?, ?, ?, ?, ?, ?)")) {
 			if (!$stmt->bind_param('isssss', UserConfig::$currentTOSVersion, $name, $username, $email, $pass, $salt)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			$id = $stmt->insert_id;
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		$user = self::getUser($id);
@@ -864,7 +859,7 @@ class User {
 	/**
 	 * Deletes user from the system
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function delete() {
 
@@ -874,15 +869,15 @@ class User {
 
 		if ($stmt = $db->prepare('DELETE FROM u_users WHERE username = ?')) {
 			if (!$stmt->bind_param('s', $username)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 	}
 
@@ -891,7 +886,7 @@ class User {
 	 *
 	 * @return int Total number of users (including disabled users)
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getTotalUsers() {
 		$db = UserConfig::getDB();
@@ -900,16 +895,16 @@ class User {
 
 		if ($stmt = $db->prepare('SELECT COUNT(*) FROM u_users')) {
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($total)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $total;
@@ -925,7 +920,7 @@ class User {
 	 *
 	 * @return int Number of active users
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getActiveUsers($date = null) {
 		$db = UserConfig::getDB();
@@ -979,21 +974,21 @@ class User {
 		if ($stmt = $db->prepare($query)) {
 			if (!is_null($date)) {
 				if (!$stmt->bind_param('ss', $date, $date)) {
-					throw new DBBindParamException($db, $stmt);
+					throw new Exceptions\DBBindParamException($db, $stmt);
 				}
 			}
 
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($total)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $total;
@@ -1006,7 +1001,7 @@ class User {
 	 *
 	 * @return array Array of active users numbers for the requested period
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getDailyActiveUsers($lastndays = null) {
 		$db = UserConfig::getDB();
@@ -1028,16 +1023,16 @@ class User {
 						' WHERE time > DATE_SUB(NOW(), INTERVAL ' . $lastndays . ' DAY)' : '')
 		)) {
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($start_date, $start_day, $start_month, $start_year)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			$stmt->fetch();
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		// no activities recorded yet
@@ -1051,10 +1046,10 @@ class User {
 				((!is_null($lastndays) && is_int($lastndays)) ?
 						' WHERE day > DATE_SUB(NOW(), INTERVAL ' . $lastndays . ' DAY)' : ''))) {
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($date, $active_users)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -1063,7 +1058,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		$timestamp = mktime(0, 0, 1, $start_month, $start_day, $start_year);
@@ -1103,12 +1098,12 @@ class User {
 
 			if ($stmt = $db->prepare($query)) {
 				if (!$stmt->execute()) {
-					throw new DBExecuteStmtException($db, $stmt);
+					throw new Exceptions\DBExecuteStmtException($db, $stmt);
 				}
 
 				$stmt->close();
 			} else {
-				throw new DBPrepareStmtException($db);
+				throw new Exceptions\DBPrepareStmtException($db);
 			}
 		}
 
@@ -1122,7 +1117,7 @@ class User {
 	 *
 	 * @return array Array of activity counters for all dates when activity was recorded
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 *
 	 * @internal Used in admin dashboard
 	 */
@@ -1133,13 +1128,13 @@ class User {
 
 		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, count(*) AS cnt FROM u_activity WHERE activity_id = ? GROUP BY activity_date')) {
 			if (!$stmt->bind_param('i', $activityid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($date, $cnt)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -1148,7 +1143,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $daily_activity;
@@ -1163,7 +1158,7 @@ class User {
 	 *
 	 * @return array Array of arrays (data, activity, total) for all dates when activities were recorded
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 *
 	 * @internal Used in admin dashboard
 	 */
@@ -1181,10 +1176,10 @@ class User {
 
 		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total FROM u_activity ' . $where . 'GROUP BY activity_date, activity_id')) {
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($date, $id, $total)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -1193,7 +1188,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $daily_activity;
@@ -1203,7 +1198,7 @@ class User {
 	 * Aggregates activity points for users, should be ran within cron job
 	 * on a daily basis or more often if needed.
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function aggregateActivityPoints() {
 		$db = UserConfig::getDB();
@@ -1234,24 +1229,24 @@ class User {
 					{
 						if (!$stmt->execute())
 						{
-							throw new DBExecuteStmtException($db, $stmt);
+							throw new Exceptions\DBExecuteStmtException($db, $stmt);
 						}
 
 						$stmt->close();
 					} else {
-						throw new DBException($db);
+						throw new Exceptions\DBException($db);
 					}
 
 				} else {
-					throw new DBException($db);
+					throw new Exceptions\DBException($db);
 				}
 			} else {
-				throw new DBException($db);
+				throw new Exceptions\DBException($db);
 			}
 		}
 		else
 		{
-			throw new DBException($db);
+			throw new Exceptions\DBException($db);
 		}
 	}
 
@@ -1260,7 +1255,7 @@ class User {
 	 *
 	 * @return array Array of registration numbers for each date
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 *
 	 * @internal Used in admin dashboard
 	 */
@@ -1271,10 +1266,10 @@ class User {
 
 		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, count(*) AS regs FROM u_users GROUP BY regdate')) {
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($regdate, $regs)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -1283,7 +1278,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $dailyregs;
@@ -1294,7 +1289,7 @@ class User {
 	 *
 	 * @return array Array of arrays of registration numbers for each module for each date
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 *
 	 * @internal Used in admin dashboard
 	 */
@@ -1305,10 +1300,10 @@ class User {
 
 		if ($stmt = $db->prepare('SELECT CAST(regtime AS DATE) AS regdate, regmodule, count(*) AS reg FROM u_users GROUP BY regdate, regmodule')) {
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($date, $module, $regs)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch()) {
@@ -1317,7 +1312,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $dailyregs;
@@ -1335,7 +1330,7 @@ class User {
 	 *
 	 * @return array Array of recent registration counters for each authentication module
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 *
 	 * @internal Used on admin dashboard
 	 */
@@ -1346,10 +1341,10 @@ class User {
 
 		if ($stmt = $db->prepare('SELECT regmodule, count(*) AS reg FROM u_users u WHERE regtime > DATE_SUB(NOW(), INTERVAL 30 DAY) GROUP BY regmodule')) {
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($module, $reg)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch()) {
@@ -1358,7 +1353,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $regs;
@@ -1413,7 +1408,7 @@ class User {
 	 *
 	 * @return User[] Array of user objects
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 *
 	 * @internal Used in admin dashboard to show users
 	 */
@@ -1462,13 +1457,13 @@ class User {
 			}
 
 			if (!$result) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -1477,7 +1472,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $users;
@@ -1495,7 +1490,7 @@ class User {
 	 *
 	 * @return User[] Array of user objects
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 *
 	 * @internal Used in admin dashboard
 	 */
@@ -1513,13 +1508,13 @@ class User {
 
 		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE INSTR(name, ?) > 0 OR INSTR(username, ?) > 0 OR INSTR(email, ?) > 0 ORDER BY ' . $orderby . ' DESC LIMIT ?, ?')) {
 			if (!$stmt->bind_param('sssii', $search, $search, $search, $first, $perpage)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -1528,7 +1523,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $users;
@@ -1547,7 +1542,7 @@ class User {
 	 *
 	 * @return array Array of (time, user_id, activity_id) records
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 *
 	 * @internal Used in admin dashboard
 	 */
@@ -1583,13 +1578,13 @@ class User {
 
 		if ($stmt = $db->prepare($query)) {
 			if (!$stmt->bind_param('ii', $first, $perpage)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($time, $user_id, $activity_id)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -1598,7 +1593,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $activities;
@@ -1613,7 +1608,7 @@ class User {
 	 *
 	 * @return array Array of (time, user_id) records
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 *
 	 * @internal Used in admin dashboard
 	 */
@@ -1633,13 +1628,13 @@ class User {
 
 		if ($stmt = $db->prepare($query)) {
 			if (!$stmt->bind_param('iii', $activityid, $first, $perpage)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($time, $user_id)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -1648,7 +1643,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $activities;
@@ -1663,7 +1658,7 @@ class User {
 	 *
 	 * @return array Array of User objects
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getUsersByEmailOrUsername($nameoremail) {
 		$db = UserConfig::getDB();
@@ -1674,13 +1669,13 @@ class User {
 
 		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE username = ? OR email = ?')) {
 			if (!$stmt->bind_param('ss', $nameoremail, $nameoremail)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -1689,7 +1684,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $users;
@@ -1704,7 +1699,7 @@ class User {
 	 *
 	 * @return array Array of activity_id/count pairs
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 *
 	 * @internal Used in admin dashboard
 	 */
@@ -1722,10 +1717,10 @@ class User {
 
 		if ($stmt = $db->prepare($query)) {
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($activity_id, $cnt)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -1734,7 +1729,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $stats;
@@ -1749,7 +1744,7 @@ class User {
 	 *
 	 * @return array Array of (time, user_id, activity_id) records
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 *
 	 * @internal Used in admin dashboard
 	 */
@@ -1780,13 +1775,13 @@ class User {
 
 		if ($stmt = $db->prepare($query)) {
 			if (!$stmt->bind_param('iii', $this->userid, $first, $perpage)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($time, $user_id, $activity_id)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -1795,7 +1790,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $activities;
@@ -1810,7 +1805,7 @@ class User {
 	 *
 	 * @return string
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function generateTemporaryPassword() {
 		$db = UserConfig::getDB();
@@ -1820,15 +1815,15 @@ class User {
 
 		if ($stmt = $db->prepare('UPDATE u_users SET temppass = ?, temppasstime = now() WHERE id = ?')) {
 			if (!$stmt->bind_param('si', $temppass, $this->userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $temppass;
@@ -1839,22 +1834,22 @@ class User {
 	 *
 	 * @see generateTemporaryPassword
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function resetTemporaryPassword() {
 		$db = UserConfig::getDB();
 
 		if ($stmt = $db->prepare('UPDATE u_users SET temppass = null, temppasstime = null WHERE id = ?')) {
 			if (!$stmt->bind_param('s', $this->userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 	}
 
@@ -1865,7 +1860,7 @@ class User {
 	 *
 	 * @param StartupAPIModule $module Startup API Module object
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 *
 	 * @deprecated
 	 */
@@ -1876,15 +1871,15 @@ class User {
 
 		if ($stmt = $db->prepare('UPDATE u_users SET regmodule = ? WHERE id = ?')) {
 			if (!$stmt->bind_param('si', $module_id, $this->userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 	}
 
@@ -1901,7 +1896,7 @@ class User {
 	 *
 	 * @return User[] Array of User objects
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getUsersByIDs($userids) {
 		$db = UserConfig::getDB();
@@ -1923,10 +1918,10 @@ class User {
 
 		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE id IN (' . $idlist . ')')) {
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
@@ -1935,7 +1930,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $users;
@@ -1952,7 +1947,7 @@ class User {
 	 *
 	 * @return User|null User object or null if username and password do not match
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getUserByUsernamePassword($entered_username, $entered_password) {
 		$db = UserConfig::getDB();
@@ -1961,13 +1956,13 @@ class User {
 
 		if ($stmt = $db->prepare('SELECT id, status, name, username, email, pass, salt, temppass, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE username = ?')) {
 			if (!$stmt->bind_param('s', $entered_username)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($id, $status, $name, $username, $email, $pass, $salt, $temppass, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE) {
@@ -1988,19 +1983,19 @@ class User {
 				$user->resetTemporaryPassword();
 			}
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		if (is_null($user)) {
 			if ($stmt = $db->prepare('SELECT id, status, name, username, email, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE username = ? AND temppass = ? AND temppasstime > DATE_SUB(NOW(), INTERVAL 1 DAY)')) {
 				if (!$stmt->bind_param('ss', $entered_username, $entered_password)) {
-					throw new DBBindParamException($db, $stmt);
+					throw new Exceptions\DBBindParamException($db, $stmt);
 				}
 				if (!$stmt->execute()) {
-					throw new DBExecuteStmtException($db, $stmt);
+					throw new Exceptions\DBExecuteStmtException($db, $stmt);
 				}
 				if (!$stmt->bind_result($id, $status, $name, $username, $email, $fb_id, $regtime, $points, $is_email_verified)) {
-					throw new DBBindResultException($db, $stmt);
+					throw new Exceptions\DBBindResultException($db, $stmt);
 				}
 
 				if ($stmt->fetch() === TRUE) {
@@ -2014,7 +2009,7 @@ class User {
 					$user->save();
 				}
 			} else {
-				throw new DBPrepareStmtException($db);
+				throw new Exceptions\DBPrepareStmtException($db);
 			}
 		} else {
 			$user->resetTemporaryPassword();
@@ -2039,7 +2034,7 @@ class User {
 	 *
 	 * @return User|null User object if user with such ID does not exist
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getUserByFacebookID($fb_id) {
 		$db = UserConfig::getDB();
@@ -2048,13 +2043,13 @@ class User {
 
 		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE fb_id = ?')) {
 			if (!$stmt->bind_param('i', $fb_id)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $regtime, $points, $is_email_verified)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE) {
@@ -2063,7 +2058,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $user;
@@ -2076,7 +2071,7 @@ class User {
 	 *
 	 * @return User|null User object
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public static function getUser($userid) {
 		$db = UserConfig::getDB();
@@ -2085,13 +2080,13 @@ class User {
 
 		if ($stmt = $db->prepare('SELECT status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE id = ?')) {
 			if (!$stmt->bind_param('i', $userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE) {
@@ -2100,7 +2095,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $user;
@@ -2111,7 +2106,7 @@ class User {
 	 *
 	 * @param string $return Return URL
 	 *
-	 * @throws StartupAPIException
+	 * @throws Exceptions\StartupAPIException
 	 */
 	private static function setReturn($return) {
 		$storage = new MrClay_CookieStorage(array(
@@ -2122,7 +2117,7 @@ class User {
 				));
 
 		if (!$storage->store(UserConfig::$session_return_key, $return)) {
-			throw new StartupAPIException(implode('; ', $storage->errors));
+			throw new Exceptions\StartupAPIException(implode('; ', $storage->errors));
 		}
 	}
 
@@ -2345,13 +2340,13 @@ class User {
 	 *
 	 * @param string $username User's login name
 	 *
-	 * @throws StartupAPIException
+	 * @throws Exceptions\StartupAPIException
 	 */
 	public function setUsername($username) {
 		if (is_null($this->username)) {
 			$this->username = $username;
 		} else {
-			throw new StartupAPIException('This user already has username set.');
+			throw new Exceptions\StartupAPIException('This user already has username set.');
 		}
 	}
 
@@ -2475,20 +2470,20 @@ class User {
 	 *
 	 * @return boolean True if password matches
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function checkPass($password) {
 		$db = UserConfig::getDB();
 
 		if ($stmt = $db->prepare('SELECT pass, salt FROM u_users WHERE id = ?')) {
 			if (!$stmt->bind_param('i', $this->userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($pass, $salt)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE) {
@@ -2497,7 +2492,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return false;
@@ -2508,7 +2503,7 @@ class User {
 	 *
 	 * @param string $password New password
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function setPass($password) {
 		$db = UserConfig::getDB();
@@ -2518,15 +2513,15 @@ class User {
 
 		if ($stmt = $db->prepare('UPDATE u_users SET pass = ?, salt = ? WHERE id = ?')) {
 			if (!$stmt->bind_param('ssi', $pass, $salt, $this->userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 	}
 
@@ -2542,19 +2537,19 @@ class User {
 				WHERE user_id = ?')
 		) {
 			if (!$stmt->bind_param('i', $userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->bind_result($json)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->fetch();
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		$settings = json_decode($json, true);
@@ -2574,22 +2569,22 @@ class User {
 			SET app_settings_json = ? WHERE user_id = ?')
 		) {
 			if (!$stmt->bind_param('si', $json, $this->userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 	}
 
 	/**
 	 * Persists user's data into the database
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function save() {
 		$db = UserConfig::getDB();
@@ -2608,15 +2603,15 @@ class User {
 
 		if ($stmt = $db->prepare('UPDATE u_users SET status = ?, username = ?, name = ?, email = ?, email_verified = ?, requirespassreset = ?, fb_id = ? WHERE id = ?')) {
 			if (!$stmt->bind_param('isssiiii', $status, $username, $name, $email, $email_verifiednum, $passresetnum, $this->fbid, $this->userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		$old_email = $old_user->getEmail();
@@ -2637,7 +2632,7 @@ class User {
 	 *
 	 * @param boolean $remember Set to true to remember user beyond browser session (if globally enabled)
 	 *
-	 * @throws StartupAPIException
+	 * @throws Exceptions\StartupAPIException
 	 */
 	public function setSession($remember) {
 		$storage = new MrClay_CookieStorage(array(
@@ -2649,7 +2644,7 @@ class User {
 				));
 
 		if (!$storage->store(UserConfig::$session_userid_key, $this->userid)) {
-			throw new StartupAPIException(implode('; ', $storage->errors));
+			throw new Exceptions\StartupAPIException(implode('; ', $storage->errors));
 		}
 	}
 
@@ -2677,7 +2672,7 @@ class User {
 	 *
 	 * @return User|null New user object with current user associated with it as impersonator
 	 *
-	 * @throws StartupAPIException
+	 * @throws Exceptions\StartupAPIException
 	 */
 	public function impersonate($user) {
 		if (is_null($user) || $user->isTheSameAs($this)) {
@@ -2692,11 +2687,11 @@ class User {
 				));
 
 		if (!$this->isAdmin()) {
-			throw new StartupAPIException('Not admin (userid: ' . $this->userid . ') is trying to impersonate another user (userid: ' . $user->userid . ')');
+			throw new Exceptions\StartupAPIException('Not admin (userid: ' . $this->userid . ') is trying to impersonate another user (userid: ' . $user->userid . ')');
 		}
 
 		if (!$storage->store(UserConfig::$impersonation_userid_key, $user->userid)) {
-			throw new StartupAPIException(implode('; ', $storage->errors));
+			throw new Exceptions\StartupAPIException(implode('; ', $storage->errors));
 		}
 
 		$user->impersonator = $this;
@@ -2731,7 +2726,7 @@ class User {
 	 * Records user activity
 	 * @param int $activity_id ID of activity performed by the user
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function recordActivity($activity_id) {
 		if ($this->isImpersonated()) {
@@ -2745,28 +2740,28 @@ class User {
 
 		if ($stmt = $db->prepare('INSERT INTO u_activity (user_id, activity_id) VALUES (?, ?)')) {
 			if (!$stmt->bind_param('ii', $this->userid, $activity_id)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		if ($stmt = $db->prepare('UPDATE u_users SET points = points + ? WHERE id = ?')) {
 			if (!$stmt->bind_param('ii', UserConfig::$activities[$activity_id][1], $this->userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		$this->triggerActivityBadge($activity_id);
@@ -2789,7 +2784,7 @@ class User {
 	 *
 	 * @return int Number of times any of the activities requested have happened
 	 *
-	 * @throws DBException
+	 * @throws Exceptions\DBException
 	 */
 	public function getActivitiesCount($activity_ids, $period = null) {
 		$db = UserConfig::getDB();
@@ -2805,13 +2800,13 @@ class User {
 		if ($stmt = $db->prepare('SELECT count(*) as count FROM u_activity
 									WHERE user_id = ? AND activity_id IN (' . $in . ')')) {
 			if (!$stmt->bind_param('i', $this->userid)) {
-				throw new DBBindParamException($db, $stmt);
+				throw new Exceptions\DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
+				throw new Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($count)) {
-				throw new DBBindResultException($db, $stmt);
+				throw new Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE) {
@@ -2820,7 +2815,7 @@ class User {
 
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $activity_count;
@@ -2840,8 +2835,8 @@ class User {
 	 *
 	 * @return array Array of Account, role pairs
 	 *
-	 * @throws DBException
-	 * @throws StartupAPIException
+	 * @throws Exceptions\DBException
+	 * @throws Exceptions\StartupAPIException
 	 */
 	public function getAccountsAndRoles() {
 		return Account::getUserAccountsAndRoles($this);

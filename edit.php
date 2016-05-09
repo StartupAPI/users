@@ -1,7 +1,7 @@
 <?php
+namespace StartupAPI;
 
 require_once(__DIR__ . '/global.php');
-require_once(__DIR__ . '/classes/User.php');
 
 UserConfig::$IGNORE_REQUIRED_EMAIL_VERIFICATION = true;
 
@@ -43,9 +43,9 @@ if (array_key_exists('save', $_POST)) {
 			}
 
 			exit;
-		} catch (InputValidationException $ex) {
+		} catch (Exceptions\Authentication\InputValidationException $ex) {
 			$errors[$current_module->getID()] = $ex->getErrors();
-		} catch (ExistingUserException $ex) {
+		} catch (Exceptions\Authentication\ExistingUserException $ex) {
 			$user_exists = true;
 			$errors[$current_module->getID()] = $ex->getErrors();
 		}

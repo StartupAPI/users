@@ -26,15 +26,15 @@ class TransactionLogger {
 
 		if (!($stmt = $db->prepare('INSERT INTO u_transaction_log
 			(date_time, account_id, engine_slug, amount, message) VALUES (NOW(), ?, ?, ?, ?)'))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		if (!$stmt->bind_param('isds', $account_id, $engine_slug, $amount, $message)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		$id = $db->insert_id;
@@ -69,7 +69,7 @@ class TransactionLogger {
 				(is_null($offset) ? '' : ' OFFSET ?');
 
 		if (!($stmt = $db->prepare($query))) {
-			throw new DBPrepareStmtException($db);
+			throw new Exceptions\DBPrepareStmtException($db);
 		}
 
 		$params = array();
@@ -90,15 +90,15 @@ class TransactionLogger {
 		}
 
 		if (!call_user_func_array(array($stmt, 'bind_param'), $params)) {
-			throw new DBBindParamException($db, $stmt);
+			throw new Exceptions\DBBindParamException($db, $stmt);
 		}
 
 		if (!$stmt->execute()) {
-			throw new DBExecuteStmtException($db, $stmt);
+			throw new Exceptions\DBExecuteStmtException($db, $stmt);
 		}
 
 		if (!$stmt->bind_result($t_id, $date_time, $engine_slug, $amount, $message)) {
-			throw new DBBindResultException($db, $stmt);
+			throw new Exceptions\DBBindResultException($db, $stmt);
 		}
 
 		$t = array();
