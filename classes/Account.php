@@ -1232,7 +1232,7 @@ class Account {
 			$old_engine_slug = is_null($this->paymentEngine) ? NULL : $this->paymentEngine->getSlug();
 
 			if ($this->plan) {
-				$this->plan->deactivateHook($this->id, $plan_slug, $schedule_slug);
+				$this->plan->deactivateHook($this->id, $plan_slug, $schedule_slug, $engine_slug);
 			}
 
 			$this->plan = $new_plan;

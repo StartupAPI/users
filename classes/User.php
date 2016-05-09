@@ -482,17 +482,19 @@ class User {
 	 * @throws Exceptions\DBException
 	 */
 	private function init() {
-		$invitation_code = $_SESSION[UserConfig::$invitation_code_key];
-		unset($_SESSION[UserConfig::$invitation_code_key]);
-
 		$invitation = null;
-		if (!is_null($invitation_code)) {
-			$invitation = Invitation::getByCode($invitation_code);
-		}
+		if (array_key_exists(UserConfig::$invitation_code_key, $_SESSION)) {
+			$invitation_code = $_SESSION[UserConfig::$invitation_code_key];
+			unset($_SESSION[UserConfig::$invitation_code_key]);
 
-		if (!is_null($invitation)) {
-			$invitation->setUser($this);
-			$invitation->save();
+			if (!is_null($invitation_code)) {
+				$invitation = Invitation::getByCode($invitation_code);
+			}
+
+			if (!is_null($invitation)) {
+				$invitation->setUser($this);
+				$invitation->save();
+			}
 		}
 
 		$db = UserConfig::getDB();
@@ -662,7 +664,7 @@ class User {
 
 		$subject = UserConfig::$emailVerificationSubject;
 
-		$message = Swift_Message::newInstance($subject, $message_body);
+		$message = \Swift_Message::newInstance($subject, $message_body);
 		$message->setFrom(array(UserConfig::$supportEmailFromEmail => UserConfig::$supportEmailFromName));
 		$message->setTo(array($email => $name));
 		$message->setReplyTo(array(UserConfig::$supportEmailReplyTo));

@@ -54,7 +54,7 @@ if (UserConfig::$enableRegistration && array_key_exists('register', $_POST)) {
 		exit;
 	} catch (Exceptions\Authentication\InputValidationException $ex) {
 		$errors[$module->getID()] = $ex->getErrors();
-	} catch (Exceptions\ExistingUserException $ex) {
+	} catch (Exceptions\Authentication\ExistingUserException $ex) {
 		$user_exists = true;
 		$errors[$module->getID()] = $ex->getErrors();
 	}
