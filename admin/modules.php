@@ -1,8 +1,10 @@
 <?php
+namespace StartupAPI;
+
 require_once(__DIR__ . '/admin.php');
 
 // temporary switch to make it easy to see experimental modules
-$show_experimental = true;
+$show_experimental = array_key_exists('experimental', $_GET);
 
 $ADMIN_SECTION = 'modules';
 require_once(__DIR__ . '/header.php');
@@ -26,7 +28,7 @@ require_once(__DIR__ . '/header.php');
 		foreach ($category_modules as $module_slug => $module) {
 			$instances = array();
 			foreach (UserConfig::$all_modules as $installed_module) {
-				if (get_class($installed_module) == $module['class']) {
+				if (get_class($installed_module) == 'StartupAPI\\Modules\\' . $module['class']) {
 					$instances[] = $installed_module;
 				}
 			}
@@ -37,7 +39,7 @@ require_once(__DIR__ . '/header.php');
 				/*
 				 * Ignore experimental modules that are not installed
 				 */
-				if (!array_key_exists('experimental', $module) || !$module['experimental']) {
+				if ($show_experimental || !array_key_exists('experimental', $module) || !$module['experimental']) {
 					$not_installed_modules[$module_slug] = $module;
 				}
 			}
@@ -58,12 +60,10 @@ require_once(__DIR__ . '/header.php');
 			foreach ($category_modules as $module_slug => $module) {
 				?>
 				<?php
-				UserConfig::loadModule($module_slug);
-
 				$instances = array();
 				foreach (UserConfig::$all_modules as $installed_module) {
 					// checking if this built-in module was ever instantiated
-					if (get_class($installed_module) == $module['class']) {
+					if (get_class($installed_module) == 'StartupAPI\\Modules\\' . $module['class']) {
 						$instances[] = $installed_module;
 					}
 				}
@@ -111,7 +111,7 @@ require_once(__DIR__ . '/header.php');
 					?>
 					<div class="well well-small startupapi-module startupapi-module-not-installed">
 						<?php
-						$class = $module['class'];
+						$class = '\\StartupAPI\\Modules\\' . $module['class'];
 
 						// getting info from the class
 						$logo = $class::getModulesLogo(100);

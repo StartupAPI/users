@@ -53,8 +53,8 @@ abstract class StartupAPIModule implements StartupAPIModuleInterface {
 			'class' => 'TwitterAuthenticationModule',
 			'category_slug' => 'auth'
 		),
-		'google_oauth' => array(
-			'class' => 'GoogleOAuthAuthenticationModule',
+		'google' => array(
+			'class' => 'GoogleAuthenticationModule',
 			'category_slug' => 'auth'
 		),
 		'linkedin' => array(
@@ -77,6 +77,10 @@ abstract class StartupAPIModule implements StartupAPIModuleInterface {
 			'class' => 'GithubAuthenticationModule',
 			'category_slug' => 'auth'
 		),
+		'instagram' => array(
+			'class' => 'InstagramAuthenticationModule',
+			'category_slug' => 'auth'
+		),
 		'mailchimp' => array(
 			'class' => 'MailChimpModule',
 			'experimental' => true,
@@ -96,7 +100,7 @@ abstract class StartupAPIModule implements StartupAPIModuleInterface {
 			'class' => 'StripePaymentEngine',
 			'experimental' => true,
 			'category_slug' => 'payment'
-		),
+		)
 	);
 
 	/**

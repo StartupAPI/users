@@ -1,4 +1,6 @@
 <?php
+namespace StartupAPI;
+
 require_once(__DIR__ . '/admin.php');
 
 if (!array_key_exists('id', $_GET) || !$_GET['id']) {

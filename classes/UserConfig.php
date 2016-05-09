@@ -1119,7 +1119,7 @@ EOD;
 	 * @throws Exceptions\StartupAPIDeprecatedException
 	 */
 	public static function loadModule($modulename) {
-		throw new StartupAPIDeprecatedException('Module loading no longer needed, just instantiate the class');
+		throw new Exceptions\StartupAPIDeprecatedException('Module loading no longer needed, just instantiate the class');
 	}
 
 	/**

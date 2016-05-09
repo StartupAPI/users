@@ -1,4 +1,5 @@
 <?php
+namespace StartupAPI;
 
 /**
  * Helper class to facilitate logging for subscription transactions

@@ -1,4 +1,6 @@
 <?php
+namespace StartupAPI;
+
 /**
  * Abstract class for newsletter management modules to subclass
  *
@@ -17,7 +19,7 @@ abstract class EmailModule extends StartupAPIModule {
 		parent::__construct();
 
 		if (!is_null(UserConfig::$email_module)) {
-			throw new EmailModuleException("You can assign only one email module");
+			throw new Exceptions\Email\EmailModuleException("You can assign only one email module");
 		}
 
 		UserConfig::$email_module = $this;
@@ -80,41 +82,9 @@ abstract class EmailModule extends StartupAPIModule {
 					// update subscriber info
 					UserConfig::$email_module->updateSubscriber($old_user, $new_user);
 				}
-			} catch (EmailModuleException $e) {
+			} catch (Exceptions\Email\EmailModuleException $e) {
 				error_log($e."\n[User Info]: ".var_export($new_user, true));
 			}
 		}
 	}
 }
-
-/**
- * Generic Email Module Exception
- *
- * @package StartupAPI
- * @subpackage Email
- */
-class EmailModuleException extends Exception {}
-
-/**
- * Exception thrown when there are subscription problems
- *
- * @package StartupAPI
- * @subpackage Email
- */
-class EmailSubscriptionException extends EmailModuleException { }
-
-/**
- * Exception thrown when there are problem with updating subscriber information
- *
- * @package StartupAPI
- * @subpackage Email
- */
-class EmailSubscriberUpdateException extends EmailModuleException { }
-
-/**
- * Exception thrown when there are problems with unsubscribing a user
- *
- * @package StartupAPI
- * @subpackage Email
- */
-class EmailUnSubscriptionException extends EmailModuleException { }

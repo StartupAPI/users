@@ -1,4 +1,6 @@
 <?php
+namespace StartupAPI;
+
 require_once(__DIR__.'/admin.php');
 
 $ADMIN_SECTION = 'features';
@@ -112,7 +114,7 @@ foreach (Feature::getAll() as $feature) {
 </table>
 <?php
 } else {
-	?><div style="text-align: center; padding: 2em">No <a href="http://startupapi.org/StartupAPI/FeatureManagement" target="_blank">features</a> defined in this application</div><?php
+	?><div style="text-align: center; padding: 2em">No <a href="https://github.com/StartupAPI/users/wiki/Feature-Management" target="_blank">features</a> defined in this application</div><?php
 }
 
 ?>

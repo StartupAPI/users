@@ -9,7 +9,7 @@ namespace StartupAPI\Modules;
 /**
  * Payment engine using Stripe.com service
  */
-class StripePaymentEngine extends PaymentEngine {
+class StripePaymentEngine extends \StartupAPI\PaymentEngine {
 
 	/**
 	 * @var boolean Singleton flag
@@ -41,7 +41,7 @@ EOF;
 
 	public static function getModulesLogo($size = 100) {
 		if ($size == 100) {
-			return UserConfig::$USERSROOTURL . '/modules/stripe/images/logo_100x.png';
+			return \StartupAPI\UserConfig::$USERSROOTURL . '/modules/stripe/images/logo_100x.png';
 		}
 	}
 
@@ -162,7 +162,7 @@ EOF;
 	 */
 	public function renderTransactionLogDetails($transaction_id) {
 		$details = $this->expandTransactionDetails($transaction_id);
-		$operator = User::getUser($details['operator_id']);
+		$operator = \StartupAPI\User::getUser($details['operator_id']);
 		$name = is_null($operator) ? 'Unknown' : $operator->getName();
 		$source = is_null($details['funds_source']) ? 'Unknown' : $details['funds_source'];
 		$comment = is_null($details['comment']) ? '-' : $details['comment'];

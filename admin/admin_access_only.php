@@ -1,4 +1,6 @@
 <?php
+namespace StartupAPI;
+
 require_once(UserConfig::$header);
 
 ?><h2>Access Denied</h2>

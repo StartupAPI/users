@@ -8,9 +8,9 @@ namespace StartupAPI\Modules;
  * @package StartupAPI
  * @subpackage Authentication\Githib
  */
-class GithubAuthenticationModule extends OAuth2AuthenticationModule
+class GithubAuthenticationModule extends \StartupAPI\OAuth2AuthenticationModule
 {
-	protected $userCredentialsClass = 'GithubUserCredentials';
+	protected $userCredentialsClass = '\StartupAPI\Modules\GithubAuthenticationModule\GithubUserCredentials';
 
 	public function __construct($oAuth2ClientID, $oAuth2ClientSecret, $scopes = '')
 	{
@@ -62,7 +62,7 @@ class GithubAuthenticationModule extends OAuth2AuthenticationModule
 
 	public static function getModulesLogo($size = 100) {
 		if ($size == 100) {
-			return UserConfig::$USERSROOTURL . '/modules/github/images/octocat_100x.png';
+			return \StartupAPI\UserConfig::$USERSROOTURL . '/modules/github/images/octocat_100x.png';
 		}
 	}
 
@@ -73,10 +73,10 @@ class GithubAuthenticationModule extends OAuth2AuthenticationModule
 			$result = $credentials->makeOAuth2Request('https://api.github.com/user', 'GET', null, array(
 				CURLOPT_HTTPHEADER => array(
 					'Accept: application/json',
-					'User-Agent: ' . UserConfig::$appName . ' (Startup API v.' . StartupAPI::getVersion() . ')'
+					'User-Agent: ' . \StartupAPI\UserConfig::$appName . ' (Startup API v.' . StartupAPI::getVersion() . ')'
 				)
 			));
-		} catch (Exceptions\OAuth2Exception $ex) {
+		} catch (\StartupAPI\Exceptions\OAuth2Exception $ex) {
 			return null;
 		}
 
@@ -115,16 +115,9 @@ class GithubAuthenticationModule extends OAuth2AuthenticationModule
 			$template_info = array();
 		}
 
-		return StartupAPI::$template->render("@startupapi/modules/github/user_info.html.twig", $template_info);
-	}
-}
-
-/**
- * @package StartupAPI
- * @subpackage Authentication\Github
- */
-class GithubUserCredentials extends OAuth2UserCredentials {
-	public function getHTML() {
-		return StartupAPI::$template->render("@startupapi/modules/github/credentials.html.twig", $this->userinfo);
+		return \StartupAPI\StartupAPI::$template->render(
+			"@startupapi/modules/github/user_info.html.twig",
+			$template_info
+		);
 	}
 }

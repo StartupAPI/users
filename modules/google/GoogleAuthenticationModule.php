@@ -8,9 +8,9 @@ namespace StartupAPI\Modules;
  * @package StartupAPI
  * @subpackage Authentication\Google
  */
-class GoogleAuthenticationModule extends OAuth2AuthenticationModule
+class GoogleAuthenticationModule extends \StartupAPI\OAuth2AuthenticationModule
 {
-	protected $userCredentialsClass = 'GoogleUserCredentials';
+	protected $userCredentialsClass = '\StartupAPI\Modules\GoogleAuthenticationModule\GoogleUserCredentials';
 
 	public function __construct($oAuth2ClientID, $oAuth2ClientSecret,
 		$scopes = 'profile'
@@ -23,9 +23,9 @@ class GoogleAuthenticationModule extends OAuth2AuthenticationModule
 			'https://accounts.google.com/o/oauth2/auth',
 			'https://www.googleapis.com/oauth2/v3/token',
 			$scopes,
-			UserConfig::$USERSROOTURL.'/modules/google/login-button.png',
-			UserConfig::$USERSROOTURL.'/modules/google/login-button.png',
-			UserConfig::$USERSROOTURL.'/modules/google/login-button.png',
+			\StartupAPI\UserConfig::$USERSROOTURL.'/modules/google/login-button.png',
+			\StartupAPI\UserConfig::$USERSROOTURL.'/modules/google/login-button.png',
+			\StartupAPI\UserConfig::$USERSROOTURL.'/modules/google/login-button.png',
 			array(
 				array(3005, "Logged in using Google account", 1),
 				array(3006, "Added Google account", 1),
@@ -65,7 +65,7 @@ class GoogleAuthenticationModule extends OAuth2AuthenticationModule
 
 	public static function getModulesLogo($size = 100) {
 		if ($size == 100) {
-			return UserConfig::$USERSROOTURL . '/modules/google/images/logo_100x.png';
+			return \StartupAPI\UserConfig::$USERSROOTURL . '/modules/google/images/logo_100x.png';
 		}
 	}
 
@@ -74,7 +74,7 @@ class GoogleAuthenticationModule extends OAuth2AuthenticationModule
 
 		try {
 			$result = $credentials->makeOAuth2Request('https://www.googleapis.com/plus/v1/people/me');
-		} catch (Exceptions\OAuth2Exception $ex) {
+		} catch (\StartupAPI\Exceptions\OAuth2Exception $ex) {
 			return null;
 		}
 
@@ -101,7 +101,7 @@ class GoogleAuthenticationModule extends OAuth2AuthenticationModule
 		}
 
 		if (array_key_exists('error', $data)) {
-			UserTools::debug("Got errors from /people/me API call: " . var_export($data['error'], true));
+			\StartupAPI\UserTools::debug("Got errors from /people/me API call: " . var_export($data['error'], true));
 			return null;
 		}
 
@@ -110,7 +110,7 @@ class GoogleAuthenticationModule extends OAuth2AuthenticationModule
 		) {
 			$user_info['name'] = $user_info['displayName'];
 		} else {
-			UserTools::debug("Don't have ID or displayName: " . var_export($user_info, true));
+			\StartupAPI\UserTools::debug("Don't have ID or displayName: " . var_export($user_info, true));
 			return null;
 		}
 
@@ -126,16 +126,6 @@ class GoogleAuthenticationModule extends OAuth2AuthenticationModule
 			$template_info = array();
 		}
 
-		return StartupAPI::$template->render("@startupapi/modules/google/user_info.html.twig", $template_info);
-	}
-}
-
-/**
- * @package StartupAPI
- * @subpackage Authentication\Google
- */
-class GoogleUserCredentials extends OAuth2UserCredentials {
-	public function getHTML() {
-		return StartupAPI::$template->render("@startupapi/modules/google/credentials.html.twig", $this->userinfo);
+		return \StartupAPI\StartupAPI::$template->render("@startupapi/modules/google/user_info.html.twig", $template_info);
 	}
 }

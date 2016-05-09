@@ -1,4 +1,6 @@
-<!-- admin footer starts -->
+<?php
+namespace StartupAPI;
+?><!-- admin footer starts -->
 			</div>
 		</div>
 		<footer class="footer startupapi-admin-footer navbar-inner">

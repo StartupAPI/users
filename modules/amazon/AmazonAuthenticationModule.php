@@ -8,9 +8,9 @@ namespace StartupAPI\Modules;
  * @package StartupAPI
  * @subpackage Authentication\Amazon
  */
-class AmazonAuthenticationModule extends OAuth2AuthenticationModule
+class AmazonAuthenticationModule extends \StartupAPI\OAuth2AuthenticationModule
 {
-	protected $userCredentialsClass = 'AmazonUserCredentials';
+	protected $userCredentialsClass = '\StartupAPI\Modules\AmazonAuthenticationModule\AmazonUserCredentials';
 
 	public function __construct($oAuth2ClientID, $oAuth2ClientSecret, $scopes = 'profile profile:user_id postal_code')
 	{
@@ -22,9 +22,9 @@ class AmazonAuthenticationModule extends OAuth2AuthenticationModule
 			'https://www.amazon.com/ap/oa',
 			'https://api.amazon.com/auth/o2/token',
 			$scopes,
-			UserConfig::$USERSROOTURL.'/modules/amazon/login-button.png',
-			UserConfig::$USERSROOTURL.'/modules/amazon/login-button.png',
-			UserConfig::$USERSROOTURL.'/modules/amazon/login-button.png',
+			\StartupAPI\UserConfig::$USERSROOTURL.'/modules/amazon/login-button.png',
+			\StartupAPI\UserConfig::$USERSROOTURL.'/modules/amazon/login-button.png',
+			\StartupAPI\UserConfig::$USERSROOTURL.'/modules/amazon/login-button.png',
 			array(
 				array(9051, "Logged in using Amazon account", 1),
 				array(9052, "Added Amazon account", 1),
@@ -64,7 +64,7 @@ class AmazonAuthenticationModule extends OAuth2AuthenticationModule
 
 	public static function getModulesLogo($size = 100) {
 		if ($size == 100) {
-			return UserConfig::$USERSROOTURL . '/modules/amazon/images/logo_100x.png';
+			return \StartupAPI\UserConfig::$USERSROOTURL . '/modules/amazon/images/logo_100x.png';
 		}
 	}
 
@@ -78,10 +78,10 @@ class AmazonAuthenticationModule extends OAuth2AuthenticationModule
 			$result = $credentials->makeOAuth2Request('https://api.amazon.com/auth/o2/tokeninfo', 'GET', null, array(
 				CURLOPT_HTTPHEADER => array(
 					'Accept: application/json',
-					'User-Agent: ' . UserConfig::$appName . ' (Startup API v.' . StartupAPI::getVersion() . ')'
+					'User-Agent: ' . \StartupAPI\UserConfig::$appName . ' (Startup API v.' . \StartupAPI\StartupAPI::getVersion() . ')'
 				)
 			));
-		} catch (Exceptions\OAuth2Exception $ex) {
+		} catch (\StartupAPI\Exceptions\OAuth2Exception $ex) {
 			error_log("Error verifying access token: " . $ex->getMessage());
 			return null;
 		}
@@ -91,10 +91,10 @@ class AmazonAuthenticationModule extends OAuth2AuthenticationModule
 			$result = $credentials->makeOAuth2Request('https://api.amazon.com/user/profile', 'GET', null, array(
 				CURLOPT_HTTPHEADER => array(
 					'Accept: application/json',
-					'User-Agent: ' . UserConfig::$appName . ' (Startup API v.' . StartupAPI::getVersion() . ')'
+					'User-Agent: ' . \StartupAPI\UserConfig::$appName . ' (Startup API v.' . \StartupAPI\StartupAPI::getVersion() . ')'
 				)
 			));
-		} catch (Exceptions\OAuth2Exception $ex) {
+		} catch (\StartupAPI\Exceptions\OAuth2Exception $ex) {
 			error_log("Error getting identity: " . $ex->getMessage());
 			return null;
 		}
@@ -134,16 +134,9 @@ class AmazonAuthenticationModule extends OAuth2AuthenticationModule
 			$template_info = array();
 		}
 
-		return StartupAPI::$template->render("@startupapi/modules/amazon/user_info.html.twig", $template_info);
-	}
-}
-
-/**
- * @package StartupAPI
- * @subpackage Authentication\Amazon
- */
-class AmazonUserCredentials extends OAuth2UserCredentials {
-	public function getHTML() {
-		return StartupAPI::$template->render("@startupapi/modules/amazon/credentials.html.twig", $this->userinfo);
+		return \StartupAPI\StartupAPI::$template->render(
+			"@startupapi/modules/amazon/user_info.html.twig",
+			$template_info
+		);
 	}
 }

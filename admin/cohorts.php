@@ -1,4 +1,6 @@
 <?php
+namespace StartupAPI;
+
 /**
  * @package StartupAPI
  * @subpackage Analytics\CohortAnalysis

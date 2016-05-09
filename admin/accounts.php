@@ -1,4 +1,6 @@
 <?php
+namespace StartupAPI;
+
 require_once(__DIR__ . '/admin.php');
 
 $ADMIN_SECTION = 'accounts';
@@ -128,7 +130,6 @@ if (is_null($search)) {
 			?><li class="previous"><a href="?page=<?php
 		echo $pagenumber - 1;
 		echo is_null($search) ? '' : '&q=' . urlencode($search);
-		echo $sortby == 'activity' ? '&sort=activity' : '';
 			?>">&larr; prev</a></li><?php
 							} else {
 			?><li class="previous disabled"><a href="#">&larr; prev</a></li><?php
@@ -140,7 +141,6 @@ if (is_null($search)) {
 			?><li class="next"><a href="?page=<?php
 		echo $pagenumber + 1;
 		echo is_null($search) ? '' : '&q=' . urlencode($search);
-		echo $sortby == 'activity' ? '&sort=activity' : '';
 			?>">next &rarr;</a></li><?php
 						} else {
 			?><li class="next disabled"><a href="#">next &rarr;</a></li><?php }

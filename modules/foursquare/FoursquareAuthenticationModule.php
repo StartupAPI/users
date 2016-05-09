@@ -8,11 +8,11 @@ namespace StartupAPI\Modules;
  * @package StartupAPI
  * @subpackage Authentication\Foursquare
  */
-class FoursquareAuthenticationModule extends OAuth2AuthenticationModule
+class FoursquareAuthenticationModule extends \StartupAPI\OAuth2AuthenticationModule
 {
 	const COMPATIBILITY_DATE = '20130302';
 
-	protected $userCredentialsClass = 'FoursquareUserCredentials';
+	protected $userCredentialsClass = '\StartupAPI\Modules\FoursquareAuthenticationModule\FoursquareUserCredentials';
 
 	public function __construct($oAuth2ClientID, $oAuth2ClientSecret, $scopes = '')
 	{
@@ -67,7 +67,7 @@ class FoursquareAuthenticationModule extends OAuth2AuthenticationModule
 
 	public static function getModulesLogo($size = 100) {
 		if ($size == 100) {
-			return UserConfig::$USERSROOTURL . '/modules/foursquare/images/logo_100x.png';
+			return \StartupAPI\UserConfig::$USERSROOTURL . '/modules/foursquare/images/logo_100x.png';
 		}
 	}
 
@@ -77,7 +77,7 @@ class FoursquareAuthenticationModule extends OAuth2AuthenticationModule
 
 		try {
 			$result = $credentials->makeOAuth2Request('https://api.foursquare.com/v2/users/self');
-		} catch (Exceptions\OAuth2Exception $ex) {
+		} catch (\StartupAPI\Exceptions\OAuth2Exception $ex) {
 			return null;
 		}
 
@@ -130,16 +130,9 @@ class FoursquareAuthenticationModule extends OAuth2AuthenticationModule
 			$template_info = array();
 		}
 
-		return StartupAPI::$template->render("@startupapi/modules/foursquare/user_info.html.twig", $template_info);
-	}
-}
-
-/**
- * @package StartupAPI
- * @subpackage Authentication\Foursquare
- */
-class FoursquareUserCredentials extends OAuth2UserCredentials {
-	public function getHTML() {
-		return StartupAPI::$template->render("@startupapi/modules/foursquare/credentials.html.twig", $this->userinfo);
+		return \StartupAPI\StartupAPI::$template->render(
+			"@startupapi/modules/foursquare/user_info.html.twig",
+			$template_info
+		);
 	}
 }

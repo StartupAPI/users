@@ -7,7 +7,7 @@ namespace StartupAPI\Modules\UsernamePasswordAuthenticationModule;
  * @package StartupAPI
  * @subpackage Authentication\UsernamePassword
  */
-class UsernamePassUserCredentials extends UserCredentials {
+class UsernamePassUserCredentials extends \StartupAPI\UserCredentials {
 	/**
 	 * @var string Username
 	 */

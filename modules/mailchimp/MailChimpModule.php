@@ -11,7 +11,7 @@ namespace StartupAPI\Modules;
  * @package StartupAPI
  * @subpackage Email\MailChimp
  */
-class MailChimpModule extends EmailModule
+class MailChimpModule extends \StartupAPI\EmailModule
 {
 	/**
 	 * @var string MailChimp API key
@@ -48,7 +48,7 @@ class MailChimpModule extends EmailModule
 
 	public static function getModulesLogo($size = 100) {
 		if ($size == 100) {
-			return UserConfig::$USERSROOTURL . '/modules/mailchimp/images/logo_100x.png';
+			return \StartupAPI\UserConfig::$USERSROOTURL . '/modules/mailchimp/images/logo_100x.png';
 		}
 	}
 
@@ -74,7 +74,7 @@ class MailChimpModule extends EmailModule
 		$pos = strpos($apiKey, '-');
 
 		if ($pos === FALSE) {
-			throw new MailChimpException("Wrong API key. Expected '-' in it somewhere.");
+			throw new MailChimpModule\MailChimpException("Wrong API key. Expected '-' in it somewhere.");
 		}
 
 		$datacenter = substr($apiKey, $pos + 1);
@@ -108,12 +108,12 @@ class MailChimpModule extends EmailModule
 		$result = curl_exec($ch);
 
 		if (curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200) {
-			throw new MailChimpException("API call failed: ".curl_error($ch));
+			throw new MailChimpModule\MailChimpException("API call failed: ".curl_error($ch));
 		}
 		curl_close($ch);
 
 		if ($result !== 'true') {
-			throw new EmailSubscriptionException("MailChimp subscription failed: ".var_export($result, true));
+			throw new \StartupAPI\Exceptions\Email\EmailSubscriptionException("MailChimp subscription failed: ".var_export($result, true));
 		}
 	}
 
@@ -137,11 +137,3 @@ class MailChimpModule extends EmailModule
 		return ($old_user->getName() != $new_user->getName());
 	}
 }
-
-/**
- * MailChimp integration exception
- *
- * @package StartupAPI
- * @subpackage Email\MailChimp
- */
-class MailChimpException extends Exceptions\StartupAPIException { }

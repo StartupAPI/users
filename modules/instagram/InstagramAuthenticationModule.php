@@ -8,9 +8,9 @@ namespace StartupAPI\Modules;
  * @package StartupAPI
  * @subpackage Authentication\Instagram
  */
-class InstagramAuthenticationModule extends OAuth2AuthenticationModule
+class InstagramAuthenticationModule extends \StartupAPI\OAuth2AuthenticationModule
 {
-	protected $userCredentialsClass = 'InstagramUserCredentials';
+	protected $userCredentialsClass = '\StartupAPI\Modules\InstagramAuthenticationModule\InstagramUserCredentials';
 
 	public function __construct($oAuth2ClientID, $oAuth2ClientSecret,
 		$scopes = 'basic'
@@ -23,9 +23,9 @@ class InstagramAuthenticationModule extends OAuth2AuthenticationModule
 			'https://api.instagram.com/oauth/authorize/',
 			'https://api.instagram.com/oauth/access_token',
 			$scopes,
-			UserConfig::$USERSROOTURL.'/modules/instagram/login-button.png',
-			UserConfig::$USERSROOTURL.'/modules/instagram/login-button.png',
-			UserConfig::$USERSROOTURL.'/modules/instagram/login-button.png',
+			\StartupAPI\UserConfig::$USERSROOTURL.'/modules/instagram/login-button.png',
+			\StartupAPI\UserConfig::$USERSROOTURL.'/modules/instagram/login-button.png',
+			\StartupAPI\UserConfig::$USERSROOTURL.'/modules/instagram/login-button.png',
 			array(
 				array(11005, "Logged in using Instagram account", 1),
 				array(11006, "Added Instagram account", 1),
@@ -63,7 +63,7 @@ class InstagramAuthenticationModule extends OAuth2AuthenticationModule
 
 	public static function getModulesLogo($size = 100) {
 		if ($size == 100) {
-			return UserConfig::$USERSROOTURL . '/modules/instagram/images/logo_100x.png';
+			return \StartupAPI\UserConfig::$USERSROOTURL . '/modules/instagram/images/logo_100x.png';
 		}
 	}
 
@@ -72,7 +72,7 @@ class InstagramAuthenticationModule extends OAuth2AuthenticationModule
 
 		try {
 			$result = $credentials->makeOAuth2Request('https://api.instagram.com/v1/users/self');
-		} catch (Exceptions\OAuth2Exception $ex) {
+		} catch (\StartupAPI\Exceptions\OAuth2Exception $ex) {
 			return null;
 		}
 
@@ -99,12 +99,12 @@ class InstagramAuthenticationModule extends OAuth2AuthenticationModule
 		}
 
 		if ($data['meta']['code'] != 200) {
-			UserTools::debug("Got API error from /users/self call: " . var_export($data['error'], true));
+			\StartupAPI\UserTools::debug("Got API error from /users/self call: " . var_export($data['error'], true));
 			return null;
 		}
 
 		if (array_key_exists('error', $data)) {
-			UserTools::debug("Got errors from /users/self API call: " . var_export($data['error'], true));
+			\StartupAPI\UserTools::debug("Got errors from /users/self API call: " . var_export($data['error'], true));
 			return null;
 		}
 
@@ -113,7 +113,7 @@ class InstagramAuthenticationModule extends OAuth2AuthenticationModule
 		) {
 			$user_info['name'] = $user_info['full_name'];
 		} else {
-			UserTools::debug("Don't have ID or full_name: " . var_export($user_info, true));
+			\StartupAPI\UserTools::debug("Don't have ID or full_name: " . var_export($user_info, true));
 			return null;
 		}
 		return $user_info;
@@ -125,16 +125,9 @@ class InstagramAuthenticationModule extends OAuth2AuthenticationModule
 			$template_info = array();
 		}
 
-		return StartupAPI::$template->render("@startupapi/modules/instagram/user_info.html.twig", $template_info);
-	}
-}
-
-/**
- * @package StartupAPI
- * @subpackage Authentication\Instagram
- */
-class InstagramUserCredentials extends OAuth2UserCredentials {
-	public function getHTML() {
-		return StartupAPI::$template->render("@startupapi/modules/instagram/credentials.html.twig", $this->userinfo);
+		return \StartupAPI\StartupAPI::$template->render(
+			"@startupapi/modules/instagram/user_info.html.twig",
+			$template_info
+		);
 	}
 }

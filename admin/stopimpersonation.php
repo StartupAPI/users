@@ -1,4 +1,6 @@
 <?php
+namespace StartupAPI;
+
 require_once(__DIR__.'/admin.php');
 
 $real_user = User::get(false); // getting real user, ignoring impersonation

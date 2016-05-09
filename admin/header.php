@@ -1,7 +1,7 @@
 <?php
+namespace StartupAPI;
+
 require_once(dirname(__DIR__) . '/global.php');
-require_once(dirname(__DIR__) . '/classes/User.php');
-require_once(__DIR__ . '/adminMenus.php');
 
 $current_user = User::require_login(false);
 
@@ -30,38 +30,38 @@ $ADMIN_ROOT = UserConfig::$USERSROOTURL . '/admin';
 
 $features_num = count(Feature::getAll());
 
-$admin_menu = new AdminMenu(array(
-			new Menu('home', 'Home', $ADMIN_ROOT . '/', 'home'),
+$admin_menu = new Admin\AdminMenu(array(
+			new Admin\Menu('home', 'Home', $ADMIN_ROOT . '/', 'home'),
 			/*
 			  new menuSection('dashboards', 'Dashboards', array(
 			  new menu('basic', 'Basic Metrics', $ADMIN_ROOT . '/', 'signal')
 			  )),
 			 */
-			new MenuSection('users', 'Users', null, array(
-				new Menu('activity', 'Activity', $ADMIN_ROOT . '/activity.php', 'signal'),
-				new Menu('plans', 'Service Plans', null, 'folder-open'),
-				new Menu('registrations', 'Registered Users', $ADMIN_ROOT . '/users.php', 'user'),
-				new Menu('cohorts', 'Cohort Analysis', $ADMIN_ROOT . '/cohorts.php', 'th'),
-				new Menu('bymodule', 'Registrations By Module', $ADMIN_ROOT . '/bymodule.php', 'th-large'),
-				new Menu('invitations', 'Invitations', $ADMIN_ROOT . '/invitations.php', 'envelope', UserConfig::$adminInvitationOnly, 'Invitations are disabled in configuration'),
-				new Menu('accounts', 'Accounts', $ADMIN_ROOT . '/accounts.php', 'folder-open'),
+			new Admin\MenuSection('users', 'Users', null, array(
+				new Admin\Menu('activity', 'Activity', $ADMIN_ROOT . '/activity.php', 'signal'),
+				new Admin\Menu('plans', 'Service Plans', null, 'folder-open'),
+				new Admin\Menu('registrations', 'Registered Users', $ADMIN_ROOT . '/users.php', 'user'),
+				new Admin\Menu('cohorts', 'Cohort Analysis', $ADMIN_ROOT . '/cohorts.php', 'th'),
+				new Admin\Menu('bymodule', 'Registrations By Module', $ADMIN_ROOT . '/bymodule.php', 'th-large'),
+				new Admin\Menu('invitations', 'Invitations', $ADMIN_ROOT . '/invitations.php', 'envelope', UserConfig::$adminInvitationOnly, 'Invitations are disabled in configuration'),
+				new Admin\Menu('accounts', 'Accounts', $ADMIN_ROOT . '/accounts.php', 'folder-open'),
 			)),
-			new MenuSection('money', 'Money', null, array(
-				new Menu('outstanding', 'Outstanding charges', $ADMIN_ROOT . '/outstanding.php', 'certificate', UserConfig::$useSubscriptions, 'Subscriptions are disabled in configuration'),
-				new Menu('transactions', 'Transactions', null, 'list', UserConfig::$useSubscriptions),
-				new Menu('payment_method', 'Payment methods', null, 'th-large', UserConfig::$useSubscriptions)
+			new Admin\MenuSection('money', 'Money', null, array(
+				new Admin\Menu('outstanding', 'Outstanding charges', $ADMIN_ROOT . '/outstanding.php', 'certificate', UserConfig::$useSubscriptions, 'Subscriptions are disabled in configuration'),
+				new Admin\Menu('transactions', 'Transactions', null, 'list', UserConfig::$useSubscriptions),
+				new Admin\Menu('payment_method', 'Payment methods', null, 'th-large', UserConfig::$useSubscriptions)
 					), null, UserConfig::$useSubscriptions),
-			new MenuSection('promotion', 'Promotion', null, array(
-				new Menu('sources', 'Sources', $ADMIN_ROOT . '/sources.php', 'random'),
-				new Menu('campaigns', 'Campaign management', $ADMIN_ROOT . '/campaigns.php', 'comment')
+			new Admin\MenuSection('promotion', 'Promotion', null, array(
+				new Admin\Menu('sources', 'Sources', $ADMIN_ROOT . '/sources.php', 'random'),
+				new Admin\Menu('campaigns', 'Campaign management', $ADMIN_ROOT . '/campaigns.php', 'comment')
 			)),
-			new MenuSection('gamification', 'Gamification', null, array(
-				new Menu('badges', 'Badges', $ADMIN_ROOT . '/badges.php', 'star')
+			new Admin\MenuSection('gamification', 'Gamification', null, array(
+				new Admin\Menu('badges', 'Badges', $ADMIN_ROOT . '/badges.php', 'star')
 			)),
-			new MenuSection('settings', 'Settings', null, array(
-				new Menu('systemsettings', 'System Settings', $ADMIN_ROOT . '/settings.php', 'wrench'),
-				new Menu('modules', 'Modules', $ADMIN_ROOT . '/modules.php', 'th-large'),
-				new Menu('features', 'Features', $ADMIN_ROOT . '/features.php', 'check', $features_num > 0, 'No features defined in this app')
+			new Admin\MenuSection('settings', 'Settings', null, array(
+				new Admin\Menu('systemsettings', 'System Settings', $ADMIN_ROOT . '/settings.php', 'wrench'),
+				new Admin\Menu('modules', 'Modules', $ADMIN_ROOT . '/modules.php', 'th-large'),
+				new Admin\Menu('features', 'Features', $ADMIN_ROOT . '/features.php', 'check', $features_num > 0, 'No features defined in this app')
 			))
 		));
 

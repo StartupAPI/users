@@ -106,11 +106,11 @@ abstract class CohortProvider {
 	 */
 	public function getActivityRate($activityid, $actnum)
 	{
-		$db = UserConfig::getDB();
+		$db = \StartupAPI\UserConfig::getDB();
 
 		$siteadminsstring = null;
-		if (count(UserConfig::$admins) > 0) {
-			$siteadminsstring = implode(", ", UserConfig::$admins);
+		if (count(\StartupAPI\UserConfig::$admins) > 0) {
+			$siteadminsstring = implode(", ", \StartupAPI\UserConfig::$admins);
 		}
 
 		$aggregates = array();
@@ -138,21 +138,21 @@ abstract class CohortProvider {
 			if (!is_null($activityid)) {
 				if (!$stmt->bind_param('ii', $actnum, $activityid))
 				{
-					throw new Exceptions\DBBindParamException($db, $stmt);
+					throw new \StartupAPI\Exceptions\DBBindParamException($db, $stmt);
 				}
 			} else {
 				if (!$stmt->bind_param('i', $actnum))
 				{
-					throw new Exceptions\DBBindParamException($db, $stmt);
+					throw new \StartupAPI\Exceptions\DBBindParamException($db, $stmt);
 				}
 			}
 			if (!$stmt->execute())
 			{
-				throw new Exceptions\DBExecuteStmtException($db, $stmt);
+				throw new \StartupAPI\Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($cohort_id, $actperiod, $activeusers))
 			{
-				throw new Exceptions\DBBindResultException($db, $stmt);
+				throw new \StartupAPI\Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -164,7 +164,7 @@ abstract class CohortProvider {
 		}
 		else
 		{
-			throw new Exceptions\DBPrepareStmtException($db);
+			throw new \StartupAPI\Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $aggregates;

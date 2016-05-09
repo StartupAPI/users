@@ -84,7 +84,7 @@ class GenerationCohorts extends CohortProvider {
 	 * @throws \StartupAPI\Exceptions\DBException
 	 */
 	public function getCohorts() {
-		$db = UserConfig::getDB();
+		$db = \StartupAPI\UserConfig::getDB();
 
 		// an array of cohorts to return
 		$cohorts = array();
@@ -125,8 +125,8 @@ class GenerationCohorts extends CohortProvider {
 		}
 
 		// Excluding site administrators
-		if (count(UserConfig::$admins) > 0) {
-			$query .= "\nWHERE id NOT IN (" . implode(", ", UserConfig::$admins) . ")";
+		if (count(\StartupAPI\UserConfig::$admins) > 0) {
+			$query .= "\nWHERE id NOT IN (" . implode(", ", \StartupAPI\UserConfig::$admins) . ")";
 		}
 
 		$query .= ' GROUP BY cohort_id ORDER BY regtime DESC';
@@ -135,11 +135,11 @@ class GenerationCohorts extends CohortProvider {
 		{
 			if (!$stmt->execute())
 			{
-				throw new \StartupAPI\DBExecuteStmtException($db, $stmt);
+				throw new \StartupAPI\Exceptions\DBExecuteStmtException($db, $stmt);
 			}
 			if (!$stmt->bind_result($cohort_id, $title, $total))
 			{
-				throw new \StartupAPI\DBBindResultException($db, $stmt);
+				throw new \StartupAPI\Exceptions\DBBindResultException($db, $stmt);
 			}
 
 			while($stmt->fetch() === TRUE)
@@ -150,7 +150,7 @@ class GenerationCohorts extends CohortProvider {
 		}
 		else
 		{
-			throw new \StartupAPI\DBPrepareStmtException($db);
+			throw new \StartupAPI\Exceptions\DBPrepareStmtException($db);
 		}
 
 		return $cohorts;

@@ -1,4 +1,6 @@
 <?php
+namespace StartupAPI;
+
 /**
  * This page displays current state of the settings in the system
  *

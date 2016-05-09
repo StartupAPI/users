@@ -1,4 +1,6 @@
 <?php
+namespace StartupAPI;
+
 /**
  * Represents application feature
  *
@@ -176,7 +178,6 @@ class Feature
 		return null;
 	}
 
-	//
 	/**
 	 * Initializes features based on old configuration
 	 *
@@ -186,7 +187,7 @@ class Feature
 	 */
 	public static function init() {
 		foreach (UserConfig::$features as $id => $details) {
-			new Feature($id, $details[0], $details[1], $details[2]);
+			new self($id, $details[0], $details[1], $details[2]);
 		}
 	}
 

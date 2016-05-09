@@ -9,7 +9,7 @@ namespace StartupAPI\Modules;
 /**
  * Fake payment engine that just goes to external page and adds value to account when user comes back
  */
-class ExternalPaymentEngine extends PaymentEngine {
+class ExternalPaymentEngine extends \StartupAPI\PaymentEngine {
 
 	/**
 	 * @var int Counter of instances created
@@ -40,7 +40,7 @@ class ExternalPaymentEngine extends PaymentEngine {
 		$this->button_label = $button_label;
 
 		if (is_null($this->url)) {
-			$this->url = UserConfig::$USERSROOTFULLURL . '/modules/external_payment/external_page.php';
+			$this->url = \StartupAPI\UserConfig::$USERSROOTFULLURL . '/modules/external_payment/external_page.php';
 		}
 
 		$this->url .= (strstr($this->url, '?') === FALSE ? '?' : '&') . 'engine=' . $this->slug;

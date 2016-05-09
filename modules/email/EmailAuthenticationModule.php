@@ -12,7 +12,7 @@ namespace StartupAPI\Modules;
  * @package StartupAPI
  * @subpackage Authentication\Email
  */
-class EmailAuthenticationModule extends AuthenticationModule {
+class EmailAuthenticationModule extends \StartupAPI\AuthenticationModule {
 
 	public function getID() {
 		return "email";
@@ -42,7 +42,7 @@ class EmailAuthenticationModule extends AuthenticationModule {
 	 *
 	 * @param User $user User object
 	 *
-	 * @return EmailUserCredentials|null
+	 * @return EmailAuthenticationModule\EmailUserCredentials|null
 	 *
 	 * @throws Exceptions\DBException
 	 */
@@ -66,7 +66,7 @@ class EmailAuthenticationModule extends AuthenticationModule {
 			$stmt->close();
 
 			if (!is_null($email)) {
-				return new EmailUserCredentials($email);
+				return new EmailAuthenticationModule\EmailUserCredentials($email);
 			}
 		} else {
 			throw new Exceptions\DBPrepareStmtException($db);
@@ -306,43 +306,6 @@ class EmailAuthenticationModule extends AuthenticationModule {
 		$user->recordActivity(USERBASE_ACTIVITY_UPDATEUSERINFO);
 
 		return true;
-	}
-
-}
-
-/**
- * Email credentials for the user
- *
- * @package StartupAPI
- * @subpackage Authentication\Email
- */
-class EmailUserCredentials extends UserCredentials {
-
-	/**
-	 * @var string User's email address
-	 */
-	private $email;
-
-	/**
-	 * Creates user credentials object
-	 *
-	 * @param string $email User's email address
-	 */
-	public function __construct($email) {
-		$this->email = $email;
-	}
-
-	/**
-	 * Returns user's email address
-	 *
-	 * @return string User's email address
-	 */
-	public function getEmail() {
-		return $this->email;
-	}
-
-	public function getHTML() {
-		return $this->email;
 	}
 
 }

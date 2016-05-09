@@ -1,4 +1,6 @@
 <?php
+namespace StartupAPI;
+
 require_once(__DIR__ . '/admin.php');
 
 $user = User::require_login();
