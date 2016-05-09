@@ -1,5 +1,5 @@
 <?php
-namespace StartupAPI\Exceptions\API;
+namespace StartupAPI\API\Exceptions;
 
 /**
  * Thrown when there is no such endpoint (for a method used)

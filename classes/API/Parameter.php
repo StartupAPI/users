@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @package StartupAPI
- * @subpackage API
- */
-
 namespace StartupAPI\API;
 
 /**
@@ -89,11 +83,11 @@ class Parameter {
 	public function validate($value) {
 		// invalid if multiples are not allowed, but array of values is passed in
 		if (!$this->multiple && is_array($value)) {
-			throw new InvalidParameterValueException("Multiple values are not allowed for this parameter");
+			throw new Exceptions\InvalidParameterValueException("Multiple values are not allowed for this parameter");
 		}
 
 		if (is_null($value) && !$this->optional) {
-			throw new RequiredParameterException();
+			throw new Exceptions\RequiredParameterException();
 		}
 
 		return true;

@@ -3,12 +3,6 @@
 namespace StartupAPI\API\v1;
 
 /**
- * @package StartupAPI
- * @subpackage API
- */
-require_once(dirname(__DIR__) . '/Endpoint.php');
-
-/**
  * Returns currently authenticated user
  *
  * @package StartupAPI
@@ -26,7 +20,7 @@ class Accounts extends \StartupAPI\API\AuthenticatedEndpoint {
 		$accounts = $user->getAccounts();
 
 		// @TODO Implement general API serialization logic for all objects
-		return array_map(function(Account $account) {
+		return array_map(function(\StartupAPI\Account $account) {
 			$users_and_roles = $account->getUsers();
 			return array(
 				'id' => $account->getID(),

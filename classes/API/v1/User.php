@@ -3,16 +3,6 @@
 namespace StartupAPI\API\v1;
 
 /**
- * @package StartupAPI
- * @subpackage API
- */
-require_once(dirname(__DIR__) . '/Endpoint.php');
-require_once(dirname(__DIR__) . '/Parameter.php');
-
-require_once(dirname(dirname(__DIR__)) . '/User.php');
-require_once(dirname(dirname(__DIR__)) . '/Account.php');
-
-/**
  * Returns currently authenticated user
  *
  * @package StartupAPI
@@ -52,10 +42,10 @@ class User extends \StartupAPI\API\AuthenticatedEndpoint {
 				if ($users_belong_to_same_account) {
 					$user = $requested_user;
 				} else {
-					throw new \StartupAPI\API\UnauthorizedException("You are not allowed to request information about this user");
+					throw new \StartupAPI\API\Exceptions\UnauthorizedException("You are not allowed to request information about this user");
 				}
 			} else {
-				throw new \StartupAPI\API\ObjectNotFoundException("No such user");
+				throw new \StartupAPI\API\Exceptions\ObjectNotFoundException("No such user");
 			}
 		}
 

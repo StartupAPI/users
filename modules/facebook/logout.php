@@ -1,7 +1,7 @@
 <?php
-require_once(dirname(dirname(__DIR__)).'/global.php');
+namespace StartupAPI;
 
-require_once(dirname(dirname(__DIR__)).'/classes/User.php');
+require_once(dirname(dirname(__DIR__)).'/global.php');
 
 $module = AuthenticationModule::get('facebook');
 

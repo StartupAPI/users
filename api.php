@@ -173,7 +173,7 @@ try {
 		),
 		'result' => $endpoint->call($params, $raw_request_body)
 	);
-} catch (Exceptions\API\NotFoundException $ex) {
+} catch (API\Exceptions\NotFoundException $ex) {
 	header('HTTP/1.0 404 Not Found');
 	$response = array(
 		'meta' => array(
@@ -182,7 +182,7 @@ try {
 			'error_code' => $ex->getCode()
 		)
 	);
-} catch (Exceptions\API\MethodNotAllowedException $ex) {
+} catch (API\Exceptions\MethodNotAllowedException $ex) {
 	header('HTTP/1.0 405 Method not allowed');
 	$response = array(
 		'meta' => array(
@@ -191,7 +191,7 @@ try {
 			'error_code' => $ex->getCode()
 		)
 	);
-} catch (Exceptions\API\UnauthenticatedException $ex) {
+} catch (API\Exceptions\UnauthenticatedException $ex) {
 	header('HTTP/1.0 401 Authentication Required');
 	header('WWW-Authenticate: FormBased');
 	$response = array(
@@ -201,7 +201,7 @@ try {
 			'error_code' => $ex->getCode()
 		)
 	);
-} catch (Exceptions\API\UnauthorizedException $ex) {
+} catch (API\Exceptions\UnauthorizedException $ex) {
 	header('HTTP/1.0 403 Forbidden');
 	$response = array(
 		'meta' => array(
@@ -210,7 +210,7 @@ try {
 			'error_code' => $ex->getCode()
 		)
 	);
-} catch (Exceptions\API\BadParameterException $ex) {
+} catch (API\Exceptions\BadParameterException $ex) {
 	header('HTTP/1.0 400 Bad Parameter');
 	$response = array(
 		'meta' => array(
@@ -219,7 +219,7 @@ try {
 			'error_code' => $ex->getCode()
 		)
 	);
-} catch (Exceptions\API\APIException $ex) {
+} catch (API\API\ExceptionsException $ex) {
 	header('HTTP/1.0 500 Server Error');
 	$response = array(
 		'meta' => array(

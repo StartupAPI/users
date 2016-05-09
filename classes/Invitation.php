@@ -1,7 +1,5 @@
 <?php
-
-require_once(dirname(__DIR__) . '/global.php');
-require_once(dirname(__DIR__) . '/classes/User.php');
+namespace StartupAPI;
 
 /**
  * Invitation class

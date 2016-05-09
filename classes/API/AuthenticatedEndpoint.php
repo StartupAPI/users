@@ -26,7 +26,7 @@ abstract class AuthenticatedEndpoint extends Endpoint {
 		$user = \StartupAPI::getUser();
 
 		if (is_null($user)) {
-			throw new UnauthenticatedException();
+			throw new Exceptions\UnauthenticatedException();
 		}
 
 		return $user;

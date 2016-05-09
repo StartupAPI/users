@@ -1,5 +1,5 @@
 <?php
-namespace StartupAPI\Exceptions\API;
+namespace StartupAPI\API\Exceptions;
 
 /**
  * Thrown when user is authenticated, but not allowed to make a request

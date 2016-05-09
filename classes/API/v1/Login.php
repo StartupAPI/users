@@ -3,16 +3,6 @@
 namespace StartupAPI\API\v1;
 
 /**
- * @package StartupAPI
- * @subpackage API
- */
-require_once(dirname(__DIR__) . '/Endpoint.php');
-require_once(dirname(__DIR__) . '/Parameter.php');
-
-require_once(dirname(dirname(__DIR__)) . '/User.php');
-require_once(dirname(dirname(__DIR__)) . '/Account.php');
-
-/**
  * Returns currently authenticated user
  *
  * @package StartupAPI
@@ -37,7 +27,7 @@ class Login extends \StartupAPI\API\Endpoint {
 		$user = $module->processLogin($values, $remember);
 
 		if (is_null($user)) {
-			throw new \StartupAPI\API\UnauthenticatedException();
+			throw new \StartupAPI\API\Exceptions\UnauthenticatedException();
 		} else {
 			$user->setSession($remember);
 		}

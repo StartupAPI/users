@@ -749,37 +749,37 @@ class UserConfig {
 	/**
 	 * @var callable Hook for rendering invitation action UI in admin interface
 	 */
-	public static $onRenderUserInvitationAction = 'UserConfig::renderUserInvitationAction';
+	public static $onRenderUserInvitationAction = '\StartupAPI\UserConfig::renderUserInvitationAction';
 
 	/**
 	 * @var callable Hook for rendering invitation followup action UI in admin interface
 	 */
-	public static $onRenderUserInvitationFollowUpAction = 'UserConfig::renderUserInvitationFollowUpAction';
+	public static $onRenderUserInvitationFollowUpAction = '\StartupAPI\UserConfig::renderUserInvitationFollowUpAction';
 
 	/**
 	 * @var callable Formatter for password recovery email
 	 */
-	public static $onRenderTemporaryPasswordEmail = 'UserConfig::renderTemporaryPasswordEmail';
+	public static $onRenderTemporaryPasswordEmail = '\StartupAPI\UserConfig::renderTemporaryPasswordEmail';
 
 	/**
 	 * @var callable Formatter for user invitation message placeholder
 	 */
-	public static $onRenderUserInvitationMessagePlaceholder = 'UserConfig::renderUserInvitationMessagePlaceholder';
+	public static $onRenderUserInvitationMessagePlaceholder = '\StartupAPI\UserConfig::renderUserInvitationMessagePlaceholder';
 
 	/**
 	 * @var callable Formatter for email verification message
 	 */
-	public static $onRenderVerificationCodeEmail = 'UserConfig::renderVerificationCodeEmail';
+	public static $onRenderVerificationCodeEmail = '\StartupAPI\UserConfig::renderVerificationCodeEmail';
 
 	/**
 	 * @var callable Formatter for user-to-user invitation email message
 	 */
-	public static $onRenderInvitationEmailMessage = 'UserConfig::renderInvitationEmailMessage';
+	public static $onRenderInvitationEmailMessage = '\StartupAPI\UserConfig::renderInvitationEmailMessage';
 
 	/**
 	 * @var callable Formatter for user-to-user invitation email subject
 	 */
-	public static $onRenderInvitationEmailSubject = 'UserConfig::renderInvitationEmailSubject';
+	public static $onRenderInvitationEmailSubject = '\StartupAPI\UserConfig::renderInvitationEmailSubject';
 
 	/**
 	 * @var callable Handler to be called when new user is created, newly created user object is passed in
@@ -794,7 +794,7 @@ class UserConfig {
 	/**
 	 * @var callable Hook for rendering Terms of Service and Privacy Policy verbiage on signup forms
 	 */
-	public static $onRenderTOSLinks = 'UserConfig::renderTOSLinks';
+	public static $onRenderTOSLinks = '\StartupAPI\UserConfig::renderTOSLinks';
 
 
 	/* ========================================================================

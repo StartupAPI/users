@@ -1,5 +1,5 @@
 <?php
-namespace StartupAPI\Exceptions\API;
+namespace StartupAPI\API\Exceptions;
 
 /**
  * Abstract class for things that are not found

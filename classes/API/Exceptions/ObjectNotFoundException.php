@@ -1,5 +1,5 @@
 <?php
-namespace StartupAPI\Exceptions\API;
+namespace StartupAPI\API\Exceptions;
 
 /**
  * Thrown when requested onject is not found

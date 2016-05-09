@@ -1,10 +1,4 @@
 <?php
-
-/**
- * @package StartupAPI
- * @subpackage API
- */
-
 namespace StartupAPI\API;
 
 /**

@@ -113,7 +113,7 @@ abstract class Endpoint {
 		$parts = explode('/', $call_slug, 3);
 
 		if (!is_array($parts) || !isset($parts[1]) || !isset($parts[2])) {
-			throw new \StartupAPI\API\MalformedCallSlugException($call_slug);
+			throw new Exceptions\MalformedCallSlugException($call_slug);
 		}
 
 		$namespace_slug = $parts[1];
@@ -122,15 +122,15 @@ abstract class Endpoint {
 		$endpoint_slug = "/$endpoint_slug";
 
 		if (!array_key_exists($namespace_slug, self::$endpoints_by_method)) {
-			throw new \StartupAPI\API\NamespaceNotFoundException($namespace_slug);
+			throw new Exceptions\NamespaceNotFoundException($namespace_slug);
 		}
 
 		if (!array_key_exists($method, self::$endpoints_by_method[$namespace_slug])) {
-			throw new \StartupAPI\API\MethodNotAllowedException($method);
+			throw new Exceptions\MethodNotAllowedException($method);
 		}
 
 		if (!array_key_exists($endpoint_slug, self::$endpoints_by_method[$namespace_slug][$method])) {
-			throw new \StartupAPI\API\CallNotFoundException($method, $call_slug);
+			throw new Exceptions\CallNotFoundException($method, $call_slug);
 		}
 
 		return self::$endpoints_by_method[$namespace_slug][$method][$endpoint_slug];
@@ -206,11 +206,11 @@ abstract class Endpoint {
 		// check all passed parameters
 		foreach ($values as $name => $value) {
 			if (!array_key_exists($name, $this->params)) {
-				throw new UnknownParameterException($name);
+				throw new Exceptions\UnknownParameterException($name);
 			}
 
 			if (!$this->params[$name]->validate($value)) {
-				throw new InvalidParameterValueException("Invalid parameter value for $name");
+				throw new Exceptions\InvalidParameterValueException("Invalid parameter value for $name");
 			}
 
 			unset($missing_params[$name]);
@@ -219,7 +219,7 @@ abstract class Endpoint {
 		// check if missing parameters are required
 		foreach ($missing_params as $key => $param) {
 			if (!$param->isOptional()) {
-				throw new RequiredParameterException($key);
+				throw new Exceptions\RequiredParameterException($key);
 			}
 		}
 	}
