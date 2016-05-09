@@ -1,8 +1,6 @@
 <?php
 namespace StartupAPI;
 
-require_once(dirname(__DIR__) . '/swiftmailer/lib/swift_required.php');
-
 /**
  * This class represents a registerd user in the system
  *
