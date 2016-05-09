@@ -5,7 +5,6 @@ namespace StartupAPI;
  * @package StartupAPI
  * @subpackage Subscriptions
  */
-require_once (__DIR__ . '/PaymentSchedule.php');
 
 /**
  * Every account is associated with existing Plan using Plan Slug and PaymentSchedule using PaymentSchedule Slug.
@@ -100,15 +99,15 @@ class Plan {
 	public function __construct($slug, $settings) {
 
 		if (!$slug) {
-			throw new Exception("Plan slug is required");
+			throw new \Exception("Plan slug is required");
 		}
 
 		if (!is_array($settings)) {
-			throw new Exception("Configuration array required");
+			throw new \Exception("Configuration array required");
 		}
 
 		if (!array_key_exists('name', $settings) && $settings['name']) {
-			throw new Exception("Mandatory parameter 'name' was not found in init array for plan $slug");
+			throw new \Exception("Mandatory parameter 'name' was not found in init array for plan $slug");
 		}
 
 		// mandatory parameters checked above
@@ -151,11 +150,11 @@ class Plan {
 
 		# Check user hooks
 		if (!is_null($this->account_activate_hook) && !is_callable($this->account_activate_hook)) {
-			throw new Exception("Activate hook defined, but is not callable");
+			throw new \Exception("Activate hook defined, but is not callable");
 		}
 
 		if (!is_null($this->account_deactivate_hook) && !is_callable($this->account_deactivate_hook)) {
-			throw new Exception("Deactivate hook defined, but is not callable");
+			throw new \Exception("Deactivate hook defined, but is not callable");
 		}
 
 		// register new plan globally
@@ -378,12 +377,12 @@ class Plan {
 	public static function init($plan_parameters) {
 
 //    if (count(self::$Plans))
-//      throw new Exception("Already initialized");
+//      throw new \Exception("Already initialized");
 
 		self::$plans = array(); // Isn't it an init?
 
 		if (!is_array($plan_parameters)) {
-			throw new Exception("Plan parameters is not an array");
+			throw new \Exception("Plan parameters is not an array");
 		}
 
 		foreach ($plan_parameters as $slug => $param) {

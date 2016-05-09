@@ -6,7 +6,7 @@ namespace StartupAPI\Exceptions;
  *
  * @package StartupAPI
  */
-class Exceptions\DBException extends StartupAPIException {
+class DBException extends StartupAPIException {
 
 	/**
 	 * Creates a database-related exception

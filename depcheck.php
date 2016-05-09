@@ -1,5 +1,5 @@
 <?php
-namsepace StartupAPI;
+namespace StartupAPI;
 
 /**
  * Testing for all dependencies StartupAPI has

@@ -9,7 +9,7 @@ namespace StartupAPI\Exceptions\Authentication;
  * @package StartupAPI
  * @subpackage Authentication
  */
-abstract class AuthenticationException extends ..\StartupAPIException {
+abstract class AuthenticationException extends \StartupAPI\Exceptions\StartupAPIException {
 
 	/**
 	 * An associative array of error messages
