@@ -1,7 +1,7 @@
 <?php
+namespace StartupAPI;
 
 require_once(dirname(dirname(__DIR__)) . '/global.php');
-require_once(dirname(dirname(__DIR__)) . '/classes/User.php');
 
 $user = User::require_login();
 $account = Account::getCurrentAccount($user);
