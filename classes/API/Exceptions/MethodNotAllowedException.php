@@ -3,6 +3,9 @@ namespace StartupAPI\API\Exceptions;
 
 /**
  * Thrown when no endpoints accept HTTP method used
+ *
+ * @package StartupAPI
+ * @subpackage API
  */
 class MethodNotAllowedException extends APIException {
 

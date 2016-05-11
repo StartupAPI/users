@@ -3,6 +3,9 @@ namespace StartupAPI\API\Exceptions;
 
 /**
  * Thrown when parameter is required
+ *
+ * @package StartupAPI
+ * @subpackage API
  */
 class RequiredParameterException extends BadParameterException {
 

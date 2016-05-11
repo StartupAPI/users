@@ -2,12 +2,10 @@
 namespace StartupAPI;
 
 /**
+ * Abstract class representing payment engines users can use to pay for subscription
+ *
  * @package StartupAPI
  * @subpackage Subscriptions
- */
-
-/**
- * Abstract class representing payment engines users can use to pay for subscription
  */
 abstract class PaymentEngine extends StartupAPIModule {
 

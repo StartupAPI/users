@@ -1,10 +1,14 @@
 <?php
+namespace StartupAPI;
 
 require_once(dirname(dirname(__DIR__)).'/simpletest/autorun.php');
 
 require_once(dirname(__DIR__).'/users.php');
 require_once(dirname(__DIR__).'/classes/Clock.php');
 
+/**
+ * @package StartupAPI
+ */
 class TestClock extends UnitTestCase {
 
   function testRealClock()

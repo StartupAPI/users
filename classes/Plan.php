@@ -2,12 +2,10 @@
 namespace StartupAPI;
 
 /**
+ * Every account is associated with existing Plan using Plan Slug and PaymentSchedule using PaymentSchedule Slug.
+ *
  * @package StartupAPI
  * @subpackage Subscriptions
- */
-
-/**
- * Every account is associated with existing Plan using Plan Slug and PaymentSchedule using PaymentSchedule Slug.
  */
 class Plan {
 

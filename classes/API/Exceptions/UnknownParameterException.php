@@ -3,6 +3,9 @@ namespace StartupAPI\API\Exceptions;
 
 /**
  * Thrown when parameter passed is not defined for endpoint
+ *
+ * @package StartupAPI
+ * @subpackage API
  */
 class UnknownParameterException extends BadParameterException {
 

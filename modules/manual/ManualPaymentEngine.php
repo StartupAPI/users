@@ -2,12 +2,10 @@
 namespace StartupAPI\Modules;
 
 /**
+ * Manual payment engine used for consierge subscription
+ *
  * @package StartupAPI
  * @subpackage Subscriptions
- */
-
-/**
- * Manual payment engine used for consierge subscription
  */
 class ManualPaymentEngine extends \StartupAPI\PaymentEngine {
 

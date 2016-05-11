@@ -3,6 +3,9 @@ namespace StartupAPI;
 
 /**
  * Adding an interface to allow defining unimplemented static methods
+ *
+ * @package StartupAPI
+ * @subpackage Extensions
  */
 interface StartupAPIModuleInterface {
 

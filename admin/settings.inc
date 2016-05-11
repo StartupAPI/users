@@ -1,4 +1,5 @@
 <?php
+namespace StartupAPI;
 
 /**
  * A full list of settings available in the system, must be in sync with
@@ -11,41 +12,16 @@ $config_variables = array(
 		'groups' => array(
 			array(
 				'settings' => array(
-					array(
-						'description' => 'MySQL host',
-						'type' => 'string',
-						'name' => 'mysql_host'
+					new Setting(Setting::TYPE_STRING,'mysql_host', 'MySQL host'),
+					new Setting(Setting::TYPE_INT,'mysql_port', 'MySQL port'),
+					new Setting(Setting::TYPE_PATH,'mysql_socket', 'MySQL socket'),
+					new Setting(Setting::TYPE_STRING,'mysql_db', 'MySQL database name'),
+					new Setting(
+						Setting::TYPE_STRING,
+						'mysql_user',
+						'MySQL database user. See access permissions requirements at https://github.com/StartupAPI/users/wiki/Installation#create-mysql-database'
 					),
-					array(
-						'description' => 'MySQL port',
-						'type' => 'int',
-						'name' => 'mysql_port'
-					),
-					array(
-						'description' => 'MySQL socket',
-						'type' => 'path',
-						'name' => 'mysql_socket'
-					),
-					array(
-						'description' => 'MySQL database name',
-						'type' => 'string',
-						'name' => 'mysql_db'
-					),
-					array(
-						'description' => 'MySQL database user. See access permissions requirements at http://StartupAPI.org/StartupAPI/DB_privileges',
-						'type' => 'string',
-						'name' => 'mysql_user'
-					),
-					array(
-						'description' => 'MySQL password',
-						'type' => 'secret',
-						'name' => 'mysql_password'
-					),
-					array(
-						'description' => "MySQL table prefix for all StartupAPI tables ('u_' by default)",
-						'type' => 'string',
-						'name' => 'mysql_prefix'
-					)
+					new Setting(Setting::TYPE_SECRET,'mysql_password', 'MySQL password')
 				)
 			)
 		)
@@ -56,10 +32,10 @@ $config_variables = array(
 		'groups' => array(
 			array(
 				'settings' => array(
-					array(
-						'description' => 'Array of integer IDs for site administrators (who have access to adin UI)',
-						'type' => 'user-id[]',
-						'name' => 'admins'
+					new Setting(
+						Setting::TYPE_USER_ID_ARRAY,
+						'admins',
+						'Array of integer IDs for site administrators (who have access to admin UI)'
 					)
 				)
 			)
@@ -71,17 +47,17 @@ $config_variables = array(
 		'groups' => array(
 			array(
 				'settings' => array(
-					array(
-						'description' => 'Debug messages in log files',
-						'type' => 'boolean',
-						'name' => 'DEBUG',
-						'options' => array('true_string' => 'enabled', 'false_string' => 'disabled')
+					new Setting(
+						Setting::TYPE_BOOLEAN,
+						'DEBUG',
+						'Debug messages in log files',
+						array('true_string' => 'enabled', 'false_string' => 'disabled')
 					),
-					array(
-						'description' => 'Enable / disable developer tools in the UI',
-						'type' => 'boolean',
-						'name' => 'DEVMODE',
-						'options' => array('true_string' => 'enabled', 'false_string' => 'disabled')
+					new Setting(
+						Setting::TYPE_BOOLEAN,
+						'DEVMODE',
+						'Enable / disable developer tools in the UI',
+						array('true_string' => 'enabled', 'false_string' => 'disabled')
 					)
 				)
 			)
@@ -93,91 +69,90 @@ $config_variables = array(
 		'groups' => array(
 			array(
 				'settings' => array(
-					array(
-						'description' => 'Application name',
-						'type' => 'string',
-						'name' => 'appName'
+					new Setting(
+						Setting::TYPE_STRING,
+						'appName',
+						'Application name'
 					),
-					array(
-						'description' => 'Application icon URL (20x20)',
-						'type' => 'string',
-						'name' => 'appIconURL'
+					new Setting(
+						Setting::TYPE_URL,
+						'appIconURL',
+						'Application icon URL (20x20)'
 					),
-					array(
-						'description' => 'File system path to maillist management widget file to be included on profile management page.',
-						'type' => 'path',
-						'name' => 'maillist'
+					new Setting(
+						Setting::TYPE_PATH,
+						'maillist',
+						'File system path to maillist management widget file to be included on profile management page.'
 					),
-					array(
-						'description' => 'File system path to admin UI footer HTML file.',
-						'type' => 'path',
-						'name' => 'admin_footer'
+					new Setting(
+						Setting::TYPE_PATH,
+						'admin_footer',
+						'File system path to admin UI footer HTML file.'
 					),
-					array(
-						'description' => 'If specified, StartupAPI::head() will include this Twitter Bootstrap CSS instead of default one',
-						'type' => 'url',
-						'name' => 'bootstrapCSS'
+					new Setting(
+						Setting::TYPE_URL,
+						'bootstrapCSS',
+						'If specified, StartupAPI::head() will include this Twitter Bootstrap CSS instead of default one'
 					),
-					array(
-						'description' => 'If specified, StartupAPI::head() will include this Bootswatch Theme instead of default one',
-						'type' => 'string',
-						'name' => 'bootstrapTheme'
+					new Setting(
+						Setting::TYPE_STRING,
+						'bootstrapTheme',
+						'If specified, StartupAPI::head() will include this Bootswatch Theme instead of default one'
 					),
-					array(
-						'description' => 'Bootstrap themes available',
-						'type' => 'string[]',
-						'name' => 'availableBootstrapThemes'
+					new Setting(
+						Setting::TYPE_STRING_ARRAY,
+						'availableBootstrapThemes',
+						'Bootstrap themes available'
 					),
-
-					array(
-						'description' => 'If specified, Admin UI will include this Twitter Bootstrap CSS instead of default one',
-						'type' => 'url',
-						'name' => 'bootstrapAdminCSS'
+					new Setting(
+						Setting::TYPE_URL,
+						'bootstrapAdminCSS',
+						'If specified, Admin UI will include this Twitter Bootstrap CSS instead of default one'
 					),
-					array(
-						'description' => 'Associative array of Twig environment options',
-						'type' => 'array',
-						'name' => 'twig_options'
-					),
+					new Setting(
+						'array',
+						'twig_options',
+						'Associative array of Twig environment options'
+					)
 				),
 			),
 			array(
 				'description' => 'Power strip menu options',
 				'settings' => array(
-					array(
-						'description' => 'Put power strip in a navbar (disable if you have your own navbar going)',
-						'type' => 'boolean',
-						'name' => 'powerStripShowNavbar'
+					new Setting(
+						Setting::TYPE_BOOLEAN,
+						'powerStripShowNavbar',
+						'Put power strip in a navbar (disable if you have your own navbar going)'
 					),
-					array(
-						'description' => 'Invert power strip styles',
-						'type' => 'boolean',
-						'name' => 'powerStripInvertedNavbar'
+					new Setting(
+						Setting::TYPE_BOOLEAN,
+						'powerStripInvertedNavbar',
+						'Invert power strip styles'
 					),
-					array(
-						'description' => 'Show power strip as Bootstrap nav pills instead of navbar',
-						'type' => 'boolean',
-						'name' => 'powerStripNavPills'
+					new Setting(
+						Setting::TYPE_BOOLEAN,
+						'powerStripNavPills',
+						'Show power strip as Bootstrap nav pills instead of navbar'
 					),
-					array(
-						'description' => 'Align power strip to the right',
-						'type' => 'boolean',
-						'name' => 'powerStripPullRight'
+					new Setting(
+						Setting::TYPE_BOOLEAN,
+						'powerStripPullRight',
+						'Align power strip to the right'
 					)
 				)
 			),
 			array(
-				'description' => 'Themes (under development)',
+				'description' => 'Themes',
 				'settings' => array(
-					array(
-						'description' => 'Array of available theme slugs',
-						'type' => 'string[]',
-						'name' => 'available_themes'
+					new Setting(
+						Setting::TYPE_STRING_ARRAY,
+						'available_themes',
+						'Array of available theme slugs'
 					),
-					array(
-						'description' => 'Theme slug for current theme',
-						'type' => 'string',
-						'name' => 'theme'
+					new Setting(
+						Setting::TYPE_STRING,
+						'theme',
+						'Theme slug for current theme'
 					)
 				)
 			)
@@ -190,61 +165,61 @@ $config_variables = array(
 			array(
 				'description' => 'These paths are set automatically, so you might not want to modify them',
 				'settings' => array(
-					array(
-						'description' => 'Root path of the project on the file system',
-						'type' => 'path',
-						'name' => 'ROOTPATH'
+					new Setting(
+						Setting::TYPE_PATH,
+						'ROOTPATH',
+						'Root path of the project on the file system'
 					),
-					array(
-						'description' => 'Root URL of Startup API code (relative, e.g. /myapp/users/)',
-						'type' => 'url',
-						'name' => 'USERSROOTURL'
+					new Setting(
+						Setting::TYPE_URL,
+						'USERSROOTURL',
+						'Root URL of Startup API code (relative, e.g. /myapp/users/)'
 					),
-					array(
-						'description' => 'Root URL of Startup API code (full, e.g. http://example.com/myapp/users/)',
-						'type' => 'url',
-						'name' => 'USERSROOTFULLURL'
+					new Setting(
+						Setting::TYPE_URL,
+						'USERSROOTFULLURL',
+						'Root URL of Startup API code (full, e.g. http://example.com/myapp/users/)'
 					),
-					array(
-						'description' => 'Root URL of the application using Startup API (relative, e.g. /myapp/)',
-						'type' => 'url',
-						'name' => 'SITEROOTURL'
+					new Setting(
+						Setting::TYPE_URL,
+						'SITEROOTURL',
+						'Root URL of the application using Startup API (relative, e.g. /myapp/)'
 					),
-					array(
-						'description' => 'Root URL of the application using Startup API (full, e.g. http://example.com/myapp/)',
-						'type' => 'url',
-						'name' => 'SITEROOTFULLURL'
-					),
+					new Setting(
+						Setting::TYPE_URL,
+						'SITEROOTFULLURL',
+						'Root URL of the application using Startup API (full, e.g. http://example.com/myapp/)'
+					)
 				)
 			),
 			array(
 				'description' => 'Return URLs can be modified if you want to change where users return after each action',
 				'settings' => array(
-					array(
-						'description' => 'Default location URL to return to upon login',
-						'type' => 'url',
-						'name' => 'DEFAULTLOGINRETURN'
+					new Setting(
+						Setting::TYPE_URL,
+						'DEFAULTLOGINRETURN',
+						'Default location URL to return to upon login'
 					),
-					array(
-						'description' => 'Default location URL to return to upon logout',
-						'type' => 'url',
-						'name' => 'DEFAULTLOGOUTRETURN'
+					new Setting(
+						Setting::TYPE_URL,
+						'DEFAULTLOGOUTRETURN',
+						'Default location URL to return to upon logout'
 					),
-					array(
-						'description' => 'Default location URL to return to upon registration',
-						'type' => 'url',
-						'name' => 'DEFAULTREGISTERRETURN'
+					new Setting(
+						Setting::TYPE_URL,
+						'DEFAULTREGISTERRETURN',
+						'Default location URL to return to upon registration'
 					),
-					array(
-						'description' => 'Default location URL to return to upon password reset (for username/password auth)',
-						'type' => 'url',
-						'name' => 'DEFAULTUPDATEPASSWORDRETURN'
+					new Setting(
+						Setting::TYPE_URL,
+						'DEFAULTUPDATEPASSWORDRETURN',
+						'Default location URL to return to upon password reset (for username/password auth)'
 					),
-					array(
-						'description' => 'Default location URL to return to upon successful email verification',
-						'type' => 'url',
-						'name' => 'DEFAULT_EMAIL_VERIFIED_RETURN'
-					),
+					new Setting(
+						Setting::TYPE_URL,
+						'DEFAULT_EMAIL_VERIFIED_RETURN',
+						'Default location URL to return to upon successful email verification'
+					)
 				)
 			)
 		)

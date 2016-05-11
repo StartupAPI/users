@@ -2,13 +2,6 @@
 namespace StartupAPI\Modules\FacebookAuthenticationModule;
 
 /**
- * User credentials for Facebook users
- *
- * @package StartupAPI
- * @subpackage Authentication\Facebook
- */
-
-/**
  * Copyright 2011 Facebook, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may

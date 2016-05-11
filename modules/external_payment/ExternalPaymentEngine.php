@@ -2,12 +2,10 @@
 namespace StartupAPI\Modules;
 
 /**
+ * Fake payment engine that just goes to external page and adds value to account when user comes back
+ *
  * @package StartupAPI
  * @subpackage Subscriptions
- */
-
-/**
- * Fake payment engine that just goes to external page and adds value to account when user comes back
  */
 class ExternalPaymentEngine extends \StartupAPI\PaymentEngine {
 

@@ -3,6 +3,9 @@ namespace StartupAPI\API\Exceptions;
 
 /**
  * Thrown when API namespace is not found
+ *
+ * @package StartupAPI
+ * @subpackage API
  */
 class NamespaceNotFoundException extends NotFoundException {
 

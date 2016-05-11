@@ -4,8 +4,9 @@ namespace StartupAPI;
 /**
  * Store tamper-proof strings in an HTTP cookie
  *
- * Source: http://code.google.com/p/mrclay/source/browse/trunk/php/MrClay/CookieStorage.php
+ * @package StartupAPI
  *
+ * Source: https://github.com/mrclay/old-misc/blob/master/php/MrClay/CookieStorage.php
  * <code>
  * $storage = new MrClay_CookieStorage(array(
  *     'secret' => '67676kmcuiekihbfyhbtfitfytrdo=op-p-=[hH8'

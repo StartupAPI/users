@@ -3,6 +3,9 @@ namespace StartupAPI\API\Exceptions;
 
 /**
  * Thrown when there is no such endpoint (for a method used)
+ *
+ * @package StartupAPI
+ * @subpackage API
  */
 class CallNotFoundException extends NotFoundException {
 

@@ -3,6 +3,9 @@ namespace StartupAPI\API\Exceptions;
 
 /**
  * Thrown when no authentication provided when required
+ *
+ * @package StartupAPI
+ * @subpackage API
  */
 class UnauthenticatedException extends APIException {
 

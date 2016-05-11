@@ -3,6 +3,9 @@ namespace StartupAPI\API\Exceptions;
 
 /**
  * Thrown when we can't parse "call" parameter
+ *
+ * @package StartupAPI
+ * @subpackage API
  */
 class MalformedCallSlugException extends APIException {
 

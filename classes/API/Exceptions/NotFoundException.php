@@ -3,6 +3,9 @@ namespace StartupAPI\API\Exceptions;
 
 /**
  * Abstract class for things that are not found
+ *
+ * @package StartupAPI
+ * @subpackage API
  */
 abstract class NotFoundException extends APIException {
 

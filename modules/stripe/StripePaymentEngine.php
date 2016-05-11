@@ -2,12 +2,10 @@
 namespace StartupAPI\Modules;
 
 /**
+ * Payment engine using Stripe.com service
+ *
  * @package StartupAPI
  * @subpackage Subscriptions/Stripe
- */
-
-/**
- * Payment engine using Stripe.com service
  */
 class StripePaymentEngine extends \StartupAPI\PaymentEngine {
 

@@ -3,6 +3,9 @@ namespace StartupAPI\API\Exceptions;
 
 /**
  * Thrown when parameter value is invalid
+ * 
+ * @package StartupAPI
+ * @subpackage API
  */
 class InvalidParameterValueException extends APIException {
 

@@ -195,20 +195,19 @@ class StartupAPI {
 			foreach ($section['groups'] as $group) {
 				foreach ($group['settings'] as $setting) {
 					// don't make secret values available to templates
-					if ($setting['type'] == 'secret') {
+					if ($setting->getType() == Setting::TYPE_SECRET) {
 						continue;
 					}
 
-					$setting_type = $setting['type'];
-					$var_type = self::phpType($setting_type);
+					$var_type = $setting::phpType();
 					if (substr($var_type, -2) == '[]') {
 						$var_type = substr($var_type, 0, -2);
 					}
 					if ($var_type == 'int' || $var_type == 'string' || $var_type == 'boolean') {
-						if (substr($setting_type, -2) == '[]' && !is_array(UserConfig::${$setting['name']})) {
+						if (substr($setting_type, -2) == '[]' && !is_array(UserConfig::${$setting->getName()})) {
 							continue;
 						}
-						$config_info[$setting['name']] = UserConfig::${$setting['name']};
+						$config_info[$setting->getName()] = UserConfig::${$setting->getName()};
 					}
 				}
 			}
@@ -314,45 +313,6 @@ class StartupAPI {
 			'POWERSTRIP' => $powerstrip_info,
 			'APP' => UserConfig::$app_global_template_variables
 		);
-	}
-
-	/**
-	 * Returns PHP types of the configuration variables
-	 *
-	 * @param string $type StartupAPI configuration value type
-	 * @return string PHP type of the variable
-	 */
-	public static function phpType($type) {
-		if (substr($type, -2) == '[]') {
-			return self::phpType(substr($type, 0, -2)) . '[]';
-		}
-
-		if ($type == 'seconds') {
-			return 'int';
-		}
-		if ($type == 'minutes') {
-			return 'int';
-		}
-		if ($type == 'days') {
-			return 'int';
-		}
-		if ($type == 'path') {
-			return 'string';
-		}
-		if ($type == 'url') {
-			return 'string';
-		}
-		if ($type == 'cookie-key') {
-			return 'string';
-		}
-		if ($type == 'secret') {
-			return 'string';
-		}
-		if ($type == 'user-id') {
-			return 'int';
-		}
-
-		return $type;
 	}
 
 }

@@ -1,9 +1,13 @@
 <?php
+namespace StartupAPI;
 
 error_reporting(E_ALL);
 
 require_once(dirname(dirname(__DIR__)).'/simpletest/autorun.php');
 
+/**
+ * @package StartupAPI
+ */
 class AllTests extends TestSuite {
   function AllTests()
   {
@@ -15,5 +19,3 @@ class AllTests extends TestSuite {
     $this->addFile('TestClock.php');
   }
 }
-
-?>

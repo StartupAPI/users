@@ -1,9 +1,13 @@
 <?php
+namespace StartupAPI;
 
 require_once(dirname(dirname(__DIR__)) . '/simpletest/autorun.php');
 
 require_once(dirname(__DIR__) . '/users.php');
 
+/**
+ * @package StartupAPI
+ */
 class TestUser extends UnitTestCase {
 
 	private $user = null;
