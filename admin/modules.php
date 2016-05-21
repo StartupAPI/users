@@ -2,7 +2,7 @@
 require_once(__DIR__ . '/admin.php');
 
 // temporary switch to make it easy to see experimental modules
-$show_experimental = true;
+$show_experimental = array_key_exists('experimental', $_GET);
 
 $module_categories = array(
 	'auth' => array(
@@ -89,6 +89,16 @@ require_once(__DIR__ . '/header.php');
 ?>
 <div class="span9">
 	<?php
+	if ($show_experimental) {
+		?>
+		<a href="modules.php" class="btn btn-warning pull-right">Hide Experimental</a>
+		<?php
+	} else {
+		?>
+		<a href="modules.php?experimental" class="btn pull-right">Show Experimental</a>
+		<?php
+	}
+
 	foreach ($module_categories as $category_slug => $module_category) {
 		$category_modules = array();
 		foreach ($builtin_modules as $module_slug => $module) {
@@ -117,7 +127,7 @@ require_once(__DIR__ . '/header.php');
 				/*
 				 * Ignore experimental modules that are not installed
 				 */
-				if (!array_key_exists('experimental', $module) || !$module['experimental']) {
+				if ($show_experimental || !array_key_exists('experimental', $module) || !$module['experimental']) {
 					$not_installed_modules[$module_slug] = $module;
 				}
 			}
@@ -136,8 +146,6 @@ require_once(__DIR__ . '/header.php');
 		<div class="modules">
 			<?php
 			foreach ($category_modules as $module_slug => $module) {
-				?>
-				<?php
 				UserConfig::loadModule($module_slug);
 
 				$instances = array();
