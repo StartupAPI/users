@@ -5,7 +5,7 @@
  * Registers users with their username, password, name and email address
  *
  * This is the module that is enabled by default in user_config.sample.php
- * because it requires not configuration.
+ * because it requires no configuration.
  *
  * @package StartupAPI
  * @subpackage Authentication\UsernamePassword
@@ -220,7 +220,6 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 			if (preg_match('/^[a-z][a-z0-9.]*[a-z0-9]$/', $username) !== 1)
 			{
 				$errors['username'][] = "Username must start with the letter and contain only latin letters, digits or '.' symbols";
-
 			}
 		}
 		else
