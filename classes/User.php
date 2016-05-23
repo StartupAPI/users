@@ -627,6 +627,29 @@ class User {
 		return $verified;
 	}
 
+	public function getEmailVerificationCode() {
+		$code = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 10);
+
+		if ($stmt = $db->prepare('UPDATE u_users SET
+										email_verification_code = ?,
+										email_verification_code_time = now()
+									WHERE id = ?')
+		) {
+			if (!$stmt->bind_param('si', $code, $this->userid)) {
+				throw new DBBindParamException($db, $stmt);
+			}
+			if (!$stmt->execute()) {
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+
+			$stmt->close();
+		} else {
+			throw new DBPrepareStmtException($db);
+		}
+
+		return $code;
+	}
+
 	/**
 	 * Sends email verification emai to user's email address
 	 *
@@ -645,23 +668,7 @@ class User {
 
 		$db = UserConfig::getDB();
 
-		$code = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 10);
-
-		if ($stmt = $db->prepare('UPDATE u_users SET
-										email_verification_code = ?,
-										email_verification_code_time = now()
-									WHERE id = ?')) {
-			if (!$stmt->bind_param('si', $code, $this->userid)) {
-				throw new DBBindParamException($db, $stmt);
-			}
-			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
-			}
-
-			$stmt->close();
-		} else {
-			throw new DBPrepareStmtException($db);
-		}
+		$code = $this->getEmailVerificationCode();
 
 		$verification_link = UserConfig::$USERSROOTFULLURL . '/verify_email.php?code=' . urlencode($code);
 
@@ -731,6 +738,11 @@ class User {
 		$email = null;
 		if (array_key_exists('email', $me)) {
 			$email = $me['email'];
+		}
+
+		$existing_users = User::getUsersByEmailOrUsername($email);
+		if (count($existing_users) > 0) {
+			throw new ExistingUserException($existing_users[0]);
 		}
 
 		$user = null;
@@ -1657,7 +1669,8 @@ class User {
 	/**
 	 * Return a list of users who match a username or email
 	 *
-	 * Used to retrieve user based on a login form, can return multiple objects
+	 * Used to retrieve user based on a login form.
+	 * @TODO CONFIRM that this call can return multiple objects, including users with unverified emails.
 	 *
 	 * @param string $nameoremail String with username or email address
 	 *
@@ -2373,6 +2386,12 @@ class User {
 	 */
 	public function setEmail($email) {
 		if ($this->email != $email) {
+			// Checking if there are other users with this email
+			$existing_users = User::getUsersByEmailOrUsername($email);
+			if (count($existing_users) > 0) {
+				throw new ExistingUserException($existing_users[0]);
+			}
+
 			$this->setEmailVerified(false);
 		}
 
