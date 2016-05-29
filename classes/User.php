@@ -628,6 +628,8 @@ class User {
 	}
 
 	public function getEmailVerificationCode() {
+		$db = UserConfig::getDB();
+
 		$code = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 10);
 
 		if ($stmt = $db->prepare('UPDATE u_users SET
