@@ -791,12 +791,13 @@ class User {
 	 * @param StartupAPIModule $module Registratin module used when registering the user
 	 * @param string $name User's display name
 	 * @param string $email User's emaol or null if no email is known
+	 * @param boolean $send_verification_code Whatever to send verification email or not
 	 *
 	 * @return User Newly created user object
 	 *
 	 * @throws DBException
 	 */
-	public static function createNewWithoutCredentials(StartupAPIModule $module, $name, $email = null) {
+	public static function createNewWithoutCredentials(StartupAPIModule $module, $name, $email = null, $send_verification_code = TRUE) {
 		$module_id = $module->getID();
 
 		$name = mb_convert_encoding($name, 'UTF-8');
@@ -808,6 +809,14 @@ class User {
 		$email = filter_var($email, FILTER_VALIDATE_EMAIL);
 		if ($email === FALSE) {
 			$email = null;
+		}
+
+		if ($email) {
+			$existing_users = User::getUsersByEmailOrUsername($email);
+
+			if (count($existing_users) > 0) {
+				throw new ExistingUserException($existing_users[0]);
+			}
 		}
 
 		if ($stmt = $db->prepare('INSERT INTO u_users (name, email, regmodule, tos_version) VALUES (?, ?, ?, ?)')) {
@@ -828,7 +837,10 @@ class User {
 		$user->setReferer();
 		$user->setRegCampaign();
 		$user->init();
-		$user->sendEmailVerificationCode();
+
+		if ($send_verification_code) {
+			$user->sendEmailVerificationCode();
+		}
 
 		return $user;
 	}
