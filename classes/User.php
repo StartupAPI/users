@@ -489,8 +489,15 @@ class User {
 	 * @throws DBException
 	 */
 	private function init() {
-		$invitation_code = $_SESSION[UserConfig::$invitation_code_key];
-		unset($_SESSION[UserConfig::$invitation_code_key]);
+		$storage = new MrClay_CookieStorage(array(
+					'secret' => UserConfig::$SESSION_SECRET,
+					'path' => UserConfig::$SITEROOTURL,
+					'expire' => 0,
+					'httponly' => true
+				));
+
+		$invitation_code = $storage->fetch(UserConfig::$invitation_code_key);
+		$storage->delete(UserConfig::$invitation_code_key);
 
 		$invitation = null;
 		if (!is_null($invitation_code)) {
