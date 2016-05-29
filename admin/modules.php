@@ -82,6 +82,11 @@ $builtin_modules = array(
 		'experimental' => true,
 		'category_slug' => 'payment'
 	),
+	'shallow' => array(
+		'class' => 'ShallowAuthenticationModule',
+		'experimental' => true,
+		'category_slug' => 'auth'
+	),
 );
 
 $ADMIN_SECTION = 'modules';
