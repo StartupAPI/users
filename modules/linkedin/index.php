@@ -32,9 +32,9 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule {
 			'https://www.linkedin.com/uas/oauth/authenticate',
 			array('HMAC-SHA1', 'PLAINTEXT'),
 			$oAuthScope,
-			UserConfig::$USERSROOTURL . '/modules/linkedin/linkedin-small.png',
-			UserConfig::$USERSROOTURL . '/modules/linkedin/linkedin-small.png',
-			UserConfig::$USERSROOTURL . '/modules/linkedin/linkedin-small.png'
+			UserConfig::$USERSROOTURL . '/modules/linkedin/linkedin.png',
+			UserConfig::$USERSROOTURL . '/modules/linkedin/linkedin.png',
+			UserConfig::$USERSROOTURL . '/modules/linkedin/linkedin.png'
 		);
 	}
 
