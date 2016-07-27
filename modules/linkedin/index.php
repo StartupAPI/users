@@ -23,8 +23,8 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule {
 	 */
 	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret, $oAuthScope = null) {
 		parent::__construct(
-			'LinkedIn','
-			https://api.linkedin.com',
+			'LinkedIn',
+			'https://api.linkedin.com',
 			$oAuthConsumerKey,
 			$oAuthConsumerSecret,
 			'https://api.linkedin.com/uas/oauth/requestToken',
