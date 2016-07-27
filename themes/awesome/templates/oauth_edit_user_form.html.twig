@@ -11,9 +11,9 @@
 			{% endif %}
 		</div>
 		<div class="panel-body">
-			{% if errors %}
+			{% if errors and errors[module.id] %}
 				<div class="alert alert-danger" style="margin-top: 15px">
-					{% for field, errorset in errors %}
+					{% for errorset in errors[module.id] %}
 						{% for error in errorset %}
 							<div>{{error}}</div>
 						{% endfor %}
