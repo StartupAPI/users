@@ -116,7 +116,7 @@ $return = User::getReturn();
 User::clearReturn();
 
 if (is_null($return) && !is_null($current_user)) {
-    $return = UserConfig::$USERSROOTURL.'/edit.php';
+    $return = UserConfig::$USERSROOTURL.'/edit.php' . (array_key_exists('module', $_GET) ? '?module='.$_GET['module'] : '');
 }
 
 if (!is_null($return))
