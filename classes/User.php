@@ -511,11 +511,11 @@ class User {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt, "Can't update user preferences (set current account)");
+				throw new DBExecuteStmtException($db, $stmt, "Can't initialize user preferences");
 			}
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db, "Can't update user preferences (set current account)");
+			throw new DBPrepareStmtException($db, "Can't prepare DB statement to initialize user preferences");
 		}
 
 		$invitation_account = null;
