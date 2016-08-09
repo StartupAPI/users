@@ -20,6 +20,22 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 36
+ * corrected type 
+*/
+$versions[36]['up'][] = "ALTER TABLE `u_user_badges` MODIFY COLUMN `time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+	COMMENT 'Time when user got the badge'";
+$versions[36]['up'][] = "ALTER TABLE `u_users` MODIFY COLUMN `email_verification_code_time` DATETIME DEFAULT CURRENT_TIMESTAMP 
+	COMMENT 'Email verification code generation time'";
+$versions[36]['up'][] = "ALTER TABLE `u_users` MODIFY COLUMN `last_accessed` DATETIME  DEFAULT CURRENT_TIMESTAMP";
+
+$versions[36]['down'][] = "ALTER TABLE `u_user_badges` MODIFY COLUMN `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  COMMENT 'Time when user got the badge'";
+$versions[36]['down'][] = "ALTER TABLE `u_users` MODIFY COLUMN `email_verification_code_time` timestamp NULL DEFAULT NULL  
+	COMMENT 'Email verification code generation time'";
+$versions[36]['down'][] = "ALTER TABLE `u_users` MODIFY COLUMN `last_accessed` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 35
  * Adding application settings for a user (free-form JSON)
 */
@@ -755,7 +771,7 @@ $versions[3]['down'][]	= 'ALTER TABLE u_users DROP COLUMN points';
  * VERSION 2
  * Adding a field to indicate last time current user was retrieved
 */
-$versions[2]['up'][]	= 'ALTER TABLE u_users ADD last_accessed TIMESTAMP';
+$versions[2]['up'][]	= 'ALTER TABLE u_users ADD last_accessed TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP';
 $versions[2]['down'][]	= 'ALTER TABLE u_users DROP COLUMN last_accessed';
 
 /* -------------------------------------------------------------------------------------------------------

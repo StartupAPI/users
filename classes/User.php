@@ -588,14 +588,14 @@ class User {
 			$query = 'UPDATE u_users
 						SET email_verified = 1,
 							email_verification_code = null,
-							email_verification_code_time = null
+							email_verification_code_time = NOW()
 						WHERE email_verification_code = ?
 							AND email_verification_code_time > DATE_SUB(NOW(), INTERVAL ? DAY)';
 		} else {
 			$query = 'UPDATE u_users
 						SET email_verified = 1,
 							email_verification_code = null,
-							email_verification_code_time = null
+							email_verification_code_time = NOW()
 						WHERE id = ?
 							AND email_verification_code = ?
 							AND email_verification_code_time > DATE_SUB(NOW(), INTERVAL ? DAY)';
