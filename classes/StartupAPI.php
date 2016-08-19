@@ -186,6 +186,10 @@ class StartupAPI {
 		// do this on each page view where StartupAPI code is executed
 		CampaignTracker::preserveReferer();
 		CampaignTracker::recordCampaignVariables();
+
+		if (is_callable(UserConfig::$onStartupAPIInit)) {
+			call_user_func(UserConfig::$onStartupAPIInit);
+		}
 	}
 
 	/**

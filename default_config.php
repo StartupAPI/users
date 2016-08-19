@@ -805,6 +805,10 @@ class UserConfig {
 	 */
 	public static $onRenderTOSLinks = 'UserConfig::renderTOSLinks';
 
+	/**
+	 * @var callable Hook to execute after StartupAPI finished initializing
+	 */
+	public static $onStartupAPIInit = null;
 
 	/* ========================================================================
 	 *
