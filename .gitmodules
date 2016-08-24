@@ -34,3 +34,6 @@
 [submodule "swiftmailer"]
 	path = swiftmailer
 	url = git://github.com/swiftmailer/swiftmailer.git
+[submodule "phptidy"]
+	path = phptidy
+	url = https://github.com/cmrcx/phptidy.git
