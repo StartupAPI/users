@@ -1,147 +1,100 @@
 <?php
 require_once(__DIR__ . '/global.php');
 
-if (!array_key_exists('call', $_GET)) {
-	header('HTTP/1.0 400 Bad Request');
-	?>
-	<style>
-		code {
-			font-family: monospace,"Courier New";
-			background-color: #f9f9f9;
-			padding: 0.2em;
-		}
+if (!array_key_exists('call', $_GET) && array_key_exists('swagger-spec', $_GET)) {
+	$swagger_spec = array(
+		'swagger' => '2.0',
+		'info' => array(
+			'contact' => array(
+				'email' => UserConfig::$supportEmailFromEmail
+			),
+			'version' => UserConfig::$apiSpecVersion
+		),
+		'basePath' => UserConfig::$USERSROOTURL . '/api.php'
+	);
 
-		dl {
-			margin-bottom: 2em;
-		}
-
-		dt {
-			margin-bottom: 0.3em;
-		}
-
-		dd {
-			margin-bottom: 0.5em;
-		}
-
-		b.call {
-			color: green;
-		}
-
-		b.param {
-			color: blue;
-		}
-	</style>
-	<h1>400 Bad Request</h1>
-	<p>Required parameter: <b>call</b></p>
-	<?php
-	$user = StartupAPI::getUser();
-	if (!is_null($user) && $user->isAdmin()) {
-		?>
-		<p>
-			Available endpoints:
-			<?php
-			$all_endpoints = \StartupAPI\API\Endpoint::getAllEndpointsBySlug();
-			foreach (\StartupAPI\API\Endpoint::getNamespaces() as $namespace) {
-				?>
-			<h2><?php echo $namespace->getName(); ?></h2>
-			<ul>
-				<?php
-				$namespace_slug = $namespace->getSlug();
-				foreach ($all_endpoints[$namespace_slug] as $endpoint_slug => $endpoints) {
-					?>
-					<li>
-						<h3><?php echo $endpoint_slug ?></h3>
-						<dl>
-							<?php
-							foreach ($endpoints as $method => $endpoint) {
-								$call = "/$namespace_slug$endpoint_slug";
-
-								$params = $endpoint->getParams();
-
-								$sample_params_urlencoded = '';
-								if (count($params) > 0) {
-									foreach ($params as $name => $param) {
-										if (!$param->isOptional()) {
-											$sample_params_urlencoded .= '<b class="param">' . $name . '</b>=';
-											$sample_params_urlencoded .= urldecode($param->getSampleValue());
-										}
-									}
-
-									if (!empty($sample_params_urlencoded)) {
-										$sample_params_urlencoded = '&amp;' . $sample_params_urlencoded;
-									}
-								}
-								?>
-								<dt>
-								<code>
-									<?php echo $method; ?>
-									<?php
-									if ($method == 'GET') {
-										?>
-										<a href="?call=<?php echo $call . strip_tags($sample_params_urlencoded) ?>"><?php echo UserConfig::$USERSROOTFULLURL ?>/api.php?call=<b class="call"><?php echo $call ?></b><?php echo $sample_params_urlencoded ?></a>
-										<?php
-									} else {
-										echo UserConfig::$USERSROOTFULLURL;
-										?>/api.php?call=<b class="call"><?php echo $call; ?></b>
-										<?php
-									}
-									?>
-								</code>
-								</dt>
-								<dd>
-									<?php echo $endpoint->getDescription(); ?>
-									<?php
-									if (count($params) > 0) {
-										?>
-										<h4>Parameters:</h4>
-										<dl>
-											<?php
-											foreach ($params as $name => $param) {
-												?>
-												<dt>
-												<code><?php echo $name; ?></code>
-												<?php
-												if ($param->isOptional()) {
-													?> (optional)<?php
-												} else {
-													?> (required)<?php
-												}
-												?>
-												</dt>
-												<dd>
-													<?php
-													echo $param->getDescription();
-
-													if ($param->allowsMultipleValues()) {
-														?>
-														(allows multiple values)
-														<?php
-													}
-													?>
-												</dd>
-												<?php
-											}
-											?>
-										</dl>
-										<?php
-									}
-									?>
-								</dd>
-								<?php
-							}
-							?>
-						</dl>
-					</li>
-					<?php
-				}
-				?>
-			</ul>
-			<?php
-		}
-		?>
-		</p>
-		<?php
+	if (UserConfig::$appName) {
+		$swagger_spec['info']['title'] = UserConfig::$appName;
 	}
+
+	if (UserConfig::$termsOfServiceFullURL) {
+		$swagger_spec['info']['termsOfService'] = UserConfig::$termsOfServiceFullURL;
+	}
+
+	// Swagger tags, e.g. API namespaces
+	foreach (\StartupAPI\API\Endpoint::getNamespaces() as $namespace) {
+		$swagger_spec['tags'][] = array(
+			'name' => $namespace->getSlug(),
+			'description' => $namespace->getName()
+		);
+	}
+
+	// Swagger paths, e.g. API Endpoints groupped by path
+	$all_endpoints = \StartupAPI\API\Endpoint::getAllEndpointsBySlug();
+	foreach ($all_endpoints as $namespace_slug => $namespace_endpoints) {
+		foreach ($namespace_endpoints as $endpoint_slug => $endpoints) {
+			foreach ($endpoints as $method => $endpoint) {
+				$operation = array(
+					'tags' => array(
+						$namespace_slug
+					),
+					'summary' => $endpoint->getDescription(),
+					'description' => $endpoint->getDescription(),
+					'operationId' => get_class($endpoint),
+					'responses' => array(
+						'200' => array(
+							'description' => 'success'
+						),
+						'400' => array(
+							'description' => 'invalid input'
+						)
+					)
+				);
+
+				$params = $endpoint->getParams();
+
+				foreach ($params as $name => $param) {
+					$param_spec = array(
+						'name' => $name,
+						'description' => $param->getDescription(),
+						'required' => !$param->isOptional()
+					);
+
+					if ($method === 'GET') {
+						$param_spec['in'] = 'query';
+					} else {
+						$param_spec['in'] = 'formData';
+					}
+
+					if ($param->allowsMultipleValues()) {
+						$param_spec['type'] = 'array';
+						$param_spec['collectionFormat'] = 'multi';
+					}
+					$operation['parameters'][] = $param_spec;
+				}
+
+				$swagger_spec['paths']["/api.php?call=/$namespace_slug$endpoint_slug"] = array(
+					strtolower($method) => $operation
+				);
+			}
+		}
+	}
+
+	header('Content-type: application/json');
+	echo json_encode($swagger_spec);
+
+	if (json_last_error() !== JSON_ERROR_NONE) {
+		header('HTTP/1.1 400 Bad Request');
+		header('Content-type: text/plain');
+		echo "Error encoding JSON result";
+	}
+
+	exit;
+}
+
+if (!array_key_exists('call', $_GET)) {
+	$template_info = StartupAPI::getTemplateInfo();
+	StartupAPI::$template->display('@startupapi/swagger-ui.html.twig', $template_info);
 	exit;
 }
 
@@ -172,7 +125,7 @@ try {
 		'result' => $endpoint->call($params, $raw_request_body)
 	);
 } catch (\StartupAPI\API\NotFoundException $ex) {
-	header('HTTP/1.0 404 Not Found');
+	header('HTTP/1.1 404 Not Found');
 	$response = array(
 		'meta' => array(
 			'success' => false,
@@ -181,7 +134,7 @@ try {
 		)
 	);
 } catch (\StartupAPI\API\MethodNotAllowedException $ex) {
-	header('HTTP/1.0 405 Method not allowed');
+	header('HTTP/1.1 405 Method not allowed');
 	$response = array(
 		'meta' => array(
 			'success' => false,
@@ -190,7 +143,7 @@ try {
 		)
 	);
 } catch (\StartupAPI\API\UnauthenticatedException $ex) {
-	header('HTTP/1.0 401 Authentication Required');
+	header('HTTP/1.1 401 Authentication Required');
 	header('WWW-Authenticate: FormBased');
 	$response = array(
 		'meta' => array(
@@ -200,7 +153,7 @@ try {
 		)
 	);
 } catch (\StartupAPI\API\UnauthorizedException $ex) {
-	header('HTTP/1.0 403 Forbidden');
+	header('HTTP/1.1 403 Forbidden');
 	$response = array(
 		'meta' => array(
 			'success' => false,
@@ -209,7 +162,7 @@ try {
 		)
 	);
 } catch (\StartupAPI\API\BadParameterException $ex) {
-	header('HTTP/1.0 400 Bad Parameter');
+	header('HTTP/1.1 400 Bad Parameter');
 	$response = array(
 		'meta' => array(
 			'success' => false,
@@ -218,7 +171,7 @@ try {
 		)
 	);
 } catch (\StartupAPI\API\APIException $ex) {
-	header('HTTP/1.0 500 Server Error');
+	header('HTTP/1.1 500 Server Error');
 	$response = array(
 		'meta' => array(
 			'success' => false,

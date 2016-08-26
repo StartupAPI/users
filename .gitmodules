@@ -37,3 +37,6 @@
 [submodule "phptidy"]
 	path = phptidy
 	url = https://github.com/cmrcx/phptidy.git
+[submodule "swagger-ui"]
+	path = swagger-ui
+	url = https://github.com/swagger-api/swagger-ui.git

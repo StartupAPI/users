@@ -888,6 +888,8 @@ class UserConfig {
 	 */
 	public static $enable_startupapi_apis = true;
 
+	public static $apiSpecVersion = '1.0.0';
+
 	/* ========================================================================
 	 *
 	 * Some global functions and default hooks, as well as static initializer
