@@ -70,7 +70,7 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule {
 	}
 
 	public function getIdentity($oauth_user_id) {
-		$request = new OAuthRequester('http://api.linkedin.com/v1/people/~:(id,formatted-name,picture-url,public-profile-url)?format=json', 'GET');
+		$request = new OAuthRequester('http://api.linkedin.com/v1/people/~:(id,formatted-name,picture-url,public-profile-url,email-address)?format=json', 'GET');
 		$result = $request->doRequest($oauth_user_id);
 
 		if ($result['code'] == 200) {
@@ -78,6 +78,7 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule {
 
 			if (array_key_exists('id', $userdata) && array_key_exists('formattedName', $userdata)) {
 				$userdata['name'] = $userdata['formattedName'];
+				$userdata['email'] = $userdata['emailAddress'];
 				unset($userdata['formattedName']);
 				return $userdata;
 			}
