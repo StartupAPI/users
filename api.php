@@ -73,9 +73,9 @@ if (!array_key_exists('call', $_GET) && array_key_exists('swagger-spec', $_GET))
 					$operation['parameters'][] = $param_spec;
 				}
 
-				$swagger_spec['paths']["/api.php?call=/$namespace_slug$endpoint_slug"] = array(
-					strtolower($method) => $operation
-				);
+				$swagger_spec['paths']
+					["/api.php?call=/$namespace_slug$endpoint_slug"]
+						[strtolower($method)] = $operation;
 			}
 		}
 	}
