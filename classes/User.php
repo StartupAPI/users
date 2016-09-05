@@ -1172,14 +1172,27 @@ class User {
 
 		$daily_activity = array();
 
-		$where = '';
 		if (!is_null($user)) {
-			$where = ' WHERE user_id = ' . $user->getID() . ' ';
+			$user_id = $user->getID();
+
+			$stmt = $db->prepare(
+				"SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total
+					FROM u_activity
+					WHERE user_id = ?
+					GROUP BY activity_date, activity_id");
+
+			if ($stmt) {
+				if (!$stmt->bind_param('i', $user_id)) {
+					throw new DBBindParamException($db, $stmt);
+				}
+			}
 		} else if (count(UserConfig::$dont_display_activity_for) > 0) {
-			$where = ' WHERE user_id NOT IN(' . join(', ', UserConfig::$dont_display_activity_for) . ') ';
+			$stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total FROM u_activity WHERE user_id NOT IN(' . join(', ', UserConfig::$dont_display_activity_for) . ') GROUP BY activity_date, activity_id');
+		} else {
+			$stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total FROM u_activity GROUP BY activity_date, activity_id');
 		}
 
-		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total FROM u_activity ' . $where . 'GROUP BY activity_date, activity_id')) {
+		if ($stmt) {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
