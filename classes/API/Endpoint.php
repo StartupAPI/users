@@ -10,8 +10,7 @@ namespace StartupAPI\API;
 require_once(__DIR__ . '/EndpointNameSpace.php');
 
 // APIs Endpoints to be registered
-require_once(__DIR__ . '/v1/Login.php');
-require_once(__DIR__ . '/v1/User.php');
+require_once(__DIR__ . '/v1/User/Get.php');
 require_once(__DIR__ . '/v1/Accounts.php');
 
 require_once(dirname(__DIR__) . '/AuthenticationModule.php');
@@ -73,14 +72,10 @@ abstract class Endpoint {
 	 * Helper function that registers core API endoiunts in the system
 	 */
 	public static function registerCoreEndpoints() {
-		$namespace = new EndpointNameSpace(
-				'startupapi', 'StartupAPI', 'Startup API core endpoints'
-		);
-		if (!is_null(\AuthenticationModule::get('usernamepass'))) {
-			self::register($namespace, 'POST', new \StartupAPI\API\v1\Login());
+		if (\UserConfig::$apiNamespace) {
+			self::register(\UserConfig::$apiNamespace, 'GET', new \StartupAPI\API\v1\User\Get());
+			self::register(\UserConfig::$apiNamespace, 'GET', new \StartupAPI\API\v1\Accounts());
 		}
-		self::register($namespace, 'GET', new \StartupAPI\API\v1\User());
-		self::register($namespace, 'GET', new \StartupAPI\API\v1\Accounts());
 	}
 
 	protected function __construct($slug, $description) {
@@ -270,9 +265,9 @@ abstract class AuthenticatedEndpoint extends Endpoint {
  */
 
 /**
- * Abstract class for all API Exceptions
+ * Root class for all API Exceptions
  */
-abstract class APIException extends \StartupAPIException {
+class APIException extends \StartupAPIException {
 
 }
 

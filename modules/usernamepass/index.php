@@ -1,4 +1,7 @@
 <?php
+require_once(__DIR__ . '/API/Login.php');
+require_once(__DIR__ . '/API/Register.php');
+
 /**
  * Basic authentication module using username and password
  *
@@ -12,6 +15,24 @@
  */
 class UsernamePasswordAuthenticationModule extends AuthenticationModule
 {
+	public function __construct() {
+		parent::__construct();
+
+		if (UserConfig::$apiNamespace) {
+			\StartupAPI\API\Endpoint::register(
+				UserConfig::$apiNamespace,
+				'POST',
+				new \StartupAPI\API\v1\User\UsernamePass\Login()
+			);
+
+			\StartupAPI\API\Endpoint::register(
+				UserConfig::$apiNamespace,
+				'PUT',
+				new \StartupAPI\API\v1\User\UsernamePass\Register()
+			);
+		}
+	}
+
 	public function getID()
 	{
 		return "usernamepass";

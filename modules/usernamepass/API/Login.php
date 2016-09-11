@@ -1,16 +1,13 @@
 <?php
 
-namespace StartupAPI\API\v1;
+namespace StartupAPI\API\v1\User\UsernamePass;
 
 /**
  * @package StartupAPI
  * @subpackage API
  */
-require_once(dirname(__DIR__) . '/Endpoint.php');
-require_once(dirname(__DIR__) . '/Parameter.php');
-
-require_once(dirname(dirname(__DIR__)) . '/User.php');
-require_once(dirname(dirname(__DIR__)) . '/Account.php');
+require_once(dirname(dirname(dirname(__DIR__))) . '/classes/User.php');
+require_once(dirname(dirname(dirname(__DIR__))) . '/classes/Account.php');
 
 /**
  * Returns currently authenticated user
