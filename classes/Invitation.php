@@ -652,7 +652,7 @@ class Invitation {
 	 *
 	 * @param Account $account
 	 */
-	public function setAccount(Account $account) {
+	public function setAccount(Account $account = null) {
 		if (!is_null($account)) {
 			$this->account_id = $account->getID();
 		}
