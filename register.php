@@ -31,14 +31,7 @@ if (UserConfig::$enableRegistration && array_key_exists('register', $_POST)) {
 			throw new StartupAPIException('Invitation code is invalid');
 		}
 
-		$storage = new MrClay_CookieStorage(array(
-					'secret' => UserConfig::$SESSION_SECRET,
-					'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
-					'path' => UserConfig::$SITEROOTURL,
-					'httponly' => true
-				));
-
-		$storage->store(UserConfig::$invitation_code_key, $code);
+		$_SESSION[UserConfig::$invitation_code_key] = $code;
 	}
 
 	try {

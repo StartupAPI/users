@@ -30,10 +30,6 @@ UserTools::preventCSRF();
 $template_info = StartupAPI::getTemplateInfo();
 $template_info['account_name'] = $account->getName();
 
-if (!session_id()) {
-	session_start();
-}
-
 if (array_key_exists('plan', $_POST)) {
 	$data = explode('.', $_REQUEST['plan']);
 
