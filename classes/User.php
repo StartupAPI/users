@@ -671,8 +671,6 @@ class User {
 			return;
 		}
 
-		$db = UserConfig::getDB();
-
 		$code = $this->getEmailVerificationCode();
 
 		$verification_link = UserConfig::$USERSROOTFULLURL . '/verify_email.php?code=' . urlencode($code);
