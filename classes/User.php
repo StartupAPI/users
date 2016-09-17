@@ -781,6 +781,7 @@ class User {
 	 * Create new user without credentials
 	 *
 	 * Used primarily by modules that will store credentials separately from user table
+	 * Can also be used directly to create "shallow" accounts
 	 *
 	 * @param StartupAPIModule $module Registratin module used when registering the user
 	 * @param string $name User's display name
