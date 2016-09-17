@@ -7,7 +7,6 @@ $user = User::require_login();
 $account = Account::getCurrentAccount($user);
 
 $engine = htmlspecialchars($_REQUEST['engine']);
-session_start();
 
 // Check for no-op
 if (!is_null($account->getPaymentEngine()) && $account->getPaymentEngine()->getSlug() == $engine) {

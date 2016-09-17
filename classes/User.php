@@ -489,15 +489,11 @@ class User {
 	 * @throws DBException
 	 */
 	private function init() {
-		$storage = new MrClay_CookieStorage(array(
-					'secret' => UserConfig::$SESSION_SECRET,
-					'path' => UserConfig::$SITEROOTURL,
-					'expire' => 0,
-					'httponly' => true
-				));
-
-		$invitation_code = $storage->fetch(UserConfig::$invitation_code_key);
-		$storage->delete(UserConfig::$invitation_code_key);
+		$invitation_code = null;
+		if (array_key_exists(UserConfig::$invitation_code_key, $_SESSION)) {
+			$invitation_code = $_SESSION[UserConfig::$invitation_code_key];
+			unset($_SESSION[UserConfig::$invitation_code_key]);
+		}
 
 		$invitation = null;
 		if (!is_null($invitation_code)) {
@@ -518,11 +514,11 @@ class User {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt, "Can't update user preferences (set current account)");
+				throw new DBExecuteStmtException($db, $stmt, "Can't initialize user preferences");
 			}
 			$stmt->close();
 		} else {
-			throw new DBPrepareStmtException($db, "Can't update user preferences (set current account)");
+			throw new DBPrepareStmtException($db, "Can't prepare DB statement to initialize user preferences");
 		}
 
 		$invitation_account = null;
@@ -1205,14 +1201,27 @@ class User {
 
 		$daily_activity = array();
 
-		$where = '';
 		if (!is_null($user)) {
-			$where = ' WHERE user_id = ' . $user->getID() . ' ';
+			$user_id = $user->getID();
+
+			$stmt = $db->prepare(
+				"SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total
+					FROM u_activity
+					WHERE user_id = ?
+					GROUP BY activity_date, activity_id");
+
+			if ($stmt) {
+				if (!$stmt->bind_param('i', $user_id)) {
+					throw new DBBindParamException($db, $stmt);
+				}
+			}
 		} else if (count(UserConfig::$dont_display_activity_for) > 0) {
-			$where = ' WHERE user_id NOT IN(' . join(', ', UserConfig::$dont_display_activity_for) . ') ';
+			$stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total FROM u_activity WHERE user_id NOT IN(' . join(', ', UserConfig::$dont_display_activity_for) . ') GROUP BY activity_date, activity_id');
+		} else {
+			$stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total FROM u_activity GROUP BY activity_date, activity_id');
 		}
 
-		if ($stmt = $db->prepare('SELECT CAST(time AS DATE) AS activity_date, activity_id, count(*) AS total FROM u_activity ' . $where . 'GROUP BY activity_date, activity_id')) {
+		if ($stmt) {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}

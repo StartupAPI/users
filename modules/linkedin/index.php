@@ -23,8 +23,8 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule {
 	 */
 	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret, $oAuthScope = null) {
 		parent::__construct(
-			'LinkedIn','
-			https://api.linkedin.com',
+			'LinkedIn',
+			'https://api.linkedin.com',
 			$oAuthConsumerKey,
 			$oAuthConsumerSecret,
 			'https://api.linkedin.com/uas/oauth/requestToken',
@@ -32,9 +32,9 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule {
 			'https://www.linkedin.com/uas/oauth/authenticate',
 			array('HMAC-SHA1', 'PLAINTEXT'),
 			$oAuthScope,
-			UserConfig::$USERSROOTURL . '/modules/linkedin/linkedin-small.png',
-			UserConfig::$USERSROOTURL . '/modules/linkedin/linkedin-small.png',
-			UserConfig::$USERSROOTURL . '/modules/linkedin/linkedin-small.png'
+			UserConfig::$USERSROOTURL . '/modules/linkedin/linkedin.png',
+			UserConfig::$USERSROOTURL . '/modules/linkedin/linkedin.png',
+			UserConfig::$USERSROOTURL . '/modules/linkedin/linkedin.png'
 		);
 	}
 
@@ -70,7 +70,7 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule {
 	}
 
 	public function getIdentity($oauth_user_id) {
-		$request = new OAuthRequester('http://api.linkedin.com/v1/people/~:(id,formatted-name,picture-url,public-profile-url)?format=json', 'GET');
+		$request = new OAuthRequester('http://api.linkedin.com/v1/people/~:(id,formatted-name,picture-url,public-profile-url,email-address)?format=json', 'GET');
 		$result = $request->doRequest($oauth_user_id);
 
 		if ($result['code'] == 200) {
@@ -78,6 +78,7 @@ class LinkedInAuthenticationModule extends OAuthAuthenticationModule {
 
 			if (array_key_exists('id', $userdata) && array_key_exists('formattedName', $userdata)) {
 				$userdata['name'] = $userdata['formattedName'];
+				$userdata['email'] = $userdata['emailAddress'];
 				unset($userdata['formattedName']);
 				return $userdata;
 			}

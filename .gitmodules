@@ -7,9 +7,6 @@
 [submodule "dbupgrade"]
 	path = dbupgrade
 	url = git://github.com/sergeychernyshev/DBUpgrade.git
-[submodule "phptidy"]
-	path = phptidy
-	url = git://github.com/sergeychernyshev/phptidy.git
 [submodule "twig"]
 	path = twig
 	url = git://github.com/fabpot/Twig.git
@@ -37,3 +34,9 @@
 [submodule "swiftmailer"]
 	path = swiftmailer
 	url = git://github.com/swiftmailer/swiftmailer.git
+[submodule "phptidy"]
+	path = phptidy
+	url = https://github.com/cmrcx/phptidy.git
+[submodule "swagger-ui"]
+	path = swagger-ui
+	url = https://github.com/swagger-api/swagger-ui.git

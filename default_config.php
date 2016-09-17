@@ -433,6 +433,22 @@ class UserConfig {
 
 	/* ========================================================================
 	 *
+	 * REST API configuration
+	 *
+	 * ===================================================================== */
+
+	/**
+	 * StartupAPI namespace definition.
+	 *
+	 * Make it null to disable StartupAPI's default APIs or update API description
+	 * or namespace slug to match your app.
+	 *
+	 * @var EndpointNameSpace
+	 */
+	public static $apiNamespace = null;
+
+	/* ========================================================================
+	 *
 	 * Activity tracking and analytics
 	 *
 	 * ===================================================================== */
@@ -805,6 +821,10 @@ class UserConfig {
 	 */
 	public static $onRenderTOSLinks = 'UserConfig::renderTOSLinks';
 
+	/**
+	 * @var callable Hook to execute after StartupAPI finished initializing
+	 */
+	public static $onStartupAPIInit = null;
 
 	/* ========================================================================
 	 *
@@ -883,6 +903,8 @@ class UserConfig {
 	 * @var boolean Exposed core StartupAPI methods in API (true by default)
 	 */
 	public static $enable_startupapi_apis = true;
+
+	public static $apiSpecVersion = '1.0.0';
 
 	/* ========================================================================
 	 *
@@ -1144,31 +1166,34 @@ EOD;
 		$users_env = PHPBootstrap\bootstrap(__FILE__);
 		$site_env = PHPBootstrap\bootstrap(__DIR__);
 
-		UserConfig::$ROOTPATH = $users_env['ROOT_FILESYSTEM_PATH'];
-		UserConfig::$USERSROOTURL = $users_env['ROOT_ABSOLUTE_URL_PATH'];
+		self::$ROOTPATH = $users_env['ROOT_FILESYSTEM_PATH'];
+		self::$USERSROOTURL = $users_env['ROOT_ABSOLUTE_URL_PATH'];
 
 		// we assume that package is extracted into the root of the site
-		UserConfig::$SITEROOTURL = $site_env['ROOT_ABSOLUTE_URL_PATH'] . '/';
+		self::$SITEROOTURL = $site_env['ROOT_ABSOLUTE_URL_PATH'] . '/';
 
-		UserConfig::$DEFAULTLOGINRETURN = UserConfig::$SITEROOTURL;
-		UserConfig::$DEFAULTLOGOUTRETURN = UserConfig::$SITEROOTURL;
-		UserConfig::$DEFAULTREGISTERRETURN = UserConfig::$SITEROOTURL;
-		UserConfig::$DEFAULTUPDATEPASSWORDRETURN = UserConfig::$SITEROOTURL;
-		UserConfig::$DEFAULT_EMAIL_VERIFIED_RETURN = UserConfig::$SITEROOTURL;
+		self::$DEFAULTLOGINRETURN = self::$SITEROOTURL;
+		self::$DEFAULTLOGOUTRETURN = self::$SITEROOTURL;
+		self::$DEFAULTREGISTERRETURN = self::$SITEROOTURL;
+		self::$DEFAULTUPDATEPASSWORDRETURN = self::$SITEROOTURL;
+		self::$DEFAULT_EMAIL_VERIFIED_RETURN = self::$SITEROOTURL;
 
-		UserConfig::$SITEROOTFULLURL = $site_env['ROOT_FULL_URL'];
-		UserConfig::$USERSROOTFULLURL = $users_env['ROOT_FULL_URL'];
+		self::$SITEROOTFULLURL = $site_env['ROOT_FULL_URL'];
+		self::$USERSROOTFULLURL = $users_env['ROOT_FULL_URL'];
 
 		// Default locations for terms of service and privacy policy documents
-		UserConfig::$termsOfServiceURL = UserConfig::$SITEROOTURL . 'terms_of_service.php';
-		UserConfig::$termsOfServiceFullURL = UserConfig::$SITEROOTFULLURL . 'terms_of_service.php';
-		UserConfig::$privacyPolicyURL = UserConfig::$SITEROOTURL . 'privacy_policy.php';
-		UserConfig::$privacyPolicyFullURL = UserConfig::$SITEROOTFULLURL . 'privacy_policy.php';
+		self::$termsOfServiceURL = self::$SITEROOTURL . 'terms_of_service.php';
+		self::$termsOfServiceFullURL = self::$SITEROOTFULLURL . 'terms_of_service.php';
+		self::$privacyPolicyURL = self::$SITEROOTURL . 'privacy_policy.php';
+		self::$privacyPolicyFullURL = self::$SITEROOTFULLURL . 'privacy_policy.php';
 
-		UserConfig::$supportEmailXMailer = 'Startup API (PHP/' . phpversion() . ')';
+		self::$supportEmailXMailer = 'Startup API (PHP/' . phpversion() . ')';
+		self::$apiNamespace = new \StartupAPI\API\EndpointNameSpace(
+			'startupapi', 'StartupAPI', 'Startup API core endpoints'
+		);
 
 		// Instantiating email sending object
-		UserConfig::$mailer = Swift_Mailer::newInstance(Swift_MailTransport::newInstance());
+		self::$mailer = Swift_Mailer::newInstance(Swift_MailTransport::newInstance());
 
 		// Built in activities
 
@@ -1272,7 +1297,7 @@ EOD;
 		// Array of activities in the system.
 		// Key must be integer (best if specified using a constant).
 		// The values are an array with label and "points" value of activity.
-		UserConfig::$activities = array(
+		self::$activities = array(
 			USERBASE_ACTIVITY_LOGIN_UPASS => array('Logged in using username and password', 1),
 			USERBASE_ACTIVITY_LOGIN_FB => array('Logged in using Facebook', 1),
 			USERBASE_ACTIVITY_LOGIN_GFC => array('Logged in using Google Friend Connect', 1),
@@ -1295,10 +1320,10 @@ EOD;
 			USERBASE_ACTIVITY_REGISTER_EMAIL => array('Registered using email', 1)
 		);
 
-		UserConfig::$cohort_providers[] = new GenerationCohorts(GenerationCohorts::MONTH);
-		UserConfig::$cohort_providers[] = new GenerationCohorts(GenerationCohorts::WEEK);
-		UserConfig::$cohort_providers[] = new GenerationCohorts(GenerationCohorts::YEAR);
-		UserConfig::$cohort_providers[] = new RegMethodCohorts();
+		self::$cohort_providers[] = new GenerationCohorts(GenerationCohorts::MONTH);
+		self::$cohort_providers[] = new GenerationCohorts(GenerationCohorts::WEEK);
+		self::$cohort_providers[] = new GenerationCohorts(GenerationCohorts::YEAR);
+		self::$cohort_providers[] = new RegMethodCohorts();
 	}
 
 	/**

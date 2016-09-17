@@ -400,7 +400,7 @@ class Badge {
 		$user_id = $user->getID();
 
 		if ($stmt = $db->prepare('INSERT IGNORE INTO u_user_badges
-									(user_id, badge_id, badge_level) VALUES (?, ?, ?)')) {
+									(user_id, badge_id, badge_level, time) VALUES (?, ?, ?, NOW())')) {
 			if (!$stmt->bind_param('iii', $user_id, $this->id, $level)) {
 				throw new DBBindParamException($db, $stmt);
 			}
