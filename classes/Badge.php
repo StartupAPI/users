@@ -268,7 +268,7 @@ class Badge {
 
 		$user_id = $user->getID();
 
-		if ($stmt = $db->prepare('SELECT badge_id, MAX(badge_level) as level, time FROM u_user_badges WHERE user_id = ? GROUP BY badge_id')) {
+		if ($stmt = $db->prepare('SELECT badge_id, badge_level, time FROM u_user_badges WHERE user_id = ? ORDER BY badge_level ASC')) {
 			if (!$stmt->bind_param('i', $user_id)) {
 				throw new DBBindParamException($db, $stmt);
 			}

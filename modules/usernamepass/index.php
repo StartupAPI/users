@@ -8,7 +8,7 @@ require_once(__DIR__ . '/API/Register.php');
  * Registers users with their username, password, name and email address
  *
  * This is the module that is enabled by default in user_config.sample.php
- * because it requires not configuration.
+ * because it requires no configuration.
  *
  * @package StartupAPI
  * @subpackage Authentication\UsernamePassword
@@ -241,7 +241,6 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 			if (preg_match('/^[a-z][a-z0-9.]*[a-z0-9]$/', $username) !== 1)
 			{
 				$errors['username'][] = "Username must start with the letter and contain only latin letters, digits or '.' symbols";
-
 			}
 		}
 		else
@@ -280,16 +279,20 @@ class UsernamePasswordAuthenticationModule extends AuthenticationModule
 			throw new InputValidationException('Validation failed', 0, $errors);
 		}
 
-		if (count(User::getUsersByEmailOrUsername($username)) > 0 ) {
+		$existing_usernames = User::getUsersByEmailOrUsername($username);
+		if (count($existing_usernames) > 0 ) {
 			$errors['username'][] = "This username is already used, please pick another one";
 		}
-		if (count(User::getUsersByEmailOrUsername($email)) > 0 ) {
-			$errors['email'][] = "This email is already used by another user, please enter another email address.";
+
+		$existing_emails = User::getUsersByEmailOrUsername($email);
+		if (count($existing_emails) > 0 ) {
+			$errors['email'][] = "This email is already used by another user, please enter a different email address.";
 		}
 
-		if (count($errors) > 0)
+		$existing_users = array_merge($existing_usernames, $existing_emails);
+		if (count($existing_users) > 0)
 		{
-			throw new ExistingUserException('User already exists', 0, $errors);
+			throw new ExistingUserException($existing_users[0], 'User already exists', 0, $errors);
 		}
 
 		// ok, let's create a user

@@ -230,12 +230,14 @@ class EmailAuthenticationModule extends AuthenticationModule {
 			throw new InputValidationException('Validation failed', 0, $errors);
 		}
 
-		if (count(User::getUsersByEmailOrUsername($email)) > 0) {
-			$errors['email'][] = "This email is already used by another user, please enter another email address.";
+		$existing_users = User::getUsersByEmailOrUsername($email);
+
+		if (count($existing_users) > 0) {
+			$errors['email'][] = "This email is already used by another user, please enter a different email address.";
 		}
 
 		if (count($errors) > 0) {
-			throw new ExistingUserException('User already exists', 0, $errors);
+			throw new ExistingUserException($existing_users[0], 'User already exists', 0, $errors);
 		}
 
 		// ok, let's create a user
@@ -290,7 +292,7 @@ class EmailAuthenticationModule extends AuthenticationModule {
 		if (!array_key_exists('email', $errors) &&
 				(count($existing_users) > 0 && !$existing_users[0]->isTheSameAs($user))
 		) {
-			$errors['email'][] = "This email is already used by another user, please enter another email address.";
+			$errors['email'][] = "This email is already used by another user, please enter a different email address.";
 		}
 
 		if (count($errors) > 0) {

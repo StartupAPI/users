@@ -377,6 +377,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		if (array_key_exists('name', $me)) {
 			$name = $me['name'];
 		} else {
+			// @TODO Revise this check to show appropriate message when FB user doesn't have a name
 			$errors['username'][] = "User doesn't have a name";
 		}
 
@@ -388,7 +389,8 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		}
 
 		if (count($errors) > 0) {
-			throw new ExistingUserException('User already exists', 0, $errors);
+			// @TODO figure out what to throw here and send appropriate exception
+			throw new ExistingUserException(null, 'User already exists', 0, $errors);
 		}
 
 		$user->recordActivity(USERBASE_ACTIVITY_REGISTER_FB);
@@ -440,7 +442,11 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 			}
 
 			if (array_key_exists('email', $me)) {
-				$user->setEmail($me['email']);
+				try {
+					$user->setEmail($me['email']);
+				} catch (ExistingUserException $ex) {
+					// @TODO find existing users with such emai address and merge accounts???
+				}
 			}
 		}
 

@@ -630,6 +630,31 @@ class User {
 		return $verified;
 	}
 
+	public function getEmailVerificationCode() {
+		$db = UserConfig::getDB();
+
+		$code = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 10);
+
+		if ($stmt = $db->prepare('UPDATE u_users SET
+										email_verification_code = ?,
+										email_verification_code_time = now()
+									WHERE id = ?')
+		) {
+			if (!$stmt->bind_param('si', $code, $this->userid)) {
+				throw new DBBindParamException($db, $stmt);
+			}
+			if (!$stmt->execute()) {
+				throw new DBExecuteStmtException($db, $stmt);
+			}
+
+			$stmt->close();
+		} else {
+			throw new DBPrepareStmtException($db);
+		}
+
+		return $code;
+	}
+
 	/**
 	 * Sends email verification emai to user's email address
 	 *
@@ -646,25 +671,7 @@ class User {
 			return;
 		}
 
-		$db = UserConfig::getDB();
-
-		$code = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 10);
-
-		if ($stmt = $db->prepare('UPDATE u_users SET
-										email_verification_code = ?,
-										email_verification_code_time = now()
-									WHERE id = ?')) {
-			if (!$stmt->bind_param('si', $code, $this->userid)) {
-				throw new DBBindParamException($db, $stmt);
-			}
-			if (!$stmt->execute()) {
-				throw new DBExecuteStmtException($db, $stmt);
-			}
-
-			$stmt->close();
-		} else {
-			throw new DBPrepareStmtException($db);
-		}
+		$code = $this->getEmailVerificationCode();
 
 		$verification_link = UserConfig::$USERSROOTFULLURL . '/verify_email.php?code=' . urlencode($code);
 
@@ -736,6 +743,11 @@ class User {
 			$email = $me['email'];
 		}
 
+		$existing_users = User::getUsersByEmailOrUsername($email);
+		if (count($existing_users) > 0) {
+			throw new ExistingUserException($existing_users[0]);
+		}
+
 		$user = null;
 
 		if ($stmt = $db->prepare("INSERT INTO u_users (name, regmodule, tos_version, email, fb_id) VALUES (?, 'facebook', ?, ?, ?)")) {
@@ -769,16 +781,18 @@ class User {
 	 * Create new user without credentials
 	 *
 	 * Used primarily by modules that will store credentials separately from user table
+	 * Can also be used directly to create "shallow" accounts
 	 *
 	 * @param StartupAPIModule $module Registratin module used when registering the user
 	 * @param string $name User's display name
 	 * @param string $email User's emaol or null if no email is known
+	 * @param boolean $send_verification_code Whatever to send verification email or not
 	 *
 	 * @return User Newly created user object
 	 *
 	 * @throws DBException
 	 */
-	public static function createNewWithoutCredentials(StartupAPIModule $module, $name, $email = null) {
+	public static function createNewWithoutCredentials(StartupAPIModule $module, $name, $email = null, $send_verification_code = TRUE) {
 		$module_id = $module->getID();
 
 		$name = mb_convert_encoding($name, 'UTF-8');
@@ -790,6 +804,14 @@ class User {
 		$email = filter_var($email, FILTER_VALIDATE_EMAIL);
 		if ($email === FALSE) {
 			$email = null;
+		}
+
+		if ($email) {
+			$existing_users = User::getUsersByEmailOrUsername($email);
+
+			if (count($existing_users) > 0) {
+				throw new ExistingUserException($existing_users[0]);
+			}
 		}
 
 		if ($stmt = $db->prepare('INSERT INTO u_users (name, email, regmodule, tos_version) VALUES (?, ?, ?, ?)')) {
@@ -810,7 +832,10 @@ class User {
 		$user->setReferer();
 		$user->setRegCampaign();
 		$user->init();
-		$user->sendEmailVerificationCode();
+
+		if ($send_verification_code) {
+			$user->sendEmailVerificationCode();
+		}
 
 		return $user;
 	}
@@ -1673,7 +1698,8 @@ class User {
 	/**
 	 * Return a list of users who match a username or email
 	 *
-	 * Used to retrieve user based on a login form, can return multiple objects
+	 * Used to retrieve user based on a login form.
+	 * @TODO CONFIRM that this call can return multiple objects, including users with unverified emails.
 	 *
 	 * @param string $nameoremail String with username or email address
 	 *
@@ -2389,6 +2415,12 @@ class User {
 	 */
 	public function setEmail($email) {
 		if ($this->email != $email) {
+			// Checking if there are other users with this email
+			$existing_users = User::getUsersByEmailOrUsername($email);
+			if (count($existing_users) > 0) {
+				throw new ExistingUserException($existing_users[0]);
+			}
+
 			$this->setEmailVerified(false);
 		}
 

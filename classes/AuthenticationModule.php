@@ -304,7 +304,26 @@ class InputValidationException extends AuthenticationException {
  * @subpackage Authentication
  */
 class ExistingUserException extends AuthenticationException {
+	/**
+	 * User that was found to already exist.
+	 * Can be null if we just know that user exists, but did not get object specifically.
+	 *
+	 * @var User|null Existing user or null if we just know that user exists, but did not get object specifically.
+	 */
+	private $existing_user;
 
+	public function __construct(User $user = null, $string, $code, $errors) {
+		parent::__construct($user, $string, $code, $errors);
+		$this->existing_user = $user;
+	}
+
+	/**
+	 * Returns existing user or null
+	 * @return User|null Existing user or null if we just know that user exists, but did not get object specifically.
+	 */
+	public function getExistingUser() {
+		return $this->existing_user;
+	}
 }
 
 /**
