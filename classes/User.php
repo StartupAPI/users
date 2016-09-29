@@ -687,7 +687,11 @@ class User {
 		$headers = $message->getHeaders();
 		$headers->addTextHeader('X-Mailer', UserConfig::$supportEmailXMailer);
 
-		UserConfig::$mailer->send($message);
+		try {
+			$result = UserConfig::$mailer->send($message);
+		} catch (Exception $e) {
+			UserTools::debug($e->getMessage());
+		}
 	}
 
 	/**
