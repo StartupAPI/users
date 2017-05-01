@@ -105,7 +105,11 @@ $params = \StartupAPI\API\Endpoint::parseURLEncoded($query);
 
 $raw_request_body = file_get_contents('php://input');
 
-if (!empty($raw_request_body) && strtolower($_SERVER['CONTENT_TYPE']) == 'application/x-www-form-urlencoded') {
+// ignore encoding header when comparing format
+// TODO: might need to test how it behaves with multibyte payload
+$content_type = explode(';', $_SERVER['CONTENT_TYPE'])[0];
+
+if (!empty($raw_request_body) && strtolower($content_type) == 'application/x-www-form-urlencoded') {
 	$params = \StartupAPI\API\Endpoint::parseURLEncoded($raw_request_body, $params);
 }
 
