@@ -107,10 +107,12 @@ $raw_request_body = file_get_contents('php://input');
 
 // ignore encoding header when comparing format
 // TODO: might need to test how it behaves with multibyte payload
-$content_type = explode(';', $_SERVER['CONTENT_TYPE'])[0];
+if (array_key_exists('CONTENT_TYPE', $_SERVER)) {
+	$content_type = explode(';', $_SERVER['CONTENT_TYPE'])[0];
 
-if (!empty($raw_request_body) && strtolower($content_type) == 'application/x-www-form-urlencoded') {
-	$params = \StartupAPI\API\Endpoint::parseURLEncoded($raw_request_body, $params);
+	if (!empty($raw_request_body) && strtolower($content_type) == 'application/x-www-form-urlencoded') {
+		$params = \StartupAPI\API\Endpoint::parseURLEncoded($raw_request_body, $params);
+	}
 }
 
 unset($params['call']); // except for the call parameter
