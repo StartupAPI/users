@@ -10,9 +10,6 @@
 [submodule "twig"]
 	path = twig
 	url = git://github.com/fabpot/Twig.git
-[submodule "modules/facebook/facebook-php-sdk"]
-	path = modules/facebook/facebook-php-sdk
-	url = git://github.com/facebook/facebook-php-sdk.git
 [submodule "trunk8"]
 	path = trunk8
 	url = git://github.com/rviscomi/trunk8.git
@@ -40,3 +37,6 @@
 [submodule "swagger-ui"]
 	path = swagger-ui
 	url = https://github.com/swagger-api/swagger-ui.git
+[submodule "modules/facebook/php-graph-sdk"]
+	path = modules/facebook/php-graph-sdk
+	url = https://github.com/facebook/php-graph-sdk.git
