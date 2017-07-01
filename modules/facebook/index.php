@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . '/facebook.php');
+require_once(__DIR__ . '/php-graph-sdk/src/Facebook/autoload.php');
 
 /**
  * Facebook Authentication Module
@@ -64,11 +64,12 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		}
 
 		$config = array(
-			'appId' => $this->appID,
-			'secret' => $this->secret
+			'app_id' => $this->appID,
+			'app_secret' => $this->secret,
+			'default_graph_version' => 'v2.9'
 		);
 
-		$this->sdk = new Facebook($config);
+		$this->sdk = new \Facebook\Facebook($config);
 	}
 
 	public function getID() {
@@ -247,11 +248,20 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 			return $this->renderForm($template_info, $action, 'connect');
 		} else {
 			try {
-				$me = $this->api('/me?fields=id,name,email,link');
-			} catch (Exception $e) {
-				UserTools::debug("Can't get /me API data: " . $e);
-				return;
+			  $response = $this->sdk->get('/me?fields=id,name,email,link', $this->getAccessToken());
+			} catch(\Facebook\Exceptions\FacebookResponseException $e) {
+			  // When Graph returns an error
+			  UserTools::debug("Can't get Facebook user. Graph returned an error: " . $e->getMessage());
+				return null;
+			} catch(\Facebook\Exceptions\FacebookSDKException $e) {
+			  // When validation fails or other local issues
+				UserTools::debug("Can't get Facebook user. Facebook SDK returned an error: " . $e->getMessage());
+				return null;
 			}
+
+			$fbuser = $response->getGraphUser();
+			$fbuser_id = $fbuser->getId();
+			$me = $response->getDecodedBody();
 
 			$template_info['slug'] = $this->getID();
 			$template_info['action'] = $action;
@@ -259,7 +269,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 			$template_info['data'] = $data;
 
 			$template_info['me'] = $me;
-			$template_info['fb_id'] = $fb_id;
+			$template_info['fb_id'] = $fbuser_id;
 
 			return StartupAPI::$template->render("@startupapi/modules/facebook/edit_user_form.html.twig", $template_info);
 		}
@@ -275,6 +285,68 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 
 	public function getAutoLogoutURL($return) {
 		return UserConfig::$USERSROOTFULLURL . '/modules/facebook/logout.php';
+	}
+
+	function getAccessToken() {
+		$storage = new MrClay_CookieStorage(array(
+			'secret' => UserConfig::$SESSION_SECRET,
+			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+			'path' => UserConfig::$SITEROOTURL,
+			'httponly' => true
+		));
+
+		$accessToken = $storage->fetch(UserConfig::$fb_access_token_key);
+
+		UserTools::debug('FB access token used: ' . var_export($accessToken, true));
+
+		if (!$accessToken) {
+			$accessToken = $this->retrieveAccessToken();
+		}
+
+		return $accessToken;
+	}
+
+	function retrieveAccessToken() {
+		try {
+		  $accessToken = $this->sdk->getJavaScriptHelper()->getAccessToken();
+		} catch(Facebook\Exceptions\FacebookResponseException $e) {
+		  // When Graph returns an error
+		  UserTools::debug("Can't get Facebook user. Graph returned an error: " . $e->getMessage());
+			return null;
+		} catch(Facebook\Exceptions\FacebookSDKException $e) {
+		  // When validation fails or other local issues
+			UserTools::debug("Can't get Facebook user. Facebook SDK returned an error: " . $e->getMessage());
+			return null;
+		}
+
+		if (!isset($accessToken)) {
+			UserTools::debug("Can't get Facebook user. No cookie set or no OAuth data could be obtained from cookie.");
+			return null;
+		}
+
+		$oAuth2Client = $this->sdk->getOAuth2Client();
+		if (!$accessToken->isLongLived()) {
+		  // Exchanges a short-lived access token for a long-lived one
+		  try {
+		    $accessToken = $oAuth2Client->getLongLivedAccessToken($accessToken);
+		  } catch (Facebook\Exceptions\FacebookSDKException $e) {
+				UserTools::debug("Error getting long-lived access token: " . $helper->getMessage());
+				return null;
+		  }
+		}
+
+		$storage = new MrClay_CookieStorage(array(
+			'secret' => UserConfig::$SESSION_SECRET,
+			'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+			'path' => UserConfig::$SITEROOTURL,
+			'httponly' => true
+		));
+
+		if (!$storage->store(UserConfig::$fb_access_token_key, $accessToken->getValue())) {
+			throw new StartupAPIException(implode("\n", $storage->errors));
+		}
+
+		return $accessToken->getValue();
 	}
 
 	/**
@@ -295,15 +367,23 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		$remember = $this->remember;
 
 		try {
-			$fbuser = $this->sdk->getUser();
-		} catch (FacebookApiException $e) {
-			UserTools::debug("Can't get Facebook user");
+		  $response = $this->sdk->get('/me', $this->getAccessToken());
+		} catch(\Facebook\Exceptions\FacebookResponseException $e) {
+		  // When Graph returns an error
+		  UserTools::debug("Can't get Facebook user. Graph returned an error: " . $e->getMessage());
+			return null;
+		} catch(\Facebook\Exceptions\FacebookSDKException $e) {
+		  // When validation fails or other local issues
+			UserTools::debug("Can't get Facebook user. Facebook SDK returned an error: " . $e->getMessage());
 			return null;
 		}
 
-		UserTools::debug('Facebook user id: ' . $fbuser);
+		$fbuser = $response->getGraphUser();
+		$fbuser_id = $fbuser->getId();
 
-		if ($fbuser == 0) {
+		UserTools::debug('Facebook user id: ' . $fbuser_id);
+
+		if ($fbuser_id == 0) {
 			// if we're trying to auto-login, just return null
 			if ($auto) {
 				return null;
@@ -314,10 +394,17 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		}
 
 		try {
-			$permissions = $this->api('/me/permissions');
-			UserTools::debug('User permissions: ' . var_export($permissions, true));
+			$granted_permissions = $this->api('/me/permissions')->getDecodedBody();
+			UserTools::debug('User permissions: ' . var_export($granted_permissions, true));
+
+			foreach ($granted_permissions['data'] as $perm) {
+				if ($perm['status'] == 'granted') {
+					$perm_lookup[$perm['permission']] = true;
+				}
+			}
+
 			foreach ($this->permissions as $perm) {
-				if (!array_key_exists($perm, $permissions['data'][0]) || $permissions['data'][0][$perm] !== 1) {
+				if (!array_key_exists($perm, $perm_lookup)) {
 					// looks like not all required permissions were granted
 					UserTools::debug("Can't login - not enough permissions granted");
 					return null;
@@ -328,7 +415,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 			return null;
 		}
 
-		$user = User::getUserByFacebookID($fbuser);
+		$user = User::getUserByFacebookID($fbuser_id);
 
 		if (!is_null($user)) {
 			$user->recordActivity(USERBASE_ACTIVITY_LOGIN_FB);
@@ -347,14 +434,23 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		$remember = $this->remember;
 
 		try {
-			$fbuser = $this->sdk->getUser();
-		} catch (FacebookApiException $e) {
-			UserTools::debug("Can't get Facebook user");
+		  $response = $this->sdk->get('/me?fields=id,name,email,link', $this->getAccessToken());
+		} catch(\Facebook\Exceptions\FacebookResponseException $e) {
+		  // When Graph returns an error
+		  UserTools::debug("Can't get Facebook user. Graph returned an error: " . $e->getMessage());
+			return null;
+		} catch(\Facebook\Exceptions\FacebookSDKException $e) {
+		  // When validation fails or other local issues
+			UserTools::debug("Can't get Facebook user. Facebook SDK returned an error: " . $e->getMessage());
 			return null;
 		}
 
+		$fbuser = $response->getGraphUser();
+		$fbuser_id = $fbuser->getId();
+		$me = $response->getDecodedBody();
+
 		$errors = array();
-		if ($fbuser == 0) {
+		if (!$fbuser_id) {
 			$errors['fbuserid'][] = 'No Facebook id is passed';
 			throw new InputValidationException('No facebook user id', 0, $errors);
 		}
@@ -367,13 +463,6 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 			return $existing_user;
 		}
 
-		try {
-			$me = $this->api('/me?fields=id,name,email,link');
-		} catch (Exception $e) {
-			UserTools::debug("Can't get /me API data: " . $e);
-			return null;
-		}
-
 		if (array_key_exists('name', $me)) {
 			$name = $me['name'];
 		} else {
@@ -383,7 +472,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 
 		// ok, let's create a user
 		try {
-			$user = User::createNewFacebookUser($name, $fbuser, $me);
+			$user = User::createNewFacebookUser($name, $fbuser_id, $me);
 		} catch (UserCreationException $e) {
 			$errors[$e->getField()][] = $e->getMessage();
 		}
@@ -404,25 +493,53 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 
 			$user->recordActivity(USERBASE_ACTIVITY_REMOVED_FB);
 
-			$this->api('/me/permissions', 'DELETE');
+			try {
+				$response = $this->sdk->delete('/me/permissions', [], $this->getAccessToken());
+			} catch(\Facebook\Exceptions\FacebookResponseException $e) {
+				// When Graph returns an error
+				UserTools::debug("Can't delete Facebook app. Graph returned an error: " . $e->getMessage());
+				return null;
+			} catch(\Facebook\Exceptions\FacebookSDKException $e) {
+				// When validation fails or other local issues
+				UserTools::debug("Can't delete Facebook app. Facebook SDK returned an error: " . $e->getMessage());
+				return null;
+			}
+
+			$storage = new MrClay_CookieStorage(array(
+				'secret' => UserConfig::$SESSION_SECRET,
+				'mode' => MrClay_CookieStorage::MODE_ENCRYPT,
+				'path' => UserConfig::$SITEROOTURL,
+				'httponly' => true
+			));
+
+			$storage->delete(UserConfig::$fb_access_token_key);
 
 			return true;
 		}
 
 		try {
-			$fbuser = $this->sdk->getUser();
-		} catch (FacebookApiException $e) {
-			UserTools::debug("Can't get Facebook user");
+		  $response = $this->sdk->get('/me?fields=id,name,email,link', $this->getAccessToken());
+		} catch(\Facebook\Exceptions\FacebookResponseException $e) {
+		  // When Graph returns an error
+		  UserTools::debug("Can't get Facebook user. Graph returned an error: " . $e->getMessage());
+			return null;
+		} catch(\Facebook\Exceptions\FacebookSDKException $e) {
+		  // When validation fails or other local issues
+			UserTools::debug("Can't get Facebook user. Facebook SDK returned an error: " . $e->getMessage());
 			return null;
 		}
 
+		$fbuser = $response->getGraphUser();
+		$fbuser_id = $fbuser->getId();
+		$me = $response->getDecodedBody();
+
 		$errors = array();
-		if ($fbuser == 0) {
+		if (!$fbuser_id) {
 			$errors['fbuserid'][] = 'No Facebook id is passed';
 			throw new InputValidationException('No facebook user id', 0, $errors);
 		}
 
-		if (!is_null(User::getUserByFacebookID($fbuser))) {
+		if (!is_null(User::getUserByFacebookID($fbuser_id))) {
 			$errors['fbuserid'][] = 'Another user is already associated with your Facebook account.';
 		}
 
@@ -430,17 +547,10 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 			throw new InputValidationException('Validation failed', 0, $errors);
 		}
 
-		$user->setFacebookID($fbuser);
+		$user->setFacebookID($fbuser_id);
 
 		// if user has email address and we required it for Facebook connection, let's save it
 		if (!$user->getEmail()) {
-			try {
-				$me = $this->api('/me?fields=email');
-			} catch (Exception $e) {
-				UserTools::debug("Can't get /me API data: " . $e);
-				return null;
-			}
-
 			if (array_key_exists('email', $me)) {
 				try {
 					$user->setEmail($me['email']);
@@ -464,30 +574,21 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 	 *
 	 * @throws FacebookApiException
 	 */
-	public function api(/* polymorphic */) {
+	public function api($query) {
 		$args = func_get_args();
 
-		$result = null;
-
 		try {
-			$result = call_user_func_array(array($this->sdk, 'api'), $args);
-		} catch (FacebookApiException $fb_ex) {
-			$message = $fb_ex->getMessage();
+			$result = $this->sdk->get($query, $this->getAccessToken());
+		} catch(\Facebook\Exceptions\FacebookResponseException $e) {
+			// When Graph returns an error
+			UserTools::debug("Graph returned an error: " . $e->getMessage());
 
-			if (strpos($message, 'An active access token must be used') !== false ||
-					strpos($message, 'Session has expired at unix time') !== false
-			) {
-				UserTools::debug('Facebook access token has expired, redirecting to login');
+			return null;
+		} catch(\Facebook\Exceptions\FacebookSDKException $e) {
+			// When validation fails or other local issues
+			UserTools::debug("Facebook SDK returned an error: " . $e->getMessage());
 
-				// looks like we have a problem with token, let's redirect to login
-				$url = $this->sdk->getLoginUrl(array(
-					'scope' => $this->permissions
-						));
-				header('Location: ' . $url);
-				exit;
-			}
-
-			throw $fb_ex;
+			return null;
 		}
 
 		return $result;
