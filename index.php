@@ -27,12 +27,12 @@ $submodules = array(
 		'ready' => true
 	),
 	array(
-		'path' => __DIR__ . '/modules/facebook/facebook-php-sdk/',
-		'file' => __DIR__ . '/modules/facebook/facebook-php-sdk/src/base_facebook.php',
+		'path' => __DIR__ . '/modules/facebook/php-graph-sdk/',
+		'file' => __DIR__ . '/modules/facebook/php-graph-sdk/src/Facebook/autoload.php',
 		'name' => 'Facebook SDK for PHP',
 		'description' => 'The Facebook SDK for PHP provides a rich set of server-side functionality for accessing Facebook’s server-side API calls. These include all of the features of the Graph API and FQL. Used in Facebook authentication and API module.',
-		'git-repo' => 'git://github.com/facebook/facebook-php-sdk.git',
-		'url' => 'https://developers.facebook.com/docs/reference/php/',
+		'git-repo' => 'https://github.com/facebook/php-graph-sdk.git',
+		'url' => 'https://github.com/facebook/php-graph-sdk.git',
 		'ready' => true
 	),
 	array(
