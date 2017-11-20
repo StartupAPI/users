@@ -192,6 +192,11 @@ class UserConfig {
 	public static $oauth_user_id_key = 'users-oauth-user-id';
 
 	/**
+	 * @var string cookie name for Facebook access token storage
+	 */
+	public static $fb_access_token_key = 'users-fbatkn';
+
+	/**
 	 * @var string Cookie name for storing referrer between anonymous user's arrival and their registration
 	 */
 	public static $entry_referer_key = 'users-ref';

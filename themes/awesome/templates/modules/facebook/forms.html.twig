@@ -12,8 +12,6 @@
 	{% set buttontitle = 'Connect to your Facebook Account' %}
 {% endif %}
 
-<div id="fb-root"></div>
-
 {% if show_facepile and form == 'register' %}
 	<fb:facepile width="450" size="large" max-rows="1"></fb:facepile>
 {% endif %}
@@ -33,7 +31,7 @@
 	<div class="panel-body">
 {% endif %}
 
-<a class="startupapi-fb-connect" href="#" onclick="UserBaseFBConnectButtonClicked(); return false;">
+<a class="startupapi-fb-connect" href="#" onclick="StartupAPIFBConnectButtonClicked(); return false;">
 	<span style="background-image: url({{UserConfig.USERSROOTURL}}/modules/facebook/facebook-sprite.png); {{buttonspritestyle}} display: block; cursor: hand; margin-top: 0.3em" title="{{buttontitle}}"></span>
 </a>
 
@@ -43,24 +41,21 @@
 {% endif %}
 
 <script>
-	var UserBaseFBFormType = {{form|json_encode|raw}};
+	var StartupAPIFBFormType = {{form|json_encode|raw}};
 
-	var UserBaseFBConnectButtonClicked = function() {
+	var StartupAPIFBConnectButtonClicked = function() {
 		// FB is not loaded yet
 	};
 
 	window.fbAsyncInit = function() {
-		// permissions required by this instance of UserBase
+		// permissions required by this instance of StartupAPI
 		var required_perms = {{permissions|json_encode|raw}};
 		var required_perms_string = {{permissions_string|json_encode|raw}};
 
 		FB.init({
-			appId  : '{{appID}}',
-			status : true, // check login status
-			cookie : true, // enable cookies to allow the server to access the session
-			oauth  : true, // enable OAuth 2.0
-			xfbml  : true, // parse XFBML
-			channelURL : '{{UserConfig.USERSROOTFULLURL}}/modules/facebook/channel.php' // channel file
+		  appId   : '{{appID}}',
+		  cookie  : true,
+		  version : 'v2.9'
 		});
 
 		// Auto-login if user is connected already
@@ -89,12 +84,11 @@
 						return;
 					}
 				});
-
 			}
 		});
 
 		// when button is clicked popu-up a dialog
-		UserBaseFBConnectButtonClicked = function() {
+		StartupAPIFBConnectButtonClicked = function() {
 			// it will only have 'connected' status if permissions match
 			FB.login(function(response) {
 				if (response.status === 'connected') {
@@ -105,11 +99,13 @@
 		};
 	};
 
-	(function() {
-		var e = document.createElement('script');
-		e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
-		e.async = true;
-		document.getElementById('fb-root').appendChild(e);
-	}());
+
+	(function(d, s, id) {
+	    var js, fjs = d.getElementsByTagName(s)[0];
+	    if (d.getElementById(id)) return;
+	    js = d.createElement(s); js.id = id;
+	    js.src = "//connect.facebook.net/en_US/sdk.js";
+	    fjs.parentNode.insertBefore(js, fjs);
+	  }(document, 'script', 'facebook-jssdk'));
 
 </script>

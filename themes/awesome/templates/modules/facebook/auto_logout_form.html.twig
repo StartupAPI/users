@@ -7,22 +7,30 @@
 			// force logout sequence after a long timeout of 5 seconds
 			setTimeout('window.location.href = "{{UserConfig.USERSROOTFULLURL}}/logout.php?autologgedout={{slug}}"', 5000);
 
-			FB.init({
-				appId  : '{{appID}}',
-				status : true, // check login status
-				cookie : true, // enable cookies to allow the server to access the session
-				channelURL : '{{UserConfig.USERSROOTFULLURL}}/modules/facebook/channel.php', // channel file
-				oauth  : true // enable OAuth 2.0
-			});
-			FB.getLoginStatus(function(response) {
-				if (response.authResponse) {
-					FB.logout(function(response) {
+			window.fbAsyncInit = function() {
+				FB.init({
+					appId  : '{{appID}}',
+					cookie : true, // enable cookies to allow the server to access the session
+					version : 'v2.9'
+				});
+				FB.getLoginStatus(function(response) {
+					if (response.authResponse) {
+						FB.logout(function(response) {
+							window.location.href = "{{UserConfig.USERSROOTFULLURL}}/logout.php?autologgedout={{slug}}";
+						});
+					} else {
 						window.location.href = "{{UserConfig.USERSROOTFULLURL}}/logout.php?autologgedout={{slug}}";
-					});
-				} else {
-					window.location.href = "{{UserConfig.USERSROOTFULLURL}}/logout.php?autologgedout={{slug}}";
-				}
-			});
+					}
+				});
+			};
+
+			(function(d, s, id){
+			  var js, fjs = d.getElementsByTagName(s)[0];
+			  if (d.getElementById(id)) {return;}
+			  js = d.createElement(s); js.id = id;
+			  js.src = "//connect.facebook.net/en_US/sdk.js";
+			  fjs.parentNode.insertBefore(js, fjs);
+			}(document, 'script', 'facebook-jssdk'));
 		</script>
 		Logging out from Facebook...
 	</body>
