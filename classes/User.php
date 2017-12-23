@@ -633,7 +633,7 @@ class User {
 	public function getEmailVerificationCode() {
 		$db = UserConfig::getDB();
 
-		$code = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 10);
+		$code = substr(base64_encode(UserTools::randomBytes(50)), 0, 10);
 
 		if ($stmt = $db->prepare('UPDATE u_users SET
 										email_verification_code = ?,
@@ -866,8 +866,8 @@ class User {
 
 		$user = null;
 
-		$salt = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 13);
-		;
+		$salt = substr(base64_encode(UserTools::randomBytes(50)), 0, 13);
+
 		$pass = sha1($salt . $password);
 
 		if ($stmt = $db->prepare("INSERT INTO u_users (regmodule, tos_version, name, username, email, pass, salt) VALUES ('userpass', ?, ?, ?, ?, ?, ?)")) {
@@ -1861,8 +1861,7 @@ class User {
 	public function generateTemporaryPassword() {
 		$db = UserConfig::getDB();
 
-		$temppass = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 13);
-		;
+		$temppass = substr(base64_encode(UserTools::randomBytes(50)), 0, 13);
 
 		if ($stmt = $db->prepare('UPDATE u_users SET temppass = ?, temppasstime = now() WHERE id = ?')) {
 			if (!$stmt->bind_param('si', $temppass, $this->userid)) {
@@ -2565,7 +2564,7 @@ class User {
 	public function setPass($password) {
 		$db = UserConfig::getDB();
 
-		$salt = substr(base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM)), 0, 13);
+		$salt = substr(base64_encode(UserTools::randomBytes(50)), 0, 13);
 		$pass = sha1($salt . $password);
 
 		if ($stmt = $db->prepare('UPDATE u_users SET pass = ?, salt = ? WHERE id = ?')) {

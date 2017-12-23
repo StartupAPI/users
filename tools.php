@@ -35,6 +35,14 @@ class UserTools {
 		return str_replace('+', '%20', urlencode($string));
 	}
 
+	public static function randomBytes($length) {
+		if (function_exists('openssl_random_pseudo_bytes')) {
+			return openssl_random_pseudo_bytes($length);
+		} else {
+			return mcrypt_create_iv($length, MCRYPT_DEV_URANDOM);
+		}
+	}
+
 	/**
 	 * Prevents CSRF for all POST requests by comparing cookie and POST nonces.
 	 *
@@ -81,7 +89,7 @@ class UserTools {
 			$unused_nonces = $passed_nonces;
 		}
 
-		self::$CSRF_NONCE = base64_encode(mcrypt_create_iv(50, MCRYPT_DEV_URANDOM));
+		self::$CSRF_NONCE = base64_encode(self::randomBytes(50));
 
 		// adding new nonce in front
 		array_unshift($unused_nonces, self::$CSRF_NONCE);
