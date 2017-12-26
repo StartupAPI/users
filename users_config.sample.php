@@ -82,7 +82,10 @@ new UsernamePasswordAuthenticationModule();
  * Register your app here: https://console.developers.google.com/project
  * Go to APIs & Auth -> Consent Screen and fill out app name and URL as well as other fields
  * Go to APIs & Auth -> Credentials and create new client ID, add OAuth2 callback URL
- *			https://<yourhost>/<path_to_startupapi>oauth2_callback.php?module=google
+ *			https://<yourhost>/<path_to_startupapi>oauth2_callback.php?module=google_oauth
+ *
+ * Enable Google+ API for the project:
+ *      https://console.developers.google.com/apis/library/plus.googleapis.com/
  *
  * And then uncomment lines below and copy Client ID and Client Secret
  * Optional 3rd parameter is an array of API scopes you need authorization for.
@@ -90,8 +93,8 @@ new UsernamePasswordAuthenticationModule();
  * 	See up-to-date list of APIs and scopes here: https://developers.google.com/oauthplayground/
  *	(One of /Google Contacts API scope is required and is included by default)
  */
-#UserConfig::loadModule('google_oauth');
-#new GoogleOAuthAuthenticationModule(
+#UserConfig::loadModule('google');
+#new GoogleAuthenticationModule(
 #	'...OAuth2.client.id.goes.here...',
 #	'...OAuth2.clientsecret.goes.here...',
 #	array(

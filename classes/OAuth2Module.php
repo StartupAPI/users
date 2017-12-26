@@ -509,7 +509,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		$current_expires = null;
 		$current_refresh = null;
 
-		$query = 'SELECT oauth2_client_id, access_token_expires, refresh_token
+		$query = 'SELECT oauth2_client_id, UNIX_TIMESTAMP(access_token_expires), refresh_token
 			FROM u_oauth2_clients
 			WHERE module_slug = ? AND access_token = ?';
 		UserTools::debug($query);
@@ -540,7 +540,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		if (!$oauth2_client_id) {
 			$query = 'INSERT INTO u_oauth2_clients
                                 (module_slug, access_token, access_token_expires, refresh_token)
-                                VALUES (?, ?, ?, ?)';
+                                VALUES (?, ?, FROM_UNIXTIME(?), ?)';
 			UserTools::debug($query);
 
 			if ($stmt = $db->prepare($query))
@@ -566,7 +566,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		} else if ($access_token_expires != $current_expires
 				|| $refresh_token != $current_refresh) {
 			$query = 'UPDATE u_oauth2_clients
-                                SET access_token_expires = ?, refresh_token = ?
+                                SET access_token_expires = FROM_UNIXTIME(?), refresh_token = ?
                                 WHERE oauth2_client_id = ?';
 			UserTools::debug($query);
 
@@ -739,7 +739,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 
 		$serialized_userinfo = null;
 
-		$query = 'SELECT userinfo, access_token, access_token_expires, refresh_token
+		$query = 'SELECT userinfo, access_token, UNIX_TIMESTAMP(access_token_expires), refresh_token
 			FROM u_oauth2_clients
 			WHERE oauth2_client_id = ?';
 		UserTools::debug($query);
@@ -793,7 +793,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		$serialized_userinfo = null;
 
 		$query = 'SELECT c.oauth2_client_id, c.userinfo,
-			c.access_token, c.access_token_expires, c.refresh_token
+			c.access_token, UNIX_TIMESTAMP(c.access_token_expires), c.refresh_token
 			FROM u_user_oauth2_identity i
 			INNER JOIN u_oauth2_clients c
 				on i.oauth2_client_id = c.oauth2_client_id
