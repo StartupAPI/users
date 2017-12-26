@@ -34,8 +34,8 @@ $builtin_modules = array(
 		'class' => 'TwitterAuthenticationModule',
 		'category_slug' => 'auth'
 	),
-	'google_oauth' => array(
-		'class' => 'GoogleOAuthAuthenticationModule',
+	'google' => array(
+		'class' => 'GoogleAuthenticationModule',
 		'category_slug' => 'auth'
 	),
 	'linkedin' => array(

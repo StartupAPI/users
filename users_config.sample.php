@@ -82,7 +82,7 @@ new UsernamePasswordAuthenticationModule();
  * Register your app here: https://console.developers.google.com/project
  * Go to APIs & Auth -> Consent Screen and fill out app name and URL as well as other fields
  * Go to APIs & Auth -> Credentials and create new client ID, add OAuth2 callback URL
- *			https://<yourhost>/<path_to_startupapi>oauth2_callback.php?module=google_oauth
+ *			https://<yourhost>/<path_to_startupapi>oauth2_callback.php?module=google
  *
  * Enable Google+ API for the project:
  *      https://console.developers.google.com/apis/library/plus.googleapis.com/
