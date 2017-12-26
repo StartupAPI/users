@@ -1,15 +1,9 @@
 {% if form == 'login' %}
 	{% set formsubmit = 'login' %}
-	{% set buttonspritestyle = 'background-position: 0px -22px; width: 147px; height: 22px;' %}
-	{% set buttontitle = 'Login with Facebook' %}
 {% elseif form == 'register' %}
 	{% set formsubmit = 'register' %}
-	{% set buttonspritestyle = 'background-position: 0px 0px; width: 200px; height: 22px;' %}
-	{% set buttontitle = 'Quick Sign-up using Facebook' %}
 {% elseif form == 'connect' %}
 	{% set formsubmit = 'save' %}
-	{% set buttonspritestyle = 'background-position: 0px -44px; width: 230px; height: 22px;' %}
-	{% set buttontitle = 'Connect to your Facebook Account' %}
 {% endif %}
 
 <div id="fb-root"></div>
@@ -25,7 +19,13 @@
 	{{PAGE.TOSlinks|raw}}
 {% endif %}
 <a class="startupapi-fb-connect" href="#" onclick="UserBaseFBConnectButtonClicked(); return false;">
-	<span style="background-image: url({{UserConfig.USERSROOTURL}}/modules/facebook/facebook-sprite.png); {{buttonspritestyle}} display: block; cursor: hand; margin-top: 0.3em" title="{{buttontitle}}"></span>
+	{% if form == 'login' %}
+		<img src="{{UserConfig.USERSROOTURL}}/modules/facebook/login_with_facebook.png" width="309" height="50" alt="Login with Facebook button" title="Login with Facebook"/>
+	{% elseif form == 'register' %}
+		<img src="{{UserConfig.USERSROOTURL}}/modules/facebook/continue_with_facebook.png" width="309" height="50" alt="Continue with Facebook button" title="Quick Sign-up using Facebook"/>
+	{% elseif form == 'connect' %}
+		<img src="{{UserConfig.USERSROOTURL}}/modules/facebook/connect_with_facebook.png" width="309" height="50" alt="Connect with Facebook button" title="Connect to your Facebook Account"/>
+	{% endif %}
 </a>
 
 <script>
