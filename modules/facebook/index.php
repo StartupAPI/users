@@ -456,7 +456,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		}
 
 		// checking if user with this Facebook ID already exists and if so, then logs them in
-		$existing_user = User::getUserByFacebookID($fbuser);
+		$existing_user = User::getUserByFacebookID($fbuser_id);
 		if (!is_null($existing_user)) {
 			UserTools::debug('processRegistration - existing user: ' . $existing_user->getID());
 			$existing_user->recordActivity(USERBASE_ACTIVITY_LOGIN_FB);
