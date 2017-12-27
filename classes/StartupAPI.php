@@ -137,6 +137,16 @@ class StartupAPI {
 	 */
 	static function init() {
 		/**
+		 * Verify if we use HTTPS, unless it explicitly disabled
+		 */
+		if (!array_key_exists('HTTPS', $_SERVER) && !UserConfig::$disableSecureConnection) {
+			header('HTTP/1.1 403 Forbidden');
+			echo "<h1>403 Forbidden</h1>";
+			echo "Access over insecure connection is forbidden, use HTTPS transport protocol.\n";
+			exit;
+		}
+
+		/**
 		 * Legacy configuration options support
 		 */
 		if (!is_null(UserConfig::$enableInvitations)) {

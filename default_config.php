@@ -255,6 +255,17 @@ class UserConfig {
 	 */
 	public static $admins = array();
 
+
+	/**
+	 * By default, do not allow usage of non-secure connections and enforce HTTPS
+	 *
+	 * WARNING, be absolutely sure when you change this and disable HTTPS:
+	 * https://www.owasp.org/index.php/REST_Security_Cheat_Sheet#HTTPS
+	 *
+	 * @var boolean
+	 */
+	public static $disableSecureConnection = FALSE;
+
 	/* ========================================================================
 	 *
 	 * DB cpnnectivity
