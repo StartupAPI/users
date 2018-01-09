@@ -1014,7 +1014,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	{
 		$ch = curl_init();
 
-		$separator = strpos('?', $url) ? '&' : '?';
+		$separator = strpos($url, '?') ? '&' : '?';
 
 		if (!is_array($request_params)) {
 			$request_params = array();
