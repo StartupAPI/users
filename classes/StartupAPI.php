@@ -139,7 +139,7 @@ class StartupAPI {
 		/**
 		 * Verify if we use HTTPS, unless it explicitly disabled
 		 */
-		if (!array_key_exists('HTTPS', $_SERVER) && !UserConfig::$disableSecureConnection) {
+		if (php_sapi_name() !== 'cli' && !array_key_exists('HTTPS', $_SERVER) && !UserConfig::$disableSecureConnection) {
 			header('HTTP/1.1 403 Forbidden');
 			echo "<h1>403 Forbidden</h1>";
 			echo "Access over insecure connection is forbidden, use HTTPS transport protocol.\n";
