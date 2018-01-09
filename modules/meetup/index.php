@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__DIR__)).'/classes/OAuthModule.php');
+require_once(dirname(dirname(__DIR__)).'/classes/OAuth2Module.php');
 
 /**
  * Meetup authentication module
@@ -9,32 +9,30 @@ require_once(dirname(dirname(__DIR__)).'/classes/OAuthModule.php');
  * @package StartupAPI
  * @subpackage Authentication\Meetup
  */
-class MeetupAuthenticationModule extends OAuthAuthenticationModule
+class MeetupAuthenticationModule extends OAuth2AuthenticationModule
 {
 	protected $userCredentialsClass = 'MeetupUserCredentials';
 
 	/**
 	 * Instantiates Meetup authentication module and registers it with the system
 	 *
-	 * @param string $oAuthConsumerKey OAuth Consumer Key
-	 * @param string $oAuthConsumerSecret OAuth Consumer Secret
-	 * @param string $oAuthScope Requested permission scopes (zero or more scope strings, usually URLs, separated by spaces)
+	 * @param string $oAuth2ClientID OAuth2 Client ID
+	 * @param string $oAuth2ClientSecret OAuth2 Client Secret
+	 * @param string $oAuth2Scopes Requested permission scopes (zero or more scope strings, usually URLs, separated by spaces)
 	 */
-	public function __construct($oAuthConsumerKey, $oAuthConsumerSecret, $oAuthScope = 'basic')
+	public function __construct($oAuth2ClientID, $oAuth2ClientSecret, $oAuth2Scopes = 'basic')
 	{
 		parent::__construct(
 			'Meetup',
-			'http://api.meetup.com',
-			$oAuthConsumerKey,
-			$oAuthConsumerSecret,
-			'https://api.meetup.com/oauth/request/',
-			'https://api.meetup.com/oauth/access/',
-			'http://www.meetup.com/authenticate/',
-			array('HMAC-SHA1', 'PLAINTEXT'),
-			$oAuthScope,
+			'https://api.meetup.com',
+			$oAuth2ClientID,
+			$oAuth2ClientSecret,
+			'https://secure.meetup.com/oauth2/authorize',
+			'https://secure.meetup.com/oauth2/access',
+			$oAuth2Scopes,
+			UserConfig::$USERSROOTURL.'/modules/meetup/login-button.png', //signup-button.png',
 			UserConfig::$USERSROOTURL.'/modules/meetup/login-button.png',
-			UserConfig::$USERSROOTURL.'/modules/meetup/login-button.png',
-			UserConfig::$USERSROOTURL.'/modules/meetup/login-button.png',
+			UserConfig::$USERSROOTURL.'/modules/meetup/login-button.png', //connect-button.png',
 			array(
 				array(2001, "Logged in using Meetup account", 1),
 				array(2002, "Added Meetup account", 1),
@@ -42,6 +40,8 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 				array(2004, "Registered using Meetup account", 1),
 			)
 		);
+
+		$this->oAuth2AccessTokenRequestFormURLencoded = TRUE;
 	}
 
 	public function getID()
@@ -74,23 +74,25 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
 	}
 
 	public static function getSignupURL() {
-		return 'http://www.meetup.com/meetup_api/oauth_consumers/';
+		return 'https://www.meetup.com/meetup_api/oauth_consumers/';
 	}
 
-	public function getIdentity($oauth_user_id) {
-		// get meetup user id
-		$request = new OAuthRequester('https://api.meetup.com/members.json/?relation=self', 'GET');
-		$result = $request->doRequest($oauth_user_id);
+	public function getIdentity($oauth2_user_id) {
+		$credentials = $this->getOAuth2Credentials($oauth2_user_id);
 
-		if ($result['code'] == 200) {
-			$userdata = json_decode($result['body'], true);
+		try {
+			$result = $credentials->makeOAuth2Request('https://api.meetup.com/members.json/?relation=self');
+		} catch (OAuth2Exception $ex) {
+			return null;
+		}
 
-			// array includes 'id' parameter which uniquely identifies a user
-			if (array_key_exists('id', $userdata['results'][0])
-				&& array_key_exists('name', $userdata['results'][0])
-			) {
-				return $userdata['results'][0];
-			}
+		$userdata = json_decode($result, true);
+
+		// array includes 'id' parameter which uniquely identifies a user
+		if (array_key_exists('id', $userdata['results'][0])
+			&& array_key_exists('name', $userdata['results'][0])
+		) {
+			return $userdata['results'][0];
 		}
 
 		return null;
@@ -112,7 +114,7 @@ class MeetupAuthenticationModule extends OAuthAuthenticationModule
  * @package StartupAPI
  * @subpackage Authentication\Meetup
  */
-class MeetupUserCredentials extends OAuthUserCredentials {
+class MeetupUserCredentials extends OAuth2UserCredentials {
 	public function getHTML() {
 		return StartupAPI::$template->render("@startupapi/modules/meetup/credentials.html.twig", $this->userinfo);
 	}
