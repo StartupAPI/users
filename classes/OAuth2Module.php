@@ -1137,6 +1137,15 @@ class OAuth2UserCredentials extends UserCredentials {
 	}
 
 	/**
+	 * Returns an array of user information key-value pairs
+	 *
+	 * @return array Array of user-specific information
+	 */
+	public function getUserInfo() {
+		return $this->userinfo;
+	}
+
+	/**
 	 * Returns a chunk of HTML to display user's credentials
 	 *
 	 * This method will most likely be implemented by a subclass using $this->userinfo object.
