@@ -1014,7 +1014,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	{
 		$ch = curl_init();
 
-		$separator = strpos('?', $url) ? '&' : '?';
+		$separator = strpos($url, '?') ? '&' : '?';
 
 		if (!is_array($request_params)) {
 			$request_params = array();
@@ -1134,6 +1134,15 @@ class OAuth2UserCredentials extends UserCredentials {
 		$this->access_token = $access_token;
 		$this->access_token_expires = $access_token_expires;
 		$this->refresh_token = $refresh_token;
+	}
+
+	/**
+	 * Returns an array of user information key-value pairs
+	 *
+	 * @return array Array of user-specific information
+	 */
+	public function getUserInfo() {
+		return $this->userinfo;
 	}
 
 	/**
