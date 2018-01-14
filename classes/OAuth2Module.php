@@ -436,7 +436,8 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	/**
 	 * Retrieves OAuth2 access token from the service and creates new client entry
 	 *
-	 * @param string $code OAuth2 code
+	 * @param string $code	OAuth2 code
+	 * @return int			Internal OAuth2 client id
 	 */
 	public function getOAuth2ClientIDByCode($code) {
 		//  STEP 2:  Get access token
@@ -449,6 +450,34 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 			'client_secret' => $this->oAuth2ClientSecret
 		);
 
+		return $this->updateOAuth2Tokens($params);
+	}
+
+	/**
+	 * Refreshes access token for existing credentials
+	 *
+	 * @param  OAuth2UserCredentials $credentials Existing user credentials
+	 */
+	public function refreshAccessToken($credentials) {
+		$params = array(
+			'grant_type' => 'refresh_token',
+			'refresh_token' => $credentials->getRefreshToken(),
+			'client_id' => $this->oAuth2ClientID,
+			'client_secret' => $this->oAuth2ClientSecret
+		);
+
+		UserTools::debug("Refreshing OAuth2 token");
+
+		$this->updateOAuth2Tokens($params, $credentials);
+	}
+
+	/**
+	 * Creates or updates OAuth2 tokens and database records
+	 * @param  array						$params					Authorization request parameters
+	 * @param  OAuth2UserCredentials|null	$current_credentials	Current user credentials
+	 * @return int         					Internal OAuth2 client id
+	 */
+	private function updateOAuth2Tokens($params, $current_credentials = null) {
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $this->oAuth2AccessTokenURL);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
@@ -488,6 +517,8 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 			throw new OAuth2Exception("OAuth2 access token is not returned");
 		}
 
+		UserTools::debug("Access token: " . $access_token);
+
 		$refresh_token = array_key_exists('refresh_token', $result) ? $result['refresh_token'] : null;
 		$expires_in = array_key_exists('expires_in', $result) ? $result['expires_in'] : null;
 		$token_type = array_key_exists('token_type', $result) ? $result['token_type'] : 'bearer';
@@ -505,43 +536,57 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 
 		$access_token_expires = is_null($expires_in) ? null : time() + $expires_in;
 
-		$oauth2_client_id = null;
+		$oauth2_client_id = $current_credentials ? $current_credentials->getClientId() : null;
 		$current_expires = null;
 		$current_refresh = null;
 
-		$query = 'SELECT oauth2_client_id, UNIX_TIMESTAMP(access_token_expires), refresh_token
-			FROM u_oauth2_clients
-			WHERE module_slug = ? AND access_token = ?';
-		UserTools::debug($query);
+		if (!$current_credentials) {
+			/**
+			 * Let's try reading client info for this access_token from the database
+			 */
+			$query = 'SELECT oauth2_client_id, UNIX_TIMESTAMP(access_token_expires), refresh_token
+				FROM u_oauth2_clients
+				WHERE module_slug = ? AND access_token = ?';
+			UserTools::debug($query);
 
-		if ($stmt = $db->prepare($query))
-		{
-			if (!$stmt->bind_param('ss', $module_slug, $access_token))
+			if ($stmt = $db->prepare($query))
 			{
-				throw new DBBindParamException($db, $stmt);
-			}
-			if (!$stmt->execute())
-			{
-				throw new DBExecuteStmtException($db, $stmt);
-			}
-			if (!$stmt->bind_result($oauth2_client_id, $current_expires, $current_refresh))
-			{
-				throw new DBBindResultException($db, $stmt);
-			}
+				if (!$stmt->bind_param('ss', $module_slug, $access_token))
+				{
+					throw new DBBindParamException($db, $stmt);
+				}
+				if (!$stmt->execute())
+				{
+					throw new DBExecuteStmtException($db, $stmt);
+				}
+				if (!$stmt->bind_result($oauth2_client_id, $current_expires, $current_refresh))
+				{
+					throw new DBBindResultException($db, $stmt);
+				}
 
-			$stmt->fetch();
-			$stmt->close();
+				$stmt->fetch();
+				$stmt->close();
+			}
+			else
+			{
+				throw new DBPrepareStmtException($db);
+			}
 		}
-		else
-		{
-			throw new DBPrepareStmtException($db);
-		}
 
+		/**
+		 * If we don't have client_id (for new access_token), let's insert a new one into the database (without identity)
+		 */
 		if (!$oauth2_client_id) {
 			$query = 'INSERT INTO u_oauth2_clients
                                 (module_slug, access_token, access_token_expires, refresh_token)
                                 VALUES (?, ?, FROM_UNIXTIME(?), ?)';
 			UserTools::debug($query);
+			UserTools::debug(var_export([
+				"module_slug" => $module_slug,
+				"access_token" => $access_token,
+				"access_token_expires" => $access_token_expires,
+				"refresh_token" => $refresh_token
+			], true));
 
 			if ($stmt = $db->prepare($query))
 			{
@@ -563,16 +608,29 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 			} else {
 				throw new DBPrepareStmtException($db);
 			}
-		} else if ($access_token_expires != $current_expires
+		} else
+			/**
+			 * Otherwise update the token if we a refreshing the token or expires timestamp / refresh token are updated
+			 */
+			if ($current_credentials
+				|| $access_token_expires != $current_expires
 				|| $refresh_token != $current_refresh) {
 			$query = 'UPDATE u_oauth2_clients
-                                SET access_token_expires = FROM_UNIXTIME(?), refresh_token = ?
+                                SET access_token = ?, access_token_expires = FROM_UNIXTIME(?), refresh_token = ?
                                 WHERE oauth2_client_id = ?';
 			UserTools::debug($query);
+			UserTools::debug(var_export([
+				"module_slug" => $module_slug,
+				"access_token" => $access_token,
+				"access_token_expires" => $access_token_expires,
+				"refresh_token" => $refresh_token,
+				"oauth2_client_id" => $oauth2_client_id
+			], true));
 
 			if ($stmt = $db->prepare($query))
 			{
-				if (!$stmt->bind_param('ssi',
+				if (!$stmt->bind_param('sssi',
+					$access_token,
 					$access_token_expires,
 					$refresh_token,
 					$oauth2_client_id))
@@ -588,6 +646,8 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 			} else {
 				throw new DBPrepareStmtException($db);
 			}
+
+			$current_credentials->updateCredentials($access_token, $access_token_expires, $refresh_token);
 		}
 
 		return $oauth2_client_id;
@@ -1003,14 +1063,15 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	 * This method allows requesting information on behalf of the user from a 3rd party provider.
 	 * Possibly the most important feature of the whole system.
 	 *
-	 * @param User $user User to make request for
+	 * @param UserCredentials $credentials Credentials object representing OAuth2 user
 	 * @param string $request Request URL
 	 * @param string $method HTTP method (e.g. GET, POST, PUT, etc)
 	 * @param array $params Request parameters key->value array
+	 * @param boolean $refresh_if_unauthorized Whatever to attempt to refresh the token on failure (to avoid recursion)
 	 *
 	 * @return array Response data (code=>int, headers=>array(), body=>string)
 	 */
-	public function makeOAuth2Request($credentials, $url, $method = 'GET', $request_params = array(), $curlopt = array())
+	public function makeOAuth2Request($credentials, $url, $method = 'GET', $request_params = array(), $curlopt = array(), $refresh_if_unauthorized = TRUE)
 	{
 		$ch = curl_init();
 
@@ -1027,7 +1088,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		// always pass access_token as a query string parameter
 		if (count($params)) {
 			if ($method == 'GET') {
-				$url .= $separator . http_build_query($params);
+				$call_url = $url . $separator . http_build_query($params);
 				$separator = '&';
 			} else if ($method == 'POST') {
 				$curlopt[CURLOPT_POST] = TRUE;
@@ -1039,15 +1100,15 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		if ($this->oAuth2SendAccessTokenAsHeader) {
 			$curlopt[CURLOPT_HTTPHEADER][] = 'Authorization: Bearer ' . $credentials->getAccessToken();
 		} else {
-			$url .= $separator . http_build_query(array(
+			$call_url = $url . $separator . http_build_query(array(
 				$this->oAuth2AccessTokenParamName => $credentials->getAccessToken()
 			));
 			$separator = '&';
 		}
 
-		UserTools::debug("URL: $url");
+		UserTools::debug("URL: $call_url");
 
-		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_URL, $call_url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($ch, CURLOPT_HEADER, FALSE);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE);
@@ -1060,6 +1121,20 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 		$result = curl_exec($ch);
 		UserTools::debug("Request: " . var_export(curl_getinfo($ch, CURLINFO_HEADER_OUT), true));
 		UserTools::debug("Response: $result");
+
+		// let's see if our access token has expired and try to refresh it
+		if ($result) {
+			$data = json_decode($result, true);
+
+			if (array_key_exists('code', $data) && $data['code'] == 'not_authorized') {
+				$this->refreshAccessToken($credentials);
+
+				// call thyself without refreshing on failure (to avoid recursion)
+
+				// @TODO debug why this goes into infinite loop before re-emabling it
+				return $this->makeOAuth2Request($credentials, $url, $method, $request_params, $curlopt, FALSE);
+			}
+		}
 
 		if (curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200) {
 			throw new OAuth2Exception("OAuth2 call failed: " . curl_error($ch) . ' (Code: ' . curl_getinfo($ch, CURLINFO_HTTP_CODE) . ')');
@@ -1164,6 +1239,25 @@ class OAuth2UserCredentials extends UserCredentials {
 	 */
 	public function getAccessToken() {
 		return $this->access_token;
+	}
+
+	/**
+	 * Returns OAuth2 refresh token
+	 *
+	 * @return string OAuth2 refresh token
+	 */
+	public function getRefreshToken() {
+		return $this->refresh_token;
+	}
+
+	public function getClientId() {
+		return $this->oauth2_client_id;
+	}
+
+	public function updateCredentials($access_token, $access_token_expires, $refresh_token) {
+		$this->access_token = $access_token;
+		$this->access_token_expires = $access_token_expires;
+		$this->refresh_token = $refresh_token;
 	}
 
 	public function makeOAuth2Request($request, $method = 'GET', $params = null, $curlopt = array()) {
