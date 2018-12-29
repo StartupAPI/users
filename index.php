@@ -144,8 +144,14 @@ $dependencies = array(
 		'url' => 'http://www.php.net/manual/en/book.mysqli.php',
 		'ready' => true
 	),
+	'openssl' => array(
+		'name' => 'PHP OpenSSL support',
+		'description' => 'PHP bindings for OpenSSL library needed for security of user information',
+		'url' => 'http://php.net/manual/en/book.openssl.php',
+		'ready' => true
+	),
 	'mcrypt' => array(
-		'name' => 'PHP Mcrypt support',
+		'name' => 'PHP Mcrypt support (alternative to openssl)',
 		'description' => 'PHP Mcrypt library support needed for security of user information',
 		'url' => 'http://www.php.net/manual/en/book.mcrypt.php',
 		'ready' => true
@@ -177,12 +183,31 @@ if (!version_compare($current_php_version, $required_php_version, '>=')) {
 	$dependencies['php-version'] = false;
 }
 
-$required_extensions = array('mysqli', 'mcrypt', 'curl', 'mbstring', 'json');
+$required_extensions = array('mysqli', ['mcrypt', 'openssl'], 'curl', 'mbstring', 'json');
 $current_php_extensions = get_loaded_extensions();
-foreach ($required_extensions as $extension) {
-	if (!in_array($extension, $current_php_extensions)) {
-		$dependencies_ready = false;
-		$dependencies[$extension]['ready'] = false;
+
+foreach ($required_extensions as $component) {
+	if (is_array($component)) {
+		$one_of_extensions_ready = false;
+
+		// only one of the elements of component array is a required extension
+		foreach ($component as $extension) {
+			if (in_array($extension, $current_php_extensions)) {
+				$one_of_extensions_ready = true;
+			} else {
+				$dependencies[$extension]['ready'] = false;
+			}
+		}
+
+		if (!$one_of_extensions_ready) {
+			$dependencies_ready = false;
+		}
+	} else {
+		// each component is a required extension
+		if (!in_array($component, $current_php_extensions)) {
+			$dependencies_ready = false;
+			$dependencies[$component]['ready'] = false;
+		}
 	}
 }
 
