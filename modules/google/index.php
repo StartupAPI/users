@@ -13,7 +13,7 @@ class GoogleAuthenticationModule extends OAuth2AuthenticationModule
 	protected $userCredentialsClass = 'GoogleUserCredentials';
 
 	public function __construct($oAuth2ClientID, $oAuth2ClientSecret,
-		$scopes = 'profile'
+		$scopes = 'https://www.googleapis.com/auth/userinfo.profile'
 	) {
 		parent::__construct(
 			'Google',
@@ -73,7 +73,7 @@ class GoogleAuthenticationModule extends OAuth2AuthenticationModule
 		$credentials = $this->getOAuth2Credentials($oauth2_client_id);
 
 		try {
-			$result = $credentials->makeOAuth2Request('https://www.googleapis.com/plus/v1/people/me');
+			$result = $credentials->makeOAuth2Request('https://www.googleapis.com/oauth2/v2/userinfo');
 		} catch (OAuth2Exception $ex) {
 			return null;
 		}
@@ -106,17 +106,15 @@ class GoogleAuthenticationModule extends OAuth2AuthenticationModule
 		}
 
 		$user_info = $data;
-		if (array_key_exists('id', $user_info) && array_key_exists('displayName', $user_info)
-		) {
-			$user_info['name'] = $user_info['displayName'];
-		} else {
-			UserTools::debug("Don't have ID or displayName: " . var_export($user_info, true));
+		if (!array_key_exists('id', $user_info) || !array_key_exists('name', $user_info)) {
+			UserTools::debug("Don't have ID or name: " . var_export($user_info, true));
 			return null;
 		}
 
 		if (array_key_exists('emails', $user_info) && count($user_info['emails'] > 0)) {
 			$user_info['email'] = $user_info['emails'][0]['value'];
 		}
+
 		return $user_info;
 	}
 

@@ -89,19 +89,25 @@ new UsernamePasswordAuthenticationModule();
  *
  * And then uncomment lines below and copy Client ID and Client Secret
  * Optional 3rd parameter is an array of API scopes you need authorization for.
- *	See Google's explanation for scopes here: https://developers.google.com/+/web/api/rest/oauth#authorization-scopes
+ *	See Google's explanation for scopes here: https://developers.google.com/identity/protocols/googlescopes
  * 	See up-to-date list of APIs and scopes here: https://developers.google.com/oauthplayground/
- *	(One of /Google Contacts API scope is required and is included by default)
+ *
+ *  Google Oauth2 "https://www.googleapis.com/auth/userinfo.profile" scope is required
+ *  and included by default, but you need to explicitly specify it if you add other scopes.
+ *
+ *  You can also add "https://www.googleapis.com/auth/userinfo.email" scope
+ *  if you want to get user's email address.
+ *
+ * Your personal OAuth authorizations are recorded here to be used for debugging:
+ * https://myaccount.google.com/permissions
  */
 #UserConfig::loadModule('google');
 #new GoogleAuthenticationModule(
 #	'...OAuth2.client.id.goes.here...',
 #	'...OAuth2.clientsecret.goes.here...',
 #	array(
-#		'profile',
-#		'email',
-#		'https://www.googleapis.com/auth/plus.login',
-#		'https://www.googleapis.com/auth/plus.profile.emails.read'
+#		'https://www.googleapis.com/auth/userinfo.profile',
+#		'https://www.googleapis.com/auth/userinfo.email',
 #	)
 #);
 
