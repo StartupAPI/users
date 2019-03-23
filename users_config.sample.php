@@ -116,9 +116,14 @@ new UsernamePasswordAuthenticationModule();
  * Register your app here: https://developers.facebook.com/apps
  * Click "Edit settings" -> "Website with Facebook Login" and enter your site's URL
  * And then uncomment two lines below and copy API Key and App Secret
+ *
+ * Optional 3rd argument is an array of additional permission scopes you'd like to request
+ * See: https://developers.facebook.com/docs/facebook-login/permissions/#user-data
+ * (default set is available right away, adding more scopes will require app review)
  */
 #UserConfig::loadModule('facebook');
 #new FacebookAuthenticationModule('...api.key.goes.here...', '...api.secret.goes.here...');
+#new FacebookAuthenticationModule('...api.key.goes.here...', '...api.secret.goes.here...', ['email', 'user_link']);
 
 /**
  * Twitter Authentication configuration
