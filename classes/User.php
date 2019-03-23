@@ -737,7 +737,7 @@ class User {
 	 *
 	 * @throws DBException
 	 */
-	public static function createNewFacebookUser($name, $fb_id, $me = null) {
+	public static function createNewFacebookUser($name, $fb_id, $fb_link = null, $me = null) {
 		$name = mb_convert_encoding($name, 'UTF-8');
 
 		$db = UserConfig::getDB();
@@ -754,8 +754,8 @@ class User {
 
 		$user = null;
 
-		if ($stmt = $db->prepare("INSERT INTO u_users (name, regmodule, tos_version, email, fb_id) VALUES (?, 'facebook', ?, ?, ?)")) {
-			if (!$stmt->bind_param('sisi', $name, UserConfig::$currentTOSVersion, $email, $fb_id)) {
+		if ($stmt = $db->prepare("INSERT INTO u_users (name, regmodule, tos_version, email, fb_id, fb_link) VALUES (?, 'facebook', ?, ?, ?, ?)")) {
+			if (!$stmt->bind_param('sisis', $name, UserConfig::$currentTOSVersion, $email, $fb_id, $fb_link)) {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
@@ -2282,6 +2282,11 @@ class User {
 	private $fbid;
 
 	/**
+	 * @var string Facebook profile link
+	 */
+	private $fblink;
+
+	/**
 	 * @var int Unix timestamp indicating user's registration time
 	 */
 	private $regtime;
@@ -2308,11 +2313,12 @@ class User {
 	 * @param string $email Email address
 	 * @param boolean $requirespassreset Is this user required to reset their password
 	 * @param int $fbid Facebook ID
+	 * @param int $fblink Facebook profile link
 	 * @param int $regtime Registration time
 	 * @param int $points Total points user has
 	 * @param boolean $is_email_verified Is user's email verified or not
 	 */
-	private function __construct($userid, $status = true, $name, $username = null, $email = null, $requirespassreset = false, $fbid = null, $regtime = null, $points = 0, $is_email_verified = false) {
+	private function __construct($userid, $status = true, $name, $username = null, $email = null, $requirespassreset = false, $fbid = null, $fblink = null, $regtime = null, $points = 0, $is_email_verified = false) {
 		$this->userid = $userid;
 		$this->status = $status ? true : false;
 		$this->name = $name;
@@ -2320,6 +2326,7 @@ class User {
 		$this->email = $email;
 		$this->requirespassreset = $requirespassreset ? true : false;
 		$this->fbid = $fbid;
+		$this->fblink = $fblink;
 		$this->regtime = $regtime;
 		$this->points = $points;
 		$this->is_email_verified = $is_email_verified ? true : false;
@@ -2468,6 +2475,26 @@ class User {
 	 */
 	public function setFacebookID($fbid) {
 		$this->fbid = $fbid;
+	}
+
+	/**
+	 * Sets user's Facebook profile link
+	 *
+	 * You have to call save() method to persist to the database
+	 *
+	 * @param string $fblink User's Facebook profile link
+	 */
+	public function setFacebookProfileLink($fblink) {
+		$this->fblink = $fblink;
+	}
+
+	/**
+	 * Returns user's Facebook profile link or null if user doesn't have a facebook account associated or link is not known
+	 *
+	 * @return string|null User's Facebook profile link
+	 */
+	public function getFacebookProfileLink() {
+		return $this->fblink;
 	}
 
 	/**
@@ -2657,8 +2684,8 @@ class User {
 		$name = is_null($this->name) || $this->name == '' ? null : mb_convert_encoding($this->name, 'UTF-8');
 		$email = is_null($this->email) || $this->email == '' ? null : mb_convert_encoding($this->email, 'UTF-8');
 
-		if ($stmt = $db->prepare('UPDATE u_users SET status = ?, username = ?, name = ?, email = ?, email_verified = ?, requirespassreset = ?, fb_id = ? WHERE id = ?')) {
-			if (!$stmt->bind_param('isssiiii', $status, $username, $name, $email, $email_verifiednum, $passresetnum, $this->fbid, $this->userid)) {
+		if ($stmt = $db->prepare('UPDATE u_users SET status = ?, username = ?, name = ?, email = ?, email_verified = ?, requirespassreset = ?, fb_id = ?, fb_link = ? WHERE id = ?')) {
+			if (!$stmt->bind_param('isssiiisi', $status, $username, $name, $email, $email_verifiednum, $passresetnum, $this->fbid, $this->fblink, $this->userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {

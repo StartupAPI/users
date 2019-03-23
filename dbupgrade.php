@@ -20,6 +20,17 @@ $versions[_]['down'][]	= "";
 */
 
 /* -------------------------------------------------------------------------------------------------------
+ * VERSION 37
+ * Add fb_link field
+*/
+$versions[37]['up'][]	= "ALTER TABLE `u_users` ADD COLUMN fb_link TEXT
+CHARACTER SET utf8 COLLATE utf8_general_ci NULL
+COMMENT 'Facebook profile link'
+AFTER fb_id";
+
+$versions[37]['down'][]	= 'ALTER TABLE u_users DROP COLUMN `fb_link`';
+
+/* -------------------------------------------------------------------------------------------------------
  * VERSION 36
  * corrected type
 */

@@ -116,14 +116,14 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 
 		$userid = $user->getID();
 
-		if ($stmt = $db->prepare('SELECT fb_id FROM u_users WHERE id = ?')) {
+		if ($stmt = $db->prepare('SELECT fb_id, fb_link FROM u_users WHERE id = ?')) {
 			if (!$stmt->bind_param('i', $userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($fb_id)) {
+			if (!$stmt->bind_result($fb_id, $fb_link)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
@@ -131,7 +131,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 			$stmt->close();
 
 			if (!is_null($fb_id)) {
-				return new FacebookUserCredentials($fb_id);
+				return new FacebookUserCredentials($fb_id, $fb_link);
 			}
 		} else {
 			throw new DBPrepareStmtException($db);
@@ -243,6 +243,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 	 */
 	public function renderEditUserForm($template_info, $action, $errors, $user, $data) {
 		$fb_id = $user->getFacebookID();
+		$fb_link = $user->getFacebookProfileLink();
 
 		if (is_null($fb_id)) {
 			return $this->renderForm($template_info, $action, 'connect');
@@ -270,6 +271,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 
 			$template_info['me'] = $me;
 			$template_info['fb_id'] = $fbuser_id;
+			$template_info['fb_link'] = $fb_link;
 
 			return StartupAPI::$template->render("@startupapi/modules/facebook/edit_user_form.html.twig", $template_info);
 		}
@@ -447,6 +449,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 
 		$fbuser = $response->getGraphUser();
 		$fbuser_id = $fbuser->getId();
+		$fbuser_link = $fbuser["link"];
 		$me = $response->getDecodedBody();
 
 		$errors = array();
@@ -472,7 +475,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 
 		// ok, let's create a user
 		try {
-			$user = User::createNewFacebookUser($name, $fbuser_id, $me);
+			$user = User::createNewFacebookUser($name, $fbuser_id, $fbuser_link, $me);
 		} catch (UserCreationException $e) {
 			$errors[$e->getField()][] = $e->getMessage();
 		}
@@ -489,6 +492,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 	public function processEditUser($user, $data) {
 		if (array_key_exists('remove', $data)) {
 			$user->setFacebookID(null);
+			$user->setFacebookProfileLink(null);
 			$user->save();
 
 			$user->recordActivity(USERBASE_ACTIVITY_REMOVED_FB);
@@ -531,6 +535,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 
 		$fbuser = $response->getGraphUser();
 		$fbuser_id = $fbuser->getId();
+		$fbuser_link = $fbuser["link"];
 		$me = $response->getDecodedBody();
 
 		$errors = array();
@@ -548,6 +553,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		}
 
 		$user->setFacebookID($fbuser_id);
+		$user->setFacebookProfileLink($fbuser_link);
 
 		// if user has email address and we required it for Facebook connection, let's save it
 		if (!$user->getEmail()) {
@@ -619,12 +625,19 @@ class FacebookUserCredentials extends UserCredentials {
 	private $fb_id;
 
 	/**
+	 * @var string Facebook profile link
+	 */
+	private $fb_link;
+
+	/**
 	 * Creates credemtials onject
 	 *
 	 * @param int $fb_id Facebook user ID
+	 * @param string $fb_link Facebook profile link
 	 */
-	public function __construct($fb_id) {
+	public function __construct($fb_id, $fb_link = null) {
 		$this->fb_id = $fb_id;
+		$this->fb_link = $fb_link;
 	}
 
 	/**
@@ -637,7 +650,7 @@ class FacebookUserCredentials extends UserCredentials {
 	}
 
 	public function getHTML() {
-		return StartupAPI::$template->render("@startupapi/modules/facebook/credentials.html.twig", array('fb_id' => $this->fb_id));
+		return StartupAPI::$template->render("@startupapi/modules/facebook/credentials.html.twig", array('fb_id' => $this->fb_id, 'fb_link' => $this->fb_link));
 	}
 
 }

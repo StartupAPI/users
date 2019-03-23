@@ -311,9 +311,8 @@ class ExistingUserException extends AuthenticationException {
 	 * @var User|null Existing user or null if we just know that user exists, but did not get object specifically.
 	 */
 	private $existing_user;
-
-	public function __construct(User $user = null, $string, $code, $errors) {
-		parent::__construct($user, $string, $code, $errors);
+	public function __construct(User $user = null, $string = "User Alerady Exists", $code = 500, $errors = ["User Already Exists"]) {
+		parent::__construct($string, $code, $errors);
 		$this->existing_user = $user;
 	}
 
