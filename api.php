@@ -120,6 +120,19 @@ unset($params['call']); // except for the call parameter
 header('Content-type: application/json');
 
 try {
+	if ($_SERVER['REQUEST_METHOD'] !== "GET") {
+		$found_CSRF_header = false;
+		foreach (getallheaders() as $header => $value) {
+			if (strtolower($header) === 'x-csrf-token') {
+				$found_CSRF_header = true;
+			}
+		}
+
+		if (!$found_CSRF_header) {
+			throw new \StartupAPI\API\UnauthenticatedException("Missing X-CSRF-token header");
+		}
+	}
+
 	$endpoint = \StartupAPI\API\Endpoint::getEndpoint($_SERVER['REQUEST_METHOD'], $_GET['call']);
 
 	// default output format is JSON
