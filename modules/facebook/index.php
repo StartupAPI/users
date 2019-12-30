@@ -66,7 +66,7 @@ class FacebookAuthenticationModule extends AuthenticationModule {
 		$config = array(
 			'app_id' => $this->appID,
 			'app_secret' => $this->secret,
-			'default_graph_version' => 'v2.9'
+			'graph_api_version' => 'v5.0'
 		);
 
 		$this->sdk = new \Facebook\Facebook($config);
