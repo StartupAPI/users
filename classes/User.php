@@ -258,19 +258,19 @@ class User {
 
 		$sources = array();
 
-		if ($stmt = $db->prepare('SELECT referer, id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE referer IS NOT NULL AND regtime > DATE_SUB(NOW(), INTERVAL ? DAY) ORDER BY regtime DESC')) {
+		if ($stmt = $db->prepare('SELECT referer, id, status, name, username, email, requirespassreset, fb_id, fb_link, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE referer IS NOT NULL AND regtime > DATE_SUB(NOW(), INTERVAL ? DAY) ORDER BY regtime DESC')) {
 			if (!$stmt->bind_param('i', $days)) {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($referer, $userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
+			if (!$stmt->bind_result($referer, $userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $fb_link, $regtime, $points, $is_email_verified)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
-				$sources[$referer][] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
+				$sources[$referer][] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $fb_link, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
@@ -404,7 +404,7 @@ class User {
 		$campaigns = array();
 
 		if ($stmt = $db->prepare('SELECT cmp.name, cmp_content.content, cmp_keywords.keywords, cmp_medium.medium, cmp_source.source,
-			users.id, status, users.name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified
+			users.id, status, users.name, username, email, requirespassreset, fb_id, fb_link, UNIX_TIMESTAMP(regtime), points, email_verified
 			FROM u_users AS users
 				LEFT JOIN u_cmp AS cmp ON users.reg_cmp_name_id = cmp.id
 				LEFT JOIN u_cmp_content AS cmp_content ON users.reg_cmp_content_id = cmp_content.id
@@ -425,12 +425,12 @@ class User {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($cmp_name, $cmp_content, $cmp_keywords, $cmp_medium, $cmp_source, $userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
+			if (!$stmt->bind_result($cmp_name, $cmp_content, $cmp_keywords, $cmp_medium, $cmp_source, $userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $fb_link, $regtime, $points, $is_email_verified)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
-				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
+				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $fb_link, $regtime, $points, $is_email_verified);
 
 				if (!is_null($cmp_name)) {
 					$campaigns['cmp_name'][$cmp_name][] = $user;
@@ -1489,7 +1489,7 @@ class User {
 			$where = ' WHERE ' . implode(' AND ', $where_conditions);
 		}
 
-		$query = 'SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified
+		$query = 'SELECT id, status, name, username, email, requirespassreset, fb_id, fb_link, UNIX_TIMESTAMP(regtime), points, email_verified
 			FROM u_users ' .
 				$where . '
 			ORDER BY ' . $orderby . ' ' . ($sort_order ? 'ASC' : 'DESC') . '
@@ -1512,12 +1512,12 @@ class User {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $fb_link, $regtime, $points, $is_email_verified)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
-				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
+				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $fb_link, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
@@ -1556,19 +1556,19 @@ class User {
 			$orderby = 'points';
 		}
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE INSTR(name, ?) > 0 OR INSTR(username, ?) > 0 OR INSTR(email, ?) > 0 ORDER BY ' . $orderby . ' DESC LIMIT ?, ?')) {
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, fb_link, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE INSTR(name, ?) > 0 OR INSTR(username, ?) > 0 OR INSTR(email, ?) > 0 ORDER BY ' . $orderby . ' DESC LIMIT ?, ?')) {
 			if (!$stmt->bind_param('sssii', $search, $search, $search, $first, $perpage)) {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $fb_link, $regtime, $points, $is_email_verified)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
-				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
+				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $fb_link, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
@@ -1718,19 +1718,19 @@ class User {
 
 		$users = array();
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE username = ? OR email = ?')) {
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, fb_link, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE username = ? OR email = ?')) {
 			if (!$stmt->bind_param('ss', $nameoremail, $nameoremail)) {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $fb_link, $regtime, $points, $is_email_verified)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
-				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
+				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $fb_link, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
@@ -1966,16 +1966,16 @@ class User {
 
 		$idlist = join(', ', $ids);
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE id IN (' . $idlist . ')')) {
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_id, fb_link, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE id IN (' . $idlist . ')')) {
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $fb_link, $regtime, $points, $is_email_verified)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			while ($stmt->fetch() === TRUE) {
-				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
+				$users[] = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $fb_link, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
@@ -2004,20 +2004,20 @@ class User {
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, pass, salt, temppass, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE username = ?')) {
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, pass, salt, temppass, requirespassreset, fb_id, fb_link, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE username = ?')) {
 			if (!$stmt->bind_param('s', $entered_username)) {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($id, $status, $name, $username, $email, $pass, $salt, $temppass, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
+			if (!$stmt->bind_result($id, $status, $name, $username, $email, $pass, $salt, $temppass, $requirespassreset, $fb_id, $fb_link, $regtime, $points, $is_email_verified)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE) {
 				if (sha1($salt . $entered_password) == $pass) {
-					$user = new self($id, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
+					$user = new self($id, $status, $name, $username, $email, $requirespassreset, $fb_id, $fb_link, $regtime, $points, $is_email_verified);
 				}
 			}
 
@@ -2037,19 +2037,19 @@ class User {
 		}
 
 		if (is_null($user)) {
-			if ($stmt = $db->prepare('SELECT id, status, name, username, email, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE username = ? AND temppass = ? AND temppasstime > DATE_SUB(NOW(), INTERVAL 1 DAY)')) {
+			if ($stmt = $db->prepare('SELECT id, status, name, username, email, fb_id, fb_link, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE username = ? AND temppass = ? AND temppasstime > DATE_SUB(NOW(), INTERVAL 1 DAY)')) {
 				if (!$stmt->bind_param('ss', $entered_username, $entered_password)) {
 					throw new DBBindParamException($db, $stmt);
 				}
 				if (!$stmt->execute()) {
 					throw new DBExecuteStmtException($db, $stmt);
 				}
-				if (!$stmt->bind_result($id, $status, $name, $username, $email, $fb_id, $regtime, $points, $is_email_verified)) {
+				if (!$stmt->bind_result($id, $status, $name, $username, $email, $fb_id, $fb_link, $regtime, $points, $is_email_verified)) {
 					throw new DBBindResultException($db, $stmt);
 				}
 
 				if ($stmt->fetch() === TRUE) {
-					$user = new self($id, $status, $name, $username, $email, null, $fb_id, $regtime, $points, $is_email_verified);
+					$user = new self($id, $status, $name, $username, $email, null, $fb_id, $fb_link, $regtime, $points, $is_email_verified);
 				}
 
 				$stmt->close();
@@ -2091,19 +2091,19 @@ class User {
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE fb_id = ?')) {
+		if ($stmt = $db->prepare('SELECT id, status, name, username, email, requirespassreset, fb_link, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE fb_id = ?')) {
 			if (!$stmt->bind_param('i', $fb_id)) {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $regtime, $points, $is_email_verified)) {
+			if (!$stmt->bind_result($userid, $status, $name, $username, $email, $requirespassreset, $fb_link, $regtime, $points, $is_email_verified)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE) {
-				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
+				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $fb_link, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
@@ -2128,19 +2128,19 @@ class User {
 
 		$user = null;
 
-		if ($stmt = $db->prepare('SELECT status, name, username, email, requirespassreset, fb_id, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE id = ?')) {
+		if ($stmt = $db->prepare('SELECT status, name, username, email, requirespassreset, fb_id, fb_link, UNIX_TIMESTAMP(regtime), points, email_verified FROM u_users WHERE id = ?')) {
 			if (!$stmt->bind_param('i', $userid)) {
 				throw new DBBindParamException($db, $stmt);
 			}
 			if (!$stmt->execute()) {
 				throw new DBExecuteStmtException($db, $stmt);
 			}
-			if (!$stmt->bind_result($status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified)) {
+			if (!$stmt->bind_result($status, $name, $username, $email, $requirespassreset, $fb_id, $fb_link, $regtime, $points, $is_email_verified)) {
 				throw new DBBindResultException($db, $stmt);
 			}
 
 			if ($stmt->fetch() === TRUE) {
-				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $regtime, $points, $is_email_verified);
+				$user = new self($userid, $status, $name, $username, $email, $requirespassreset, $fb_id, $fb_link, $regtime, $points, $is_email_verified);
 			}
 
 			$stmt->close();
