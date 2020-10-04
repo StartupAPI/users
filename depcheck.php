@@ -3,7 +3,7 @@
  * Testing for all dependencies StartupAPI has
  * http://startupapi.org/Startup_API/Installation#Prerequisites
  */
-$required_php_version = '5.3.0';
+$required_php_version = '5.4.0';
 $required_extensions = array('mysqli', ['mcrypt', 'openssl'], 'curl', 'mbstring', 'json');
 
 $current_php_version = phpversion();
