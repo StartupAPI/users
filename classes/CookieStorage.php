@@ -224,9 +224,7 @@ class MrClay_CookieStorage {
         if (isset($this->_returns[self::MODE_VISIBLE][$name])) {
             return $this->_returns[self::MODE_VISIBLE][$name][0];
         }
-        $cookie = get_magic_quotes_gpc()
-            ? stripslashes($_COOKIE[$name])
-            : $_COOKIE[$name];
+        $cookie = $_COOKIE[$name];
         $parts = explode('|', $cookie, 3);
         if (3 !== count($parts)) {
             $this->errors[] = 'Cookie was tampered with.';
@@ -252,9 +250,7 @@ class MrClay_CookieStorage {
             $this->errors[] = 'Decrypt function not callable';
             return false;
         }
-        $cookie = get_magic_quotes_gpc()
-            ? stripslashes($_COOKIE[$name])
-            : $_COOKIE[$name];
+        $cookie = $_COOKIE[$name];
         $key = self::hash($this->_o['secret']);
         $timeStr = call_user_func($this->_o['decryptFunc'], $key, $cookie);
         if (! $timeStr) {
