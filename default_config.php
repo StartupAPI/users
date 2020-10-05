@@ -367,7 +367,7 @@ class UserConfig {
 	/**
 	 * @var array[] Array of available theme slugs
 	 */
-	public static $available_themes = array('classic', 'awesome');
+	public static $available_themes = array('classic', 'awesome', 'amazing');
 
 	/**
 	 * @var string Theme slug for current theme
@@ -826,6 +826,11 @@ class UserConfig {
 	 * @var callable Handler to be called when new user is created, newly created user object is passed in
 	 */
 	public static $onCreate = null;
+
+	/**
+	 * @var callable Hook for rendering main navigation links
+	 */
+	public static $onNavigationLinks = null;
 
 	/**
 	 * @var callable Hook for rendering extra links on power strip

@@ -309,6 +309,15 @@ class StartupAPI {
 			ob_end_clean();
 		}
 
+		if (!is_null(UserConfig::$onNavigationLinks)) {
+			$links = call_user_func_array(UserConfig::$onNavigationLinks, array($current_user, $current_account));
+			if (is_array($links)) {
+				foreach ($links as $link) {
+					$page_info['navigationlinks'][] = $link;
+				}
+			}
+		}
+
 		if (!is_null(UserConfig::$onLoginStripLinks)) {
 			$links = call_user_func_array(UserConfig::$onLoginStripLinks, array($current_user, $current_account));
 			if (is_array($links)) {

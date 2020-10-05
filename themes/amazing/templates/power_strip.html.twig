@@ -1,0 +1,63 @@
+<!-- NAVBAR START -->
+<!-- Use "fixed-top" to stick the navbar to the top of the page -->
+<nav class="navbar navbar-expand-lg {% if POWERSTRIP.inverted_navbar %} navbar-dark bg-dark{% else %} navbar-light bg-light{% endif %}">
+	<a class="navbar-brand" href="{{ UserConfig.SITEROOTURL }}">
+	{% if UserConfig.appIconURL %}
+		<img class="startupapi-logo d-inline-block align-middle" width="30" height="30" src="{{ UserConfig.appIconURL }}" />
+	{% else %}
+		<img class="startupapi-logo d-inline-block align-middle" width="30" height="30" src="{{ UserConfig.USERSROOTURL }}/images/header_icon.png" />
+	{% endif %}
+
+	{% if UserConfig.appName %}
+		{{" "}}{{UserConfig.appName}}
+	{% endif %}
+	</a>
+
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	</button>
+
+	<div class="collapse navbar-collapse" id="navbarSupportedContent">
+		<ul class="navbar-nav mr-auto">
+			{% for link in PAGE.navigationlinks %}
+				<li class="nav-item" {% if link.id %} id="{{ link.id }}"{% endif %}>
+					<a class="nav-link" href="{{ link.url }}"
+						{% if link.title %}
+							title="{{ link.title }}"
+						{% endif %}
+						{% if link.target %}
+							target="{{ link.target }}"
+						{% endif %}
+					>{{ link.text }}</a>
+				</li>
+			{% endfor %}
+		</ul>
+
+		<ul class="navbar-nav d-flex justify-content-end">
+		{% if AUTH.current_user.is_logged_in %}
+			{% if AUTH.current_user.is_admin %}
+				<li class="nav-item"><a class="nav-link" id="startupapi-navbox-admin" href="{{ UserConfig.USERSROOTURL }}/admin/">Admin</a></li>
+			{% endif %}
+			{% for link in PAGE.extralinks %}
+				<li class="nav-item" {% if link.id %} id="{{ link.id }}"{% endif %}>
+					<a class="nav-link" href="{{ link.url }}"
+						{% if link.title %}
+							title="{{ link.title }}"
+						{% endif %}
+						{% if link.target %}
+							target="{{ link.target }}"
+						{% endif %}
+					>{{ link.text }}</a>
+				</li>
+			{% endfor %}
+
+			<li id="startupapi-navbox-username" class="nav-item"><a class="nav-link" href="{{ UserConfig.USERSROOTURL }}/edit.php" title="{{ AUTH.current_user.name }}'s user information">{{ AUTH.current_user.name }}</a></li>
+			<li id="startupapi-navbox-logout" class="nav-item"><a class="nav-link" href="{{ UserConfig.USERSROOTURL }}/logout.php">Logout</a></li>
+		{% else %}
+			<li id="startupapi-navbox-signup" class="nav-item"><a class="nav-link" href="{{ UserConfig.USERSROOTURL }}/register.php">Sign Up</a></li>
+			<li id="startupapi-navbox-login" class="nav-item"><a class="nav-link" href="{{ UserConfig.USERSROOTURL }}/login.php">Log in</a></li>
+		{% endif %}
+		</ul>
+	</div>
+</nav>
+<!-- NAVBAR END -->

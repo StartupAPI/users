@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{% block title %}{{UserConfig.appName}}{% endblock %}</title>
+	{% include '@startupapi/head_tag.html.twig' %}
+	{% block head %}{% endblock %}
+</head>
+<body>
+{% include '@startupapi/power_strip.html.twig' %}
+<!-- header ends -->
+
+{% block base %}
+	<div id="startupapi-message" style="display: none">
+		<div class="alert alert-block">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<div id="startupapi-message_copy"></div>
+		</div>
+	</div>
+	{% block content %}{% endblock %}
+{% endblock %}
+
+{% block footer %}
+<!-- footer starts -->
+<footer class="footer navbar navbar-expand-lg {% if POWERSTRIP.inverted_navbar %} navbar-dark bg-dark{% else %} navbar-light bg-light{% endif %}">
+	<div class="container-fluid">
+		<ul class="navbar-nav mr-auto">
+			<li class="nav-item">
+				<a class="nav-link" href="http://www.startupapi.com/" target="_blank">
+					<img class="startupapi-logo" width="20" height="20" hspace="5" src="{{ UserConfig.USERSROOTURL }}/images/header_icon.png" title="Powered by Startup API"/>
+					<span class="startupapi-poweredby">
+						Powered by Startup API
+					</span>
+				</a>
+			</li>
+		</ul>
+
+		{% if UserConfig.appName %}
+			<ul class="navbar-nav d-flex justify-content-end">
+				<li class="nav-item">
+					<a class="nav-link" href="{{UserConfig.SITEROOTURL}}">
+						{{PAGE.YEAR}} &copy;
+						{{UserConfig.appName}}
+					</a>
+				</li>
+			</ul>
+		{% endif %}
+	</div>
+</footer>
+<!-- footer ends -->
+{% endblock %}
+
+</body>
+</html>

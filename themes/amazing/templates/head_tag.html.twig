@@ -1,0 +1,20 @@
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+{# WILL ADD BOOTSWATCH WHEN MAIN THEME IS READY #}
+{# {% if UserConfig.bootstrapTheme and UserConfig.bootstrapTheme != 'default' %}
+	{% set startupapi_bootstrap_css = UserConfig.USERSROOTURL ~ '/bootswatch4/' ~ UserConfig.bootstrapTheme ~ '/bootstrap.min.css' %}
+{% else %} #}
+	{% set startupapi_bootstrap_css = UserConfig.USERSROOTURL ~ '/bootstrap4/css/bootstrap.min.css' %}
+{# {% endif %} #}
+
+<link{% if UserConfig.DEVMODE %} id="startupapi-dev-theme-switcher"{% endif %} href="{{startupapi_bootstrap_css}}" rel="stylesheet">
+
+<script src="{{ UserConfig.USERSROOTURL }}/themes/{{ UserConfig.theme }}/jquery-3.5.1.slim.min.js"></script>
+<script src="{{ UserConfig.USERSROOTURL }}/bootstrap4/js/bootstrap.bundle.min.js"></script>
+<script src="{{ UserConfig.USERSROOTURL }}/themes/{{ UserConfig.theme }}/startupapi.js"></script>
+<link rel="stylesheet" type="text/css" href="{{ UserConfig.USERSROOTURL }}/themes/{{ UserConfig.theme }}/startupapi.css">
+
+
+
