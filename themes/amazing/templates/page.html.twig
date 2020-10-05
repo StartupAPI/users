@@ -6,16 +6,49 @@
 	{% block head %}{% endblock %}
 </head>
 <body>
-{% include '@startupapi/power_strip.html.twig' %}
+
+<!-- NAVBAR START -->
+<!-- Use "fixed-top" to stick the navbar to the top of the page -->
+<nav class="navbar navbar-expand-lg {% if POWERSTRIP.inverted_navbar %} navbar-dark bg-dark{% else %} navbar-light bg-light{% endif %}">
+	<a class="navbar-brand" href="{{ UserConfig.SITEROOTURL }}">
+	{% if UserConfig.appIconURL %}
+		<img class="startupapi-logo d-inline-block align-middle" width="30" height="30" src="{{ UserConfig.appIconURL }}" />
+	{% else %}
+		<img class="startupapi-logo d-inline-block align-middle" width="30" height="30" src="{{ UserConfig.USERSROOTURL }}/images/header_icon.png" />
+	{% endif %}
+
+	{% if UserConfig.appName %}
+		{{" "}}{{UserConfig.appName}}
+	{% endif %}
+	</a>
+
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	</button>
+
+	<div class="collapse navbar-collapse" id="navbarSupportedContent">
+		<ul class="navbar-nav mr-auto">
+			{% for link in PAGE.navigationlinks %}
+				<li class="nav-item" {% if link.id %} id="{{ link.id }}"{% endif %}>
+					<a class="nav-link" href="{{ link.url }}"
+						{% if link.title %}
+							title="{{ link.title }}"
+						{% endif %}
+						{% if link.target %}
+							target="{{ link.target }}"
+						{% endif %}
+					>{{ link.text }}</a>
+				</li>
+			{% endfor %}
+		</ul>
+
+		{% include '@startupapi/power_strip.html.twig' %}
+	</div>
+</nav>
+<!-- NAVBAR END -->
 <!-- header ends -->
 
 {% block base %}
-	<div id="startupapi-message" style="display: none">
-		<div class="alert alert-block">
-			<button type="button" class="close" data-dismiss="alert">&times;</button>
-			<div id="startupapi-message_copy"></div>
-		</div>
-	</div>
 	{% block content %}{% endblock %}
 {% endblock %}
 
