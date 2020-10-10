@@ -62,7 +62,8 @@ class Get extends \StartupAPI\API\AuthenticatedEndpoint {
 		// @TODO Implement general API serialization logic for all objects
 		return array(
 			'id' => $user->getID(),
-			'name' => $user->getName()
+			'name' => $user->getName(),
+			'is_system_admin' => $user->isAdmin()
 		);
 	}
 
