@@ -1389,7 +1389,7 @@ class Account {
 
 		if ($plan) {
 			$capabilities = $plan->getCapabilities();
-			if (array_key_exists('individual', $capabilities)) {
+			if (isset($capabilities['individual'])) {
 				return $capabilities['individual'] ? TRUE : FALSE;
 			}
 		}

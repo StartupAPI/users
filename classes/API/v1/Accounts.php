@@ -25,12 +25,15 @@ class Accounts extends \StartupAPI\API\AuthenticatedEndpoint {
 
 		$accounts = $user->getAccounts();
 
+		$current_account = \Account::getCurrentAccount($user);
+
 		$results = array();
 		foreach ($accounts as $account) {
 			$results[] = array(
 				'id' => $account->getID(),
 				'name' => $account->getName(),
-				'is_admin' => ($account->getUserRole($user) == \Account::ROLE_ADMIN)
+				'is_admin' => ($account->getUserRole($user) == \Account::ROLE_ADMIN),
+				'is_current' => $current_account->isTheSameAs($account)
 			);
 		}
 
