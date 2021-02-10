@@ -2,7 +2,7 @@
 require_once(dirname(dirname(__DIR__)).'/classes/OAuth2Module.php');
 
 /**
- * First register an app here: https://console.developers.google.com/project
+ * First register an app here: https://console.cloud.google.com/apis/credentials
  * Google OAuth2 docs: https://developers.google.com/identity/protocols/OAuth2
  *
  * @package StartupAPI
