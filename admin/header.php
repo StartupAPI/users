@@ -84,9 +84,43 @@ if (!isset($BREADCRUMB_EXTRA)) {
 		}
 		?>
 		<link href="<?php echo $bootstrapCSS ?>" rel="stylesheet">
+		<link href="<?php echo $bootstrapCSS ?>" rel="stylesheet">
 		<link href="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap2/css/bootstrap-responsive.min.css" rel="stylesheet">
 		<script src="<?php echo UserConfig::$USERSROOTURL ?>/jquery-1.11.1.min.js"></script>
 		<script src="<?php echo UserConfig::$USERSROOTURL ?>/bootstrap2/js/bootstrap.min.js"></script>
+		<style>
+		/** Admin-specific styles formerly loaded from a theme */
+		.startupapi-module {
+			min-height: 100px;
+			width: 45%;
+			min-width: 30em;
+		}
+		.startupapi-module-not-installed {
+			color: silver;
+		}
+
+		.startupapi-module-not-installed a {
+			color: grey;
+		}
+		.startupapi-module-title {
+			font-size: x-large;
+			font-weight: bold;
+		}
+		.startupapi-module-logo {
+			width: 100px;
+			height: 100px;
+
+			margin-left: 1em;
+			margin-bottom: 1em;
+		}
+		.startupapi-module-not-installed .startupapi-module-logo {
+			opacity: 0.3;
+		}
+		.startupapi-user-disabled {
+			color: silver;
+			text-decoration: line-through;
+		}
+		</style>
 	</head>
 	<body>
 		<div class="navbar">
