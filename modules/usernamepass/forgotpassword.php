@@ -24,7 +24,7 @@ if (array_key_exists('recover', $_POST)) {
 
 			$message_body = call_user_func_array(UserConfig::$onRenderTemporaryPasswordEmail, array($baseurl, $username, $temppass));
 
-			$message = Swift_Message::newInstance($subject, $message_body);
+			$message = new Swift_Message($subject, $message_body);
 			$message->setFrom(array(UserConfig::$supportEmailFromEmail => UserConfig::$supportEmailFromName));
 			$message->setTo(array($email => $name));
 			$message->setReplyTo(array(UserConfig::$supportEmailReplyTo));

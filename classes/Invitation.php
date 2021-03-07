@@ -428,7 +428,7 @@ class Invitation {
 		$message_body = call_user_func_array(UserConfig::$onRenderInvitationEmailMessage, array($this));
 		$subject = call_user_func_array(UserConfig::$onRenderInvitationEmailSubject, array($this));
 
-		$message = Swift_Message::newInstance($subject, $message_body);
+		$message = new Swift_Message($subject, $message_body);
 		$message->setFrom(array(UserConfig::$supportEmailFromEmail => UserConfig::$supportEmailFromName));
 		$message->setTo(array($email => $name));
 		$message->setReplyTo(array(UserConfig::$supportEmailReplyTo));
