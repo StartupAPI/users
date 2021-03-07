@@ -12,6 +12,7 @@ require_once(__DIR__ . '/EndpointNameSpace.php');
 // APIs Endpoints to be registered
 require_once(__DIR__ . '/v1/User/Get.php');
 require_once(__DIR__ . '/v1/Accounts.php');
+require_once(__DIR__ . '/v1/Modules.php');
 
 require_once(dirname(__DIR__) . '/AuthenticationModule.php');
 
@@ -75,6 +76,7 @@ abstract class Endpoint {
 		if (\UserConfig::$apiNamespace) {
 			self::register(\UserConfig::$apiNamespace, 'GET', new \StartupAPI\API\v1\User\Get());
 			self::register(\UserConfig::$apiNamespace, 'GET', new \StartupAPI\API\v1\Accounts());
+			self::register(\UserConfig::$apiNamespace, 'GET', new \StartupAPI\API\v1\Modules());
 		}
 	}
 
