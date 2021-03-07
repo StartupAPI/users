@@ -110,7 +110,7 @@ function value($type, $value, $options = array()) {
 }
 
 /* Getting $config_variables from settings.inc file */
-require_once(__DIR__ . '/settings.inc');
+require_once(__DIR__ . '/settings.inc.php');
 
 $ADMIN_SECTION = 'systemsettings';
 require_once(__DIR__ . '/header.php');

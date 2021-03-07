@@ -206,7 +206,7 @@ class StartupAPI {
 	 * @returns array Returns global Twig template variables for the page
 	 */
 	public static function getTemplateInfo() {
-		require(dirname(__DIR__) . '/admin/settings.inc');
+		require(dirname(__DIR__) . '/admin/settings.inc.php');
 
 		// UserConfig
 		$config_info = array();
