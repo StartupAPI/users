@@ -362,6 +362,31 @@ $config_variables = array(
 						'description' => 'Amount of days email verification code is valid for',
 						'type' => 'days',
 						'name' => 'emailVerificationCodeExpiresInDays'
+					),
+					array(
+						'description' => 'SMTP host',
+						'type' => 'string',
+						'name' => 'SMTPHost'
+					),
+					array(
+						'description' => 'SMTP port',
+						'type' => 'string',
+						'name' => 'SMTPPort'
+					),
+					array(
+						'description' => 'SMTP User name',
+						'type' => 'string',
+						'name' => 'SMTPUserName'
+					),
+					array(
+						'description' => 'SMTP password',
+						'type' => 'secret',
+						'name' => 'SMTPPassword'
+					),
+					array(
+						'description' => 'SMTP Encryption',
+						'type' => 'string',
+						'name' => 'SMTPEncryption'
 					)
 				)
 			)

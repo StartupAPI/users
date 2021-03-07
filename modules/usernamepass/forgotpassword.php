@@ -32,7 +32,7 @@ if (array_key_exists('recover', $_POST)) {
 			$headers = $message->getHeaders();
 			$headers->addTextHeader('X-Mailer', UserConfig::$supportEmailXMailer);
 
-			UserConfig::$mailer->send($message);
+			UserConfig::getMailer()->send($message);
 		}
 
 		// We always report "sent" to avoid information disclosure

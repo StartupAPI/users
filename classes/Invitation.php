@@ -436,7 +436,7 @@ class Invitation {
 		$headers = $message->getHeaders();
 		$headers->addTextHeader('X-Mailer', UserConfig::$supportEmailXMailer);
 
-		UserConfig::$mailer->send($message);
+		UserConfig::getMailer()->send($message);
 	}
 
 	/**

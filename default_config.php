@@ -655,10 +655,46 @@ class UserConfig {
 	 *
 	 * ===================================================================== */
 
-   /**
-    * @var Swift_Mailer Transactional mailer object
-    */
+	/**
+     * @var string SMTP host
+     */
+	public static $SMTPHost = 'localhost';
+
+	/**
+     * @var int SMTP port
+     */
+	public static $SMTPPort = 25;
+
+	/**
+     * @var string User name for SMTP authentication
+     */
+	public static $SMTPUserName;
+
+	/**
+     * @var string Password for SMTP authentication
+     */
+	public static $SMTPPassword;
+
+	/**
+	 * Encryption method for Swiftmailer SMTP encryption
+	 * - 'ssl' for SMTPS - mandatory encryption with TLS)
+	 * - 'tls' best-effort encryption for SMTP using TLS
+	 * encryption will not be used if parameter is not set
+	 * (see https://swiftmailer.symfony.com/docs/sending.html#encrypted-smtp for mode details)
+     * @var string
+     */
+	public static $SMTPEncryption;
+
+	/**
+	 * @var Swift_Mailer Transactional mailer object
+	 * @deprecated do not access directly, use UserConfig::getMailer() function to get mailer object
+	 */
 	public static $mailer;
+
+	/**
+	 * @var Swift_Mailer Mailer singleton used in UserConfig::getMailer()
+	 */
+	private static $_mailer;
 
 	/**
 	 * @var string Name and email to send invitations from (e.g. 'User Support <support@example.com>')
@@ -1173,6 +1209,50 @@ EOD;
 	}
 
 	/**
+	 * Returns an instance of Swiftmailer
+	 *
+	 * @return Swift_mailer
+	 */
+	public static function getMailer() {
+		// using UserConfig::$mailer if set (for backwards compatibility)
+		if (self::$mailer){
+			self::$_mailer = self::$mailer;
+		}
+
+		// singleton patter - just use the object if it's alrady set
+		if (self::$_mailer) {
+			return self::$_mailer;
+		}
+
+		// Instantiating email transport
+		$smtp_transport = self::$SMTPEncryption
+			? new Swift_SmtpTransport(self::$SMTPHost, self::$SMTPPort, self::$SMTPEncryption)
+			: new Swift_SmtpTransport(self::$SMTPHost, self::$SMTPPort);
+
+		if (self::$SMTPUserName && self::$SMTPPassword) {
+			$smtp_transport->setUsername(self::$SMTPUserName)->setPassword(self::$SMTPPassword);
+		}
+
+		// instantiating mailer object
+		self::$_mailer = new Swift_Mailer($smtp_transport);
+
+		return self::$_mailer;
+	}
+
+	/**
+	 * Sets an instance of Swiftmailer
+	 *
+	 * @param Swift_mailer
+	 */
+	public static function setMailer($mailer) {
+		self::$_mailer = $mailer;
+
+		// setting old public UserConfig::$mailer object for backwards compatibility
+		// (some apps might be using it to send transactional emails in the app)
+		self::$mailer = $mailer;
+	}
+
+	/**
 	 * Initializing static variables *BEFORE* user overrides them.
 	 *
 	 * If any initialization needs to happen after user changes are done,
@@ -1207,9 +1287,6 @@ EOD;
 		self::$apiNamespace = new \StartupAPI\API\EndpointNameSpace(
 			'startupapi', 'StartupAPI', 'Startup API core endpoints'
 		);
-
-		// Instantiating email sending object
-		self::$mailer = Swift_Mailer::newInstance(Swift_MailTransport::newInstance());
 
 		// Built in activities
 
