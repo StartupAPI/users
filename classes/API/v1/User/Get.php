@@ -59,12 +59,30 @@ class Get extends \StartupAPI\API\AuthenticatedEndpoint {
 			}
 		}
 
-		// @TODO Implement general API serialization logic for all objects
-		return array(
+		$result = array(
 			'id' => $user->getID(),
 			'name' => $user->getName(),
-			'is_system_admin' => $user->isAdmin()
+			'is_system_admin' => $user->isAdmin(),
+			'is_email_verified' => $user->isEmailVerified()
 		);
+
+		// optional email
+		$email = $user->getEmail();
+		if ($email) {
+			$result['email'] = $email;
+		}
+
+		// optional username
+		$username = $user->getUsername();
+		if ($username) {
+			$result['username'] = $username;
+		}
+
+		if ($user->isImpersonated()) {
+			$result['impersonator'] = $user->getImpersonator()->getID();
+		}
+
+		return $result;
 	}
 
 }
