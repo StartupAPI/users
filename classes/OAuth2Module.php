@@ -923,7 +923,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	 *
 	 * Subclasses can override to add links to user profiles on destination sites, userpics and etc.
 	 *
-	 * @param array $serialized_userinfo Array of user info parameters from provider with "id" and "name" required
+	 * @param string $serialized_userinfo Serialized array of user info parameters from provider with "id" and "name" required
 	 *
 	 * @return string Rendered user information HTML
 	 */
@@ -1089,7 +1089,7 @@ abstract class OAuth2AuthenticationModule extends AuthenticationModule
 	 * This method allows requesting information on behalf of the user from a 3rd party provider.
 	 * Possibly the most important feature of the whole system.
 	 *
-	 * @param UserCredentials $credentials Credentials object representing OAuth2 user
+	 * @param OAuth2UserCredentials $credentials Credentials object representing OAuth2 user
 	 * @param string $request Request URL
 	 * @param string $method HTTP method (e.g. GET, POST, PUT, etc)
 	 * @param array $params Request parameters key->value array
