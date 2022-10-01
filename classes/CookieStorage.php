@@ -103,7 +103,7 @@ class MrClay_CookieStorage {
             return false;
         }
 
-        if (function_exists('openssl_encrypt')) {
+        if (function_exists('openssl_decrypt')) {
           $cipher = self::getOpenSSLCipher();
           $iv_len = openssl_cipher_iv_length($cipher);
           $iv = substr($data, 0, $iv_len);
