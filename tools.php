@@ -147,4 +147,73 @@ class UserTools {
 		}
 	}
 
+    public static function encrypt($str)
+    {
+		$key = UserConfig::$SESSION_SECRET;
+
+        if (function_exists('openssl_encrypt')) {
+          $cipher = self::getOpenSSLCipher();
+          $iv_len = openssl_cipher_iv_length($cipher);
+          $iv = openssl_random_pseudo_bytes($iv_len);
+          $data = openssl_encrypt($str, $cipher, $key, $options=OPENSSL_RAW_DATA, $iv);
+          $hmac = hash_hmac('sha256', $data, $key, $as_binary=true);
+          return base64_encode($iv.$hmac.$data);
+        } else {
+          $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
+          $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
+          $data = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, self::padkey($key, 256), $str, MCRYPT_MODE_ECB, $iv);
+          return base64_encode($data);
+        }
+
+    }
+
+    public static function decrypt($data)
+    {
+		$key = UserConfig::$SESSION_SECRET;
+
+        if (false === ($data = base64_decode($data))) {
+            return false;
+        }
+
+        if (function_exists('openssl_decrypt')) {
+          $cipher = self::getOpenSSLCipher();
+          $iv_len = openssl_cipher_iv_length($cipher);
+          $iv = substr($data, 0, $iv_len);
+          $hmac = substr($data, $iv_len, $sha2len=32);
+          $ciphertext_raw = substr($data, $iv_len+$sha2len);
+          $original_plaintext = openssl_decrypt($ciphertext_raw, $cipher, $key, $options=OPENSSL_RAW_DATA, $iv);
+          $calcmac = hash_hmac('sha256', $ciphertext_raw, $key, $as_binary=true);
+          if (hash_equals($hmac, $calcmac)) {
+            return $original_plaintext;
+          } else {
+            return null;
+          }
+        } else {
+          $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
+          $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
+          return mcrypt_decrypt(MCRYPT_RIJNDAEL_256, self::padkey($key, 256), $data, MCRYPT_MODE_ECB, $iv);
+        }
+    }
+
+	private static function getOpenSSLCipher() {
+		$ciphers = array_intersect(array(
+		  'AES-256-CTR',
+		  'AES-256-CFB',
+		  'AES-128-CFB',
+		), openssl_get_cipher_methods());
+  
+		if (empty($ciphers)) {
+		  throw new Exception('No usable ciphers available');
+		}
+  
+		return array_shift($ciphers);
+	  }
+
+	  private static function padkey($key, $bits = 256)
+	  {
+		  $keylen = round($bits / 8);
+		  $currlen = strlen($key);
+		  $newkey = (($currlen < $keylen) ? str_pad($key, $keylen, '0', STR_PAD_RIGHT) : substr($key, 0, $keylen));
+		  return $newkey;
+	  }  
 }
