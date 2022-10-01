@@ -62,7 +62,6 @@ $total = 0;
 
 require_once(__DIR__.'/header.php');
 ?>
-<script type='text/javascript' src='swfobject/swfobject/swfobject.js'></script>
 <script type='text/javascript' src='//www.google.com/jsapi'></script>
 <script type='text/javascript'>
 google.load('visualization', '1', {'packages':['annotatedtimeline', 'corechart']});
@@ -123,19 +122,10 @@ google.setOnLoadCallback(function() {
 	];
 
 	data.addRows(daily);
-	if (swfobject.hasFlashPlayerVersion("5")) {
-		var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
-		chart.draw(data, {
-			displayAnnotations: true,
-			scaleColumns: [0, 1],
-			scaleType: 'allmaximized'
-		});
-	} else {
-		var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-		chart.draw(data, {
-			legend: 'top'
-		});
-	}
+	var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+	chart.draw(data, {
+		legend: 'top'
+	});
 });
 </script>
 <div class="span9">

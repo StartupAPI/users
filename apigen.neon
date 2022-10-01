@@ -6,7 +6,6 @@ exclude:
 	- */oauth-php/*
 	- */modules/facebook/facebook-php-sdk/*
 	- */dbupgrade/*
-	- */admin/swfobject/*
 	- */docs/*
 	- */twig/*
 	- */phptidy/*

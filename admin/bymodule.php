@@ -4,7 +4,6 @@ require_once(__DIR__.'/admin.php');
 $ADMIN_SECTION = 'bymodule';
 require_once(__DIR__.'/header.php');
 ?>
-<script type='text/javascript' src='swfobject/swfobject/swfobject.js'></script>
 <script type='text/javascript' src='//www.google.com/jsapi'></script>
 <script type='text/javascript'>
 google.load('visualization', '1', {'packages':['annotatedtimeline', 'corechart']});
@@ -59,22 +58,11 @@ google.setOnLoadCallback(function() {
 	];
 
 	data.addRows(daily);
-
-	data.addRows(daily);
-	if (swfobject.hasFlashPlayerVersion("5")) {
-		var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
-		chart.draw(data, {
-			displayAnnotations: true,
-			colors: <?php echo json_encode($colors) ?>
-		});
-	}
-	else {
-		var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-		chart.draw(data, {
-			legend: 'top',
-			colors: <?php echo json_encode($colors) ?>
-		});
-	}
+	var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+	chart.draw(data, {
+		legend: 'top',
+		colors: <?php echo json_encode($colors) ?>
+	});
 });
 </script>
 <div class="span9">

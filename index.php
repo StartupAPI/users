@@ -36,17 +36,6 @@ $submodules = array(
 		'ready' => true
 	),
 	array(
-		'path' => __DIR__ . '/admin/swfobject/',
-		'file' => __DIR__ . '/admin/swfobject/swfobject/swfobject.js',
-		'name' => 'SWF Object Flash insertion script',
-		'description' => 'SWFObject is a free, open-source tool for embedding swf content in websites. Used for Flash fallback detection in admin UI.',
-		'git-repo' => 'git://github.com/swfobject/swfobject.git',
-		'github-user' => 'swfobject',
-		'github-repo' => 'swfobject',
-		'url' => 'https://github.com/swfobject/swfobject',
-		'ready' => true
-	),
-	array(
 		'path' => __DIR__ . '/dbupgrade/',
 		'file' => __DIR__ . '/dbupgrade/lib.php',
 		'name' => 'DBUpgrade library',

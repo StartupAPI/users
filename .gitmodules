@@ -1,36 +1,33 @@
 [submodule "oauth-php"]
 	path = oauth-php
-	url = git://github.com/sergeychernyshev/oauth-php.git
-[submodule "admin/swfobject"]
-	path = admin/swfobject
-	url = git://github.com/swfobject/swfobject.git
+	url = https://github.com/sergeychernyshev/oauth-php.git
 [submodule "dbupgrade"]
 	path = dbupgrade
-	url = git://github.com/sergeychernyshev/DBUpgrade.git
+	url = https://github.com/sergeychernyshev/DBUpgrade.git
 [submodule "twig"]
 	path = twig
-	url = git://github.com/fabpot/Twig.git
+	url = https://github.com/fabpot/Twig.git
 [submodule "trunk8"]
 	path = trunk8
-	url = git://github.com/rviscomi/trunk8.git
+	url = https://github.com/rviscomi/trunk8.git
 [submodule "masonry"]
 	path = masonry
-	url = git://github.com/desandro/masonry.git
+	url = https://github.com/desandro/masonry.git
 [submodule "calendarview"]
 	path = calendarview
-	url = git://github.com/jsmecham/CalendarView.git
+	url = https://github.com/jsmecham/CalendarView.git
 [submodule "php-bootstrap"]
 	path = php-bootstrap
-	url = git://github.com/sergeychernyshev/php-bootstrap.git
+	url = https://github.com/sergeychernyshev/php-bootstrap.git
 [submodule "bootswatch"]
 	path = bootswatch
-	url = git://github.com/thomaspark/bootswatch.git
+	url = https://github.com/thomaspark/bootswatch.git
 [submodule "imagesloaded"]
 	path = imagesloaded
-	url = git://github.com/desandro/imagesloaded.git
+	url = https://github.com/desandro/imagesloaded.git
 [submodule "swiftmailer"]
 	path = swiftmailer
-	url = git://github.com/swiftmailer/swiftmailer.git
+	url = https://github.com/swiftmailer/swiftmailer.git
 [submodule "phptidy"]
 	path = phptidy
 	url = https://github.com/cmrcx/phptidy.git
