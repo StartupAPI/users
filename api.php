@@ -69,6 +69,8 @@ if (!array_key_exists('call', $_GET) && array_key_exists('swagger-spec', $_GET))
 					if ($param->allowsMultipleValues()) {
 						$param_spec['type'] = 'array';
 						$param_spec['collectionFormat'] = 'multi';
+					} else {
+						$param_spec['type'] = $param->getType();
 					}
 					$operation['parameters'][] = $param_spec;
 				}

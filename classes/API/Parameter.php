@@ -63,6 +63,21 @@ class Parameter {
 	}
 
 	/**
+	 * @return string Parameter type
+	 */
+	public function getType() {
+		if (is_numeric($this->sample_value)) {
+			return 'number';
+		} else if (is_bool($this->sample_value)) {
+			return 'boolean';
+		} else if (is_int($this->sample_value)) {
+			return 'integer';
+		}
+
+		return 'string';
+	}
+
+	/**
 	 * @return boolean Returns true if parameter is optional
 	 */
 	public function isOptional() {
