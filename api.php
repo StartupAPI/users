@@ -2,28 +2,32 @@
 require_once(__DIR__ . '/global.php');
 
 if (!array_key_exists('call', $_GET) && array_key_exists('swagger-spec', $_GET)) {
-	$swagger_spec = array(
-		'swagger' => '2.0',
+	$openapi_spec = array(
+		'openapi' => '3.1.0',
 		'info' => array(
 			'contact' => array(
 				'email' => UserConfig::$supportEmailFromEmail
 			),
 			'version' => UserConfig::$apiSpecVersion
 		),
-		'basePath' => UserConfig::$USERSROOTURL . '/api.php'
+		'servers' => array(
+			array(
+				"url" => UserConfig::$USERSROOTURL . '/api.php'
+			)
+		)
 	);
 
 	if (UserConfig::$appName) {
-		$swagger_spec['info']['title'] = UserConfig::$appName;
+		$openapi_spec['info']['title'] = UserConfig::$appName . " API";
 	}
 
 	if (UserConfig::$termsOfServiceFullURL) {
-		$swagger_spec['info']['termsOfService'] = UserConfig::$termsOfServiceFullURL;
+		$openapi_spec['info']['termsOfService'] = UserConfig::$termsOfServiceFullURL;
 	}
 
 	// Swagger tags, e.g. API namespaces
 	foreach (\StartupAPI\API\Endpoint::getNamespaces() as $namespace) {
-		$swagger_spec['tags'][] = array(
+		$openapi_spec['tags'][] = array(
 			'name' => $namespace->getSlug(),
 			'description' => $namespace->getName()
 		);
@@ -43,39 +47,65 @@ if (!array_key_exists('call', $_GET) && array_key_exists('swagger-spec', $_GET))
 					'operationId' => get_class($endpoint),
 					'responses' => array(
 						'200' => array(
-							'description' => 'success'
+							'description' => 'success',
+							'content' => array(
+								'application/json' => array(
+									'schema' => array(
+										'type' => 'object'
+									)
+								)
+							)
 						),
 						'400' => array(
 							'description' => 'invalid input'
 						)
-					)
+					),
 				);
 
-				$params = $endpoint->getParams();
+				$request_body_properties = array();
+				$query_parameters = array();
 
+				$params = $endpoint->getParams();
 				foreach ($params as $name => $param) {
-					$param_spec = array(
+					$property = array(
 						'name' => $name,
 						'description' => $param->getDescription(),
 						'required' => !$param->isOptional()
 					);
 
 					if ($method === 'GET') {
-						$param_spec['in'] = 'query';
+						$property['in'] = 'query';
+						$property['schema'] = array(
+							'type' => $param->getType()
+						);
+						$query_parameters[] = $property;
 					} else {
-						$param_spec['in'] = 'formData';
+						if ($param->allowsMultipleValues()) {
+							$property['type'] = 'array';
+							// $param_spec['collectionFormat'] = 'multi';
+						} else {
+							$property['type'] = $param->getType();
+						}
+						$request_body_properties[$name] = $property;
 					}
-
-					if ($param->allowsMultipleValues()) {
-						$param_spec['type'] = 'array';
-						$param_spec['collectionFormat'] = 'multi';
-					} else {
-						$param_spec['type'] = $param->getType();
-					}
-					$operation['parameters'][] = $param_spec;
 				}
 
-				$swagger_spec['paths']
+				if ($method === 'GET') {
+					$operation["parameters"] = $query_parameters;
+				} else {
+					$operation["requestBody"] = array (
+						'content' => array(
+							"application/x-www-form-urlencoded" => array(
+								'schema' => array(
+									"type" => "object",
+									"properties" => $request_body_properties
+								)
+							)
+						)
+					);
+				}
+
+				$openapi_spec['paths']
 					["/api.php?call=/$namespace_slug$endpoint_slug"]
 						[strtolower($method)] = $operation;
 			}
@@ -83,7 +113,7 @@ if (!array_key_exists('call', $_GET) && array_key_exists('swagger-spec', $_GET))
 	}
 
 	header('Content-type: application/json');
-	echo json_encode($swagger_spec);
+	echo json_encode($openapi_spec);
 
 	if (json_last_error() !== JSON_ERROR_NONE) {
 		header('HTTP/1.1 400 Bad Request');

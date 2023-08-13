@@ -10,7 +10,7 @@
 </div>
 
 <script src="{{ UserConfig.USERSROOTURL }}/swagger-ui/dist/swagger-ui-bundle.js"></script>
-<script src="{{ UserConfig.USERSROOTURL }}/swagger-ui/dist/swagger-ui-standalone-preset.js"></script>
+<script src="{{ UserConfig.USERSROOTURL }}/swagger-ui/dist/swagger-initializer.js"></script>
 
 <script>
 window.onload = function() {
@@ -21,14 +21,9 @@ window.onload = function() {
     deepLinking: true,
     presets: [
       SwaggerUIBundle.presets.apis,
-      SwaggerUIStandalonePreset
     ],
-    plugins: [
-      SwaggerUIBundle.plugins.DownloadUrl
-    ],
-    layout: "StandaloneLayout",
-    requestInterceptor: function(a) {
-      this.headers['X-CSRF-token'] = "not a real token, but a placeholder";
+    requestInterceptor: (request) => {
+      request.headers['X-CSRF-token'] = "not a real token, but a placeholder";
     }
   })
 
