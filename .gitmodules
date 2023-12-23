@@ -27,7 +27,7 @@
 	url = https://github.com/desandro/imagesloaded.git
 [submodule "swiftmailer"]
 	path = swiftmailer
-	url = https://github.com/swiftmailer/swiftmailer.git
+	url = https://github.com/sergeychernyshev/swiftmailer.git
 [submodule "phptidy"]
 	path = phptidy
 	url = https://github.com/cmrcx/phptidy.git
